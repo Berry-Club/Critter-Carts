@@ -69,6 +69,10 @@ class ScoochwormSegments(
 		return segments.getOrNull(partIndex)?.container
 	}
 
+	fun getBodyPart(partIndex: Int): ScoochwormPartEntity? {
+		return bodyParts.getOrNull(partIndex)
+	}
+
 	fun update(path: ScoochwormPath) {
 		ensureBodyParts(path)
 

@@ -90,6 +90,9 @@ class ScoochwormEntity(
 		val removeAttachmentResult = tryRemoveAttachment(player, heldStack, partIndex)
 		if (removeAttachmentResult != null) return removeAttachmentResult
 
+		val rideResult = tryRide(player, partIndex)
+		if (rideResult != null) return rideResult
+
 		val openChestResult = tryOpenChest(player, partIndex)
 		if (openChestResult != null) return openChestResult
 
@@ -185,6 +188,21 @@ class ScoochwormEntity(
 
 			playSound(SoundEvents.ITEM_FRAME_REMOVE_ITEM, 1f, 1f)
 			gameEvent(GameEvent.UNEQUIP, player)
+		}
+
+		return InteractionResult.sidedSuccess(isClientSide)
+	}
+
+	private fun tryRide(
+		player: Player,
+		partIndex: Int?
+	): InteractionResult? {
+		if (partIndex == null || player.isShiftKeyDown) return null
+		if (bodySegments.getAttachment(partIndex) != ScoochwormPartAttachment.SADDLE) return null
+
+		if (isServerSide) {
+			val bodyPart = bodySegments.getBodyPart(partIndex) ?: return null
+			if (!player.startRiding(bodyPart)) return null
 		}
 
 		return InteractionResult.sidedSuccess(isClientSide)
