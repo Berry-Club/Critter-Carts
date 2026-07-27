@@ -29,10 +29,12 @@ class ScoochwormPartEntity(
 
 	private val animatableInstanceCache = SingletonAnimatableInstanceCache(this)
 	private var missingParentTicks = 0
-	private var interpolationSteps = 0
-	private var interpolationPosition = Vec3.ZERO
-	private var interpolationYaw = 0f
-	private var interpolationPitch = 0f
+	private var lerpSteps = 0
+	private var lerpX = 0.0
+	private var lerpY = 0.0
+	private var lerpZ = 0.0
+	private var lerpYRot = 0.0
+	private var lerpXRot = 0.0
 
 	init {
 		noPhysics = true
@@ -115,20 +117,26 @@ class ScoochwormPartEntity(
 		xRot: Float,
 		lerpSteps: Int
 	) {
-		interpolationPosition = Vec3(x, y, z)
-		interpolationYaw = yRot
-		interpolationPitch = xRot
-		interpolationSteps = lerpSteps
+		lerpX = x
+		lerpY = y
+		lerpZ = z
+		lerpYRot = yRot.toDouble()
+		lerpXRot = xRot.toDouble()
+		this.lerpSteps = lerpSteps
 	}
 
 	private fun tickInterpolation() {
-		if (interpolationSteps <= 0) return
+		if (lerpSteps <= 0) return
 
-		val progress = 1.0 / interpolationSteps
-		setPos(position().lerp(interpolationPosition, progress))
-		yRot += Mth.wrapDegrees(interpolationYaw - yRot) / interpolationSteps
-		xRot += (interpolationPitch - xRot) / interpolationSteps
-		interpolationSteps--
+		val x = x + (lerpX - x) / lerpSteps
+		val y = y + (lerpY - y) / lerpSteps
+		val z = z + (lerpZ - z) / lerpSteps
+
+		yRot += Mth.wrapDegrees(lerpYRot - yRot).toFloat() / lerpSteps
+		xRot += ((lerpXRot - xRot) / lerpSteps).toFloat()
+
+		lerpSteps--
+		setPos(x, y, z)
 	}
 
 	// Collision

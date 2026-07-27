@@ -27,7 +27,7 @@ object ModEntityTypes {
 			EntityType.Builder.of(::ScoochwormPartEntity, MobCategory.MISC)
 				.sized(ScoochwormEntity.SIZE, ScoochwormEntity.SIZE)
 				.clientTrackingRange(10)
-				.updateInterval(1)
+				.updateInterval(3)
 				.build("scoochworm_part")
 		})
 }
