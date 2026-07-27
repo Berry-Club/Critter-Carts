@@ -65,6 +65,15 @@ class ScoochwormEntity(
 		bodySegments.discard()
 	}
 
+	override fun dropEquipment() {
+		super.dropEquipment()
+
+		val attachmentItems = bodySegments.takeAllAttachmentItems()
+		for (attachmentItem in attachmentItems) {
+			spawnAtLocation(attachmentItem)
+		}
+	}
+
 	// Interaction
 
 	override fun mobInteract(player: Player, hand: InteractionHand): InteractionResult {
@@ -123,7 +132,10 @@ class ScoochwormEntity(
 		if (!heldStack.isItem(Items.SHEARS) || !bodySegments.contains(partIndex)) return null
 
 		if (isServerSide) {
-			bodySegments.removeFrom(partIndex)
+			val attachmentItems = bodySegments.removeFrom(partIndex)
+			for (attachmentItem in attachmentItems) {
+				spawnAtLocation(attachmentItem)
+			}
 
 			val equipmentSlot = hand.getEquipmentSlot()
 			heldStack.hurtAndBreak(1, player, equipmentSlot)
