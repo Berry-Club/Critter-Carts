@@ -16,14 +16,19 @@ object ModEntityDataSerializers {
 			CritterCarts.MOD_ID
 		)
 
-	val SCOOCHWORM_PART_ATTACHMENT:
-			DeferredHolder<EntityDataSerializer<*>, EntityDataSerializer<ScoochwormPartAttachment>> =
-		ENTITY_DATA_SERIALIZER_REGISTRY.register(
+	val SCOOCHWORM_PART_ATTACHMENT: DeferredHolder<EntityDataSerializer<*>, EntityDataSerializer<ScoochwormPartAttachment>> =
+		register(
 			"scoochworm_part_attachment",
-			Supplier {
-				EntityDataSerializer.forValueType(
-					ScoochwormPartAttachment.STREAM_CODEC
-				)
-			}
+			EntityDataSerializer.forValueType(
+				ScoochwormPartAttachment.STREAM_CODEC
+			)
 		)
+
+	private fun <T : EntityDataSerializer<*>> register(
+		name: String,
+		serializer: T
+	): DeferredHolder<EntityDataSerializer<*>, T> {
+		return ENTITY_DATA_SERIALIZER_REGISTRY.register(name, Supplier { serializer })
+	}
+
 }
