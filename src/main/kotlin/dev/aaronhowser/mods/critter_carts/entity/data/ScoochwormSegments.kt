@@ -14,14 +14,11 @@ class ScoochwormSegments(
 	private val segments: MutableList<ScoochwormSegment> = mutableListOf(ScoochwormSegment())
 	private val bodyParts: MutableList<ScoochwormPartEntity> = mutableListOf()
 
-	val count: Int
-		get() = segments.size
-
 	val canGrow: Boolean
-		get() = count < MAX_COUNT
+		get() = segments.size < MAX_COUNT
 
 	fun contains(partIndex: Int): Boolean {
-		return partIndex in 0 until count
+		return partIndex in segments.indices
 	}
 
 	fun grow() {
@@ -41,7 +38,7 @@ class ScoochwormSegments(
 			segment.dropAttachmentItem(bodyPart)
 		}
 
-		while (bodyParts.size > count) {
+		while (bodyParts.size > segments.size) {
 			bodyParts.removeLast().discard()
 		}
 	}
@@ -54,18 +51,13 @@ class ScoochwormSegments(
 		}
 	}
 
-	fun getAttachment(partIndex: Int): ScoochwormPartAttachment? {
-		return segments.getOrNull(partIndex)?.attachment
-	}
-
 	fun setAttachmentItem(
 		partIndex: Int,
 		attachmentItem: ItemStack
-	): Boolean {
-		val segment = segments.getOrNull(partIndex) ?: return false
+	) {
+		val segment = segments.getOrNull(partIndex) ?: return
 		segment.equipAttachmentItem(attachmentItem)
 		bodyParts.getOrNull(partIndex)?.attachment = segment.attachment
-		return true
 	}
 
 	fun removeAttachmentItem(partIndex: Int): ItemStack {
@@ -131,7 +123,7 @@ class ScoochwormSegments(
 			discard()
 		}
 
-		while (bodyParts.size < count) {
+		while (bodyParts.size < segments.size) {
 			createPart(path)
 		}
 	}
