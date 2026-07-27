@@ -31,7 +31,9 @@ class ScoochwormSegments(
 	fun removeFrom(partIndex: Int) {
 		if (!contains(partIndex)) return
 
-		while (segments.size > partIndex) {
+		val remainingCount = partIndex.coerceAtLeast(MIN_COUNT)
+
+		while (segments.size > remainingCount) {
 			segments.removeLast()
 		}
 
@@ -82,12 +84,16 @@ class ScoochwormSegments(
 				ScoochwormSegment.load(tag.getCompound(index))
 			)
 		}
+
+		if (segments.isEmpty()) {
+			segments.add(ScoochwormSegment())
+		}
 	}
 
 	fun restoreLegacyCount(segmentCount: Int) {
 		segments.clear()
 
-		repeat(segmentCount.coerceIn(0, MAX_COUNT)) {
+		for (i in 0 until segmentCount.coerceIn(MIN_COUNT, MAX_COUNT)) {
 			segments.add(ScoochwormSegment())
 		}
 	}
@@ -142,6 +148,7 @@ class ScoochwormSegments(
 	}
 
 	companion object {
-		const val MAX_COUNT = 8
+		private const val MIN_COUNT = 1
+		const val MAX_COUNT = 16
 	}
 }
