@@ -1,0 +1,276 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.slf4j.event.Level
+
+import java.time.Instant
+
+plugins {
+	id 'java-library'
+	id 'idea'
+	id 'maven-publish'
+	id 'net.neoforged.moddev' version '2.0.124'
+	id 'org.jetbrains.kotlin.jvm' version '2.1.21'
+	id 'me.modmuss50.mod-publish-plugin' version '2.1.1'
+	id 'org.moddedmc.wiki.toolkit' version '0.3.2'
+}
+
+def environment = System.getenv()
+def isLocal = !environment.containsKey('GITHUB_RUN_NUMBER')
+def archiveName = "${mod_id.replace('_', '-')}-${minecraft_version}"
+
+version = "${mod_version}-${isLocal ? "local.${Instant.now().epochSecond}" : "build.${environment.GITHUB_RUN_NUMBER}"}"
+group = mod_group_id
+base.archivesName = archiveName
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+compileKotlin.compilerOptions.jvmTarget = JvmTarget.JVM_21
+
+neoForge {
+	enable {
+		version = neo_version
+		validateAccessTransformers = environment.CI != 'true'
+		disableRecompilation = environment.CI == 'true'
+
+		accessTransformers {
+			publish(project.file('src/main/resources/META-INF/accesstransformer.cfg'))
+		}
+	}
+
+	parchment {
+		mappingsVersion = project.parchment_mappings_version
+		minecraftVersion = project.parchment_minecraft_version
+	}
+
+	runs {
+		configureEach {
+			systemProperty 'forge.logging.markers', 'REGISTRIES'
+			logLevel = Level.DEBUG
+		}
+
+		'Client-One' {
+			client()
+			ideName = 'Client One'
+			systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+			gameDirectory = file 'runs/client'
+
+			if (environment.MC_CLIENT_ARGS) {
+				programArguments.addAll(environment.MC_CLIENT_ARGS.split(' '))
+			}
+		}
+
+		'Client-Two' {
+			client()
+			ideName = 'Client Two'
+			systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+			gameDirectory = file 'runs/client'
+
+			if (environment.MC_CLIENT_2_ARGS) {
+				programArguments.addAll(environment.MC_CLIENT_2_ARGS.split(' '))
+			}
+		}
+
+		server {
+			server()
+			ideName = 'Server'
+			programArgument '--nogui'
+			systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+			gameDirectory = file 'runs/server'
+		}
+
+		gameTestServer {
+			type = 'gameTestServer'
+			systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+		}
+
+		data {
+			data()
+			programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').absolutePath, '--existing', file('src/main/resources/').absolutePath
+			gameDirectory = file 'runs/client'
+		}
+
+		'Wiki-Export-Client' {
+			client()
+			ideName = 'Wiki Export Client'
+			gameDirectory = file 'runs/wiki_exporter'
+			systemProperty 'wiki_exporter.enabled', 'true'
+		}
+	}
+
+	mods {
+		"${mod_id}" {
+			sourceSet(sourceSets.main)
+		}
+	}
+}
+
+sourceSets.main.resources { srcDir 'src/generated/resources' }
+
+configurations {
+	runtimeClasspath.extendsFrom localRuntime
+}
+
+repositories {
+	mavenLocal()
+
+	maven {
+		name = 'Kotlin for Forge'
+		url = 'https://thedarkcolour.github.io/KotlinForForge/'
+	}
+
+	maven {
+		name = 'TerraformersMC'
+		url = 'https://maven.terraformersmc.com/releases/'
+	}
+
+	maven {
+		name = 'Illusive Soulworks'
+		url = 'https://maven.theillusivec4.top/'
+	}
+
+	maven {
+		url = 'https://dl.cloudsmith.io/public/klikli-dev/mods/maven/'
+		content {
+			includeGroup 'com.klikli_dev'
+		}
+	}
+
+	maven {
+		url = 'https://maven.latvian.dev/releases'
+		content {
+			includeGroup 'dev.aaronhowser.mods'
+		}
+	}
+
+	maven {
+		url = 'https://maven.sinytra.org'
+	}
+
+	maven {
+		name = "Jared's maven"
+		url = 'https://maven.blamejared.com/'
+	}
+}
+
+dependencies {
+	implementation "thedarkcolour:kotlinforforge-neoforge:${kff_version}"
+	implementation "dev.aaronhowser.mods:aaron-1.21.1:${aaron_lib_version}"
+
+	compileOnly "mezz.jei:jei-1.21.1-neoforge-api:${jei_version}"
+	runtimeOnly "mezz.jei:jei-1.21.1-neoforge:${jei_version}"
+
+	compileOnly "top.theillusivec4.curios:curios-neoforge:${curios_version}:api"
+	runtimeOnly "top.theillusivec4.curios:curios-neoforge:${curios_version}"
+
+	runtimeOnly 'org.sinytra:wiki-exporter-neoforge:2.2.1+1.21.1'
+}
+
+tasks.withType(ProcessResources).configureEach {
+	def replaceProperties = [
+		minecraft_version       : minecraft_version,
+		minecraft_version_range : minecraft_version_range,
+		neo_version             : neo_version,
+		neo_version_range       : neo_version_range,
+		loader_version_range    : loader_version_range,
+		mod_id                  : mod_id,
+		mod_name                : mod_name,
+		mod_license             : mod_license,
+		mod_version             : mod_version,
+		mod_authors             : mod_authors,
+		mod_description         : mod_description,
+		curios_version_range    : curios_version_range,
+		kff_version_range       : kff_version_range,
+		aaron_lib_version_range : aaron_lib_version_range
+	]
+	inputs.properties replaceProperties
+
+	filesMatching('META-INF/neoforge.mods.toml') {
+		expand replaceProperties
+	}
+}
+
+tasks.withType(JavaCompile).configureEach {
+	options.encoding = 'UTF-8'
+}
+
+idea {
+	module {
+		downloadSources = true
+		downloadJavadoc = true
+	}
+}
+
+java {
+	withSourcesJar()
+	withJavadocJar()
+}
+
+publishing {
+	publications {
+		mavenNeoForge(MavenPublication) {
+			artifactId = archiveName
+			from components.java
+		}
+	}
+
+	repositories {
+		if (environment.MAVEN_URL && environment.MAVEN_USERNAME && environment.MAVEN_TOKEN) {
+			maven {
+				url = environment.MAVEN_URL
+				credentials {
+					username = environment.MAVEN_USERNAME
+					password = environment.MAVEN_TOKEN
+				}
+			}
+		}
+	}
+}
+
+publishMods {
+	file = jar.archiveFile
+	displayName = "Critter Carts ${project.minecraft_version} ${project.version}"
+	changelog = providers.fileContents(layout.projectDirectory.file('CHANGELOG.md')).asText
+	modLoaders.add('neoforge')
+
+	type = environment.RELEASE_TYPE == 'beta'
+		? BETA
+		: environment.RELEASE_TYPE == 'alpha' ? ALPHA : STABLE
+
+	if (environment.CURSEFORGE_KEY && project.curseforge_id) {
+		curseforge {
+			accessToken = providers.environmentVariable('CURSEFORGE_KEY')
+			projectId = project.curseforge_id
+			minecraftVersions.add(project.minecraft_version)
+			client = true
+			server = true
+			requires('kotlin-for-forge')
+			requires('curios')
+			requires('aaron')
+		}
+	}
+
+	if (environment.MODRINTH_TOKEN && project.modrinth_id) {
+		modrinth {
+			accessToken = providers.environmentVariable('MODRINTH_TOKEN')
+			projectId = project.modrinth_id
+			minecraftVersions.add(project.minecraft_version)
+			requires('kotlin-for-forge')
+			requires('curios')
+			requires('aaron')
+		}
+	}
+}
+
+wiki {
+	wikiAccessToken = environment.MODDED_MC_WIKI_TOKEN
+
+	docs {
+		critter_carts {
+			root = file('docs/critter_carts')
+		}
+	}
+}
+
+tasks.named('processResources') {
+	from("$rootDir/docs") {
+		into 'assets/oracle_index/books'
+	}
+}
