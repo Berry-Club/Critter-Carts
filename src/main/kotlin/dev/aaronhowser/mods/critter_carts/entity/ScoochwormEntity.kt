@@ -117,21 +117,29 @@ class ScoochwormEntity(
 
 		movementPath.clear()
 
-		val segmentCount = if (tag.contains(SEGMENT_COUNT_TAG, Tag.TAG_INT.toInt())) {
-			tag.getInt(SEGMENT_COUNT_TAG)
+		if (tag.contains(SEGMENTS_TAG, Tag.TAG_LIST.toInt())) {
+			bodySegments.load(
+				tag.getList(SEGMENTS_TAG, Tag.TAG_COMPOUND.toInt())
+			)
+		} else if (tag.contains(SEGMENT_COUNT_TAG, Tag.TAG_INT.toInt())) {
+			bodySegments.restoreLegacyCount(
+				tag.getInt(SEGMENT_COUNT_TAG)
+			)
 		} else if (tag.contains(LEGACY_SEGMENT_POSITIONS_TAG, Tag.TAG_LIST.toInt())) {
-			tag.getList(LEGACY_SEGMENT_POSITIONS_TAG, Tag.TAG_COMPOUND.toInt())
-				.size
+			bodySegments.restoreLegacyCount(
+				tag.getList(
+					LEGACY_SEGMENT_POSITIONS_TAG,
+					Tag.TAG_COMPOUND.toInt()
+				).size
+			)
 		} else {
-			1
+			bodySegments.restoreLegacyCount(1)
 		}
-
-		bodySegments.restoreCount(segmentCount)
 	}
 
 	override fun addAdditionalSaveData(tag: CompoundTag) {
 		super.addAdditionalSaveData(tag)
-		tag.putInt(SEGMENT_COUNT_TAG, bodySegments.count)
+		tag.put(SEGMENTS_TAG, bodySegments.save())
 	}
 
 	// Animation
@@ -145,6 +153,7 @@ class ScoochwormEntity(
 		const val SIZE = 14f / 16f
 		const val PART_SPACING = SIZE * 1.2
 
+		private const val SEGMENTS_TAG = "Segments"
 		private const val SEGMENT_COUNT_TAG = "SegmentCount"
 		private const val LEGACY_SEGMENT_POSITIONS_TAG = "SegmentPositions"
 

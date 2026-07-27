@@ -1,15 +1,19 @@
 package dev.aaronhowser.mods.critter_carts.entity
 
 import dev.aaronhowser.mods.critter_carts.registry.ModEntityTypes
+import net.minecraft.nbt.ListTag
 
 class ScoochwormSegments(
 	private val scoochworm: ScoochwormEntity
 ) {
 
+	private val segments: MutableList<ScoochwormSegment> = mutableListOf(
+		ScoochwormSegment()
+	)
 	private val bodyParts: MutableList<ScoochwormPartEntity> = mutableListOf()
 
-	var count = 1
-		private set
+	val count: Int
+		get() = segments.size
 
 	val canGrow: Boolean
 		get() = count < MAX_COUNT
@@ -20,18 +24,34 @@ class ScoochwormSegments(
 
 	fun grow() {
 		if (canGrow) {
-			count++
+			segments.add(ScoochwormSegment())
 		}
 	}
 
 	fun removeFrom(partIndex: Int) {
 		if (!contains(partIndex)) return
 
-		count = partIndex
+		while (segments.size > partIndex) {
+			segments.removeLast()
+		}
 
 		while (bodyParts.size > count) {
 			bodyParts.removeLast().discard()
 		}
+	}
+
+	fun getAttachment(partIndex: Int): ScoochwormPartAttachment? {
+		return segments.getOrNull(partIndex)?.attachment
+	}
+
+	fun setAttachment(
+		partIndex: Int,
+		attachment: ScoochwormPartAttachment
+	): Boolean {
+		val segment = segments.getOrNull(partIndex) ?: return false
+		segment.attachment = attachment
+		bodyParts.getOrNull(partIndex)?.setAttachment(attachment)
+		return true
 	}
 
 	fun update(path: ScoochwormPath) {
@@ -44,8 +64,32 @@ class ScoochwormSegments(
 		}
 	}
 
-	fun restoreCount(segmentCount: Int) {
-		count = segmentCount.coerceIn(0, MAX_COUNT)
+	fun save(): ListTag {
+		val tag = ListTag()
+
+		for (segment in segments) {
+			tag.add(segment.save())
+		}
+
+		return tag
+	}
+
+	fun load(tag: ListTag) {
+		segments.clear()
+
+		for (index in 0 until minOf(tag.size, MAX_COUNT)) {
+			segments.add(
+				ScoochwormSegment.load(tag.getCompound(index))
+			)
+		}
+	}
+
+	fun restoreLegacyCount(segmentCount: Int) {
+		segments.clear()
+
+		repeat(segmentCount.coerceIn(0, MAX_COUNT)) {
+			segments.add(ScoochwormSegment())
+		}
 	}
 
 	fun discard() {
@@ -72,10 +116,15 @@ class ScoochwormSegments(
 			ModEntityTypes.SCOOCHWORM_PART.get(),
 			scoochworm.level()
 		)
+		val segment = segments[partIndex]
 
 		val partPosition = path.getPosition(getPartDistance(partIndex))
 
-		bodyPart.attachTo(scoochworm, partIndex)
+		bodyPart.attachTo(
+			scoochworm,
+			partIndex,
+			segment.attachment
+		)
 		bodyPart.moveTo(
 			partPosition.x,
 			partPosition.y,

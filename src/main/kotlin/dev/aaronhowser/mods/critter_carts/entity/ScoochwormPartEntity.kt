@@ -42,9 +42,23 @@ class ScoochwormPartEntity(
 		return level().getEntity(entityData.get(DATA_PARENT_ID)) as? ScoochwormEntity
 	}
 
-	fun attachTo(parentEntity: ScoochwormEntity, partIndex: Int) {
+	val attachment: ScoochwormPartAttachment
+		get() = ScoochwormPartAttachment.fromNetworkId(
+			entityData.get(DATA_ATTACHMENT)
+		)
+
+	fun attachTo(
+		parentEntity: ScoochwormEntity,
+		partIndex: Int,
+		attachment: ScoochwormPartAttachment
+	) {
 		entityData.set(DATA_PARENT_ID, parentEntity.id)
 		entityData.set(DATA_PART_INDEX, partIndex)
+		setAttachment(attachment)
+	}
+
+	fun setAttachment(attachment: ScoochwormPartAttachment) {
+		entityData.set(DATA_ATTACHMENT, attachment.ordinal)
 	}
 
 	// Movement
@@ -133,6 +147,7 @@ class ScoochwormPartEntity(
 	override fun defineSynchedData(builder: SynchedEntityData.Builder) {
 		builder.define(DATA_PARENT_ID, NO_PARENT)
 		builder.define(DATA_PART_INDEX, 0)
+		builder.define(DATA_ATTACHMENT, ScoochwormPartAttachment.NONE.ordinal)
 	}
 
 	override fun readAdditionalSaveData(tag: CompoundTag) {}
@@ -155,6 +170,9 @@ class ScoochwormPartEntity(
 			SynchedEntityData.defineId(ScoochwormPartEntity::class.java, EntityDataSerializers.INT)
 
 		private val DATA_PART_INDEX: EntityDataAccessor<Int> =
+			SynchedEntityData.defineId(ScoochwormPartEntity::class.java, EntityDataSerializers.INT)
+
+		private val DATA_ATTACHMENT: EntityDataAccessor<Int> =
 			SynchedEntityData.defineId(ScoochwormPartEntity::class.java, EntityDataSerializers.INT)
 	}
 
