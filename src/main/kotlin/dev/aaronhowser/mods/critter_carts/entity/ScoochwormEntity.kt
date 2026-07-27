@@ -20,6 +20,11 @@ class ScoochwormEntity(
 	override fun registerGoals() {
 	}
 
+	override fun canBeCollidedWith(): Boolean = true
+	override fun isPushable(): Boolean = false
+
+	// Animation stuff
+
 	override fun registerControllers(controllers: AnimatableManager.ControllerRegistrar) {
 	}
 
