@@ -154,7 +154,7 @@ class ScoochwormEntity(
 	companion object {
 		const val SIZE = 14f / 16f
 		const val BODY_PART_COUNT = 4
-		const val PART_SPACING = SIZE * 1.6
+		const val PART_SPACING = SIZE * 1.2
 
 		private const val MAX_PATH_POINTS = 256
 		private const val MINIMUM_PATH_STEP_SQUARED = 0.000001
@@ -162,7 +162,7 @@ class ScoochwormEntity(
 		fun createAttributes(): AttributeSupplier {
 			return createMobAttributes()
 				.add(Attributes.MAX_HEALTH, 10.0)
-				.add(Attributes.MOVEMENT_SPEED, 0.4)
+				.add(Attributes.MOVEMENT_SPEED, 0.2)
 				.build()
 		}
 	}
