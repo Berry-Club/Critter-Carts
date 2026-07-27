@@ -5,6 +5,7 @@ import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isClientSide
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isItem
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isServerSide
 import dev.aaronhowser.mods.critter_carts.entity.control.ScoochwormMoveControl
+import dev.aaronhowser.mods.critter_carts.entity.data.ScoochwormPartAttachment
 import dev.aaronhowser.mods.critter_carts.entity.data.ScoochwormPath
 import dev.aaronhowser.mods.critter_carts.entity.data.ScoochwormSegments
 import dev.aaronhowser.mods.critter_carts.entity.goal.ScoochstemFollowGoal
@@ -19,6 +20,7 @@ import net.minecraft.world.entity.PathfinderMob
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.entity.player.Player
+import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.gameevent.GameEvent
@@ -74,33 +76,118 @@ class ScoochwormEntity(
 	): InteractionResult {
 		val heldStack = player.getItemInHand(hand)
 
-		if (heldStack.isItem(Items.MELON) && bodySegments.canGrow) {
-			if (isServerSide) {
-				bodySegments.grow()
-				heldStack.consume(1, player)
+		val growResult = tryGrow(player, heldStack)
+		if (growResult != null) return growResult
 
-				playSound(SoundEvents.GENERIC_EAT, 1f, 1f)
-				gameEvent(GameEvent.EAT, player)
-			}
+		val shearResult = tryShear(player, hand, heldStack, partIndex)
+		if (shearResult != null) return shearResult
 
-			return InteractionResult.sidedSuccess(isClientSide)
-		}
+		val addAttachmentResult = tryAddAttachment(player, heldStack, partIndex)
+		if (addAttachmentResult != null) return addAttachmentResult
 
-		if (partIndex != null && heldStack.isItem(Items.SHEARS) && bodySegments.contains(partIndex)) {
-			if (isServerSide) {
-				bodySegments.removeFrom(partIndex)
-
-				val equipmentSlot = hand.getEquipmentSlot()
-				heldStack.hurtAndBreak(1, player, equipmentSlot)
-
-				playSound(SoundEvents.SHEEP_SHEAR, 1f, 1f)
-				gameEvent(GameEvent.SHEAR, player)
-			}
-
-			return InteractionResult.sidedSuccess(isClientSide)
-		}
+		val removeAttachmentResult = tryRemoveAttachment(player, heldStack, partIndex)
+		if (removeAttachmentResult != null) return removeAttachmentResult
 
 		return InteractionResult.PASS
+	}
+
+	private fun tryGrow(player: Player, heldStack: ItemStack): InteractionResult? {
+		if (!heldStack.isItem(Items.MELON) || !bodySegments.canGrow) return null
+
+		if (isServerSide) {
+			bodySegments.grow()
+			heldStack.consume(1, player)
+
+			playSound(SoundEvents.GENERIC_EAT, 1f, 1f)
+			gameEvent(GameEvent.EAT, player)
+		}
+
+		return InteractionResult.sidedSuccess(isClientSide)
+	}
+
+	private fun tryShear(
+		player: Player,
+		hand: InteractionHand,
+		heldStack: ItemStack,
+		partIndex: Int?
+	): InteractionResult? {
+		if (partIndex == null) return null
+		if (!heldStack.isItem(Items.SHEARS) || !bodySegments.contains(partIndex)) return null
+
+		if (isServerSide) {
+			bodySegments.removeFrom(partIndex)
+
+			val equipmentSlot = hand.getEquipmentSlot()
+			heldStack.hurtAndBreak(1, player, equipmentSlot)
+
+			playSound(SoundEvents.SHEEP_SHEAR, 1f, 1f)
+			gameEvent(GameEvent.SHEAR, player)
+		}
+
+		return InteractionResult.sidedSuccess(isClientSide)
+	}
+
+	private fun tryAddAttachment(
+		player: Player,
+		heldStack: ItemStack,
+		partIndex: Int?
+	): InteractionResult? {
+		if (partIndex == null) return null
+		if (bodySegments.getAttachment(partIndex) != ScoochwormPartAttachment.NONE) return null
+
+		val attachment = when {
+			heldStack.isItem(Items.SADDLE) -> ScoochwormPartAttachment.SADDLE
+			heldStack.isItem(Items.CHEST) -> ScoochwormPartAttachment.CHEST
+			else -> return null
+		}
+
+		if (isServerSide) {
+			bodySegments.setAttachment(partIndex, attachment)
+			heldStack.consume(1, player)
+
+			@Suppress("KotlinConstantConditions")
+			val sound = when (attachment) {
+				ScoochwormPartAttachment.SADDLE -> SoundEvents.HORSE_SADDLE
+				ScoochwormPartAttachment.CHEST -> SoundEvents.DONKEY_CHEST
+				ScoochwormPartAttachment.NONE -> return null
+			}
+
+			playSound(sound, 1f, 1f)
+			gameEvent(GameEvent.EQUIP, player)
+		}
+
+		return InteractionResult.sidedSuccess(isClientSide)
+	}
+
+	private fun tryRemoveAttachment(
+		player: Player,
+		heldStack: ItemStack,
+		partIndex: Int?
+	): InteractionResult? {
+		if (partIndex == null) return null
+		if (!player.isShiftKeyDown || !heldStack.isEmpty) return null
+
+		val attachment = bodySegments.getAttachment(partIndex)
+		if (attachment == null || attachment == ScoochwormPartAttachment.NONE) return null
+
+		if (isServerSide) {
+			bodySegments.setAttachment(partIndex, ScoochwormPartAttachment.NONE)
+
+			val item = when (attachment) {
+				ScoochwormPartAttachment.SADDLE -> Items.SADDLE
+				ScoochwormPartAttachment.CHEST -> Items.CHEST
+				ScoochwormPartAttachment.NONE -> return null
+			}
+
+			if (!player.addItem(item.defaultInstance)) {
+				player.drop(item.defaultInstance, false)
+			}
+
+			playSound(SoundEvents.ITEM_FRAME_REMOVE_ITEM, 1f, 1f)
+			gameEvent(GameEvent.UNEQUIP, player)
+		}
+
+		return InteractionResult.sidedSuccess(isClientSide)
 	}
 
 	// Collision
@@ -109,6 +196,7 @@ class ScoochwormEntity(
 	override fun canCollideWith(entity: Entity): Boolean {
 		return entity !is ScoochwormPartEntity || entity.parentId != id
 	}
+
 	override fun isPushable(): Boolean = false
 	override fun isPushedByFluid(type: FluidType): Boolean = false
 	override fun getPistonPushReaction(): PushReaction = PushReaction.IGNORE
