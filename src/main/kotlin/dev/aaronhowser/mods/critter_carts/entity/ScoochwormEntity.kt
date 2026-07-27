@@ -148,7 +148,7 @@ class ScoochwormEntity(
 	}
 
 	private fun getPartDistance(partIndex: Int): Double {
-		return PART_SPACING * (partIndex + 2)
+		return PART_SPACING * (partIndex + 1)
 	}
 
 	companion object {
