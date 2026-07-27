@@ -4,6 +4,9 @@ import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isItem
 import dev.aaronhowser.mods.critter_carts.entity.control.ScoochwormMoveControl
 import dev.aaronhowser.mods.critter_carts.entity.goal.ScoochstemFollowGoal
 import dev.aaronhowser.mods.critter_carts.registry.ModEntityTypes
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.nbt.ListTag
+import net.minecraft.nbt.Tag
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
@@ -232,6 +235,94 @@ class ScoochwormEntity(
 		return PART_SPACING * (partIndex + 1)
 	}
 
+	// Entity data
+
+	override fun readAdditionalSaveData(tag: CompoundTag) {
+		super.readAdditionalSaveData(tag)
+
+		segmentPositions.clear()
+		pathHistory.clear()
+
+		if (tag.contains(SEGMENT_POSITIONS_TAG, Tag.TAG_LIST.toInt())) {
+			segmentPositions.addAll(
+				readPositions(tag, SEGMENT_POSITIONS_TAG, MAX_SEGMENT_COUNT)
+			)
+		} else {
+			segmentPositions.add(
+				getPathPosition(getPartDistance(0))
+			)
+		}
+
+		if (tag.contains(PATH_HISTORY_TAG, Tag.TAG_LIST.toInt())) {
+			pathHistory.addAll(
+				readPositions(tag, PATH_HISTORY_TAG, MAX_PATH_POINTS)
+			)
+		}
+	}
+
+	override fun addAdditionalSaveData(tag: CompoundTag) {
+		super.addAdditionalSaveData(tag)
+
+		val segmentPositionTags = ListTag()
+
+		for (partIndex in segmentPositions.indices) {
+			val segmentTag = if (partIndex < bodyParts.size) {
+				bodyParts[partIndex].createSegmentTag()
+			} else {
+				ScoochwormPartEntity.createSegmentTag(
+					segmentPositions[partIndex]
+				)
+			}
+
+			segmentPositionTags.add(segmentTag)
+		}
+
+		tag.put(SEGMENT_POSITIONS_TAG, segmentPositionTags)
+
+		val savedPathHistory = ListTag()
+
+		for (pathPosition in pathHistory) {
+			savedPathHistory.add(createPathPositionTag(pathPosition))
+		}
+
+		tag.put(PATH_HISTORY_TAG, savedPathHistory)
+	}
+
+	private fun readPositions(tag: CompoundTag, key: String, maximumSize: Int): List<Vec3> {
+		val positionTags = tag.getList(key, Tag.TAG_COMPOUND.toInt())
+		val positions = mutableListOf<Vec3>()
+		val positionCount = minOf(positionTags.size, maximumSize)
+
+		for (index in 0 until positionCount) {
+			val positionTag = positionTags.getCompound(index)
+			val position = if (key == SEGMENT_POSITIONS_TAG) {
+				ScoochwormPartEntity.readSegmentPosition(positionTag)
+			} else {
+				readPathPosition(positionTag)
+			}
+
+			positions.add(position)
+		}
+
+		return positions
+	}
+
+	private fun createPathPositionTag(position: Vec3): CompoundTag {
+		val positionTag = CompoundTag()
+		positionTag.putDouble(POSITION_X_TAG, position.x)
+		positionTag.putDouble(POSITION_Y_TAG, position.y)
+		positionTag.putDouble(POSITION_Z_TAG, position.z)
+		return positionTag
+	}
+
+	private fun readPathPosition(tag: CompoundTag): Vec3 {
+		return Vec3(
+			tag.getDouble(POSITION_X_TAG),
+			tag.getDouble(POSITION_Y_TAG),
+			tag.getDouble(POSITION_Z_TAG)
+		)
+	}
+
 	// Animation
 
 	override fun registerControllers(controllers: AnimatableManager.ControllerRegistrar) {
@@ -246,6 +337,11 @@ class ScoochwormEntity(
 		private const val MAX_SEGMENT_COUNT = 4
 		private const val MAX_PATH_POINTS = 256
 		private const val MINIMUM_PATH_STEP_SQUARED = 0.000001
+		private const val SEGMENT_POSITIONS_TAG = "SegmentPositions"
+		private const val PATH_HISTORY_TAG = "PathHistory"
+		private const val POSITION_X_TAG = "X"
+		private const val POSITION_Y_TAG = "Y"
+		private const val POSITION_Z_TAG = "Z"
 
 		fun createAttributes(): AttributeSupplier {
 			return createMobAttributes()
