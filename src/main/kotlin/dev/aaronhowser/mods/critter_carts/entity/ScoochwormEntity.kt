@@ -4,6 +4,7 @@ import dev.aaronhowser.mods.aaron.misc.AaronExtensions.getEquipmentSlot
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isClientSide
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isItem
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isServerSide
+import dev.aaronhowser.mods.aaron.misc.AaronExtensions.nextRange
 import dev.aaronhowser.mods.critter_carts.entity.control.ScoochwormMoveControl
 import dev.aaronhowser.mods.critter_carts.entity.data.ScoochwormPartAttachment
 import dev.aaronhowser.mods.critter_carts.entity.data.ScoochwormPath
@@ -176,7 +177,7 @@ class ScoochwormEntity(
 				ScoochwormPartAttachment.NONE -> return null
 			}
 
-			playSound(sound, 1f, 1f)
+			playSound(sound, 1f, random.nextRange(0.8f, 1.2f))
 			gameEvent(GameEvent.EQUIP, player)
 		}
 
@@ -199,7 +200,7 @@ class ScoochwormEntity(
 				player.drop(attachmentItem, false)
 			}
 
-			playSound(SoundEvents.ITEM_FRAME_REMOVE_ITEM, 1f, 1f)
+			playSound(SoundEvents.ITEM_FRAME_REMOVE_ITEM, 1f, random.nextRange(0.8f, 1.2f))
 			gameEvent(GameEvent.UNEQUIP, player)
 		}
 
