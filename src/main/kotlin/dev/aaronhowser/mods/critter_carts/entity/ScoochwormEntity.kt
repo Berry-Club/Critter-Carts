@@ -56,6 +56,8 @@ class ScoochwormEntity(
 		bodyParts.clear()
 	}
 
+	// Collision
+
 	override fun canBeCollidedWith(): Boolean = !isDeadOrDying
 	override fun isPushable(): Boolean = false
 	override fun isPushedByFluid(type: FluidType): Boolean = false
@@ -63,12 +65,7 @@ class ScoochwormEntity(
 	override fun knockback(strength: Double, x: Double, z: Double) {}
 	override fun push(entity: Entity) {}
 
-	// Animation stuff
-
-	override fun registerControllers(controllers: AnimatableManager.ControllerRegistrar) {
-	}
-
-	override fun getAnimatableInstanceCache(): AnimatableInstanceCache = cache
+	// Path tracking
 
 	private fun recordPath() {
 		val currentPosition = position()
@@ -94,6 +91,26 @@ class ScoochwormEntity(
 			pathHistory.removeLast()
 		}
 	}
+
+	private fun getPathPosition(targetDistance: Double): Vec3 {
+		var remainingDistance = targetDistance
+		var newerPosition = pathHistory.peekFirst() ?: position()
+
+		for (olderPosition in pathHistory.drop(1)) {
+			val sectionDistance = newerPosition.distanceTo(olderPosition)
+
+			if (sectionDistance >= remainingDistance && sectionDistance > 0.0) {
+				return newerPosition.lerp(olderPosition, remainingDistance / sectionDistance)
+			}
+
+			remainingDistance -= sectionDistance
+			newerPosition = olderPosition
+		}
+
+		return newerPosition
+	}
+
+	// Body parts
 
 	private fun ensureBodyParts() {
 		bodyParts.removeAll { it.isRemoved }
@@ -129,27 +146,16 @@ class ScoochwormEntity(
 		}
 	}
 
-	private fun getPathPosition(targetDistance: Double): Vec3 {
-		var remainingDistance = targetDistance
-		var newerPosition = pathHistory.peekFirst() ?: position()
-
-		for (olderPosition in pathHistory.drop(1)) {
-			val sectionDistance = newerPosition.distanceTo(olderPosition)
-
-			if (sectionDistance >= remainingDistance && sectionDistance > 0.0) {
-				return newerPosition.lerp(olderPosition, remainingDistance / sectionDistance)
-			}
-
-			remainingDistance -= sectionDistance
-			newerPosition = olderPosition
-		}
-
-		return newerPosition
-	}
-
 	private fun getPartDistance(partIndex: Int): Double {
 		return PART_SPACING * (partIndex + 1)
 	}
+
+	// Animation
+
+	override fun registerControllers(controllers: AnimatableManager.ControllerRegistrar) {
+	}
+
+	override fun getAnimatableInstanceCache(): AnimatableInstanceCache = cache
 
 	companion object {
 		const val SIZE = 14f / 16f

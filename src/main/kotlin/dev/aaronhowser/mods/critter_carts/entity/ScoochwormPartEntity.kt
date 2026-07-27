@@ -32,10 +32,17 @@ class ScoochwormPartEntity(
 		noPhysics = true
 	}
 
+	// Parent
+
+	private val parent: ScoochwormEntity?
+		get() = level().getEntity(entityData.get(DATA_PARENT_ID)) as? ScoochwormEntity
+
 	fun attachTo(parent: ScoochwormEntity, partIndex: Int) {
 		entityData.set(DATA_PARENT_ID, parent.id)
 		entityData.set(DATA_PART_INDEX, partIndex)
 	}
+
+	// Movement
 
 	fun moveAlongPath(pathPosition: Vec3, pitch: Float) {
 		val movement = pathPosition.subtract(position())
@@ -51,6 +58,8 @@ class ScoochwormPartEntity(
 		yRot = movementYaw
 		xRot = pitch
 	}
+
+	// Lifecycle
 
 	override fun tick() {
 		super.tick()
@@ -72,6 +81,8 @@ class ScoochwormPartEntity(
 		}
 	}
 
+	// Interpolation
+
 	override fun lerpTo(
 		x: Double,
 		y: Double,
@@ -86,28 +97,6 @@ class ScoochwormPartEntity(
 		interpolationSteps = lerpSteps
 	}
 
-	override fun hurt(damageSource: DamageSource, amount: Float): Boolean {
-		val parent = parent ?: return false
-		return parent.hurt(damageSource, amount)
-	}
-
-	override fun defineSynchedData(builder: SynchedEntityData.Builder) {
-		builder.define(DATA_PARENT_ID, NO_PARENT)
-		builder.define(DATA_PART_INDEX, 0)
-	}
-
-	override fun readAdditionalSaveData(tag: CompoundTag) {}
-	override fun addAdditionalSaveData(tag: CompoundTag) {}
-
-	override fun shouldBeSaved(): Boolean = false
-	override fun isPickable(): Boolean = true
-	override fun isPushable(): Boolean = false
-	override fun canBeCollidedWith(): Boolean = true
-
-	override fun registerControllers(controllers: AnimatableManager.ControllerRegistrar) {}
-
-	override fun getAnimatableInstanceCache(): AnimatableInstanceCache = cache
-
 	private fun tickInterpolation() {
 		if (interpolationSteps <= 0) return
 
@@ -118,8 +107,34 @@ class ScoochwormPartEntity(
 		interpolationSteps--
 	}
 
-	private val parent: ScoochwormEntity?
-		get() = level().getEntity(entityData.get(DATA_PARENT_ID)) as? ScoochwormEntity
+	// Collision
+
+	override fun hurt(damageSource: DamageSource, amount: Float): Boolean {
+		val parent = parent ?: return false
+		return parent.hurt(damageSource, amount)
+	}
+
+	override fun canBeCollidedWith(): Boolean = true
+	override fun isPickable(): Boolean = true
+	override fun isPushable(): Boolean = false
+
+	// Entity data
+
+	override fun defineSynchedData(builder: SynchedEntityData.Builder) {
+		builder.define(DATA_PARENT_ID, NO_PARENT)
+		builder.define(DATA_PART_INDEX, 0)
+	}
+
+	override fun readAdditionalSaveData(tag: CompoundTag) {}
+	override fun addAdditionalSaveData(tag: CompoundTag) {}
+
+	override fun shouldBeSaved(): Boolean = false
+
+	// Animation
+
+	override fun registerControllers(controllers: AnimatableManager.ControllerRegistrar) {}
+
+	override fun getAnimatableInstanceCache(): AnimatableInstanceCache = cache
 
 	companion object {
 		private const val NO_PARENT = -1
