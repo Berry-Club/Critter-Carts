@@ -14,12 +14,14 @@ import net.minecraft.nbt.Tag
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
+import net.minecraft.world.SimpleMenuProvider
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.PathfinderMob
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.entity.player.Player
+import net.minecraft.world.inventory.ChestMenu
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.Level
@@ -88,6 +90,9 @@ class ScoochwormEntity(
 		val removeAttachmentResult = tryRemoveAttachment(player, heldStack, partIndex)
 		if (removeAttachmentResult != null) return removeAttachmentResult
 
+		val openChestResult = tryOpenChest(player, partIndex)
+		if (openChestResult != null) return openChestResult
+
 		return InteractionResult.PASS
 	}
 
@@ -142,7 +147,8 @@ class ScoochwormEntity(
 		}
 
 		if (isServerSide) {
-			bodySegments.setAttachment(partIndex, attachment)
+			val attachmentItem = heldStack.copyWithCount(1)
+			bodySegments.setAttachmentItem(partIndex, attachmentItem)
 			heldStack.consume(1, player)
 
 			@Suppress("KotlinConstantConditions")
@@ -171,20 +177,35 @@ class ScoochwormEntity(
 		if (attachment == null || attachment == ScoochwormPartAttachment.NONE) return null
 
 		if (isServerSide) {
-			bodySegments.setAttachment(partIndex, ScoochwormPartAttachment.NONE)
+			val attachmentItem = bodySegments.removeAttachmentItem(partIndex)
 
-			val item = when (attachment) {
-				ScoochwormPartAttachment.SADDLE -> Items.SADDLE
-				ScoochwormPartAttachment.CHEST -> Items.CHEST
-				ScoochwormPartAttachment.NONE -> return null
-			}
-
-			if (!player.addItem(item.defaultInstance)) {
-				player.drop(item.defaultInstance, false)
+			if (!player.addItem(attachmentItem)) {
+				player.drop(attachmentItem, false)
 			}
 
 			playSound(SoundEvents.ITEM_FRAME_REMOVE_ITEM, 1f, 1f)
 			gameEvent(GameEvent.UNEQUIP, player)
+		}
+
+		return InteractionResult.sidedSuccess(isClientSide)
+	}
+
+	private fun tryOpenChest(
+		player: Player,
+		partIndex: Int?
+	): InteractionResult? {
+		if (partIndex == null) return null
+		if (bodySegments.getAttachment(partIndex) != ScoochwormPartAttachment.CHEST) return null
+
+		if (isServerSide) {
+			val container = bodySegments.getContainer(partIndex) ?: return null
+			val menuProvider = SimpleMenuProvider(
+				{ containerId, playerInventory, _ ->
+					ChestMenu.threeRows(containerId, playerInventory, container)
+				},
+				Items.CHEST.description
+			)
+			player.openMenu(menuProvider)
 		}
 
 		return InteractionResult.sidedSuccess(isClientSide)

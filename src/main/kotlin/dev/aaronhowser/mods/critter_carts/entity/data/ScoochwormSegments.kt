@@ -4,6 +4,8 @@ import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormPartEntity
 import dev.aaronhowser.mods.critter_carts.registry.ModEntityTypes
 import net.minecraft.nbt.ListTag
+import net.minecraft.world.SimpleContainer
+import net.minecraft.world.item.ItemStack
 
 class ScoochwormSegments(
 	private val scoochworm: ScoochwormEntity
@@ -46,14 +48,25 @@ class ScoochwormSegments(
 		return segments.getOrNull(partIndex)?.attachment
 	}
 
-	fun setAttachment(
+	fun setAttachmentItem(
 		partIndex: Int,
-		attachment: ScoochwormPartAttachment
+		attachmentItem: ItemStack
 	): Boolean {
 		val segment = segments.getOrNull(partIndex) ?: return false
-		segment.attachment = attachment
-		bodyParts.getOrNull(partIndex)?.attachment = attachment
+		segment.equipAttachmentItem(attachmentItem)
+		bodyParts.getOrNull(partIndex)?.attachment = segment.attachment
 		return true
+	}
+
+	fun removeAttachmentItem(partIndex: Int): ItemStack {
+		val segment = segments.getOrNull(partIndex) ?: return ItemStack.EMPTY
+		val attachmentItem = segment.removeAttachmentItem()
+		bodyParts.getOrNull(partIndex)?.attachment = ScoochwormPartAttachment.NONE
+		return attachmentItem
+	}
+
+	fun getContainer(partIndex: Int): SimpleContainer? {
+		return segments.getOrNull(partIndex)?.container
 	}
 
 	fun update(path: ScoochwormPath) {
