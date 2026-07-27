@@ -106,6 +106,9 @@ class ScoochwormEntity(
 	// Collision
 
 	override fun canBeCollidedWith(): Boolean = !isDeadOrDying
+	override fun canCollideWith(entity: Entity): Boolean {
+		return entity !is ScoochwormPartEntity || entity.parentId != id
+	}
 	override fun isPushable(): Boolean = false
 	override fun isPushedByFluid(type: FluidType): Boolean = false
 	override fun getPistonPushReaction(): PushReaction = PushReaction.IGNORE
