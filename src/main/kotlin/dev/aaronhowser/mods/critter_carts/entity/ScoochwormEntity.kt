@@ -5,6 +5,8 @@ import net.minecraft.world.entity.PathfinderMob
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.level.Level
+import net.minecraft.world.level.material.PushReaction
+import net.neoforged.neoforge.fluids.FluidType
 import software.bernie.geckolib.animatable.GeoEntity
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache
 import software.bernie.geckolib.animatable.instance.SingletonAnimatableInstanceCache
@@ -22,6 +24,10 @@ class ScoochwormEntity(
 
 	override fun canBeCollidedWith(): Boolean = true
 	override fun isPushable(): Boolean = false
+	override fun isPushedByFluid(): Boolean = false
+	override fun isPushedByFluid(type: FluidType): Boolean = false
+	override fun getPistonPushReaction(): PushReaction = PushReaction.IGNORE
+	override fun knockback(strength: Double, x: Double, z: Double) {}
 
 	// Animation stuff
 
