@@ -80,13 +80,13 @@ class ScoochstemFollowGoal(
 
 	private fun chooseNextStem(currentStem: BlockPos, forwardDirection: Direction): BlockPos? {
 		val forwardStem = currentStem.relative(forwardDirection)
-		if (isScoochstem(forwardStem)) return forwardStem
+		if (isTraversableStem(currentStem, forwardStem)) return forwardStem
 
 		val leftStem = currentStem.relative(forwardDirection.counterClockWise)
-		val hasLeftStem = isScoochstem(leftStem)
+		val hasLeftStem = isTraversableStem(currentStem, leftStem)
 
 		val rightStem = currentStem.relative(forwardDirection.clockWise)
-		val hasRightStem = isScoochstem(rightStem)
+		val hasRightStem = isTraversableStem(currentStem, rightStem)
 
 		if (hasLeftStem && hasRightStem) {
 			return if (scoochworm.random.nextBoolean()) leftStem else rightStem
@@ -101,7 +101,7 @@ class ScoochstemFollowGoal(
 		var segmentEnd = start.relative(direction)
 		var nextStem = segmentEnd.relative(direction)
 
-		while (isScoochstem(nextStem)) {
+		while (isTraversableStem(segmentEnd, nextStem)) {
 			segmentEnd = nextStem
 			nextStem = segmentEnd.relative(direction)
 		}
@@ -126,6 +126,32 @@ class ScoochstemFollowGoal(
 		return scoochworm.level()
 			.getBlockState(position)
 			.isBlock(ModBlocks.SCOOCHSTEM.get())
+	}
+
+	private fun isTraversableStem(from: BlockPos, to: BlockPos): Boolean {
+		if (!isScoochstem(to)) return false
+
+		val fromX = from.x + 0.5
+		val fromY = from.y + 1.0
+		val fromZ = from.z + 0.5
+
+		val toX = to.x + 0.5
+		val toY = to.y + 1.0
+		val toZ = to.z + 0.5
+
+		val fromBounds = scoochworm.boundingBox.move(
+			fromX - scoochworm.x,
+			fromY - scoochworm.y,
+			fromZ - scoochworm.z
+		)
+
+		val travelBounds = fromBounds.expandTowards(
+			toX - fromX,
+			toY - fromY,
+			toZ - fromZ
+		)
+
+		return scoochworm.level().noCollision(scoochworm, travelBounds)
 	}
 
 	private fun directionTo(from: BlockPos, to: BlockPos): Direction {
