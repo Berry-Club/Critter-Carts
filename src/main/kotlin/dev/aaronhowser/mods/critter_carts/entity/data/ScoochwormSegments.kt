@@ -118,22 +118,15 @@ class ScoochwormSegments(
 	fun load(tag: ListTag) {
 		segments.clear()
 
-		for (index in 0 until minOf(tag.size, MAX_COUNT)) {
+		val segmentCount = tag.size.coerceIn(MIN_COUNT, MAX_COUNT)
+		for (index in 0 until segmentCount) {
 			segments.add(
-				ScoochwormSegment.load(tag.getCompound(index))
+				if (index < tag.size) {
+					ScoochwormSegment.load(tag.getCompound(index))
+				} else {
+					ScoochwormSegment()
+				}
 			)
-		}
-
-		if (segments.isEmpty()) {
-			segments.add(ScoochwormSegment())
-		}
-	}
-
-	fun restoreLegacyCount(segmentCount: Int) {
-		segments.clear()
-
-		for (i in 0 until segmentCount.coerceIn(MIN_COUNT, MAX_COUNT)) {
-			segments.add(ScoochwormSegment())
 		}
 	}
 

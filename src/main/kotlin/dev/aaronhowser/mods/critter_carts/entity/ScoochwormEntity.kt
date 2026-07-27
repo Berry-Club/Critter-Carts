@@ -10,7 +10,6 @@ import dev.aaronhowser.mods.critter_carts.entity.data.ScoochwormPath
 import dev.aaronhowser.mods.critter_carts.entity.data.ScoochwormSegments
 import dev.aaronhowser.mods.critter_carts.entity.goal.ScoochstemFollowGoal
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.nbt.Tag
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
@@ -261,24 +260,7 @@ class ScoochwormEntity(
 
 		movementPath.clear()
 
-		if (tag.contains(SEGMENTS_TAG, Tag.TAG_LIST.toInt())) {
-			bodySegments.load(
-				tag.getList(SEGMENTS_TAG, Tag.TAG_COMPOUND.toInt())
-			)
-		} else if (tag.contains(SEGMENT_COUNT_TAG, Tag.TAG_INT.toInt())) {
-			bodySegments.restoreLegacyCount(
-				tag.getInt(SEGMENT_COUNT_TAG)
-			)
-		} else if (tag.contains(LEGACY_SEGMENT_POSITIONS_TAG, Tag.TAG_LIST.toInt())) {
-			bodySegments.restoreLegacyCount(
-				tag.getList(
-					LEGACY_SEGMENT_POSITIONS_TAG,
-					Tag.TAG_COMPOUND.toInt()
-				).size
-			)
-		} else {
-			bodySegments.restoreLegacyCount(1)
-		}
+		bodySegments.load(tag.getList(SEGMENTS_TAG, CompoundTag.TAG_COMPOUND.toInt()))
 	}
 
 	override fun addAdditionalSaveData(tag: CompoundTag) {
@@ -298,8 +280,6 @@ class ScoochwormEntity(
 		const val PART_SPACING = SIZE * 1.2
 
 		private const val SEGMENTS_TAG = "Segments"
-		private const val SEGMENT_COUNT_TAG = "SegmentCount"
-		private const val LEGACY_SEGMENT_POSITIONS_TAG = "SegmentPositions"
 
 		fun createAttributes(): AttributeSupplier {
 			return createMobAttributes()
