@@ -6,6 +6,7 @@ import net.minecraft.core.component.DataComponents
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtOps
 import net.minecraft.world.SimpleContainer
+import net.minecraft.world.entity.Entity
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import net.minecraft.world.item.component.ItemContainerContents
@@ -42,6 +43,13 @@ class ScoochwormSegment(
 		attachmentItem = ItemStack.EMPTY
 		container.clearContent()
 		return removedStack
+	}
+
+	fun dropAttachmentItem(entity: Entity) {
+		val attachmentItem = removeAttachmentItem()
+		if (attachmentItem.isEmpty) return
+
+		entity.spawnAtLocation(attachmentItem)
 	}
 
 	private fun loadContainer() {

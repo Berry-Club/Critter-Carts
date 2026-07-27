@@ -30,40 +30,28 @@ class ScoochwormSegments(
 		}
 	}
 
-	fun removeFrom(partIndex: Int): List<ItemStack> {
-		if (!contains(partIndex)) return emptyList()
+	fun removeFrom(partIndex: Int) {
+		if (!contains(partIndex)) return
 
 		val remainingCount = partIndex.coerceAtLeast(MIN_COUNT)
-		val removedAttachments = mutableListOf<ItemStack>()
 
 		while (segments.size > remainingCount) {
+			val bodyPart = bodyParts.getOrNull(segments.lastIndex) ?: scoochworm
 			val segment = segments.removeLast()
-			val attachmentItem = segment.removeAttachmentItem()
-
-			if (!attachmentItem.isEmpty) {
-				removedAttachments.add(attachmentItem)
-			}
+			segment.dropAttachmentItem(bodyPart)
 		}
 
 		while (bodyParts.size > count) {
 			bodyParts.removeLast().discard()
 		}
-
-		return removedAttachments
 	}
 
-	fun takeAllAttachmentItems(): List<ItemStack> {
-		val removedAttachments = mutableListOf<ItemStack>()
-
-		for (segment in segments) {
-			val attachmentItem = segment.removeAttachmentItem()
-
-			if (!attachmentItem.isEmpty) {
-				removedAttachments.add(attachmentItem)
-			}
+	fun dropAllAttachmentItems() {
+		for (partIndex in segments.indices) {
+			val segment = segments[partIndex]
+			val bodyPart = bodyParts.getOrNull(partIndex) ?: scoochworm
+			segment.dropAttachmentItem(bodyPart)
 		}
-
-		return removedAttachments
 	}
 
 	fun getAttachment(partIndex: Int): ScoochwormPartAttachment? {
