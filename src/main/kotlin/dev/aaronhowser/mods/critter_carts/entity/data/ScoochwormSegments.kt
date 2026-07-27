@@ -1,5 +1,8 @@
-package dev.aaronhowser.mods.critter_carts.entity
+package dev.aaronhowser.mods.critter_carts.entity.data
 
+import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity
+import dev.aaronhowser.mods.critter_carts.entity.ScoochwormPartAttachment
+import dev.aaronhowser.mods.critter_carts.entity.ScoochwormPartEntity
 import dev.aaronhowser.mods.critter_carts.registry.ModEntityTypes
 import net.minecraft.nbt.ListTag
 

@@ -5,6 +5,8 @@ import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isClientSide
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isItem
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isServerSide
 import dev.aaronhowser.mods.critter_carts.entity.control.ScoochwormMoveControl
+import dev.aaronhowser.mods.critter_carts.entity.data.ScoochwormPath
+import dev.aaronhowser.mods.critter_carts.entity.data.ScoochwormSegments
 import dev.aaronhowser.mods.critter_carts.entity.goal.ScoochstemFollowGoal
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.Tag

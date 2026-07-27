@@ -1,4 +1,4 @@
-package dev.aaronhowser.mods.critter_carts.entity
+package dev.aaronhowser.mods.critter_carts.entity.data
 
 import net.minecraft.world.phys.Vec3
 import java.util.*
