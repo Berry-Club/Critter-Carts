@@ -5,9 +5,12 @@ import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData
 import net.minecraft.util.Mth
+import net.minecraft.world.InteractionHand
+import net.minecraft.world.InteractionResult
 import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
 import software.bernie.geckolib.animatable.GeoEntity
@@ -114,6 +117,11 @@ class ScoochwormPartEntity(
 		return parent.hurt(damageSource, amount)
 	}
 
+	override fun interact(player: Player, hand: InteractionHand): InteractionResult {
+		val parent = parent ?: return InteractionResult.PASS
+		return parent.interactWithPart(player, hand, entityData.get(DATA_PART_INDEX))
+	}
+
 	override fun canBeCollidedWith(): Boolean = true
 	override fun isPickable(): Boolean = true
 	override fun isPushable(): Boolean = false
@@ -146,5 +154,6 @@ class ScoochwormPartEntity(
 
 		private val DATA_PART_INDEX: EntityDataAccessor<Int> =
 			SynchedEntityData.defineId(ScoochwormPartEntity::class.java, EntityDataSerializers.INT)
+
 	}
 }

@@ -9,6 +9,7 @@ import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.PathfinderMob
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier
 import net.minecraft.world.entity.ai.attributes.Attributes
@@ -88,6 +89,24 @@ class ScoochwormEntity(
 			return InteractionResult.sidedSuccess(level().isClientSide)
 		}
 
+		if (partIndex != null && heldItem.`is`(Items.SHEARS) && partIndex < segmentPositions.size) {
+			if (!level().isClientSide) {
+				removeSegmentsFrom(partIndex)
+
+				val equipmentSlot = if (hand == InteractionHand.MAIN_HAND) {
+					EquipmentSlot.MAINHAND
+				} else {
+					EquipmentSlot.OFFHAND
+				}
+
+				heldItem.hurtAndBreak(1, player, equipmentSlot)
+				playSound(SoundEvents.SHEEP_SHEAR, 1f, 1f)
+				gameEvent(GameEvent.SHEAR, player)
+			}
+
+			return InteractionResult.sidedSuccess(level().isClientSide)
+		}
+
 		return InteractionResult.PASS
 	}
 
@@ -102,6 +121,16 @@ class ScoochwormEntity(
 		return finalSegmentPosition.subtract(
 			forward.scale(PART_SPACING)
 		)
+	}
+
+	private fun removeSegmentsFrom(partIndex: Int) {
+		while (segmentPositions.size > partIndex) {
+			segmentPositions.removeLast()
+		}
+
+		while (bodyParts.size > partIndex) {
+			bodyParts.removeLast().discard()
+		}
 	}
 
 	// Collision
