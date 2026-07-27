@@ -136,9 +136,8 @@ class ScoochwormEntity(
 		player: Player,
 		hand: InteractionHand,
 		heldStack: ItemStack,
-		partIndex: Int?
+		partIndex: Int
 	): InteractionResult? {
-		if (partIndex == null) return null
 		if (!heldStack.isItem(Items.SHEARS) || !bodySegments.contains(partIndex)) return null
 
 		if (isServerSide) {
@@ -157,10 +156,8 @@ class ScoochwormEntity(
 	private fun tryAddAttachment(
 		player: Player,
 		heldStack: ItemStack,
-		partIndex: Int?
+		partIndex: Int
 	): InteractionResult? {
-		if (partIndex == null) return null
-
 		val attachment = when {
 			heldStack.isItem(Items.SADDLE) -> ScoochwormPartAttachment.SADDLE
 			heldStack.isItem(Items.CHEST) -> ScoochwormPartAttachment.CHEST
@@ -189,13 +186,11 @@ class ScoochwormEntity(
 	private fun tryRemoveAttachment(
 		player: Player,
 		heldStack: ItemStack,
-		partIndex: Int?,
-		attachment: ScoochwormPartAttachment?
+		partIndex: Int,
+		currentAttachment: ScoochwormPartAttachment?
 	): InteractionResult? {
-		if (partIndex == null) return null
+		if (currentAttachment == null || currentAttachment == ScoochwormPartAttachment.NONE) return null
 		if (!player.isShiftKeyDown || !heldStack.isEmpty) return null
-
-		if (attachment == null || attachment == ScoochwormPartAttachment.NONE) return null
 
 		if (isServerSide) {
 			val attachmentItem = bodySegments.removeAttachmentItem(partIndex)
@@ -213,9 +208,9 @@ class ScoochwormEntity(
 
 	private fun tryRide(
 		player: Player,
-		partIndex: Int?
+		partIndex: Int
 	): InteractionResult? {
-		if (partIndex == null || player.isShiftKeyDown) return null
+		if (player.isShiftKeyDown) return null
 
 		if (isServerSide) {
 			val bodyPart = bodySegments.getBodyPart(partIndex) ?: return null
@@ -227,10 +222,8 @@ class ScoochwormEntity(
 
 	private fun tryOpenChest(
 		player: Player,
-		partIndex: Int?
+		partIndex: Int
 	): InteractionResult? {
-		if (partIndex == null) return null
-
 		if (isServerSide) {
 			val container = bodySegments.getContainer(partIndex) ?: return null
 			val menuProvider = SimpleMenuProvider(
