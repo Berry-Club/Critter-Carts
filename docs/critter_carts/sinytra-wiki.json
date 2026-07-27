@@ -1,0 +1,16 @@
+{
+	"id": "critter-carts",
+	"modid": "critter_carts",
+	"owners": [
+		"aaronhowser1"
+	],
+	"platforms": {},
+	"licenses": {
+		"project": {
+			"id": "MIT"
+		}
+	},
+	"versions": {
+		"1.21.1": "main"
+	}
+}
