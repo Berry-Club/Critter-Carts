@@ -3,9 +3,7 @@ package dev.aaronhowser.mods.critter_carts.entity
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isItem
 import dev.aaronhowser.mods.critter_carts.entity.control.ScoochwormMoveControl
 import dev.aaronhowser.mods.critter_carts.entity.goal.ScoochstemFollowGoal
-import dev.aaronhowser.mods.critter_carts.registry.ModEntityTypes
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.nbt.ListTag
 import net.minecraft.nbt.Tag
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.world.InteractionHand
@@ -21,13 +19,11 @@ import net.minecraft.world.item.Items
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.gameevent.GameEvent
 import net.minecraft.world.level.material.PushReaction
-import net.minecraft.world.phys.Vec3
 import net.neoforged.neoforge.fluids.FluidType
 import software.bernie.geckolib.animatable.GeoEntity
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache
 import software.bernie.geckolib.animatable.instance.SingletonAnimatableInstanceCache
 import software.bernie.geckolib.animation.AnimatableManager
-import java.util.*
 
 class ScoochwormEntity(
 	entityType: EntityType<ScoochwormEntity>,
@@ -36,9 +32,8 @@ class ScoochwormEntity(
 
 	private val cache = SingletonAnimatableInstanceCache(this)
 	val scoochwormMoveControl = ScoochwormMoveControl(this)
-	private val bodyParts: MutableList<ScoochwormPartEntity> = mutableListOf()
-	private val pathHistory: ArrayDeque<Vec3> = ArrayDeque()
-	private val segmentPositions: MutableList<Vec3> = mutableListOf(position())
+	private val path = ScoochwormPath(PART_SPACING * ScoochwormSegments.MAX_COUNT)
+	private val segments = ScoochwormSegments(this)
 
 	init {
 		moveControl = scoochwormMoveControl
@@ -53,19 +48,13 @@ class ScoochwormEntity(
 
 		if (level().isClientSide) return
 
-		recordPath()
-		ensureBodyParts()
-		updateBodyParts()
+		path.record(position(), yRot)
+		segments.update(path)
 	}
 
 	override fun remove(reason: RemovalReason) {
 		super.remove(reason)
-
-		for (bodyPart in bodyParts) {
-			bodyPart.discard()
-		}
-
-		bodyParts.clear()
+		segments.discard()
 	}
 
 	// Interaction
@@ -81,9 +70,9 @@ class ScoochwormEntity(
 	): InteractionResult {
 		val heldItem = player.getItemInHand(hand)
 
-		if (heldItem.isItem(Items.MELON) && segmentPositions.size < MAX_SEGMENT_COUNT) {
+		if (heldItem.isItem(Items.MELON) && segments.canGrow) {
 			if (!level().isClientSide) {
-				segmentPositions.add(getNewSegmentPosition())
+				segments.grow()
 				heldItem.consume(1, player)
 				playSound(SoundEvents.GENERIC_EAT, 1f, 1f)
 				gameEvent(GameEvent.EAT, player)
@@ -92,9 +81,9 @@ class ScoochwormEntity(
 			return InteractionResult.sidedSuccess(level().isClientSide)
 		}
 
-		if (partIndex != null && heldItem.`is`(Items.SHEARS) && partIndex < segmentPositions.size) {
+		if (partIndex != null && heldItem.`is`(Items.SHEARS) && segments.contains(partIndex)) {
 			if (!level().isClientSide) {
-				removeSegmentsFrom(partIndex)
+				segments.removeFrom(partIndex)
 
 				val equipmentSlot = if (hand == InteractionHand.MAIN_HAND) {
 					EquipmentSlot.MAINHAND
@@ -113,29 +102,6 @@ class ScoochwormEntity(
 		return InteractionResult.PASS
 	}
 
-	private fun getNewSegmentPosition(): Vec3 {
-		val finalSegmentIndex = segmentPositions.lastIndex
-		val finalSegment = bodyParts.getOrNull(finalSegmentIndex)
-		val finalSegmentPosition = finalSegment?.position()
-			?: segmentPositions.last()
-		val finalSegmentYaw = finalSegment?.yRot ?: yRot
-		val forward = Vec3.directionFromRotation(0f, finalSegmentYaw)
-
-		return finalSegmentPosition.subtract(
-			forward.scale(PART_SPACING)
-		)
-	}
-
-	private fun removeSegmentsFrom(partIndex: Int) {
-		while (segmentPositions.size > partIndex) {
-			segmentPositions.removeLast()
-		}
-
-		while (bodyParts.size > partIndex) {
-			bodyParts.removeLast().discard()
-		}
-	}
-
 	// Collision
 
 	override fun canBeCollidedWith(): Boolean = !isDeadOrDying
@@ -145,182 +111,28 @@ class ScoochwormEntity(
 	override fun knockback(strength: Double, x: Double, z: Double) {}
 	override fun push(entity: Entity) {}
 
-	// Path tracking
-
-	private fun recordPath() {
-		val currentPosition = position()
-
-		if (pathHistory.isEmpty()) {
-			val forward = Vec3.directionFromRotation(0f, yRot)
-			val fullBodyLength = getPartDistance(MAX_SEGMENT_COUNT - 1)
-
-			pathHistory.addFirst(currentPosition)
-			pathHistory.addLast(
-				currentPosition.subtract(forward.scale(fullBodyLength))
-			)
-			return
-		}
-
-		val previousPosition = pathHistory.peekFirst()
-
-		if (previousPosition.distanceToSqr(currentPosition) > MINIMUM_PATH_STEP_SQUARED) {
-			pathHistory.addFirst(currentPosition)
-		}
-
-		while (pathHistory.size > MAX_PATH_POINTS) {
-			pathHistory.removeLast()
-		}
-	}
-
-	private fun getPathPosition(targetDistance: Double): Vec3 {
-		var remainingDistance = targetDistance
-		var newerPosition = pathHistory.peekFirst() ?: position()
-
-		for (olderPosition in pathHistory.drop(1)) {
-			val sectionDistance = newerPosition.distanceTo(olderPosition)
-
-			if (sectionDistance >= remainingDistance && sectionDistance > 0.0) {
-				return newerPosition.lerp(olderPosition, remainingDistance / sectionDistance)
-			}
-
-			remainingDistance -= sectionDistance
-			newerPosition = olderPosition
-		}
-
-		return newerPosition
-	}
-
-	// Body parts
-
-	private fun ensureBodyParts() {
-		bodyParts.removeAll(ScoochwormPartEntity::isRemoved)
-
-		while (bodyParts.size > segmentPositions.size) {
-			bodyParts.removeLast().discard()
-		}
-
-		while (bodyParts.size < segmentPositions.size) {
-			val partIndex = bodyParts.size
-			val bodyPart = ScoochwormPartEntity(
-				ModEntityTypes.SCOOCHWORM_PART.get(),
-				level()
-			)
-			val partPosition = segmentPositions[partIndex]
-
-			bodyPart.attachTo(this, partIndex)
-			bodyPart.moveTo(
-				partPosition.x,
-				partPosition.y,
-				partPosition.z,
-				yRot,
-				xRot
-			)
-			level().addFreshEntity(bodyPart)
-			bodyParts.add(bodyPart)
-		}
-	}
-
-	private fun updateBodyParts() {
-		for (index in bodyParts.indices) {
-			val distance = getPartDistance(index)
-			val pathPosition = getPathPosition(distance)
-			val bodyPart = bodyParts[index]
-
-			bodyPart.moveAlongPath(pathPosition, xRot)
-			segmentPositions[index] = pathPosition
-		}
-	}
-
-	private fun getPartDistance(partIndex: Int): Double {
-		return PART_SPACING * (partIndex + 1)
-	}
-
 	// Entity data
 
 	override fun readAdditionalSaveData(tag: CompoundTag) {
 		super.readAdditionalSaveData(tag)
 
-		segmentPositions.clear()
-		pathHistory.clear()
+		path.clear()
 
-		if (tag.contains(SEGMENT_POSITIONS_TAG, Tag.TAG_LIST.toInt())) {
-			segmentPositions.addAll(
-				readPositions(tag, SEGMENT_POSITIONS_TAG, MAX_SEGMENT_COUNT)
-			)
+		val segmentCount = if (tag.contains(SEGMENT_COUNT_TAG, Tag.TAG_INT.toInt())) {
+			tag.getInt(SEGMENT_COUNT_TAG)
+		} else if (tag.contains(LEGACY_SEGMENT_POSITIONS_TAG, Tag.TAG_LIST.toInt())) {
+			tag.getList(LEGACY_SEGMENT_POSITIONS_TAG, Tag.TAG_COMPOUND.toInt())
+				.size
 		} else {
-			segmentPositions.add(
-				getPathPosition(getPartDistance(0))
-			)
+			1
 		}
 
-		if (tag.contains(PATH_HISTORY_TAG, Tag.TAG_LIST.toInt())) {
-			pathHistory.addAll(
-				readPositions(tag, PATH_HISTORY_TAG, MAX_PATH_POINTS)
-			)
-		}
+		segments.restoreCount(segmentCount)
 	}
 
 	override fun addAdditionalSaveData(tag: CompoundTag) {
 		super.addAdditionalSaveData(tag)
-
-		val segmentPositionTags = ListTag()
-
-		for (partIndex in segmentPositions.indices) {
-			val segmentTag = if (partIndex < bodyParts.size) {
-				bodyParts[partIndex].createSegmentTag()
-			} else {
-				ScoochwormPartEntity.createSegmentTag(
-					segmentPositions[partIndex]
-				)
-			}
-
-			segmentPositionTags.add(segmentTag)
-		}
-
-		tag.put(SEGMENT_POSITIONS_TAG, segmentPositionTags)
-
-		val savedPathHistory = ListTag()
-
-		for (pathPosition in pathHistory) {
-			savedPathHistory.add(createPathPositionTag(pathPosition))
-		}
-
-		tag.put(PATH_HISTORY_TAG, savedPathHistory)
-	}
-
-	private fun readPositions(tag: CompoundTag, key: String, maximumSize: Int): List<Vec3> {
-		val positionTags = tag.getList(key, Tag.TAG_COMPOUND.toInt())
-		val positions = mutableListOf<Vec3>()
-		val positionCount = minOf(positionTags.size, maximumSize)
-
-		for (index in 0 until positionCount) {
-			val positionTag = positionTags.getCompound(index)
-			val position = if (key == SEGMENT_POSITIONS_TAG) {
-				ScoochwormPartEntity.readSegmentPosition(positionTag)
-			} else {
-				readPathPosition(positionTag)
-			}
-
-			positions.add(position)
-		}
-
-		return positions
-	}
-
-	private fun createPathPositionTag(position: Vec3): CompoundTag {
-		val positionTag = CompoundTag()
-		positionTag.putDouble(POSITION_X_TAG, position.x)
-		positionTag.putDouble(POSITION_Y_TAG, position.y)
-		positionTag.putDouble(POSITION_Z_TAG, position.z)
-		return positionTag
-	}
-
-	private fun readPathPosition(tag: CompoundTag): Vec3 {
-		return Vec3(
-			tag.getDouble(POSITION_X_TAG),
-			tag.getDouble(POSITION_Y_TAG),
-			tag.getDouble(POSITION_Z_TAG)
-		)
+		tag.putInt(SEGMENT_COUNT_TAG, segments.count)
 	}
 
 	// Animation
@@ -334,14 +146,8 @@ class ScoochwormEntity(
 		const val SIZE = 14f / 16f
 		const val PART_SPACING = SIZE * 1.2
 
-		private const val MAX_SEGMENT_COUNT = 4
-		private const val MAX_PATH_POINTS = 256
-		private const val MINIMUM_PATH_STEP_SQUARED = 0.000001
-		private const val SEGMENT_POSITIONS_TAG = "SegmentPositions"
-		private const val PATH_HISTORY_TAG = "PathHistory"
-		private const val POSITION_X_TAG = "X"
-		private const val POSITION_Y_TAG = "Y"
-		private const val POSITION_Z_TAG = "Z"
+		private const val SEGMENT_COUNT_TAG = "SegmentCount"
+		private const val LEGACY_SEGMENT_POSITIONS_TAG = "SegmentPositions"
 
 		fun createAttributes(): AttributeSupplier {
 			return createMobAttributes()

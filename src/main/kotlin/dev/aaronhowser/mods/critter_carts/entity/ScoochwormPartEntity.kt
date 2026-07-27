@@ -45,10 +45,6 @@ class ScoochwormPartEntity(
 		entityData.set(DATA_PART_INDEX, partIndex)
 	}
 
-	fun createSegmentTag(): CompoundTag {
-		return createSegmentTag(position())
-	}
-
 	// Movement
 
 	fun moveAlongPath(pathPosition: Vec3, pitch: Float) {
@@ -152,30 +148,12 @@ class ScoochwormPartEntity(
 		private const val NO_PARENT = -1
 		private const val MAX_MISSING_PARENT_TICKS = 20
 		private const val MINIMUM_MOVEMENT_SQUARED = 0.000001
-		private const val POSITION_X_TAG = "X"
-		private const val POSITION_Y_TAG = "Y"
-		private const val POSITION_Z_TAG = "Z"
 
 		private val DATA_PARENT_ID: EntityDataAccessor<Int> =
 			SynchedEntityData.defineId(ScoochwormPartEntity::class.java, EntityDataSerializers.INT)
 
 		private val DATA_PART_INDEX: EntityDataAccessor<Int> =
 			SynchedEntityData.defineId(ScoochwormPartEntity::class.java, EntityDataSerializers.INT)
-
-		fun createSegmentTag(position: Vec3): CompoundTag {
-			val tag = CompoundTag()
-			tag.putDouble(POSITION_X_TAG, position.x)
-			tag.putDouble(POSITION_Y_TAG, position.y)
-			tag.putDouble(POSITION_Z_TAG, position.z)
-			return tag
-		}
-
-		fun readSegmentPosition(tag: CompoundTag): Vec3 {
-			return Vec3(
-				tag.getDouble(POSITION_X_TAG),
-				tag.getDouble(POSITION_Y_TAG),
-				tag.getDouble(POSITION_Z_TAG)
-			)
-		}
 	}
+
 }
