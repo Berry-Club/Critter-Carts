@@ -1,6 +1,7 @@
 package dev.aaronhowser.mods.critter_carts.event
 
 import dev.aaronhowser.mods.critter_carts.CritterCarts
+import dev.aaronhowser.mods.critter_carts.client.renderer.ScoochwormPartRenderer
 import dev.aaronhowser.mods.critter_carts.client.renderer.ScoochwormRenderer
 import dev.aaronhowser.mods.critter_carts.registry.ModEntityTypes
 import net.neoforged.api.distmarker.Dist
@@ -17,5 +18,6 @@ object ClientEvents {
 	@SubscribeEvent
 	fun registerEntityRenderers(event: EntityRenderersEvent.RegisterRenderers) {
 		event.registerEntityRenderer(ModEntityTypes.SCOOCHWORM.get(), ::ScoochwormRenderer)
+		event.registerEntityRenderer(ModEntityTypes.SCOOCHWORM_PART.get(), ::ScoochwormPartRenderer)
 	}
 }
