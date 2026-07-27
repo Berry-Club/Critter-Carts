@@ -39,25 +39,30 @@ class ScoochwormPartEntity(
 
 	// Parent
 
+	var parentId: Int
+		get() = entityData.get(DATA_PARENT_ID)
+		set(value) = entityData.set(DATA_PARENT_ID, value)
+
 	private fun getParent(): ScoochwormEntity? {
-		return level().getEntity(entityData.get(DATA_PARENT_ID)) as? ScoochwormEntity
+		return level().getEntity(parentId) as? ScoochwormEntity
 	}
 
-	val attachment: ScoochwormPartAttachment
+	var partIndex: Int
+		get() = entityData.get(DATA_PART_INDEX)
+		set(value) = entityData.set(DATA_PART_INDEX, value)
+
+	var attachment: ScoochwormPartAttachment
 		get() = entityData.get(DATA_ATTACHMENT)
+		set(value) = entityData.set(DATA_ATTACHMENT, value)
 
 	fun attachTo(
 		parentEntity: ScoochwormEntity,
 		partIndex: Int,
 		attachment: ScoochwormPartAttachment
 	) {
-		entityData.set(DATA_PARENT_ID, parentEntity.id)
-		entityData.set(DATA_PART_INDEX, partIndex)
-		setAttachment(attachment)
-	}
-
-	fun setAttachment(attachment: ScoochwormPartAttachment) {
-		entityData.set(DATA_ATTACHMENT, attachment)
+		this.parentId = parentEntity.id
+		this.partIndex = partIndex
+		this.attachment = attachment
 	}
 
 	// Movement
@@ -134,7 +139,7 @@ class ScoochwormPartEntity(
 
 	override fun interact(player: Player, hand: InteractionHand): InteractionResult {
 		val parentEntity = getParent() ?: return InteractionResult.PASS
-		return parentEntity.interactWithPart(player, hand, entityData.get(DATA_PART_INDEX))
+		return parentEntity.interactWithPart(player, hand, partIndex)
 	}
 
 	override fun canBeCollidedWith(): Boolean = true

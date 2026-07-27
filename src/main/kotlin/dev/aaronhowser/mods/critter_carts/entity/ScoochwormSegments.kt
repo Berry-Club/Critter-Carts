@@ -50,7 +50,7 @@ class ScoochwormSegments(
 	): Boolean {
 		val segment = segments.getOrNull(partIndex) ?: return false
 		segment.attachment = attachment
-		bodyParts.getOrNull(partIndex)?.setAttachment(attachment)
+		bodyParts.getOrNull(partIndex)?.attachment = attachment
 		return true
 	}
 
