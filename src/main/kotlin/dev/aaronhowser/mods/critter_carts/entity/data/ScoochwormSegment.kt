@@ -2,6 +2,9 @@ package dev.aaronhowser.mods.critter_carts.entity.data
 
 import com.mojang.serialization.Codec
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isItem
+import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity
+import dev.aaronhowser.mods.critter_carts.entity.ScoochwormPartEntity
+import dev.aaronhowser.mods.critter_carts.registry.ModEntityTypes
 import net.minecraft.core.component.DataComponents
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtOps
@@ -10,10 +13,17 @@ import net.minecraft.world.entity.Entity
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import net.minecraft.world.item.component.ItemContainerContents
+import net.minecraft.world.phys.Vec3
 
 class ScoochwormSegment(
-	var attachmentItem: ItemStack = ItemStack.EMPTY
+	attachmentItem: ItemStack = ItemStack.EMPTY
 ) {
+
+	var attachmentItem = attachmentItem
+		private set
+
+	var bodyPart: ScoochwormPartEntity? = null
+		private set
 
 	val attachment: ScoochwormPartAttachment
 		get() = when {
@@ -31,25 +41,75 @@ class ScoochwormSegment(
 		}
 	}
 
-	fun equipAttachmentItem(stack: ItemStack) {
-		attachmentItem = stack
-		loadContainer()
+	fun updateBodyPart(
+		scoochworm: ScoochwormEntity,
+		partIndex: Int,
+		position: Vec3
+	) {
+		var bodyPart = this.bodyPart
+
+		if (bodyPart == null || bodyPart.isRemoved) {
+			bodyPart = createBodyPart(scoochworm, partIndex, position)
+			this.bodyPart = bodyPart
+		}
+
+		bodyPart.moveAlongPath(position, scoochworm.xRot)
 	}
 
-	fun removeAttachmentItem(): ItemStack {
+	fun discardBodyPart() {
+		bodyPart?.discard()
+		bodyPart = null
+	}
+
+	fun setAttachment(stack: ItemStack) {
+		attachmentItem = stack
+		loadContainer()
+		bodyPart?.attachment = attachment
+	}
+
+	fun removeAttachment(): ItemStack {
 		updateContainerComponent()
 
 		val removedStack = attachmentItem
 		attachmentItem = ItemStack.EMPTY
 		container.clearContent()
+		bodyPart?.attachment = attachment
 		return removedStack
 	}
 
 	fun dropAttachmentItem(entity: Entity) {
-		val attachmentItem = removeAttachmentItem()
+		val attachmentItem = removeAttachment()
 		if (attachmentItem.isEmpty) return
 
-		entity.spawnAtLocation(attachmentItem)
+		val dropSource = bodyPart ?: entity
+		dropSource.spawnAtLocation(attachmentItem)
+	}
+
+	private fun createBodyPart(
+		scoochworm: ScoochwormEntity,
+		partIndex: Int,
+		position: Vec3
+	): ScoochwormPartEntity {
+		val bodyPart = ScoochwormPartEntity(
+			ModEntityTypes.SCOOCHWORM_PART.get(),
+			scoochworm.level()
+		)
+
+		bodyPart.attachTo(
+			scoochworm,
+			partIndex,
+			attachment
+		)
+		bodyPart.moveTo(
+			position.x,
+			position.y,
+			position.z,
+			scoochworm.yRot,
+			scoochworm.xRot
+		)
+
+		scoochworm.level().addFreshEntity(bodyPart)
+		return bodyPart
 	}
 
 	private fun loadContainer() {

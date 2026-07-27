@@ -167,7 +167,8 @@ class ScoochwormEntity(
 
 		if (isServerSide) {
 			val attachmentItem = heldStack.copyWithCount(1)
-			bodySegments.setAttachmentItem(partIndex, attachmentItem)
+			val segment = bodySegments.getSegment(partIndex) ?: return null
+			segment.setAttachment(attachmentItem)
 			heldStack.consume(1, player)
 
 			@Suppress("KotlinConstantConditions")
@@ -194,7 +195,8 @@ class ScoochwormEntity(
 		if (!player.isShiftKeyDown || !heldStack.isEmpty) return null
 
 		if (isServerSide) {
-			val attachmentItem = bodySegments.removeAttachmentItem(partIndex)
+			val segment = bodySegments.getSegment(partIndex) ?: return null
+			val attachmentItem = segment.removeAttachment()
 
 			if (!player.addItem(attachmentItem)) {
 				player.drop(attachmentItem, false)
@@ -214,7 +216,8 @@ class ScoochwormEntity(
 		if (player.isShiftKeyDown) return null
 
 		if (isServerSide) {
-			val bodyPart = bodySegments.getBodyPart(partIndex) ?: return null
+			val segment = bodySegments.getSegment(partIndex) ?: return null
+			val bodyPart = segment.bodyPart ?: return null
 			if (!player.startRiding(bodyPart)) return null
 		}
 
@@ -226,10 +229,10 @@ class ScoochwormEntity(
 		partIndex: Int
 	): InteractionResult? {
 		if (isServerSide) {
-			val container = bodySegments.getContainer(partIndex) ?: return null
+			val segment = bodySegments.getSegment(partIndex) ?: return null
 			val menuProvider = SimpleMenuProvider(
 				{ containerId, playerInventory, _ ->
-					ChestMenu.threeRows(containerId, playerInventory, container)
+					ChestMenu.threeRows(containerId, playerInventory, segment.container)
 				},
 				Items.CHEST.description
 			)
