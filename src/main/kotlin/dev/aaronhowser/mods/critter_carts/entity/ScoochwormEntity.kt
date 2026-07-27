@@ -1,5 +1,6 @@
 package dev.aaronhowser.mods.critter_carts.entity
 
+import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.PathfinderMob
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier
@@ -22,12 +23,13 @@ class ScoochwormEntity(
 	override fun registerGoals() {
 	}
 
-	override fun canBeCollidedWith(): Boolean = true
+	override fun canBeCollidedWith(): Boolean = !isDeadOrDying
 	override fun isPushable(): Boolean = false
 	override fun isPushedByFluid(): Boolean = false
 	override fun isPushedByFluid(type: FluidType): Boolean = false
 	override fun getPistonPushReaction(): PushReaction = PushReaction.IGNORE
 	override fun knockback(strength: Double, x: Double, z: Double) {}
+	override fun push(entity: Entity) {}
 
 	// Animation stuff
 
