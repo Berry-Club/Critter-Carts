@@ -10,7 +10,8 @@ object ModRegistries {
 			ModItems.ITEM_REGISTRY,
 			ModBlocks.BLOCK_REGISTRY,
 			ModCreativeModeTabs.TABS_REGISTRY,
-			ModEntityTypes.ENTITY_TYPE_REGISTRY
+			ModEntityTypes.ENTITY_TYPE_REGISTRY,
+			ModEntityDataSerializers.ENTITY_DATA_SERIALIZER_REGISTRY
 		)
 
 		for (registry in registries) {

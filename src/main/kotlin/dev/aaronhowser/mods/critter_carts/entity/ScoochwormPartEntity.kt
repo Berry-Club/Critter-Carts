@@ -1,6 +1,7 @@
 package dev.aaronhowser.mods.critter_carts.entity
 
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isClientSide
+import dev.aaronhowser.mods.critter_carts.registry.ModEntityDataSerializers
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.EntityDataSerializers
@@ -43,9 +44,7 @@ class ScoochwormPartEntity(
 	}
 
 	val attachment: ScoochwormPartAttachment
-		get() = ScoochwormPartAttachment.fromNetworkId(
-			entityData.get(DATA_ATTACHMENT)
-		)
+		get() = entityData.get(DATA_ATTACHMENT)
 
 	fun attachTo(
 		parentEntity: ScoochwormEntity,
@@ -58,7 +57,7 @@ class ScoochwormPartEntity(
 	}
 
 	fun setAttachment(attachment: ScoochwormPartAttachment) {
-		entityData.set(DATA_ATTACHMENT, attachment.ordinal)
+		entityData.set(DATA_ATTACHMENT, attachment)
 	}
 
 	// Movement
@@ -147,7 +146,7 @@ class ScoochwormPartEntity(
 	override fun defineSynchedData(builder: SynchedEntityData.Builder) {
 		builder.define(DATA_PARENT_ID, NO_PARENT)
 		builder.define(DATA_PART_INDEX, 0)
-		builder.define(DATA_ATTACHMENT, ScoochwormPartAttachment.NONE.ordinal)
+		builder.define(DATA_ATTACHMENT, ScoochwormPartAttachment.NONE)
 	}
 
 	override fun readAdditionalSaveData(tag: CompoundTag) {}
@@ -172,8 +171,11 @@ class ScoochwormPartEntity(
 		private val DATA_PART_INDEX: EntityDataAccessor<Int> =
 			SynchedEntityData.defineId(ScoochwormPartEntity::class.java, EntityDataSerializers.INT)
 
-		private val DATA_ATTACHMENT: EntityDataAccessor<Int> =
-			SynchedEntityData.defineId(ScoochwormPartEntity::class.java, EntityDataSerializers.INT)
+		private val DATA_ATTACHMENT: EntityDataAccessor<ScoochwormPartAttachment> =
+			SynchedEntityData.defineId(
+				ScoochwormPartEntity::class.java,
+				ModEntityDataSerializers.SCOOCHWORM_PART_ATTACHMENT.get()
+			)
 	}
 
 }

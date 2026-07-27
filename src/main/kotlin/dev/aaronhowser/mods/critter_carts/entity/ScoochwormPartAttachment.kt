@@ -1,21 +1,28 @@
 package dev.aaronhowser.mods.critter_carts.entity
 
+import com.mojang.serialization.Codec
+import io.netty.buffer.ByteBuf
+import net.minecraft.network.codec.ByteBufCodecs
+import net.minecraft.network.codec.StreamCodec
+import net.minecraft.util.StringRepresentable
+
 enum class ScoochwormPartAttachment(
-	val serializedName: String
-) {
+	private val serializedName: String
+) : StringRepresentable {
 	NONE("none"),
 	CHEST("chest"),
 	SADDLE("saddle");
 
-	companion object {
-		fun fromSerializedName(serializedName: String): ScoochwormPartAttachment {
-			return entries.firstOrNull {
-				it.serializedName == serializedName
-			} ?: NONE
-		}
+	override fun getSerializedName(): String = serializedName
 
-		fun fromNetworkId(networkId: Int): ScoochwormPartAttachment {
-			return entries.getOrElse(networkId) { NONE }
-		}
+	companion object {
+		val CODEC: Codec<ScoochwormPartAttachment> =
+			StringRepresentable.fromEnum(::values)
+
+		val STREAM_CODEC: StreamCodec<ByteBuf, ScoochwormPartAttachment> =
+			ByteBufCodecs.idMapper(
+				{ networkId -> entries[networkId] },
+				ScoochwormPartAttachment::ordinal
+			)
 	}
 }
