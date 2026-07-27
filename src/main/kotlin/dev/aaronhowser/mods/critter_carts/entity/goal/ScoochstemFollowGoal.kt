@@ -6,7 +6,6 @@ import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.world.entity.ai.goal.Goal
 import java.util.EnumSet
-import kotlin.math.abs
 
 class ScoochstemFollowGoal(
 	private val scoochworm: ScoochwormEntity
@@ -26,8 +25,9 @@ class ScoochstemFollowGoal(
 		val direction = travelDirection ?: Direction.fromYRot(scoochworm.yRot.toDouble())
 		val nextStem = chooseNextStem(currentStem, direction) ?: return false
 
-		travelDirection = directionTo(currentStem, nextStem)
-		targetStem = nextStem
+		val nextDirection = directionTo(currentStem, nextStem)
+		travelDirection = nextDirection
+		targetStem = findSegmentEnd(currentStem, nextDirection)
 		return true
 	}
 
@@ -40,34 +40,25 @@ class ScoochstemFollowGoal(
 		val targetX = target.x + 0.5
 		val targetZ = target.z + 0.5
 
-		val distance = if (direction.axis == Direction.Axis.X) {
-			abs(targetX - scoochworm.x)
-		} else {
-			abs(targetZ - scoochworm.z)
+		val distance = (targetX - scoochworm.x) * direction.stepX +
+			(targetZ - scoochworm.z) * direction.stepZ
+
+		if (distance <= TARGET_DISTANCE) {
+			scoochworm.setPos(targetX, scoochworm.y, targetZ)
+			val nextStem = chooseNextStem(target, direction)
+
+			if (nextStem == null) {
+				targetStem = null
+				scoochworm.deltaMovement = scoochworm.deltaMovement.multiply(0.0, 1.0, 0.0)
+				return
+			}
+
+			val nextDirection = directionTo(target, nextStem)
+			travelDirection = nextDirection
+			targetStem = findSegmentEnd(target, nextDirection)
 		}
 
-		if (distance > TARGET_DISTANCE) {
-			scoochworm.scoochwormMoveControl.setWantedPosition(
-				targetX,
-				target.y + 1.0,
-				targetZ,
-				direction,
-				1.0
-			)
-			return
-		}
-
-		scoochworm.setPos(targetX, scoochworm.y, targetZ)
-		scoochworm.deltaMovement = scoochworm.deltaMovement.multiply(0.0, 1.0, 0.0)
-		val nextStem = chooseNextStem(target, direction)
-
-		if (nextStem == null) {
-			targetStem = null
-			return
-		}
-
-		travelDirection = directionTo(target, nextStem)
-		targetStem = nextStem
+		moveTowardTarget()
 	}
 
 	override fun stop() {
@@ -92,6 +83,30 @@ class ScoochstemFollowGoal(
 		if (hasRightStem) return rightStem
 
 		return null
+	}
+
+	private fun findSegmentEnd(start: BlockPos, direction: Direction): BlockPos {
+		var segmentEnd = start.relative(direction)
+		var nextStem = segmentEnd.relative(direction)
+
+		while (isScoochstem(nextStem)) {
+			segmentEnd = nextStem
+			nextStem = segmentEnd.relative(direction)
+		}
+
+		return segmentEnd
+	}
+
+	private fun moveTowardTarget() {
+		val target = targetStem ?: return
+		val direction = travelDirection ?: return
+		scoochworm.scoochwormMoveControl.setWantedPosition(
+			target.x + 0.5,
+			target.y + 1.0,
+			target.z + 0.5,
+			direction,
+			1.0
+		)
 	}
 
 	private fun isScoochstem(position: BlockPos): Boolean {

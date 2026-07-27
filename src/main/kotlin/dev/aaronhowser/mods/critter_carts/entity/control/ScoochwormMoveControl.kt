@@ -4,6 +4,8 @@ import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity
 import net.minecraft.core.Direction
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.entity.ai.control.MoveControl
+import net.minecraft.world.phys.Vec3
+import kotlin.math.sqrt
 
 class ScoochwormMoveControl(
 	private val scoochworm: ScoochwormEntity
@@ -12,6 +14,10 @@ class ScoochwormMoveControl(
 	private var travelDirection: Direction? = null
 
 	fun setWantedPosition(x: Double, y: Double, z: Double, direction: Direction, speed: Double) {
+		if (travelDirection != null && travelDirection != direction) {
+			rotateMomentum(direction)
+		}
+
 		travelDirection = direction
 		setWantedPosition(x, y, z, speed)
 	}
@@ -49,5 +55,15 @@ class ScoochwormMoveControl(
 		} else {
 			movement.multiply(0.0, 1.0, 1.0)
 		}
+	}
+
+	private fun rotateMomentum(direction: Direction) {
+		val movement = scoochworm.deltaMovement
+		val horizontalSpeed = sqrt(movement.x * movement.x + movement.z * movement.z)
+		scoochworm.deltaMovement = Vec3(
+			direction.stepX * horizontalSpeed,
+			movement.y,
+			direction.stepZ * horizontalSpeed
+		)
 	}
 }
