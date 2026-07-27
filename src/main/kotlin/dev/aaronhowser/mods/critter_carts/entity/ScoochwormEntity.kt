@@ -36,7 +36,7 @@ class ScoochwormEntity(
 	override fun isPushedByFluid(type: FluidType): Boolean = false
 	override fun getPistonPushReaction(): PushReaction = PushReaction.IGNORE
 	override fun knockback(strength: Double, x: Double, z: Double) {}
-	override fun push(entity: Entity) {} //
+	override fun push(entity: Entity) {}
 
 	// Animation stuff
 
