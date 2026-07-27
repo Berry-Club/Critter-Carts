@@ -90,32 +90,32 @@ class ScoochwormEntity(
 		val growResult = tryGrow(player, heldStack)
 		if (growResult != null) return growResult
 
-		val isNotHead = partIndex != null
-		if (isNotHead) {
-			val shearResult = tryShear(player, hand, heldStack, partIndex)
-			if (shearResult != null) return shearResult
+		val isHead = partIndex == null
+		if (isHead) return InteractionResult.PASS
 
-			val removeAttachmentResult = tryRemoveAttachment(player, heldStack, partIndex, currentAttachment)
-			if (removeAttachmentResult != null) return removeAttachmentResult
+		val shearResult = tryShear(player, hand, heldStack, partIndex)
+		if (shearResult != null) return shearResult
 
-			when (currentAttachment) {
-				ScoochwormPartAttachment.NONE -> {
-					val addAttachmentResult = tryAddAttachment(player, heldStack, partIndex)
-					if (addAttachmentResult != null) return addAttachmentResult
-				}
+		val removeAttachmentResult = tryRemoveAttachment(player, heldStack, partIndex, currentAttachment)
+		if (removeAttachmentResult != null) return removeAttachmentResult
 
-				ScoochwormPartAttachment.SADDLE -> {
-					val rideResult = tryRide(player, partIndex)
-					if (rideResult != null) return rideResult
-				}
-
-				ScoochwormPartAttachment.CHEST -> {
-					val openChestResult = tryOpenChest(player, partIndex)
-					if (openChestResult != null) return openChestResult
-				}
-
-				null -> {}
+		when (currentAttachment) {
+			ScoochwormPartAttachment.NONE -> {
+				val addAttachmentResult = tryAddAttachment(player, heldStack, partIndex)
+				if (addAttachmentResult != null) return addAttachmentResult
 			}
+
+			ScoochwormPartAttachment.SADDLE -> {
+				val rideResult = tryRide(player, partIndex)
+				if (rideResult != null) return rideResult
+			}
+
+			ScoochwormPartAttachment.CHEST -> {
+				val openChestResult = tryOpenChest(player, partIndex)
+				if (openChestResult != null) return openChestResult
+			}
+
+			null -> {}
 		}
 
 		return InteractionResult.PASS
