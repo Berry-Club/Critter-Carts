@@ -4,6 +4,7 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData
+import net.minecraft.util.Mth
 import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
@@ -13,6 +14,7 @@ import software.bernie.geckolib.animatable.GeoEntity
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache
 import software.bernie.geckolib.animatable.instance.SingletonAnimatableInstanceCache
 import software.bernie.geckolib.animation.AnimatableManager
+import kotlin.math.atan2
 
 class ScoochwormPartEntity(
 	entityType: EntityType<ScoochwormPartEntity>,
@@ -21,6 +23,10 @@ class ScoochwormPartEntity(
 
 	private val cache = SingletonAnimatableInstanceCache(this)
 	private var missingParentTicks = 0
+	private var interpolationSteps = 0
+	private var interpolationPosition = Vec3.ZERO
+	private var interpolationYaw = 0f
+	private var interpolationPitch = 0f
 
 	init {
 		noPhysics = true
@@ -33,27 +39,26 @@ class ScoochwormPartEntity(
 
 	fun moveAlongPath(pathPosition: Vec3, pitch: Float) {
 		val movement = pathPosition.subtract(position())
-		var movementRotation = yRot
+		var movementYaw = yRot
 
 		if (movement.horizontalDistanceSqr() >= MINIMUM_MOVEMENT_SQUARED) {
-			movementRotation = Math.toDegrees(
-				kotlin.math.atan2(-movement.x, movement.z)
-			).toFloat()
+			movementYaw = Math.toDegrees(
+				atan2(movement.z, movement.x)
+			).toFloat() - 90f
 		}
 
-		moveTo(
-			pathPosition.x,
-			pathPosition.y,
-			pathPosition.z,
-			movementRotation,
-			pitch
-		)
+		setPos(pathPosition)
+		yRot = movementYaw
+		xRot = pitch
 	}
 
 	override fun tick() {
 		super.tick()
 
-		if (level().isClientSide) return
+		if (level().isClientSide) {
+			tickInterpolation()
+			return
+		}
 
 		val parent = parent
 		if (parent != null && !parent.isRemoved) {
@@ -65,6 +70,20 @@ class ScoochwormPartEntity(
 		if (missingParentTicks > MAX_MISSING_PARENT_TICKS) {
 			discard()
 		}
+	}
+
+	override fun lerpTo(
+		x: Double,
+		y: Double,
+		z: Double,
+		yRot: Float,
+		xRot: Float,
+		lerpSteps: Int
+	) {
+		interpolationPosition = Vec3(x, y, z)
+		interpolationYaw = yRot
+		interpolationPitch = xRot
+		interpolationSteps = lerpSteps
 	}
 
 	override fun hurt(damageSource: DamageSource, amount: Float): Boolean {
@@ -92,6 +111,16 @@ class ScoochwormPartEntity(
 	}
 
 	override fun getAnimatableInstanceCache(): AnimatableInstanceCache = cache
+
+	private fun tickInterpolation() {
+		if (interpolationSteps <= 0) return
+
+		val progress = 1.0 / interpolationSteps
+		setPos(position().lerp(interpolationPosition, progress))
+		yRot += Mth.wrapDegrees(interpolationYaw - yRot) / interpolationSteps
+		xRot += (interpolationPitch - xRot) / interpolationSteps
+		interpolationSteps--
+	}
 
 	private val parent: ScoochwormEntity?
 		get() = level().getEntity(entityData.get(DATA_PARENT_ID)) as? ScoochwormEntity

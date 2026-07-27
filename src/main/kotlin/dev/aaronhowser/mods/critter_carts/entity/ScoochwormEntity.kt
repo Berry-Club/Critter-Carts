@@ -72,9 +72,21 @@ class ScoochwormEntity(
 
 	private fun recordPath() {
 		val currentPosition = position()
+
+		if (pathHistory.isEmpty()) {
+			val forward = Vec3.directionFromRotation(0f, yRot)
+			val fullBodyLength = getPartDistance(BODY_PART_COUNT - 1)
+
+			pathHistory.addFirst(currentPosition)
+			pathHistory.addLast(
+				currentPosition.subtract(forward.scale(fullBodyLength))
+			)
+			return
+		}
+
 		val previousPosition = pathHistory.peekFirst()
 
-		if (previousPosition == null || previousPosition.distanceToSqr(currentPosition) > MINIMUM_PATH_STEP_SQUARED) {
+		if (previousPosition.distanceToSqr(currentPosition) > MINIMUM_PATH_STEP_SQUARED) {
 			pathHistory.addFirst(currentPosition)
 		}
 
@@ -87,13 +99,21 @@ class ScoochwormEntity(
 		bodyParts.removeAll { it.isRemoved }
 
 		while (bodyParts.size < BODY_PART_COUNT) {
+			val partIndex = bodyParts.size
 			val bodyPart = ScoochwormPartEntity(
 				ModEntityTypes.SCOOCHWORM_PART.get(),
 				level()
 			)
+			val pathPosition = getPathPosition(getPartDistance(partIndex))
 
-			bodyPart.attachTo(this, bodyParts.size)
-			bodyPart.moveTo(position())
+			bodyPart.attachTo(this, partIndex)
+			bodyPart.moveTo(
+				pathPosition.x,
+				pathPosition.y,
+				pathPosition.z,
+				yRot,
+				xRot
+			)
 			level().addFreshEntity(bodyPart)
 			bodyParts.add(bodyPart)
 		}
@@ -101,7 +121,7 @@ class ScoochwormEntity(
 
 	private fun updateBodyParts() {
 		for (index in bodyParts.indices) {
-			val distance = PART_SPACING * (index + 1)
+			val distance = getPartDistance(index)
 			val pathPosition = getPathPosition(distance)
 			val bodyPart = bodyParts[index]
 
@@ -125,6 +145,10 @@ class ScoochwormEntity(
 		}
 
 		return newerPosition
+	}
+
+	private fun getPartDistance(partIndex: Int): Double {
+		return PART_SPACING * (partIndex + 2)
 	}
 
 	companion object {
