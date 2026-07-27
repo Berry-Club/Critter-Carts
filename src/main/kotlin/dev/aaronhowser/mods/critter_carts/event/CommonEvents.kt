@@ -1,0 +1,17 @@
+package dev.aaronhowser.mods.critter_carts.event
+
+import dev.aaronhowser.mods.critter_carts.CritterCarts
+import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity
+import dev.aaronhowser.mods.critter_carts.registry.ModEntityTypes
+import net.neoforged.bus.api.SubscribeEvent
+import net.neoforged.fml.common.EventBusSubscriber
+import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent
+
+@EventBusSubscriber(modid = CritterCarts.MOD_ID)
+object CommonEvents {
+
+	@SubscribeEvent
+	fun registerEntityAttributes(event: EntityAttributeCreationEvent) {
+		event.put(ModEntityTypes.SCOOCHWORM.get(), ScoochwormEntity.createAttributes())
+	}
+}
