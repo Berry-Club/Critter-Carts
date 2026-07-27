@@ -1,14 +1,21 @@
 package dev.aaronhowser.mods.critter_carts.entity
 
+import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isItem
 import dev.aaronhowser.mods.critter_carts.entity.control.ScoochwormMoveControl
 import dev.aaronhowser.mods.critter_carts.entity.goal.ScoochstemFollowGoal
 import dev.aaronhowser.mods.critter_carts.registry.ModEntityTypes
+import net.minecraft.sounds.SoundEvents
+import net.minecraft.world.InteractionHand
+import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.PathfinderMob
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier
 import net.minecraft.world.entity.ai.attributes.Attributes
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.item.Items
 import net.minecraft.world.level.Level
+import net.minecraft.world.level.gameevent.GameEvent
 import net.minecraft.world.level.material.PushReaction
 import net.minecraft.world.phys.Vec3
 import net.neoforged.neoforge.fluids.FluidType
@@ -24,9 +31,10 @@ class ScoochwormEntity(
 ) : PathfinderMob(entityType, level), GeoEntity {
 
 	private val cache = SingletonAnimatableInstanceCache(this)
-	private val scoochwormMoveControl = ScoochwormMoveControl(this)
+	val scoochwormMoveControl = ScoochwormMoveControl(this)
 	private val bodyParts: MutableList<ScoochwormPartEntity> = mutableListOf()
 	private val pathHistory: ArrayDeque<Vec3> = ArrayDeque()
+	private val segmentPositions: MutableList<Vec3> = mutableListOf(position())
 
 	init {
 		moveControl = scoochwormMoveControl
@@ -56,6 +64,46 @@ class ScoochwormEntity(
 		bodyParts.clear()
 	}
 
+	// Interaction
+
+	override fun mobInteract(player: Player, hand: InteractionHand): InteractionResult {
+		return interactWithPart(player, hand, null)
+	}
+
+	fun interactWithPart(
+		player: Player,
+		hand: InteractionHand,
+		partIndex: Int?
+	): InteractionResult {
+		val heldItem = player.getItemInHand(hand)
+
+		if (heldItem.isItem(Items.MELON) && segmentPositions.size < MAX_SEGMENT_COUNT) {
+			if (!level().isClientSide) {
+				segmentPositions.add(getNewSegmentPosition())
+				heldItem.consume(1, player)
+				playSound(SoundEvents.GENERIC_EAT, 1f, 1f)
+				gameEvent(GameEvent.EAT, player)
+			}
+
+			return InteractionResult.sidedSuccess(level().isClientSide)
+		}
+
+		return InteractionResult.PASS
+	}
+
+	private fun getNewSegmentPosition(): Vec3 {
+		val finalSegmentIndex = segmentPositions.lastIndex
+		val finalSegment = bodyParts.getOrNull(finalSegmentIndex)
+		val finalSegmentPosition = finalSegment?.position()
+			?: segmentPositions.last()
+		val finalSegmentYaw = finalSegment?.yRot ?: yRot
+		val forward = Vec3.directionFromRotation(0f, finalSegmentYaw)
+
+		return finalSegmentPosition.subtract(
+			forward.scale(PART_SPACING)
+		)
+	}
+
 	// Collision
 
 	override fun canBeCollidedWith(): Boolean = !isDeadOrDying
@@ -72,7 +120,7 @@ class ScoochwormEntity(
 
 		if (pathHistory.isEmpty()) {
 			val forward = Vec3.directionFromRotation(0f, yRot)
-			val fullBodyLength = getPartDistance(BODY_PART_COUNT - 1)
+			val fullBodyLength = getPartDistance(MAX_SEGMENT_COUNT - 1)
 
 			pathHistory.addFirst(currentPosition)
 			pathHistory.addLast(
@@ -113,21 +161,25 @@ class ScoochwormEntity(
 	// Body parts
 
 	private fun ensureBodyParts() {
-		bodyParts.removeAll { it.isRemoved }
+		bodyParts.removeAll(ScoochwormPartEntity::isRemoved)
 
-		while (bodyParts.size < BODY_PART_COUNT) {
+		while (bodyParts.size > segmentPositions.size) {
+			bodyParts.removeLast().discard()
+		}
+
+		while (bodyParts.size < segmentPositions.size) {
 			val partIndex = bodyParts.size
 			val bodyPart = ScoochwormPartEntity(
 				ModEntityTypes.SCOOCHWORM_PART.get(),
 				level()
 			)
-			val pathPosition = getPathPosition(getPartDistance(partIndex))
+			val partPosition = segmentPositions[partIndex]
 
 			bodyPart.attachTo(this, partIndex)
 			bodyPart.moveTo(
-				pathPosition.x,
-				pathPosition.y,
-				pathPosition.z,
+				partPosition.x,
+				partPosition.y,
+				partPosition.z,
 				yRot,
 				xRot
 			)
@@ -143,6 +195,7 @@ class ScoochwormEntity(
 			val bodyPart = bodyParts[index]
 
 			bodyPart.moveAlongPath(pathPosition, xRot)
+			segmentPositions[index] = pathPosition
 		}
 	}
 
@@ -159,9 +212,9 @@ class ScoochwormEntity(
 
 	companion object {
 		const val SIZE = 14f / 16f
-		const val BODY_PART_COUNT = 4
 		const val PART_SPACING = SIZE * 1.2
 
+		private const val MAX_SEGMENT_COUNT = 4
 		private const val MAX_PATH_POINTS = 256
 		private const val MINIMUM_PATH_STEP_SQUARED = 0.000001
 
