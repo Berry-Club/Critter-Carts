@@ -21,11 +21,11 @@ class ScoochwormEntity(
 	private val cache = SingletonAnimatableInstanceCache(this)
 
 	override fun registerGoals() {
+		goalSelector.addGoal(0, ScoochstemFollowGoal(this))
 	}
 
 	override fun canBeCollidedWith(): Boolean = !isDeadOrDying
 	override fun isPushable(): Boolean = false
-	override fun isPushedByFluid(): Boolean = false
 	override fun isPushedByFluid(type: FluidType): Boolean = false
 	override fun getPistonPushReaction(): PushReaction = PushReaction.IGNORE
 	override fun knockback(strength: Double, x: Double, z: Double) {}
@@ -44,6 +44,7 @@ class ScoochwormEntity(
 		fun createAttributes(): AttributeSupplier {
 			return createMobAttributes()
 				.add(Attributes.MAX_HEALTH, 10.0)
+				.add(Attributes.MOVEMENT_SPEED, 0.15)
 				.build()
 		}
 	}
