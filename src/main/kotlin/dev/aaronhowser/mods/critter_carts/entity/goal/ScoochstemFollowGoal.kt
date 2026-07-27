@@ -1,5 +1,6 @@
-package dev.aaronhowser.mods.critter_carts.entity
+package dev.aaronhowser.mods.critter_carts.entity.goal
 
+import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity
 import dev.aaronhowser.mods.critter_carts.registry.ModBlocks
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction

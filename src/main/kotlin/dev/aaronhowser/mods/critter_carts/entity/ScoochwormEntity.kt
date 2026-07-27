@@ -1,5 +1,6 @@
 package dev.aaronhowser.mods.critter_carts.entity
 
+import dev.aaronhowser.mods.critter_carts.entity.goal.ScoochstemFollowGoal
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.PathfinderMob
