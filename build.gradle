@@ -117,19 +117,10 @@ repositories {
 	}
 
 	maven {
-		name = 'TerraformersMC'
-		url = 'https://maven.terraformersmc.com/releases/'
-	}
-
-	maven {
-		name = 'Illusive Soulworks'
-		url = 'https://maven.theillusivec4.top/'
-	}
-
-	maven {
-		url = 'https://dl.cloudsmith.io/public/klikli-dev/mods/maven/'
+		name = 'GeckoLib'
+		url = 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
 		content {
-			includeGroup 'com.klikli_dev'
+			includeGroup 'software.bernie.geckolib'
 		}
 	}
 
@@ -153,12 +144,10 @@ repositories {
 dependencies {
 	implementation "thedarkcolour:kotlinforforge-neoforge:${kff_version}"
 	implementation "dev.aaronhowser.mods:aaron-1.21.1:${aaron_lib_version}"
+	implementation "software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}"
 
 	compileOnly "mezz.jei:jei-1.21.1-neoforge-api:${jei_version}"
 	runtimeOnly "mezz.jei:jei-1.21.1-neoforge:${jei_version}"
-
-	compileOnly "top.theillusivec4.curios:curios-neoforge:${curios_version}:api"
-	runtimeOnly "top.theillusivec4.curios:curios-neoforge:${curios_version}"
 
 	runtimeOnly 'org.sinytra:wiki-exporter-neoforge:2.2.1+1.21.1'
 }
@@ -176,7 +165,7 @@ tasks.withType(ProcessResources).configureEach {
 		mod_version             : mod_version,
 		mod_authors             : mod_authors,
 		mod_description         : mod_description,
-		curios_version_range    : curios_version_range,
+		geckolib_version_range  : geckolib_version_range,
 		kff_version_range       : kff_version_range,
 		aaron_lib_version_range : aaron_lib_version_range
 	]
@@ -242,7 +231,7 @@ publishMods {
 			client = true
 			server = true
 			requires('kotlin-for-forge')
-			requires('curios')
+			requires('geckolib')
 			requires('aaron')
 		}
 	}
@@ -253,7 +242,7 @@ publishMods {
 			projectId = project.modrinth_id
 			minecraftVersions.add(project.minecraft_version)
 			requires('kotlin-for-forge')
-			requires('curios')
+			requires('geckolib')
 			requires('aaron')
 		}
 	}

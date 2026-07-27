@@ -17,9 +17,9 @@ ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.${mod_id}]]
-modId = "curios"
+modId = "geckolib"
 type = "required"
-versionRange = "${curios_version_range}"
+versionRange = "${geckolib_version_range}"
 ordering = "NONE"
 side = "BOTH"
 
