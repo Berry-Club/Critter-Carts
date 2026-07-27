@@ -88,11 +88,8 @@ class ScoochstemFollowGoal(
 		val rightStem = currentStem.relative(forwardDirection.clockWise)
 		val hasRightStem = isTraversableStem(currentStem, rightStem)
 
-		if (hasLeftStem && hasRightStem) {
-			return if (scoochworm.random.nextBoolean()) leftStem else rightStem
-		}
-
 		return when {
+			hasLeftStem && hasRightStem -> if (scoochworm.random.nextBoolean()) leftStem else rightStem
 			hasLeftStem -> leftStem
 			hasRightStem -> rightStem
 			else -> null
