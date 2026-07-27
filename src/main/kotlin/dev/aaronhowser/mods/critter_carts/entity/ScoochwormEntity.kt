@@ -45,7 +45,7 @@ class ScoochwormEntity(
 		fun createAttributes(): AttributeSupplier {
 			return createMobAttributes()
 				.add(Attributes.MAX_HEALTH, 10.0)
-				.add(Attributes.MOVEMENT_SPEED, 0.15)
+				.add(Attributes.MOVEMENT_SPEED, 0.4)
 				.build()
 		}
 	}
