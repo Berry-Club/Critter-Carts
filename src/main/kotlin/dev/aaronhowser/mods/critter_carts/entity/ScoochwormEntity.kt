@@ -1,5 +1,6 @@
 package dev.aaronhowser.mods.critter_carts.entity
 
+import dev.aaronhowser.mods.aaron.misc.AaronExtensions.getEquipmentSlot
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isItem
 import dev.aaronhowser.mods.critter_carts.entity.control.ScoochwormMoveControl
 import dev.aaronhowser.mods.critter_carts.entity.goal.ScoochstemFollowGoal
@@ -10,7 +11,6 @@ import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
-import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.PathfinderMob
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier
 import net.minecraft.world.entity.ai.attributes.Attributes
@@ -85,11 +85,7 @@ class ScoochwormEntity(
 			if (!level().isClientSide) {
 				segments.removeFrom(partIndex)
 
-				val equipmentSlot = if (hand == InteractionHand.MAIN_HAND) {
-					EquipmentSlot.MAINHAND
-				} else {
-					EquipmentSlot.OFFHAND
-				}
+				val equipmentSlot = hand.getEquipmentSlot()
 
 				heldItem.hurtAndBreak(1, player, equipmentSlot)
 				playSound(SoundEvents.SHEEP_SHEAR, 1f, 1f)
