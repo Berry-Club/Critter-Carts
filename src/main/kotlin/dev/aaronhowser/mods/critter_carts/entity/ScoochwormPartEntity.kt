@@ -165,6 +165,7 @@ class ScoochwormPartEntity(
 			else -> true
 		}
 	}
+
 	override fun isPickable(): Boolean = true
 	override fun isPushable(): Boolean = false
 
