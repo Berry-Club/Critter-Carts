@@ -1,7 +1,9 @@
 package dev.aaronhowser.mods.critter_carts.entity
 
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.getEquipmentSlot
+import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isClientSide
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isItem
+import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isServerSide
 import dev.aaronhowser.mods.critter_carts.entity.control.ScoochwormMoveControl
 import dev.aaronhowser.mods.critter_carts.entity.goal.ScoochstemFollowGoal
 import net.minecraft.nbt.CompoundTag
@@ -30,10 +32,10 @@ class ScoochwormEntity(
 	level: Level
 ) : PathfinderMob(entityType, level), GeoEntity {
 
-	private val cache = SingletonAnimatableInstanceCache(this)
+	private val animatableInstanceCache = SingletonAnimatableInstanceCache(this)
 	val scoochwormMoveControl = ScoochwormMoveControl(this)
-	private val path = ScoochwormPath(PART_SPACING * ScoochwormSegments.MAX_COUNT)
-	private val segments = ScoochwormSegments(this)
+	private val movementPath = ScoochwormPath(PART_SPACING * ScoochwormSegments.MAX_COUNT)
+	private val bodySegments = ScoochwormSegments(this)
 
 	init {
 		moveControl = scoochwormMoveControl
@@ -46,15 +48,15 @@ class ScoochwormEntity(
 	override fun aiStep() {
 		super.aiStep()
 
-		if (level().isClientSide) return
+		if (isClientSide) return
 
-		path.record(position(), yRot)
-		segments.update(path)
+		movementPath.record(position(), yRot)
+		bodySegments.update(movementPath)
 	}
 
 	override fun remove(reason: RemovalReason) {
 		super.remove(reason)
-		segments.discard()
+		bodySegments.discard()
 	}
 
 	// Interaction
@@ -66,33 +68,34 @@ class ScoochwormEntity(
 	fun interactWithPart(
 		player: Player,
 		hand: InteractionHand,
-		partIndex: Int?
+		partIndex: Int?            // null = head
 	): InteractionResult {
-		val heldItem = player.getItemInHand(hand)
+		val heldStack = player.getItemInHand(hand)
 
-		if (heldItem.isItem(Items.MELON) && segments.canGrow) {
-			if (!level().isClientSide) {
-				segments.grow()
-				heldItem.consume(1, player)
+		if (heldStack.isItem(Items.MELON) && bodySegments.canGrow) {
+			if (isServerSide) {
+				bodySegments.grow()
+				heldStack.consume(1, player)
+
 				playSound(SoundEvents.GENERIC_EAT, 1f, 1f)
 				gameEvent(GameEvent.EAT, player)
 			}
 
-			return InteractionResult.sidedSuccess(level().isClientSide)
+			return InteractionResult.sidedSuccess(isClientSide)
 		}
 
-		if (partIndex != null && heldItem.`is`(Items.SHEARS) && segments.contains(partIndex)) {
-			if (!level().isClientSide) {
-				segments.removeFrom(partIndex)
+		if (partIndex != null && heldStack.isItem(Items.SHEARS) && bodySegments.contains(partIndex)) {
+			if (isServerSide) {
+				bodySegments.removeFrom(partIndex)
 
 				val equipmentSlot = hand.getEquipmentSlot()
+				heldStack.hurtAndBreak(1, player, equipmentSlot)
 
-				heldItem.hurtAndBreak(1, player, equipmentSlot)
 				playSound(SoundEvents.SHEEP_SHEAR, 1f, 1f)
 				gameEvent(GameEvent.SHEAR, player)
 			}
 
-			return InteractionResult.sidedSuccess(level().isClientSide)
+			return InteractionResult.sidedSuccess(isClientSide)
 		}
 
 		return InteractionResult.PASS
@@ -112,7 +115,7 @@ class ScoochwormEntity(
 	override fun readAdditionalSaveData(tag: CompoundTag) {
 		super.readAdditionalSaveData(tag)
 
-		path.clear()
+		movementPath.clear()
 
 		val segmentCount = if (tag.contains(SEGMENT_COUNT_TAG, Tag.TAG_INT.toInt())) {
 			tag.getInt(SEGMENT_COUNT_TAG)
@@ -123,12 +126,12 @@ class ScoochwormEntity(
 			1
 		}
 
-		segments.restoreCount(segmentCount)
+		bodySegments.restoreCount(segmentCount)
 	}
 
 	override fun addAdditionalSaveData(tag: CompoundTag) {
 		super.addAdditionalSaveData(tag)
-		tag.putInt(SEGMENT_COUNT_TAG, segments.count)
+		tag.putInt(SEGMENT_COUNT_TAG, bodySegments.count)
 	}
 
 	// Animation
@@ -136,7 +139,7 @@ class ScoochwormEntity(
 	override fun registerControllers(controllers: AnimatableManager.ControllerRegistrar) {
 	}
 
-	override fun getAnimatableInstanceCache(): AnimatableInstanceCache = cache
+	override fun getAnimatableInstanceCache(): AnimatableInstanceCache = animatableInstanceCache
 
 	companion object {
 		const val SIZE = 14f / 16f

@@ -1,7 +1,7 @@
 package dev.aaronhowser.mods.critter_carts.entity
 
 import net.minecraft.world.phys.Vec3
-import java.util.ArrayDeque
+import java.util.*
 
 class ScoochwormPath(
 	private val initialLength: Double
@@ -9,47 +9,46 @@ class ScoochwormPath(
 
 	private val positions = ArrayDeque<Vec3>()
 
-	fun record(position: Vec3, yaw: Float) {
+	fun record(headPos: Vec3, yaw: Float) {
 		if (positions.isEmpty()) {
-			val forward = Vec3.directionFromRotation(0f, yaw)
+			positions.addFirst(headPos)
 
-			positions.addFirst(position)
-			positions.addLast(
-				position.subtract(forward.scale(initialLength))
-			)
+			val forwardDirection = Vec3.directionFromRotation(0f, yaw)
+			val firstSegmentPos = headPos.subtract(forwardDirection.scale(initialLength))
+			positions.addLast(firstSegmentPos)
 			return
 		}
 
-		if (positions.first.distanceToSqr(position) > MINIMUM_STEP_SQUARED) {
-			positions.addFirst(position)
+		if (positions.first.distanceToSqr(headPos) > MINIMUM_STEP_DISTANCE_SQUARED) {
+			positions.addFirst(headPos)
 		}
 
-		while (positions.size > MAX_POINTS) {
+		while (positions.size > MAX_PATH_POINTS) {
 			positions.removeLast()
 		}
 	}
 
-	fun getPosition(distance: Double): Vec3 {
-		var remainingDistance = distance
+	fun getPosition(distanceFromHead: Double): Vec3 {
+		var remainingDistance = distanceFromHead
 		val iterator = positions.iterator()
-		var newerPosition = iterator.next()
+		var positionCloserToHead = iterator.next()
 
 		while (iterator.hasNext()) {
-			val olderPosition = iterator.next()
-			val sectionDistance = newerPosition.distanceTo(olderPosition)
+			val positionFartherFromHead = iterator.next()
+			val segmentLength = positionCloserToHead.distanceTo(positionFartherFromHead)
 
-			if (sectionDistance >= remainingDistance && sectionDistance > 0.0) {
-				return newerPosition.lerp(
-					olderPosition,
-					remainingDistance / sectionDistance
+			if (segmentLength >= remainingDistance && segmentLength > 0.0) {
+				return positionCloserToHead.lerp(
+					positionFartherFromHead,
+					remainingDistance / segmentLength
 				)
 			}
 
-			remainingDistance -= sectionDistance
-			newerPosition = olderPosition
+			remainingDistance -= segmentLength
+			positionCloserToHead = positionFartherFromHead
 		}
 
-		return newerPosition
+		return positionCloserToHead
 	}
 
 	fun clear() {
@@ -57,7 +56,7 @@ class ScoochwormPath(
 	}
 
 	companion object {
-		private const val MAX_POINTS = 256
-		private const val MINIMUM_STEP_SQUARED = 0.000001
+		private const val MAX_PATH_POINTS = 256
+		private const val MINIMUM_STEP_DISTANCE_SQUARED = 0.000001
 	}
 }

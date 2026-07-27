@@ -1,5 +1,6 @@
 package dev.aaronhowser.mods.critter_carts.entity
 
+import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isClientSide
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.EntityDataSerializers
@@ -24,7 +25,7 @@ class ScoochwormPartEntity(
 	level: Level
 ) : Entity(entityType, level), GeoEntity {
 
-	private val cache = SingletonAnimatableInstanceCache(this)
+	private val animatableInstanceCache = SingletonAnimatableInstanceCache(this)
 	private var missingParentTicks = 0
 	private var interpolationSteps = 0
 	private var interpolationPosition = Vec3.ZERO
@@ -37,23 +38,24 @@ class ScoochwormPartEntity(
 
 	// Parent
 
-	private val parent: ScoochwormEntity?
-		get() = level().getEntity(entityData.get(DATA_PARENT_ID)) as? ScoochwormEntity
+	private fun getParent(): ScoochwormEntity? {
+		return level().getEntity(entityData.get(DATA_PARENT_ID)) as? ScoochwormEntity
+	}
 
-	fun attachTo(parent: ScoochwormEntity, partIndex: Int) {
-		entityData.set(DATA_PARENT_ID, parent.id)
+	fun attachTo(parentEntity: ScoochwormEntity, partIndex: Int) {
+		entityData.set(DATA_PARENT_ID, parentEntity.id)
 		entityData.set(DATA_PART_INDEX, partIndex)
 	}
 
 	// Movement
 
 	fun moveAlongPath(pathPosition: Vec3, pitch: Float) {
-		val movement = pathPosition.subtract(position())
+		val displacement = position().vectorTo(pathPosition)
 		var movementYaw = yRot
 
-		if (movement.horizontalDistanceSqr() >= MINIMUM_MOVEMENT_SQUARED) {
+		if (displacement.horizontalDistanceSqr() >= MINIMUM_MOVEMENT_DISTANCE_SQUARED) {
 			movementYaw = Math.toDegrees(
-				atan2(movement.z, movement.x)
+				atan2(displacement.z, displacement.x)
 			).toFloat() - 90f
 		}
 
@@ -67,13 +69,13 @@ class ScoochwormPartEntity(
 	override fun tick() {
 		super.tick()
 
-		if (level().isClientSide) {
+		if (isClientSide) {
 			tickInterpolation()
 			return
 		}
 
-		val parent = parent
-		if (parent != null && !parent.isRemoved) {
+		val parentEntity = getParent()
+		if (parentEntity != null && !parentEntity.isRemoved) {
 			missingParentTicks = 0
 			return
 		}
@@ -113,13 +115,13 @@ class ScoochwormPartEntity(
 	// Collision
 
 	override fun hurt(damageSource: DamageSource, amount: Float): Boolean {
-		val parent = parent ?: return false
-		return parent.hurt(damageSource, amount)
+		val parentEntity = getParent() ?: return false
+		return parentEntity.hurt(damageSource, amount)
 	}
 
 	override fun interact(player: Player, hand: InteractionHand): InteractionResult {
-		val parent = parent ?: return InteractionResult.PASS
-		return parent.interactWithPart(player, hand, entityData.get(DATA_PART_INDEX))
+		val parentEntity = getParent() ?: return InteractionResult.PASS
+		return parentEntity.interactWithPart(player, hand, entityData.get(DATA_PART_INDEX))
 	}
 
 	override fun canBeCollidedWith(): Boolean = true
@@ -142,12 +144,12 @@ class ScoochwormPartEntity(
 
 	override fun registerControllers(controllers: AnimatableManager.ControllerRegistrar) {}
 
-	override fun getAnimatableInstanceCache(): AnimatableInstanceCache = cache
+	override fun getAnimatableInstanceCache(): AnimatableInstanceCache = animatableInstanceCache
 
 	companion object {
 		private const val NO_PARENT = -1
 		private const val MAX_MISSING_PARENT_TICKS = 20
-		private const val MINIMUM_MOVEMENT_SQUARED = 0.000001
+		private const val MINIMUM_MOVEMENT_DISTANCE_SQUARED = 0.000001
 
 		private val DATA_PARENT_ID: EntityDataAccessor<Int> =
 			SynchedEntityData.defineId(ScoochwormPartEntity::class.java, EntityDataSerializers.INT)

@@ -14,8 +14,8 @@ class ScoochwormSegments(
 	val canGrow: Boolean
 		get() = count < MAX_COUNT
 
-	fun contains(index: Int): Boolean {
-		return index in 0 until count
+	fun contains(partIndex: Int): Boolean {
+		return partIndex in 0 until count
 	}
 
 	fun grow() {
@@ -24,10 +24,10 @@ class ScoochwormSegments(
 		}
 	}
 
-	fun removeFrom(index: Int) {
-		if (!contains(index)) return
+	fun removeFrom(partIndex: Int) {
+		if (!contains(partIndex)) return
 
-		count = index
+		count = partIndex
 
 		while (bodyParts.size > count) {
 			bodyParts.removeLast().discard()
@@ -37,14 +37,15 @@ class ScoochwormSegments(
 	fun update(path: ScoochwormPath) {
 		ensureBodyParts(path)
 
-		for (index in bodyParts.indices) {
-			val pathPosition = path.getPosition(getPartDistance(index))
-			bodyParts[index].moveAlongPath(pathPosition, scoochworm.xRot)
+		for (partIndex in bodyParts.indices) {
+			val partPosition = path.getPosition(getPartDistance(partIndex))
+			val part = bodyParts[partIndex]
+			part.moveAlongPath(partPosition, scoochworm.xRot)
 		}
 	}
 
-	fun restoreCount(count: Int) {
-		this.count = count.coerceIn(0, MAX_COUNT)
+	fun restoreCount(segmentCount: Int) {
+		count = segmentCount.coerceIn(0, MAX_COUNT)
 	}
 
 	fun discard() {
@@ -61,24 +62,30 @@ class ScoochwormSegments(
 		}
 
 		while (bodyParts.size < count) {
-			val partIndex = bodyParts.size
-			val bodyPart = ScoochwormPartEntity(
-				ModEntityTypes.SCOOCHWORM_PART.get(),
-				scoochworm.level()
-			)
-			val partPosition = path.getPosition(getPartDistance(partIndex))
-
-			bodyPart.attachTo(scoochworm, partIndex)
-			bodyPart.moveTo(
-				partPosition.x,
-				partPosition.y,
-				partPosition.z,
-				scoochworm.yRot,
-				scoochworm.xRot
-			)
-			scoochworm.level().addFreshEntity(bodyPart)
-			bodyParts.add(bodyPart)
+			createPart(path)
 		}
+	}
+
+	private fun createPart(path: ScoochwormPath) {
+		val partIndex = bodyParts.size
+		val bodyPart = ScoochwormPartEntity(
+			ModEntityTypes.SCOOCHWORM_PART.get(),
+			scoochworm.level()
+		)
+
+		val partPosition = path.getPosition(getPartDistance(partIndex))
+
+		bodyPart.attachTo(scoochworm, partIndex)
+		bodyPart.moveTo(
+			partPosition.x,
+			partPosition.y,
+			partPosition.z,
+			scoochworm.yRot,
+			scoochworm.xRot
+		)
+
+		scoochworm.level().addFreshEntity(bodyPart)
+		bodyParts.add(bodyPart)
 	}
 
 	private fun getPartDistance(partIndex: Int): Double {
@@ -86,6 +93,6 @@ class ScoochwormSegments(
 	}
 
 	companion object {
-		const val MAX_COUNT = 4
+		const val MAX_COUNT = 8
 	}
 }

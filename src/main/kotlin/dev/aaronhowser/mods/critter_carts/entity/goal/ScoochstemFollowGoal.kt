@@ -1,11 +1,12 @@
 package dev.aaronhowser.mods.critter_carts.entity.goal
 
+import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isBlock
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity
 import dev.aaronhowser.mods.critter_carts.registry.ModBlocks
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.world.entity.ai.goal.Goal
-import java.util.EnumSet
+import java.util.*
 
 class ScoochstemFollowGoal(
 	private val scoochworm: ScoochwormEntity
@@ -22,8 +23,8 @@ class ScoochstemFollowGoal(
 		val currentStem = scoochworm.blockPosition().below()
 		if (!isScoochstem(currentStem)) return false
 
-		val direction = travelDirection ?: Direction.fromYRot(scoochworm.yRot.toDouble())
-		val nextStem = chooseNextStem(currentStem, direction) ?: return false
+		val currentDirection = travelDirection ?: Direction.fromYRot(scoochworm.yRot.toDouble())
+		val nextStem = chooseNextStem(currentStem, currentDirection) ?: return false
 
 		val nextDirection = directionTo(currentStem, nextStem)
 		travelDirection = nextDirection
@@ -34,54 +35,65 @@ class ScoochstemFollowGoal(
 	override fun canContinueToUse(): Boolean = targetStem != null
 
 	override fun tick() {
-		val target = targetStem ?: return
-		val direction = travelDirection ?: return
+		val currentTargetStem = targetStem ?: return
+		val currentDirection = travelDirection ?: return
 
-		val targetX = target.x + 0.5
-		val targetZ = target.z + 0.5
+		val targetX = currentTargetStem.x + 0.5
+		val targetZ = currentTargetStem.z + 0.5
 
-		val distance = (targetX - scoochworm.x) * direction.stepX +
-			(targetZ - scoochworm.z) * direction.stepZ
+		val distanceToTarget = (targetX - scoochworm.x) * currentDirection.stepX +
+			(targetZ - scoochworm.z) * currentDirection.stepZ
 
-		if (distance <= TARGET_DISTANCE) {
-			scoochworm.setPos(targetX, scoochworm.y, targetZ)
-			val nextStem = chooseNextStem(target, direction)
-
-			if (nextStem == null) {
-				targetStem = null
-				scoochworm.deltaMovement = scoochworm.deltaMovement.multiply(0.0, 1.0, 0.0)
-				return
-			}
-
-			val nextDirection = directionTo(target, nextStem)
-			travelDirection = nextDirection
-			targetStem = findSegmentEnd(target, nextDirection)
+		val hasReachedTarget = distanceToTarget <= TARGET_DISTANCE
+		if (hasReachedTarget) {
+			reachTarget(currentTargetStem, currentDirection)
 		}
 
 		moveTowardTarget()
+	}
+
+	private fun reachTarget(currentTargetStem: BlockPos, currentDirection: Direction) {
+		scoochworm.setPos(
+			currentTargetStem.x + 0.5,
+			scoochworm.y,
+			currentTargetStem.z + 0.5
+		)
+
+		val nextStem = chooseNextStem(currentTargetStem, currentDirection)
+		if (nextStem == null) {
+			targetStem = null
+			scoochworm.deltaMovement = scoochworm
+				.deltaMovement
+				.multiply(0.0, 1.0, 0.0)
+
+			return
+		}
+
+		val nextDirection = directionTo(currentTargetStem, nextStem)
+		travelDirection = nextDirection
+		targetStem = findSegmentEnd(currentTargetStem, nextDirection)
 	}
 
 	override fun stop() {
 		targetStem = null
 	}
 
-	private fun chooseNextStem(currentStem: BlockPos, forward: Direction): BlockPos? {
-		val forwardStem = currentStem.relative(forward)
+	private fun chooseNextStem(currentStem: BlockPos, forwardDirection: Direction): BlockPos? {
+		val forwardStem = currentStem.relative(forwardDirection)
 		if (isScoochstem(forwardStem)) return forwardStem
 
-		val left = forward.counterClockWise
-		val right = forward.clockWise
-		val leftStem = currentStem.relative(left)
-		val rightStem = currentStem.relative(right)
+		val leftStem = currentStem.relative(forwardDirection.counterClockWise)
 		val hasLeftStem = isScoochstem(leftStem)
+
+		val rightStem = currentStem.relative(forwardDirection.clockWise)
 		val hasRightStem = isScoochstem(rightStem)
 
 		if (hasLeftStem && hasRightStem) {
 			return if (scoochworm.random.nextBoolean()) leftStem else rightStem
 		}
+
 		if (hasLeftStem) return leftStem
 		if (hasRightStem) return rightStem
-
 		return null
 	}
 
@@ -98,19 +110,22 @@ class ScoochstemFollowGoal(
 	}
 
 	private fun moveTowardTarget() {
-		val target = targetStem ?: return
-		val direction = travelDirection ?: return
+		val currentTargetStem = targetStem ?: return
+		val currentDirection = travelDirection ?: return
+
 		scoochworm.scoochwormMoveControl.setWantedPosition(
-			target.x + 0.5,
-			target.y + 1.0,
-			target.z + 0.5,
-			direction,
+			currentTargetStem.x + 0.5,
+			currentTargetStem.y + 1.0,
+			currentTargetStem.z + 0.5,
+			currentDirection,
 			1.0
 		)
 	}
 
 	private fun isScoochstem(position: BlockPos): Boolean {
-		return scoochworm.level().getBlockState(position).`is`(ModBlocks.SCOOCHSTEM.get())
+		return scoochworm.level()
+			.getBlockState(position)
+			.isBlock(ModBlocks.SCOOCHSTEM.get())
 	}
 
 	private fun directionTo(from: BlockPos, to: BlockPos): Direction {
