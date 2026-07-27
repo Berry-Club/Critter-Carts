@@ -10,9 +10,7 @@ class ScoochwormSegments(
 	private val scoochworm: ScoochwormEntity
 ) {
 
-	private val segments: MutableList<ScoochwormSegment> = mutableListOf(
-		ScoochwormSegment()
-	)
+	private val segments: MutableList<ScoochwormSegment> = mutableListOf(ScoochwormSegment())
 	private val bodyParts: MutableList<ScoochwormPartEntity> = mutableListOf()
 
 	val count: Int
