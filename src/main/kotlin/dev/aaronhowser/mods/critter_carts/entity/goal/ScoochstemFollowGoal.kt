@@ -92,9 +92,11 @@ class ScoochstemFollowGoal(
 			return if (scoochworm.random.nextBoolean()) leftStem else rightStem
 		}
 
-		if (hasLeftStem) return leftStem
-		if (hasRightStem) return rightStem
-		return null
+		return when {
+			hasLeftStem -> leftStem
+			hasRightStem -> rightStem
+			else -> null
+		}
 	}
 
 	private fun findSegmentEnd(start: BlockPos, direction: Direction): BlockPos {
