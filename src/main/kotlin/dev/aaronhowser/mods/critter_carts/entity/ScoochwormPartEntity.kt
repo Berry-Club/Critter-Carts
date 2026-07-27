@@ -148,7 +148,7 @@ class ScoochwormPartEntity(
 
 	override fun interact(player: Player, hand: InteractionHand): InteractionResult {
 		val parentEntity = getParent() ?: return InteractionResult.PASS
-		return parentEntity.interactWithPart(player, hand, partIndex)
+		return parentEntity.interactWithPart(player, hand, partIndex, attachment)
 	}
 
 	override fun canBeCollidedWith(): Boolean = true

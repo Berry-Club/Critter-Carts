@@ -76,13 +76,14 @@ class ScoochwormEntity(
 	// Interaction
 
 	override fun mobInteract(player: Player, hand: InteractionHand): InteractionResult {
-		return interactWithPart(player, hand, null)
+		return interactWithPart(player, hand, null, null)
 	}
 
 	fun interactWithPart(
 		player: Player,
 		hand: InteractionHand,
-		partIndex: Int?            // null = head
+		partIndex: Int?,
+		currentAttachment: ScoochwormPartAttachment?
 	): InteractionResult {
 		val heldStack = player.getItemInHand(hand)
 
@@ -94,10 +95,10 @@ class ScoochwormEntity(
 			val shearResult = tryShear(player, hand, heldStack, partIndex)
 			if (shearResult != null) return shearResult
 
-			val removeAttachmentResult = tryRemoveAttachment(player, heldStack, partIndex)
+			val removeAttachmentResult = tryRemoveAttachment(player, heldStack, partIndex, currentAttachment)
 			if (removeAttachmentResult != null) return removeAttachmentResult
 
-			when (bodySegments.getAttachment(partIndex)) {
+			when (currentAttachment) {
 				ScoochwormPartAttachment.NONE -> {
 					val addAttachmentResult = tryAddAttachment(player, heldStack, partIndex)
 					if (addAttachmentResult != null) return addAttachmentResult
@@ -165,7 +166,6 @@ class ScoochwormEntity(
 		partIndex: Int?
 	): InteractionResult? {
 		if (partIndex == null) return null
-		if (bodySegments.getAttachment(partIndex) != ScoochwormPartAttachment.NONE) return null
 
 		val attachment = when {
 			heldStack.isItem(Items.SADDLE) -> ScoochwormPartAttachment.SADDLE
@@ -195,12 +195,12 @@ class ScoochwormEntity(
 	private fun tryRemoveAttachment(
 		player: Player,
 		heldStack: ItemStack,
-		partIndex: Int?
+		partIndex: Int?,
+		attachment: ScoochwormPartAttachment?
 	): InteractionResult? {
 		if (partIndex == null) return null
 		if (!player.isShiftKeyDown || !heldStack.isEmpty) return null
 
-		val attachment = bodySegments.getAttachment(partIndex)
 		if (attachment == null || attachment == ScoochwormPartAttachment.NONE) return null
 
 		if (isServerSide) {
@@ -222,7 +222,6 @@ class ScoochwormEntity(
 		partIndex: Int?
 	): InteractionResult? {
 		if (partIndex == null || player.isShiftKeyDown) return null
-		if (bodySegments.getAttachment(partIndex) != ScoochwormPartAttachment.SADDLE) return null
 
 		if (isServerSide) {
 			val bodyPart = bodySegments.getBodyPart(partIndex) ?: return null
@@ -237,7 +236,6 @@ class ScoochwormEntity(
 		partIndex: Int?
 	): InteractionResult? {
 		if (partIndex == null) return null
-		if (bodySegments.getAttachment(partIndex) != ScoochwormPartAttachment.CHEST) return null
 
 		if (isServerSide) {
 			val container = bodySegments.getContainer(partIndex) ?: return null
