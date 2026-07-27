@@ -1,5 +1,6 @@
 package dev.aaronhowser.mods.critter_carts.entity
 
+import dev.aaronhowser.mods.critter_carts.entity.control.ScoochwormMoveControl
 import dev.aaronhowser.mods.critter_carts.entity.goal.ScoochstemFollowGoal
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
@@ -20,6 +21,11 @@ class ScoochwormEntity(
 ) : PathfinderMob(entityType, level), GeoEntity {
 
 	private val cache = SingletonAnimatableInstanceCache(this)
+	val scoochwormMoveControl = ScoochwormMoveControl(this)
+
+	init {
+		moveControl = scoochwormMoveControl
+	}
 
 	override fun registerGoals() {
 		goalSelector.addGoal(0, ScoochstemFollowGoal(this))
@@ -45,7 +51,7 @@ class ScoochwormEntity(
 		fun createAttributes(): AttributeSupplier {
 			return createMobAttributes()
 				.add(Attributes.MAX_HEALTH, 10.0)
-				.add(Attributes.MOVEMENT_SPEED, 0.4)
+				.add(Attributes.MOVEMENT_SPEED, 1.0)
 				.build()
 		}
 	}

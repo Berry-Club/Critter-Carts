@@ -4,11 +4,9 @@ import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity
 import dev.aaronhowser.mods.critter_carts.registry.ModBlocks
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
-import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.entity.ai.goal.Goal
 import java.util.EnumSet
 import kotlin.math.abs
-import kotlin.math.min
 
 class ScoochstemFollowGoal(
 	private val scoochworm: ScoochwormEntity
@@ -49,7 +47,13 @@ class ScoochstemFollowGoal(
 		}
 
 		if (distance > TARGET_DISTANCE) {
-			moveToward(targetX, targetZ, direction, distance)
+			scoochworm.scoochwormMoveControl.setWantedPosition(
+				targetX,
+				target.y + 1.0,
+				targetZ,
+				direction,
+				1.0
+			)
 			return
 		}
 
@@ -64,28 +68,6 @@ class ScoochstemFollowGoal(
 
 		travelDirection = directionTo(target, nextStem)
 		targetStem = nextStem
-	}
-
-	private fun moveToward(targetX: Double, targetZ: Double, direction: Direction, distance: Double) {
-		val movementSpeed = scoochworm.getAttributeValue(Attributes.MOVEMENT_SPEED) * MOVEMENT_SPEED_SCALE
-		val movement = min(movementSpeed, distance)
-
-		val nextX = if (direction.axis == Direction.Axis.X) {
-			scoochworm.x + direction.stepX * movement
-		} else {
-			targetX
-		}
-
-		val nextZ = if (direction.axis == Direction.Axis.Z) {
-			scoochworm.z + direction.stepZ * movement
-		} else {
-			targetZ
-		}
-
-		scoochworm.setPos(nextX, scoochworm.y, nextZ)
-		scoochworm.deltaMovement = scoochworm.deltaMovement.multiply(0.0, 1.0, 0.0)
-		scoochworm.yRot = direction.toYRot()
-		scoochworm.yBodyRot = scoochworm.yRot
 	}
 
 	override fun stop() {
@@ -122,8 +104,7 @@ class ScoochstemFollowGoal(
 	}
 
 	companion object {
-		private const val MOVEMENT_SPEED_SCALE = 0.1
-		private const val TARGET_DISTANCE = 0.001
+		private const val TARGET_DISTANCE = 0.1
 	}
 
 }
