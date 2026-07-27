@@ -13,7 +13,13 @@ class ScoochwormMoveControl(
 
 	private var travelDirection: Direction? = null
 
-	fun setWantedPosition(x: Double, y: Double, z: Double, newTravelDirection: Direction, speed: Double) {
+	fun setWantedPosition(
+		x: Double,
+		y: Double,
+		z: Double,
+		newTravelDirection: Direction,
+		speed: Double
+	) {
 		if (travelDirection != null && travelDirection != newTravelDirection) {
 			rotateMomentum(newTravelDirection)
 		}
