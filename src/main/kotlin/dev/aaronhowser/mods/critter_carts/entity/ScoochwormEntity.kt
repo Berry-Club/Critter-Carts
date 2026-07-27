@@ -16,7 +16,7 @@ import software.bernie.geckolib.animatable.GeoEntity
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache
 import software.bernie.geckolib.animatable.instance.SingletonAnimatableInstanceCache
 import software.bernie.geckolib.animation.AnimatableManager
-import java.util.ArrayDeque
+import java.util.*
 
 class ScoochwormEntity(
 	entityType: EntityType<ScoochwormEntity>,
@@ -24,9 +24,9 @@ class ScoochwormEntity(
 ) : PathfinderMob(entityType, level), GeoEntity {
 
 	private val cache = SingletonAnimatableInstanceCache(this)
-	val scoochwormMoveControl = ScoochwormMoveControl(this)
-	private val bodyParts = mutableListOf<ScoochwormPartEntity>()
-	private val pathHistory = ArrayDeque<Vec3>()
+	private val scoochwormMoveControl = ScoochwormMoveControl(this)
+	private val bodyParts: MutableList<ScoochwormPartEntity> = mutableListOf()
+	private val pathHistory: ArrayDeque<Vec3> = ArrayDeque()
 
 	init {
 		moveControl = scoochwormMoveControl

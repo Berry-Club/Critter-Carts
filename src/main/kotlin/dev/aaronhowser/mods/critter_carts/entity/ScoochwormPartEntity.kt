@@ -96,19 +96,15 @@ class ScoochwormPartEntity(
 		builder.define(DATA_PART_INDEX, 0)
 	}
 
-	override fun readAdditionalSaveData(tag: CompoundTag) {
-	}
-
-	override fun addAdditionalSaveData(tag: CompoundTag) {
-	}
+	override fun readAdditionalSaveData(tag: CompoundTag) {}
+	override fun addAdditionalSaveData(tag: CompoundTag) {}
 
 	override fun shouldBeSaved(): Boolean = false
 	override fun isPickable(): Boolean = true
 	override fun isPushable(): Boolean = false
 	override fun canBeCollidedWith(): Boolean = true
 
-	override fun registerControllers(controllers: AnimatableManager.ControllerRegistrar) {
-	}
+	override fun registerControllers(controllers: AnimatableManager.ControllerRegistrar) {}
 
 	override fun getAnimatableInstanceCache(): AnimatableInstanceCache = cache
 
