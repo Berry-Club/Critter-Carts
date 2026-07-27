@@ -1,4 +1,4 @@
-package dev.aaronhowser.mods.critter_carts.entity
+package dev.aaronhowser.mods.critter_carts.entity.data
 
 import com.mojang.serialization.Codec
 import io.netty.buffer.ByteBuf

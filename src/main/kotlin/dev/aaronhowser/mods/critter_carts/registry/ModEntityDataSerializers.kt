@@ -1,7 +1,7 @@
 package dev.aaronhowser.mods.critter_carts.registry
 
 import dev.aaronhowser.mods.critter_carts.CritterCarts
-import dev.aaronhowser.mods.critter_carts.entity.ScoochwormPartAttachment
+import dev.aaronhowser.mods.critter_carts.entity.data.ScoochwormPartAttachment
 import net.minecraft.network.syncher.EntityDataSerializer
 import net.neoforged.neoforge.registries.DeferredHolder
 import net.neoforged.neoforge.registries.DeferredRegister

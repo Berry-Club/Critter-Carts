@@ -2,7 +2,6 @@ package dev.aaronhowser.mods.critter_carts.entity.data
 
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import dev.aaronhowser.mods.critter_carts.entity.ScoochwormPartAttachment
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtOps
 import net.minecraft.world.item.DyeColor
