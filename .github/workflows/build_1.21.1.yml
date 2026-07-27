@@ -19,6 +19,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     if: ${{ !contains(github.event.head_commit.message, '[ci skip]') }}
+    env:
+      MAVEN_URL: ${{ secrets.MAVEN_URL }}
+      MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+      MAVEN_TOKEN: ${{ secrets.MAVEN_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -46,10 +50,6 @@ jobs:
 
       - name: Publish to Maven
         if: ${{ env.MAVEN_URL != '' }}
-        env:
-          MAVEN_URL: ${{ secrets.MAVEN_URL }}
-          MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
-          MAVEN_TOKEN: ${{ secrets.MAVEN_TOKEN }}
         run: ./gradlew publish --stacktrace
 
       - name: Publish to CurseForge and Modrinth
