@@ -83,9 +83,9 @@ class ScoochstemFollowGoal(
 		if (isTraversableStem(currentStem, forwardStem)) return forwardStem
 
 		val leftStem = currentStem.relative(forwardDirection.counterClockWise)
-		val hasLeftStem = isTraversableStem(currentStem, leftStem)
-
 		val rightStem = currentStem.relative(forwardDirection.clockWise)
+
+		val hasLeftStem = isTraversableStem(currentStem, leftStem)
 		val hasRightStem = isTraversableStem(currentStem, rightStem)
 
 		return when {
