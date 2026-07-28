@@ -169,6 +169,7 @@ class ScoochwormEntity(
 		if (isServerSide) {
 			val attachmentItem = heldStack.copyWithCount(1)
 			val segment = bodySegments.getSegment(partIndex) ?: return null
+			val bodyPart = segment.bodyPart ?: return null
 			segment.setAttachment(attachmentItem)
 			heldStack.consume(1, player)
 
@@ -179,7 +180,7 @@ class ScoochwormEntity(
 				ScoochwormPartAttachment.NONE -> return null
 			}
 
-			playSound(sound, 1f, random.nextRange(0.8f, 1.2f))
+			bodyPart.playSound(sound, 1f, random.nextRange(0.8f, 1.2f))
 			gameEvent(GameEvent.EQUIP, player)
 		}
 
@@ -197,13 +198,18 @@ class ScoochwormEntity(
 
 		if (isServerSide) {
 			val segment = bodySegments.getSegment(partIndex) ?: return null
+			val bodyPart = segment.bodyPart ?: return null
 			val attachmentItem = segment.removeAttachment()
 
 			if (!player.addItem(attachmentItem)) {
 				player.drop(attachmentItem, false)
 			}
 
-			playSound(SoundEvents.ITEM_FRAME_REMOVE_ITEM, 1f, random.nextRange(0.8f, 1.2f))
+			bodyPart.playSound(
+				SoundEvents.ITEM_FRAME_REMOVE_ITEM,
+				1f,
+				random.nextRange(0.8f, 1.2f)
+			)
 			gameEvent(GameEvent.UNEQUIP, player)
 		}
 
