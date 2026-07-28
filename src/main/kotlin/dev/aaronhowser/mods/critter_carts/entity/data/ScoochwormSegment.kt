@@ -27,8 +27,8 @@ class ScoochwormSegment(
 
 	val attachment: ScoochwormPartAttachment
 		get() = when {
-			attachmentItem.isItem(ModItemTagsProvider.SCOOCHWORM_CHEST_ATTACHMENTS) -> ScoochwormPartAttachment.CHEST
-			attachmentItem.isItem(ModItemTagsProvider.SCOOCHWORM_SADDLE_ATTACHMENTS) -> ScoochwormPartAttachment.SADDLE
+			attachmentItem.isItem(ModItemTagsProvider.SCOOCHWORM_CHESTS) -> ScoochwormPartAttachment.CHEST
+			attachmentItem.isItem(ModItemTagsProvider.SCOOCHWORM_SADDLES) -> ScoochwormPartAttachment.SADDLE
 			else -> ScoochwormPartAttachment.NONE
 		}
 
@@ -122,7 +122,7 @@ class ScoochwormSegment(
 	}
 
 	private fun updateContainerComponent() {
-		if (!attachmentItem.isItem(ModItemTagsProvider.SCOOCHWORM_CHEST_ATTACHMENTS)) return
+		if (!attachmentItem.isItem(ModItemTagsProvider.SCOOCHWORM_CHESTS)) return
 
 		val contents = ItemContainerContents.fromItems(container.items)
 		attachmentItem.set(DataComponents.CONTAINER, contents)

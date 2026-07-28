@@ -161,8 +161,8 @@ class ScoochwormEntity(
 		partIndex: Int
 	): InteractionResult? {
 		val attachment = when {
-			heldStack.isItem(ModItemTagsProvider.SCOOCHWORM_SADDLE_ATTACHMENTS) -> ScoochwormPartAttachment.SADDLE
-			heldStack.isItem(ModItemTagsProvider.SCOOCHWORM_CHEST_ATTACHMENTS) -> ScoochwormPartAttachment.CHEST
+			heldStack.isItem(ModItemTagsProvider.SCOOCHWORM_SADDLES) -> ScoochwormPartAttachment.SADDLE
+			heldStack.isItem(ModItemTagsProvider.SCOOCHWORM_CHESTS) -> ScoochwormPartAttachment.CHEST
 			else -> return null
 		}
 
