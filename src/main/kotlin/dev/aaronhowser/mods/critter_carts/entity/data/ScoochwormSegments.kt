@@ -1,7 +1,11 @@
 package dev.aaronhowser.mods.critter_carts.entity.data
 
+import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isClientSide
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity
 import net.minecraft.nbt.ListTag
+import net.minecraft.world.InteractionHand
+import net.minecraft.world.InteractionResult
+import net.minecraft.world.entity.player.Player
 
 class ScoochwormSegments(
 	private val scoochworm: ScoochwormEntity
@@ -32,6 +36,31 @@ class ScoochwormSegments(
 			segment.dropAttachmentItem(scoochworm)
 			segment.discardBodyPart()
 		}
+	}
+
+	fun interact(
+		player: Player,
+		hand: InteractionHand,
+		partIndex: Int,
+		currentAttachment: ScoochwormPartAttachment
+	): InteractionResult {
+		val heldStack = player.getItemInHand(hand)
+
+		if (scoochworm.isClientSide) {
+			return ScoochwormSegment.predictInteraction(
+				player,
+				heldStack,
+				currentAttachment
+			)
+		}
+
+		val segment = getSegment(partIndex) ?: return InteractionResult.PASS
+		return segment.interact(
+			player,
+			hand,
+			heldStack,
+			onSheared = { removeFrom(partIndex) }
+		)
 	}
 
 	fun dropAllAttachmentItems() {

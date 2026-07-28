@@ -1,11 +1,8 @@
 package dev.aaronhowser.mods.critter_carts.entity
 
-import dev.aaronhowser.mods.aaron.misc.AaronExtensions.getEquipmentSlot
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isClientSide
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isItem
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isServerSide
-import dev.aaronhowser.mods.aaron.misc.AaronExtensions.nextRange
-import dev.aaronhowser.mods.critter_carts.datagen.tag.ModItemTagsProvider
 import dev.aaronhowser.mods.critter_carts.entity.control.ScoochwormMoveControl
 import dev.aaronhowser.mods.critter_carts.entity.data.ScoochwormPartAttachment
 import dev.aaronhowser.mods.critter_carts.entity.data.ScoochwormPath
@@ -15,14 +12,12 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
-import net.minecraft.world.SimpleMenuProvider
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.PathfinderMob
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.entity.player.Player
-import net.minecraft.world.inventory.ChestMenu
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.Level
@@ -89,35 +84,14 @@ class ScoochwormEntity(
 		val growResult = tryGrow(player, heldStack)
 		if (growResult != null) return growResult
 
-		val isHead = partIndex == null
-		if (isHead) return InteractionResult.PASS
+		if (partIndex == null || currentAttachment == null) return InteractionResult.PASS
 
-		val shearResult = tryShear(player, hand, heldStack, partIndex)
-		if (shearResult != null) return shearResult
-
-		val removeAttachmentResult = tryRemoveAttachment(player, heldStack, partIndex, currentAttachment)
-		if (removeAttachmentResult != null) return removeAttachmentResult
-
-		when (currentAttachment) {
-			ScoochwormPartAttachment.NONE -> {
-				val addAttachmentResult = tryAddAttachment(player, heldStack, partIndex)
-				if (addAttachmentResult != null) return addAttachmentResult
-			}
-
-			ScoochwormPartAttachment.SADDLE -> {
-				val rideResult = tryRide(player, partIndex)
-				if (rideResult != null) return rideResult
-			}
-
-			ScoochwormPartAttachment.CHEST -> {
-				val openChestResult = tryOpenChest(player, partIndex)
-				if (openChestResult != null) return openChestResult
-			}
-
-			null -> {}
-		}
-
-		return InteractionResult.PASS
+		return bodySegments.interact(
+			player,
+			hand,
+			partIndex,
+			currentAttachment
+		)
 	}
 
 	private fun tryGrow(player: Player, heldStack: ItemStack): InteractionResult? {
@@ -129,121 +103,6 @@ class ScoochwormEntity(
 
 			playSound(SoundEvents.GENERIC_EAT, 1f, 1f)
 			gameEvent(GameEvent.EAT, player)
-		}
-
-		return InteractionResult.sidedSuccess(isClientSide)
-	}
-
-	private fun tryShear(
-		player: Player,
-		hand: InteractionHand,
-		heldStack: ItemStack,
-		partIndex: Int
-	): InteractionResult? {
-		if (!heldStack.isItem(Items.SHEARS) || !bodySegments.contains(partIndex)) return null
-
-		if (isServerSide) {
-			bodySegments.removeFrom(partIndex)
-
-			val equipmentSlot = hand.getEquipmentSlot()
-			heldStack.hurtAndBreak(1, player, equipmentSlot)
-
-			playSound(SoundEvents.SHEEP_SHEAR, 1f, 1f)
-			gameEvent(GameEvent.SHEAR, player)
-		}
-
-		return InteractionResult.sidedSuccess(isClientSide)
-	}
-
-	private fun tryAddAttachment(
-		player: Player,
-		heldStack: ItemStack,
-		partIndex: Int
-	): InteractionResult? {
-		val attachment = when {
-			heldStack.isItem(ModItemTagsProvider.SCOOCHWORM_SADDLES) -> ScoochwormPartAttachment.SADDLE
-			heldStack.isItem(ModItemTagsProvider.SCOOCHWORM_CHESTS) -> ScoochwormPartAttachment.CHEST
-			else -> return null
-		}
-
-		if (isServerSide) {
-			val attachmentItem = heldStack.copyWithCount(1)
-			val segment = bodySegments.getSegment(partIndex) ?: return null
-			val bodyPart = segment.bodyPart ?: return null
-			segment.setAttachment(attachmentItem)
-			heldStack.consume(1, player)
-
-			@Suppress("KotlinConstantConditions")
-			val sound = when (attachment) {
-				ScoochwormPartAttachment.SADDLE -> SoundEvents.HORSE_SADDLE
-				ScoochwormPartAttachment.CHEST -> SoundEvents.DONKEY_CHEST
-				ScoochwormPartAttachment.NONE -> return null
-			}
-
-			bodyPart.playSound(sound, 1f, random.nextRange(0.8f, 1.2f))
-			gameEvent(GameEvent.EQUIP, player)
-		}
-
-		return InteractionResult.sidedSuccess(isClientSide)
-	}
-
-	private fun tryRemoveAttachment(
-		player: Player,
-		heldStack: ItemStack,
-		partIndex: Int,
-		currentAttachment: ScoochwormPartAttachment?
-	): InteractionResult? {
-		if (currentAttachment == null || currentAttachment == ScoochwormPartAttachment.NONE) return null
-		if (!player.isShiftKeyDown || !heldStack.isEmpty) return null
-
-		if (isServerSide) {
-			val segment = bodySegments.getSegment(partIndex) ?: return null
-			val bodyPart = segment.bodyPart ?: return null
-			val attachmentItem = segment.removeAttachment()
-
-			if (!player.addItem(attachmentItem)) {
-				player.drop(attachmentItem, false)
-			}
-
-			bodyPart.playSound(
-				SoundEvents.ITEM_FRAME_REMOVE_ITEM,
-				1f,
-				random.nextRange(0.8f, 1.2f)
-			)
-			gameEvent(GameEvent.UNEQUIP, player)
-		}
-
-		return InteractionResult.sidedSuccess(isClientSide)
-	}
-
-	private fun tryRide(
-		player: Player,
-		partIndex: Int
-	): InteractionResult? {
-		if (player.isShiftKeyDown) return null
-
-		if (isServerSide) {
-			val segment = bodySegments.getSegment(partIndex) ?: return null
-			val bodyPart = segment.bodyPart ?: return null
-			if (!player.startRiding(bodyPart)) return null
-		}
-
-		return InteractionResult.sidedSuccess(isClientSide)
-	}
-
-	private fun tryOpenChest(
-		player: Player,
-		partIndex: Int
-	): InteractionResult? {
-		if (isServerSide) {
-			val segment = bodySegments.getSegment(partIndex) ?: return null
-			val menuProvider = SimpleMenuProvider(
-				{ containerId, playerInventory, _ ->
-					ChestMenu.threeRows(containerId, playerInventory, segment.container)
-				},
-				Items.CHEST.description
-			)
-			player.openMenu(menuProvider)
 		}
 
 		return InteractionResult.sidedSuccess(isClientSide)
