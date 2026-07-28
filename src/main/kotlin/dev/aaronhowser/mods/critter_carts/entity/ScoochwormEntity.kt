@@ -5,6 +5,7 @@ import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isClientSide
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isItem
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isServerSide
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.nextRange
+import dev.aaronhowser.mods.critter_carts.datagen.tag.ModItemTagsProvider
 import dev.aaronhowser.mods.critter_carts.entity.control.ScoochwormMoveControl
 import dev.aaronhowser.mods.critter_carts.entity.data.ScoochwormPartAttachment
 import dev.aaronhowser.mods.critter_carts.entity.data.ScoochwormPath
@@ -160,8 +161,8 @@ class ScoochwormEntity(
 		partIndex: Int
 	): InteractionResult? {
 		val attachment = when {
-			heldStack.isItem(Items.SADDLE) -> ScoochwormPartAttachment.SADDLE
-			heldStack.isItem(Items.CHEST) -> ScoochwormPartAttachment.CHEST
+			heldStack.isItem(ModItemTagsProvider.SCOOCHWORM_SADDLE_ATTACHMENTS) -> ScoochwormPartAttachment.SADDLE
+			heldStack.isItem(ModItemTagsProvider.SCOOCHWORM_CHEST_ATTACHMENTS) -> ScoochwormPartAttachment.CHEST
 			else -> return null
 		}
 

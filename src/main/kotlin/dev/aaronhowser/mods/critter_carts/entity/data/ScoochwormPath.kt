@@ -37,15 +37,16 @@ class ScoochwormPath(
 			val positionFartherFromHead = iterator.next()
 			val segmentLength = positionCloserToHead.distanceTo(positionFartherFromHead)
 
-			if (segmentLength >= remainingDistance && segmentLength > 0.0) {
-				return positionCloserToHead.lerp(
-					positionFartherFromHead,
-					remainingDistance / segmentLength
-				)
+			if (segmentLength < remainingDistance || segmentLength <= 0.0) {
+				remainingDistance -= segmentLength
+				positionCloserToHead = positionFartherFromHead
+				continue
 			}
 
-			remainingDistance -= segmentLength
-			positionCloserToHead = positionFartherFromHead
+			return positionCloserToHead.lerp(
+				positionFartherFromHead,
+				remainingDistance / segmentLength
+			)
 		}
 
 		return positionCloserToHead

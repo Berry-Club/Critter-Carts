@@ -2,6 +2,7 @@ package dev.aaronhowser.mods.critter_carts.entity.data
 
 import com.mojang.serialization.Codec
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isItem
+import dev.aaronhowser.mods.critter_carts.datagen.tag.ModItemTagsProvider
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormPartEntity
 import dev.aaronhowser.mods.critter_carts.registry.ModEntityTypes
@@ -11,7 +12,6 @@ import net.minecraft.nbt.NbtOps
 import net.minecraft.world.SimpleContainer
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.item.ItemStack
-import net.minecraft.world.item.Items
 import net.minecraft.world.item.component.ItemContainerContents
 import net.minecraft.world.phys.Vec3
 
@@ -27,8 +27,8 @@ class ScoochwormSegment(
 
 	val attachment: ScoochwormPartAttachment
 		get() = when {
-			attachmentItem.isItem(Items.CHEST) -> ScoochwormPartAttachment.CHEST
-			attachmentItem.isItem(Items.SADDLE) -> ScoochwormPartAttachment.SADDLE
+			attachmentItem.isItem(ModItemTagsProvider.SCOOCHWORM_CHEST_ATTACHMENTS) -> ScoochwormPartAttachment.CHEST
+			attachmentItem.isItem(ModItemTagsProvider.SCOOCHWORM_SADDLE_ATTACHMENTS) -> ScoochwormPartAttachment.SADDLE
 			else -> ScoochwormPartAttachment.NONE
 		}
 
@@ -100,6 +100,7 @@ class ScoochwormSegment(
 			partIndex,
 			attachment
 		)
+
 		bodyPart.moveTo(
 			position.x,
 			position.y,
@@ -121,7 +122,7 @@ class ScoochwormSegment(
 	}
 
 	private fun updateContainerComponent() {
-		if (!attachmentItem.isItem(Items.CHEST)) return
+		if (!attachmentItem.isItem(ModItemTagsProvider.SCOOCHWORM_CHEST_ATTACHMENTS)) return
 
 		val contents = ItemContainerContents.fromItems(container.items)
 		attachmentItem.set(DataComponents.CONTAINER, contents)

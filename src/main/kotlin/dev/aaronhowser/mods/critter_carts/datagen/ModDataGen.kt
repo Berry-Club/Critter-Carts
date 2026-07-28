@@ -5,6 +5,7 @@ import dev.aaronhowser.mods.critter_carts.datagen.language.ModLanguageProvider
 import dev.aaronhowser.mods.critter_carts.datagen.loot.ModLootTableProvider
 import dev.aaronhowser.mods.critter_carts.datagen.model.ModBlockStateProvider
 import dev.aaronhowser.mods.critter_carts.datagen.tag.ModBlockTagsProvider
+import dev.aaronhowser.mods.critter_carts.datagen.tag.ModItemTagsProvider
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.neoforge.data.event.GatherDataEvent
@@ -29,9 +30,18 @@ object ModDataGen {
 			event.includeServer(),
 			ModLootTableProvider(output, event.lookupProvider)
 		)
-		generator.addProvider(
+		val blockTagProvider = generator.addProvider(
 			event.includeServer(),
 			ModBlockTagsProvider(output, event.lookupProvider, event.existingFileHelper)
+		)
+		generator.addProvider(
+			event.includeServer(),
+			ModItemTagsProvider(
+				output,
+				event.lookupProvider,
+				blockTagProvider.contentsGetter(),
+				event.existingFileHelper
+			)
 		)
 	}
 }
