@@ -1,7 +1,6 @@
 package dev.aaronhowser.mods.critter_carts.client.renderer
 
 import com.mojang.blaze3d.vertex.PoseStack
-import com.mojang.math.Axis
 import dev.aaronhowser.mods.critter_carts.CritterCarts
 import dev.aaronhowser.mods.critter_carts.client.model.ScoochwormPartModel
 import dev.aaronhowser.mods.critter_carts.client.renderer.layer.ScoochwormChestLayer
@@ -39,7 +38,11 @@ class ScoochwormPartRenderer(
 			animatable.yRot
 		)
 
-		poseStack.mulPose(Axis.YP.rotationDegrees(180f - interpolatedYaw))
+		ScoochwormRenderer.applyRotations(
+			poseStack,
+			animatable.attachmentBottom,
+			interpolatedYaw
+		)
 	}
 
 	companion object {

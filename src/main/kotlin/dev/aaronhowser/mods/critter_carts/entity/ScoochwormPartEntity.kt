@@ -48,10 +48,6 @@ class ScoochwormPartEntity(
 		get() = entityData.get(DATA_PARENT_ID)
 		set(value) = entityData.set(DATA_PARENT_ID, value)
 
-	private fun getParent(): ScoochwormEntity? {
-		return level().getEntity(parentId) as? ScoochwormEntity
-	}
-
 	var partIndex: Int
 		get() = entityData.get(DATA_PART_INDEX)
 		set(value) = entityData.set(DATA_PART_INDEX, value)
@@ -60,9 +56,13 @@ class ScoochwormPartEntity(
 		get() = entityData.get(DATA_ATTACHMENT)
 		set(value) = entityData.set(DATA_ATTACHMENT, value)
 
-	private var attachmentBottom: Direction
+	var attachmentBottom: Direction
 		get() = entityData.get(DATA_ATTACHMENT_BOTTOM)
-		set(value) = entityData.set(DATA_ATTACHMENT_BOTTOM, value)
+		private set(value) = entityData.set(DATA_ATTACHMENT_BOTTOM, value)
+
+	private fun getParent(): ScoochwormEntity? {
+		return level().getEntity(parentId) as? ScoochwormEntity
+	}
 
 	fun attachTo(
 		parentEntity: ScoochwormEntity,
@@ -89,11 +89,6 @@ class ScoochwormPartEntity(
 		setPos(pathPosition)
 		attachmentBottom = bottom
 		yRot = movementYaw
-		xRot = when (bottom) {
-			Direction.UP -> 180f
-			Direction.DOWN -> 0f
-			else -> -bottom.toYRot()
-		}
 	}
 
 	override fun getPassengerAttachmentPoint(
