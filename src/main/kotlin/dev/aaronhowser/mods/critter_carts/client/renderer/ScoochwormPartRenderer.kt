@@ -2,6 +2,7 @@ package dev.aaronhowser.mods.critter_carts.client.renderer
 
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.math.Axis
+import dev.aaronhowser.mods.critter_carts.CritterCarts
 import dev.aaronhowser.mods.critter_carts.client.model.ScoochwormPartModel
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormPartEntity
@@ -18,8 +19,7 @@ class ScoochwormPartRenderer(
 		withScale(ScoochwormEntity.SIZE)
 	}
 
-	override fun getTextureLocation(animatable: ScoochwormPartEntity): ResourceLocation =
-		ScoochwormRenderer.TEXTURE
+	override fun getTextureLocation(animatable: ScoochwormPartEntity): ResourceLocation = TEXTURE
 
 	override fun applyRotations(
 		animatable: ScoochwormPartEntity,
@@ -36,5 +36,9 @@ class ScoochwormPartRenderer(
 		)
 
 		poseStack.mulPose(Axis.YP.rotationDegrees(180f - interpolatedYaw))
+	}
+
+	companion object {
+		val TEXTURE: ResourceLocation = CritterCarts.modResource("textures/entity/scoochworm_body.png")
 	}
 }
