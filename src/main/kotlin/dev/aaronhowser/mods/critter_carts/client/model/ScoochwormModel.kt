@@ -5,5 +5,5 @@ import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity
 import software.bernie.geckolib.model.DefaultedEntityGeoModel
 
 class ScoochwormModel : DefaultedEntityGeoModel<ScoochwormEntity>(
-	CritterCarts.modResource("scoochworm")
+	CritterCarts.modResource("scoochworm_head")
 )

@@ -18,6 +18,6 @@ class ScoochwormRenderer(
 	override fun getTextureLocation(animatable: ScoochwormEntity): ResourceLocation = TEXTURE
 
 	companion object {
-		val TEXTURE: ResourceLocation = CritterCarts.modResource("textures/entity/scoochworm.png")
+		val TEXTURE: ResourceLocation = CritterCarts.modResource("textures/entity/scoochworm_head.png")
 	}
 }
