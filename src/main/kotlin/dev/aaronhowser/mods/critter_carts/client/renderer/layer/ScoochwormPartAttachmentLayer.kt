@@ -2,6 +2,7 @@ package dev.aaronhowser.mods.critter_carts.client.renderer.layer
 
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.blaze3d.vertex.VertexConsumer
+import dev.aaronhowser.mods.aaron.misc.AaronDsls.withPose
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormPartEntity
 import dev.aaronhowser.mods.critter_carts.entity.data.ScoochwormPartAttachment
 import net.minecraft.client.renderer.MultiBufferSource
@@ -40,17 +41,25 @@ abstract class ScoochwormPartAttachmentLayer(
 			partialTick
 		) ?: return
 
-		renderer.reRender(
-			getDefaultBakedModel(animatable),
-			poseStack,
-			bufferSource,
-			animatable,
-			attachmentRenderType,
-			bufferSource.getBuffer(attachmentRenderType),
-			partialTick,
-			packedLight,
-			packedOverlay,
-			renderer.getRenderColor(animatable, partialTick, packedLight).argbInt()
-		)
+		poseStack.withPose {
+			poseStack.translate(0.0, ATTACHMENT_OFFSET, 0.0)
+
+			renderer.reRender(
+				getDefaultBakedModel(animatable),
+				poseStack,
+				bufferSource,
+				animatable,
+				attachmentRenderType,
+				bufferSource.getBuffer(attachmentRenderType),
+				partialTick,
+				packedLight,
+				packedOverlay,
+				renderer.getRenderColor(animatable, partialTick, packedLight).argbInt()
+			)
+		}
+	}
+
+	companion object {
+		private const val ATTACHMENT_OFFSET = 1.0
 	}
 }
