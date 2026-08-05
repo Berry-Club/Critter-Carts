@@ -30,7 +30,11 @@ class ScoochwormMoveControl(
 			return
 		}
 
-		scoochworm.yRot = currentTravelDirection.toYRot()
+		scoochworm.yRot = ScoochwormEntity.getMovementYaw(
+			currentTravelDirection,
+			scoochworm.attachmentBottom
+		)
+
 		scoochworm.yBodyRot = scoochworm.yRot
 		scoochworm.speed = (speedModifier * scoochworm.getAttributeValue(Attributes.MOVEMENT_SPEED)).toFloat()
 

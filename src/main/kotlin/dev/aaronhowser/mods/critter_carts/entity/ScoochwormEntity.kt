@@ -176,6 +176,25 @@ class ScoochwormEntity(
 				EntityDataSerializers.DIRECTION
 			)
 
+		fun getMovementYaw(
+			travelDirection: Direction,
+			bottom: Direction
+		): Float {
+			if (travelDirection.axis != Direction.Axis.Y) {
+				return travelDirection.toYRot()
+			}
+
+			val movingUp = travelDirection == Direction.UP
+
+			return when (bottom) {
+				Direction.NORTH -> if (movingUp) 180f else 0f
+				Direction.SOUTH -> if (movingUp) 0f else 180f
+				Direction.WEST -> if (movingUp) 90f else -90f
+				Direction.EAST -> if (movingUp) -90f else 90f
+				Direction.UP, Direction.DOWN -> 0f
+			}
+		}
+
 		fun createAttributes(): AttributeSupplier {
 			return createMobAttributes()
 				.add(Attributes.MAX_HEALTH, 10.0)

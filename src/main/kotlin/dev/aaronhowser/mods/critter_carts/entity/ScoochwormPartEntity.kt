@@ -22,7 +22,6 @@ import software.bernie.geckolib.animatable.GeoEntity
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache
 import software.bernie.geckolib.animatable.instance.SingletonAnimatableInstanceCache
 import software.bernie.geckolib.animation.AnimatableManager
-import kotlin.math.atan2
 
 class ScoochwormPartEntity(
 	entityType: EntityType<ScoochwormPartEntity>,
@@ -80,10 +79,17 @@ class ScoochwormPartEntity(
 		val displacement = position().vectorTo(pathPosition)
 		var movementYaw = yRot
 
-		if (displacement.horizontalDistanceSqr() >= MINIMUM_MOVEMENT_DISTANCE_SQUARED) {
-			movementYaw = Math.toDegrees(
-				atan2(displacement.z, displacement.x)
-			).toFloat() - 90f
+		if (displacement.lengthSqr() >= MINIMUM_MOVEMENT_DISTANCE_SQUARED) {
+			val travelDirection = Direction.getNearest(
+				displacement.x,
+				displacement.y,
+				displacement.z
+			)
+
+			movementYaw = ScoochwormEntity.getMovementYaw(
+				travelDirection,
+				bottom
+			)
 		}
 
 		setPos(pathPosition)
