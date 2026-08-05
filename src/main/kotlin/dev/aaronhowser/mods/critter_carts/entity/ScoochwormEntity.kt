@@ -128,13 +128,17 @@ class ScoochwormEntity(
 	override fun readAdditionalSaveData(tag: CompoundTag) {
 		super.readAdditionalSaveData(tag)
 
-		movementPath.clear()
-
+		movementPath.load(tag.getList(PATH_TAG, CompoundTag.TAG_COMPOUND.toInt()))
 		bodySegments.load(tag.getList(SEGMENTS_TAG, CompoundTag.TAG_COMPOUND.toInt()))
+
+		if (!movementPath.isEmpty()) {
+			bodySegments.update(movementPath)
+		}
 	}
 
 	override fun addAdditionalSaveData(tag: CompoundTag) {
 		super.addAdditionalSaveData(tag)
+		tag.put(PATH_TAG, movementPath.save())
 		tag.put(SEGMENTS_TAG, bodySegments.save())
 	}
 
@@ -150,6 +154,7 @@ class ScoochwormEntity(
 		const val PART_SPACING = SIZE * 1.2
 
 		private const val SEGMENTS_TAG = "Segments"
+		private const val PATH_TAG = "Path"
 
 		fun createAttributes(): AttributeSupplier {
 			return createMobAttributes()

@@ -2,6 +2,8 @@ package dev.aaronhowser.mods.critter_carts.entity.data
 
 import net.minecraft.world.phys.Vec3
 import net.minecraft.core.Direction
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.nbt.ListTag
 import java.util.*
 
 class ScoochwormPath(
@@ -61,8 +63,45 @@ class ScoochwormPath(
 		positions.clear()
 	}
 
+	fun isEmpty(): Boolean = positions.isEmpty()
+
+	fun save(): ListTag {
+		val tag = ListTag()
+
+		for (pathPoint in positions) {
+			val pointTag = CompoundTag()
+			pointTag.putDouble(X_TAG, pathPoint.position.x)
+			pointTag.putDouble(Y_TAG, pathPoint.position.y)
+			pointTag.putDouble(Z_TAG, pathPoint.position.z)
+			pointTag.putInt(BOTTOM_TAG, pathPoint.bottom.get3DDataValue())
+			tag.add(pointTag)
+		}
+
+		return tag
+	}
+
+	fun load(tag: ListTag) {
+		positions.clear()
+
+		for (index in tag.indices) {
+			val pointTag = tag.getCompound(index)
+			val position = Vec3(
+				pointTag.getDouble(X_TAG),
+				pointTag.getDouble(Y_TAG),
+				pointTag.getDouble(Z_TAG)
+			)
+
+			val bottom = Direction.from3DDataValue(pointTag.getInt(BOTTOM_TAG))
+			positions.addLast(ScoochwormPathPoint(position, bottom))
+		}
+	}
+
 	companion object {
 		private const val MAX_PATH_POINTS = 256
 		private const val MINIMUM_STEP_DISTANCE_SQUARED = 0.000001
+		private const val X_TAG = "X"
+		private const val Y_TAG = "Y"
+		private const val Z_TAG = "Z"
+		private const val BOTTOM_TAG = "Bottom"
 	}
 }
