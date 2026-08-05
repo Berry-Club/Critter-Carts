@@ -9,6 +9,7 @@ import dev.aaronhowser.mods.critter_carts.entity.data.ScoochwormPath
 import dev.aaronhowser.mods.critter_carts.entity.data.ScoochwormSegments
 import dev.aaronhowser.mods.critter_carts.entity.goal.ScoochstemFollowGoal
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.core.Direction
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
@@ -38,6 +39,7 @@ class ScoochwormEntity(
 	val scoochwormMoveControl = ScoochwormMoveControl(this)
 	private val movementPath = ScoochwormPath(PART_SPACING * ScoochwormSegments.MAX_COUNT)
 	private val bodySegments = ScoochwormSegments(this)
+	var attachmentBottom: Direction = Direction.DOWN
 
 	init {
 		moveControl = scoochwormMoveControl
@@ -52,7 +54,7 @@ class ScoochwormEntity(
 
 		if (isClientSide) return
 
-		movementPath.record(position(), yRot)
+		movementPath.record(position(), attachmentBottom, yRot)
 		bodySegments.update(movementPath)
 	}
 

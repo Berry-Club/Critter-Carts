@@ -75,8 +75,8 @@ class ScoochwormSegments(
 
 	fun update(path: ScoochwormPath) {
 		for (partIndex in segments.indices) {
-			val partPosition = path.getPosition(getPartDistance(partIndex))
-			segments[partIndex].updateBodyPart(scoochworm, partIndex, partPosition)
+			val pathPoint = path.getPoint(getPartDistance(partIndex))
+			segments[partIndex].updateBodyPart(scoochworm, partIndex, pathPoint)
 		}
 	}
 

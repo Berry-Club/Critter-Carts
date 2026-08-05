@@ -4,6 +4,7 @@ import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isClientSide
 import dev.aaronhowser.mods.critter_carts.entity.data.ScoochwormPartAttachment
 import dev.aaronhowser.mods.critter_carts.registry.ModEntityDataSerializers
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.core.Direction
 import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData
@@ -70,7 +71,7 @@ class ScoochwormPartEntity(
 
 	// Movement
 
-	fun moveAlongPath(pathPosition: Vec3, pitch: Float) {
+	fun moveAlongPath(pathPosition: Vec3, bottom: Direction) {
 		val displacement = position().vectorTo(pathPosition)
 		var movementYaw = yRot
 
@@ -82,7 +83,11 @@ class ScoochwormPartEntity(
 
 		setPos(pathPosition)
 		yRot = movementYaw
-		xRot = pitch
+		xRot = when (bottom) {
+			Direction.UP -> 180f
+			Direction.DOWN -> 0f
+			else -> -bottom.toYRot()
+		}
 	}
 
 	// Lifecycle

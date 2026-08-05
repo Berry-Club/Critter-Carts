@@ -54,16 +54,16 @@ class ScoochwormSegment(
 	fun updateBodyPart(
 		scoochworm: ScoochwormEntity,
 		partIndex: Int,
-		position: Vec3
+		pathPoint: ScoochwormPathPoint
 	) {
 		var bodyPart = this.bodyPart
 
 		if (bodyPart == null || bodyPart.isRemoved) {
-			bodyPart = createBodyPart(scoochworm, partIndex, position)
+			bodyPart = createBodyPart(scoochworm, partIndex, pathPoint.position)
 			this.bodyPart = bodyPart
 		}
 
-		bodyPart.moveAlongPath(position, scoochworm.xRot)
+		bodyPart.moveAlongPath(pathPoint.position, pathPoint.bottom)
 	}
 
 	fun discardBodyPart() {
