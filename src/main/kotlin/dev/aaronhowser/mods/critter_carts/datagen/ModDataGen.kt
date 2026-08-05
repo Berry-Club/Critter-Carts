@@ -4,6 +4,7 @@ import dev.aaronhowser.mods.critter_carts.CritterCarts
 import dev.aaronhowser.mods.critter_carts.datagen.language.ModLanguageProvider
 import dev.aaronhowser.mods.critter_carts.datagen.loot.ModLootTableProvider
 import dev.aaronhowser.mods.critter_carts.datagen.model.ModBlockStateProvider
+import dev.aaronhowser.mods.critter_carts.datagen.sound.ModSoundDefinitionsProvider
 import dev.aaronhowser.mods.critter_carts.datagen.tag.ModBlockTagsProvider
 import dev.aaronhowser.mods.critter_carts.datagen.tag.ModEntityTypeTagsProvider
 import dev.aaronhowser.mods.critter_carts.datagen.tag.ModItemTagsProvider
@@ -27,6 +28,11 @@ object ModDataGen {
 		generator.addProvider(
 			event.includeClient(),
 			ModLanguageProvider(output)
+		)
+
+		generator.addProvider(
+			event.includeClient(),
+			ModSoundDefinitionsProvider(output, event.existingFileHelper)
 		)
 
 		generator.addProvider(

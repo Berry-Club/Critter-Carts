@@ -8,6 +8,7 @@ import dev.aaronhowser.mods.critter_carts.entity.data.ScoochwormPartAttachment
 import dev.aaronhowser.mods.critter_carts.entity.data.ScoochwormPath
 import dev.aaronhowser.mods.critter_carts.entity.data.ScoochwormSegments
 import dev.aaronhowser.mods.critter_carts.entity.goal.ScoochstemFollowGoal
+import dev.aaronhowser.mods.critter_carts.registry.ModSoundEvents
 import net.minecraft.core.Direction
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.syncher.EntityDataAccessor
@@ -27,6 +28,7 @@ import net.minecraft.world.item.Items
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.gameevent.GameEvent
 import net.minecraft.world.level.material.PushReaction
+import net.minecraft.world.phys.Vec3
 import net.neoforged.neoforge.fluids.FluidType
 import software.bernie.geckolib.animatable.GeoEntity
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache
@@ -42,6 +44,8 @@ class ScoochwormEntity(
 	val scoochwormMoveControl = ScoochwormMoveControl(this)
 	private val movementPath = ScoochwormPath(PART_SPACING * ScoochwormSegments.MAX_COUNT)
 	private val bodySegments = ScoochwormSegments(this)
+	private var lastFootstepPosition: Vec3? = null
+	private var nextFootstepTick = 0
 
 	init {
 		moveControl = scoochwormMoveControl
@@ -60,8 +64,39 @@ class ScoochwormEntity(
 
 		if (isClientSide) return
 
+		playFootstepWhileMoving()
+
 		movementPath.record(position(), attachmentBottom, yRot)
 		bodySegments.update(movementPath)
+	}
+
+	private fun playFootstepWhileMoving() {
+		val currentPosition = position()
+		val previousPosition = lastFootstepPosition
+		lastFootstepPosition = currentPosition
+
+		if (previousPosition == null) {
+			nextFootstepTick = tickCount + randomFootstepDelay()
+			return
+		}
+
+		if (currentPosition.distanceToSqr(previousPosition) < MIN_FOOTSTEP_MOVEMENT_SQUARED) return
+		if (tickCount < nextFootstepTick) return
+
+		playSound(
+			ModSoundEvents.SCOOCHWORM_FOOTSTEP.get(),
+			FOOTSTEP_VOLUME,
+			randomFootstepPitch()
+		)
+		nextFootstepTick = tickCount + randomFootstepDelay()
+	}
+
+	fun randomFootstepDelay(): Int {
+		return random.nextIntBetweenInclusive(MIN_FOOTSTEP_DELAY, MAX_FOOTSTEP_DELAY)
+	}
+
+	fun randomFootstepPitch(): Float {
+		return MIN_FOOTSTEP_PITCH + random.nextFloat() * FOOTSTEP_PITCH_RANGE
 	}
 
 	override fun remove(reason: RemovalReason) {
@@ -169,6 +204,12 @@ class ScoochwormEntity(
 
 		private const val SEGMENTS_TAG = "Segments"
 		private const val PATH_TAG = "Path"
+		private const val MIN_FOOTSTEP_DELAY = 10
+		private const val MAX_FOOTSTEP_DELAY = 16
+		private const val MIN_FOOTSTEP_PITCH = 0.85f
+		private const val FOOTSTEP_PITCH_RANGE = 0.3f
+		private const val FOOTSTEP_VOLUME = 0.35f
+		private const val MIN_FOOTSTEP_MOVEMENT_SQUARED = 0.0001
 
 		private val DATA_ATTACHMENT_BOTTOM: EntityDataAccessor<Direction> =
 			SynchedEntityData.defineId(

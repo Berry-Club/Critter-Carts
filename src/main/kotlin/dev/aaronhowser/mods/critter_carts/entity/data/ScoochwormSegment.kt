@@ -8,6 +8,7 @@ import dev.aaronhowser.mods.critter_carts.datagen.tag.ModItemTagsProvider
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormPartEntity
 import dev.aaronhowser.mods.critter_carts.registry.ModEntityTypes
+import dev.aaronhowser.mods.critter_carts.registry.ModSoundEvents
 import net.minecraft.core.component.DataComponents
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtOps
@@ -34,6 +35,7 @@ class ScoochwormSegment(
 
 	var bodyPart: ScoochwormPartEntity? = null
 		private set
+	private var nextFootstepTick: Int? = null
 
 	val attachment: ScoochwormPartAttachment
 		get() = when {
@@ -63,12 +65,38 @@ class ScoochwormSegment(
 			this.bodyPart = bodyPart
 		}
 
+		val previousPosition = bodyPart.position()
 		bodyPart.moveAlongPath(pathPoint.position, pathPoint.bottom)
+		playFootstepWhileMoving(scoochworm, bodyPart, previousPosition)
+	}
+
+	private fun playFootstepWhileMoving(
+		scoochworm: ScoochwormEntity,
+		bodyPart: ScoochwormPartEntity,
+		previousPosition: Vec3
+	) {
+		var nextFootstepTick = this.nextFootstepTick
+
+		if (nextFootstepTick == null) {
+			nextFootstepTick = scoochworm.tickCount + scoochworm.randomFootstepDelay()
+			this.nextFootstepTick = nextFootstepTick
+		}
+
+		if (bodyPart.position().distanceToSqr(previousPosition) < MIN_FOOTSTEP_MOVEMENT_SQUARED) return
+		if (scoochworm.tickCount < nextFootstepTick) return
+
+		bodyPart.playSound(
+			ModSoundEvents.SCOOCHWORM_FOOTSTEP.get(),
+			FOOTSTEP_VOLUME,
+			scoochworm.randomFootstepPitch()
+		)
+		this.nextFootstepTick = scoochworm.tickCount + scoochworm.randomFootstepDelay()
 	}
 
 	fun discardBodyPart() {
 		bodyPart?.discard()
 		bodyPart = null
+		nextFootstepTick = null
 	}
 
 	fun setAttachment(stack: ItemStack) {
@@ -240,6 +268,8 @@ class ScoochwormSegment(
 	companion object {
 		private const val ATTACHMENT_ITEM_TAG = "AttachmentItem"
 		private const val CONTAINER_SIZE = 27
+		private const val FOOTSTEP_VOLUME = 0.35f
+		private const val MIN_FOOTSTEP_MOVEMENT_SQUARED = 0.0001
 
 		fun predictInteraction(
 			player: Player,
