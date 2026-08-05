@@ -2,6 +2,8 @@ package dev.aaronhowser.mods.critter_carts.entity.data
 
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isClientSide
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity
+import dev.aaronhowser.mods.critter_carts.entity.ScoochwormPartEntity
+import dev.aaronhowser.mods.critter_carts.registry.ModSoundEvents
 import net.minecraft.nbt.ListTag
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
@@ -12,6 +14,7 @@ class ScoochwormSegments(
 ) {
 
 	private val segments: MutableList<ScoochwormSegment> = mutableListOf(ScoochwormSegment())
+	private var nextFootstepTick = getNextFootstepTick()
 
 	val canGrow: Boolean
 		get() = segments.size < MAX_COUNT
@@ -74,10 +77,44 @@ class ScoochwormSegments(
 	}
 
 	fun update(path: ScoochwormPath) {
+		val bodyParts = mutableListOf<ScoochwormPartEntity>()
+
 		for (partIndex in segments.indices) {
+			val segment = segments[partIndex]
 			val pathPoint = path.getPoint(getPartDistance(partIndex))
-			segments[partIndex].updateBodyPart(scoochworm, partIndex, pathPoint)
+			segment.updateBodyPart(scoochworm, partIndex, pathPoint)
+
+			val bodyPart = segment.bodyPart ?: continue
+			bodyParts.add(bodyPart)
 		}
+
+		playFootsteps(bodyParts)
+	}
+
+	private fun playFootsteps(bodyParts: List<ScoochwormPartEntity>) {
+		if (bodyParts.isEmpty()) return
+		if (scoochworm.tickCount < nextFootstepTick) return
+
+		nextFootstepTick = getNextFootstepTick()
+
+		val soundCount = bodyParts.size.coerceAtMost(4)
+		var soundIndex = 0
+		while (soundIndex < soundCount) {
+			val bodyPartIndex = scoochworm.random.nextInt(bodyParts.size)
+			val bodyPart = bodyParts[bodyPartIndex]
+
+			bodyPart.playSound(
+				ModSoundEvents.SCOOCHWORM_FOOTSTEP.get(),
+				0.35f,
+				scoochworm.randomFootstepPitch()
+			)
+
+			soundIndex++
+		}
+	}
+
+	private fun getNextFootstepTick(): Int {
+		return scoochworm.tickCount + scoochworm.randomFootstepDelay()
 	}
 
 	fun save(): ListTag {
@@ -110,6 +147,8 @@ class ScoochwormSegments(
 		for (segment in segments) {
 			segment.discardBodyPart()
 		}
+
+		nextFootstepTick = getNextFootstepTick()
 	}
 
 	private fun getPartDistance(partIndex: Int): Double {
