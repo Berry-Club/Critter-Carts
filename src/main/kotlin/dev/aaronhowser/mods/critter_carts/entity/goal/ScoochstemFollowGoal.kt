@@ -24,6 +24,8 @@ class ScoochstemFollowGoal(
 	}
 
 	override fun canUse(): Boolean {
+		if (!scoochworm.isMoving) return false
+
 		val surface = findCurrentSurface() ?: return false
 		val direction = getInitialTravelDirection(surface.bottom)
 		val nextSurface = chooseNextSurface(surface, direction) ?: return false
@@ -33,7 +35,9 @@ class ScoochstemFollowGoal(
 		return true
 	}
 
-	override fun canContinueToUse(): Boolean = targetSurface != null
+	override fun canContinueToUse(): Boolean {
+		return scoochworm.isMoving && targetSurface != null
+	}
 
 	override fun start() {
 		scoochworm.isNoGravity = true
@@ -113,7 +117,7 @@ class ScoochstemFollowGoal(
 		cornerPosition = null
 		directionAfterCorner = null
 		scoochworm.noPhysics = false
-		scoochworm.isNoGravity = false
+		scoochworm.isNoGravity = !scoochworm.isMoving
 	}
 
 	private fun chooseNextSurface(surface: StemSurface, forward: Direction): StemSurface? {

@@ -56,14 +56,20 @@ class ScoochwormEntity(
 		get() = entityData.get(DATA_ATTACHMENT_BOTTOM)
 		set(value) = entityData.set(DATA_ATTACHMENT_BOTTOM, value)
 
+	var isMoving: Boolean
+		get() = entityData.get(DATA_IS_MOVING)
+		private set(value) = entityData.set(DATA_IS_MOVING, value)
+
 	override fun registerGoals() {
 		goalSelector.addGoal(0, ScoochstemFollowGoal(this))
 	}
 
 	override fun aiStep() {
+		if (!isMoving) isNoGravity = true
+
 		super.aiStep()
 
-		if (isClientSide) return
+		if (isClientSide || !isMoving) return
 
 		playFootstepWhileMoving()
 
@@ -115,7 +121,16 @@ class ScoochwormEntity(
 	// Interaction
 
 	override fun mobInteract(player: Player, hand: InteractionHand): InteractionResult {
-		return interactWithPart(player, hand, null, null)
+		val heldStack = player.getItemInHand(hand)
+		val growResult = tryGrow(player, heldStack)
+		if (growResult != null) return growResult
+
+		if (isServerSide) {
+			isMoving = !isMoving
+			if (!isMoving) deltaMovement = Vec3.ZERO
+		}
+
+		return InteractionResult.sidedSuccess(isClientSide)
 	}
 
 	fun interactWithPart(
@@ -174,6 +189,7 @@ class ScoochwormEntity(
 	override fun defineSynchedData(builder: SynchedEntityData.Builder) {
 		super.defineSynchedData(builder)
 		builder.define(DATA_ATTACHMENT_BOTTOM, Direction.DOWN)
+		builder.define(DATA_IS_MOVING, false)
 	}
 
 	override fun readAdditionalSaveData(tag: CompoundTag) {
@@ -181,6 +197,7 @@ class ScoochwormEntity(
 
 		movementPath.load(tag.getList(PATH_TAG, CompoundTag.TAG_COMPOUND.toInt()))
 		bodySegments.load(tag.getList(SEGMENTS_TAG, CompoundTag.TAG_COMPOUND.toInt()))
+		isMoving = tag.getBoolean(MOVING_TAG)
 
 		if (!movementPath.isEmpty()) {
 			bodySegments.update(movementPath)
@@ -191,6 +208,7 @@ class ScoochwormEntity(
 		super.addAdditionalSaveData(tag)
 		tag.put(PATH_TAG, movementPath.save())
 		tag.put(SEGMENTS_TAG, bodySegments.save())
+		tag.putBoolean(MOVING_TAG, isMoving)
 	}
 
 	// Animation
@@ -206,10 +224,18 @@ class ScoochwormEntity(
 
 		private const val SEGMENTS_TAG = "Segments"
 		private const val PATH_TAG = "Path"
+		private const val MOVING_TAG = "Moving"
+
 		private val DATA_ATTACHMENT_BOTTOM: EntityDataAccessor<Direction> =
 			SynchedEntityData.defineId(
 				ScoochwormEntity::class.java,
 				EntityDataSerializers.DIRECTION
+			)
+
+		private val DATA_IS_MOVING: EntityDataAccessor<Boolean> =
+			SynchedEntityData.defineId(
+				ScoochwormEntity::class.java,
+				EntityDataSerializers.BOOLEAN
 			)
 
 		fun getMovementYaw(
