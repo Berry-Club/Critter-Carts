@@ -16,6 +16,8 @@ class ScoochstemFollowGoal(
 	private var currentSurface: StemSurface? = null
 	private var travelDirection: Direction? = null
 	private var targetSurface: StemSurface? = null
+	private var cornerPosition: Vec3? = null
+	private var directionAfterCorner: Direction? = null
 
 	init {
 		flags = EnumSet.of(Flag.MOVE)
@@ -27,8 +29,7 @@ class ScoochstemFollowGoal(
 		val nextSurface = chooseNextSurface(surface, direction) ?: return false
 
 		currentSurface = surface
-		travelDirection = directionTo(surface, nextSurface, direction)
-		targetSurface = nextSurface
+		setTarget(surface, nextSurface, direction)
 		return true
 	}
 
@@ -41,12 +42,16 @@ class ScoochstemFollowGoal(
 	override fun tick() {
 		val target = targetSurface ?: return
 		val direction = travelDirection ?: return
-		val targetPosition = getEntityPosition(target)
+		val targetPosition = cornerPosition ?: getEntityPosition(target)
 		val distanceToTarget = scoochworm.position().vectorTo(targetPosition)
 			.dot(Vec3.atLowerCornerOf(direction.normal))
 
 		if (distanceToTarget <= TARGET_DISTANCE) {
-			reachTarget(target, direction)
+			if (cornerPosition == null) {
+				reachTarget(target, direction)
+			} else {
+				reachCorner(target, targetPosition)
+			}
 		}
 
 		moveTowardTarget()
@@ -64,13 +69,50 @@ class ScoochstemFollowGoal(
 			return
 		}
 
-		travelDirection = directionTo(target, nextSurface, direction)
-		targetSurface = nextSurface
+		setTarget(target, nextSurface, direction)
+	}
+
+	private fun reachCorner(target: StemSurface, position: Vec3) {
+		scoochworm.setPos(position)
+		scoochworm.attachmentBottom = target.bottom
+		cornerPosition = null
+		travelDirection = directionAfterCorner
+		directionAfterCorner = null
+	}
+
+	private fun setTarget(
+		from: StemSurface,
+		to: StemSurface,
+		approachDirection: Direction
+	) {
+		targetSurface = to
+
+		if (from.bottom == to.bottom) {
+			cornerPosition = null
+			directionAfterCorner = null
+			travelDirection = directionTo(from, to, approachDirection)
+			return
+		}
+
+		val fromPosition = getEntityPosition(from)
+		val toPosition = getEntityPosition(to)
+		val corner = when (approachDirection.axis) {
+			Direction.Axis.X -> Vec3(toPosition.x, fromPosition.y, fromPosition.z)
+			Direction.Axis.Y -> Vec3(fromPosition.x, toPosition.y, fromPosition.z)
+			Direction.Axis.Z -> Vec3(fromPosition.x, fromPosition.y, toPosition.z)
+		}
+
+		cornerPosition = corner
+		directionAfterCorner = directionBetween(corner, toPosition)
+		travelDirection = approachDirection
 	}
 
 	override fun stop() {
 		targetSurface = null
 		currentSurface = null
+		cornerPosition = null
+		directionAfterCorner = null
+		scoochworm.noPhysics = false
 		scoochworm.isNoGravity = false
 	}
 
@@ -104,22 +146,31 @@ class ScoochstemFollowGoal(
 
 		if (isTraversableSurface(climbingSurface)) return climbingSurface
 
+		val adjoiningSurface = StemSurface(
+			surface.stem.relative(surface.bottom.opposite),
+			forward
+		)
+
+		if (isTraversableSurface(adjoiningSurface)) return adjoiningSurface
+
 		val wrappingSurface = StemSurface(surface.stem, forward.opposite)
-		if (isTraversableSurface(wrappingSurface)) return wrappingSurface
+		if (isScoochstem(wrappingSurface.stem)) return wrappingSurface
 
 		return null
 	}
 
 	private fun moveTowardTarget() {
+		val current = currentSurface ?: return
 		val target = targetSurface ?: return
 		val direction = travelDirection ?: return
-		val position = getEntityPosition(target)
+		val position = cornerPosition ?: getEntityPosition(target)
 
 		scoochworm.scoochwormMoveControl.setWantedPosition(
 			position.x,
 			position.y,
 			position.z,
 			direction,
+			current.bottom != target.bottom,
 			1.0
 		)
 	}
@@ -189,6 +240,11 @@ class ScoochstemFollowGoal(
 		return Direction.getNearest(displacement.x, displacement.y, displacement.z)
 	}
 
+	private fun directionBetween(from: Vec3, to: Vec3): Direction {
+		val displacement = from.vectorTo(to)
+		return Direction.getNearest(displacement.x, displacement.y, displacement.z)
+	}
+
 	private fun rotateAroundBottom(
 		direction: Direction,
 		bottom: Direction,
@@ -205,6 +261,6 @@ class ScoochstemFollowGoal(
 	}
 
 	companion object {
-		private const val TARGET_DISTANCE = 0.1
+		private const val TARGET_DISTANCE = 0.001
 	}
 }
