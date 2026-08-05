@@ -13,17 +13,14 @@ class ModSoundDefinitionsProvider(
 
 	override fun registerSounds() {
 		val definition = definition()
-
-		for (variation in 1..FOOTSTEP_VARIATIONS) {
-			definition.with(
-				sound(CritterCarts.modResource("entity/scoochworm/footstep_$variation"))
+			.with(
+				sound(CritterCarts.modResource("entity/scoochworm/footstep_1"))
 			)
-		}
+			.with(
+				sound(CritterCarts.modResource("entity/scoochworm/footstep_2"))
+			)
 
 		add(ModSoundEvents.SCOOCHWORM_FOOTSTEP, definition)
 	}
 
-	companion object {
-		private const val FOOTSTEP_VARIATIONS = 5
-	}
 }

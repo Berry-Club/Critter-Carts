@@ -1,0 +1,8 @@
+{
+  "scoochworm_footstep": {
+    "sounds": [
+      "critter_carts:entity/scoochworm/footstep_1",
+      "critter_carts:entity/scoochworm/footstep_2"
+    ]
+  }
+}
