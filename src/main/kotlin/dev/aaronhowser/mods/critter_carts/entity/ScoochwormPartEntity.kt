@@ -193,7 +193,7 @@ class ScoochwormPartEntity(
 				entity.parentId != parentId
 			}
 
-			else -> true
+			else -> !entity.isPassenger
 		}
 	}
 

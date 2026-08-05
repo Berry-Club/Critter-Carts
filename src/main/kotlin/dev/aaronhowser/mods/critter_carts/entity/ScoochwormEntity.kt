@@ -114,7 +114,10 @@ class ScoochwormEntity(
 
 	override fun canBeCollidedWith(): Boolean = !isDeadOrDying
 	override fun canCollideWith(entity: Entity): Boolean {
-		return entity !is ScoochwormPartEntity || entity.parentId != id
+		return when {
+			entity is ScoochwormPartEntity -> entity.parentId == id
+			else -> !entity.isPassenger
+		}
 	}
 
 	override fun isPushable(): Boolean = false
