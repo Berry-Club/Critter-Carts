@@ -3,8 +3,8 @@ package dev.aaronhowser.mods.critter_carts.entity
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isClientSide
 import dev.aaronhowser.mods.critter_carts.entity.data.ScoochwormPartAttachment
 import dev.aaronhowser.mods.critter_carts.registry.ModEntityDataSerializers
-import net.minecraft.nbt.CompoundTag
 import net.minecraft.core.Direction
+import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData
@@ -13,6 +13,7 @@ import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
 import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.EntityDimensions
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.Level
@@ -59,6 +60,10 @@ class ScoochwormPartEntity(
 		get() = entityData.get(DATA_ATTACHMENT)
 		set(value) = entityData.set(DATA_ATTACHMENT, value)
 
+	private var attachmentBottom: Direction
+		get() = entityData.get(DATA_ATTACHMENT_BOTTOM)
+		set(value) = entityData.set(DATA_ATTACHMENT_BOTTOM, value)
+
 	fun attachTo(
 		parentEntity: ScoochwormEntity,
 		partIndex: Int,
@@ -82,12 +87,33 @@ class ScoochwormPartEntity(
 		}
 
 		setPos(pathPosition)
+		attachmentBottom = bottom
 		yRot = movementYaw
 		xRot = when (bottom) {
 			Direction.UP -> 180f
 			Direction.DOWN -> 0f
 			else -> -bottom.toYRot()
 		}
+	}
+
+	override fun getPassengerAttachmentPoint(
+		entity: Entity,
+		dimensions: EntityDimensions,
+		partialTick: Float
+	): Vec3 {
+		val attachmentDistance = super.getPassengerAttachmentPoint(
+			entity,
+			dimensions,
+			partialTick
+		).y
+
+		val attachmentDirection = attachmentBottom.opposite
+
+		return Vec3(
+			attachmentDirection.stepX * attachmentDistance,
+			attachmentDirection.stepY * attachmentDistance,
+			attachmentDirection.stepZ * attachmentDistance
+		)
 	}
 
 	// Lifecycle
@@ -180,6 +206,7 @@ class ScoochwormPartEntity(
 		builder.define(DATA_PARENT_ID, NO_PARENT)
 		builder.define(DATA_PART_INDEX, 0)
 		builder.define(DATA_ATTACHMENT, ScoochwormPartAttachment.NONE)
+		builder.define(DATA_ATTACHMENT_BOTTOM, Direction.DOWN)
 	}
 
 	override fun readAdditionalSaveData(tag: CompoundTag) {}
@@ -208,6 +235,12 @@ class ScoochwormPartEntity(
 			SynchedEntityData.defineId(
 				ScoochwormPartEntity::class.java,
 				ModEntityDataSerializers.SCOOCHWORM_PART_ATTACHMENT.get()
+			)
+
+		private val DATA_ATTACHMENT_BOTTOM: EntityDataAccessor<Direction> =
+			SynchedEntityData.defineId(
+				ScoochwormPartEntity::class.java,
+				EntityDataSerializers.DIRECTION
 			)
 	}
 
