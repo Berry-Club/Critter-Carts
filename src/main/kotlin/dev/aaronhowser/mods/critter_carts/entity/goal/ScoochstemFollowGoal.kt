@@ -137,14 +137,19 @@ class ScoochstemFollowGoal(
 			}
 		}
 
+		val forwardStem = surface.stem.relative(forward)
+		val diagonalStem = forwardStem.relative(surface.bottom.opposite)
 		val climbingSurface = StemSurface(
-			surface.stem
-				.relative(forward)
-				.relative(surface.bottom.opposite),
+			diagonalStem,
 			forward
 		)
 
-		if (isTraversableSurface(climbingSurface)) return climbingSurface
+		if (
+			isScoochstem(forwardStem)
+			&& isTraversableSurface(climbingSurface)
+		) {
+			return climbingSurface
+		}
 
 		val adjoiningSurface = StemSurface(
 			surface.stem.relative(surface.bottom.opposite),
@@ -154,7 +159,13 @@ class ScoochstemFollowGoal(
 		if (isTraversableSurface(adjoiningSurface)) return adjoiningSurface
 
 		val wrappingSurface = StemSurface(surface.stem, forward.opposite)
-		if (isScoochstem(wrappingSurface.stem)) return wrappingSurface
+		if (
+			isScoochstem(wrappingSurface.stem)
+			&& hasNoCollision(forwardStem)
+			&& hasNoCollision(diagonalStem)
+		) {
+			return wrappingSurface
+		}
 
 		return null
 	}
@@ -211,6 +222,13 @@ class ScoochstemFollowGoal(
 		return scoochworm.level()
 			.getBlockState(position)
 			.isBlock(ModBlocks.SCOOCHSTEM.get())
+	}
+
+	private fun hasNoCollision(position: BlockPos): Boolean {
+		val level = scoochworm.level()
+		return level.getBlockState(position)
+			.getCollisionShape(level, position)
+			.isEmpty
 	}
 
 	private fun getEntityPosition(surface: StemSurface): Vec3 {
