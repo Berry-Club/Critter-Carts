@@ -82,14 +82,15 @@ class ScoochwormSegment(
 			this.nextFootstepTick = nextFootstepTick
 		}
 
-		if (bodyPart.position().distanceToSqr(previousPosition) < MIN_FOOTSTEP_MOVEMENT_SQUARED) return
+		if (bodyPart.position().distanceToSqr(previousPosition) < 0.0001) return
 		if (scoochworm.tickCount < nextFootstepTick) return
 
 		bodyPart.playSound(
 			ModSoundEvents.SCOOCHWORM_FOOTSTEP.get(),
-			FOOTSTEP_VOLUME,
+			0.35f,
 			scoochworm.randomFootstepPitch()
 		)
+
 		this.nextFootstepTick = scoochworm.tickCount + scoochworm.randomFootstepDelay()
 	}
 
@@ -268,9 +269,6 @@ class ScoochwormSegment(
 	companion object {
 		private const val ATTACHMENT_ITEM_TAG = "AttachmentItem"
 		private const val CONTAINER_SIZE = 27
-		private const val FOOTSTEP_VOLUME = 0.35f
-		private const val MIN_FOOTSTEP_MOVEMENT_SQUARED = 0.0001
-
 		fun predictInteraction(
 			player: Player,
 			heldStack: ItemStack,
