@@ -44,12 +44,15 @@ class ScoochwormRenderer(
 
 	companion object {
 		val TEXTURE: ResourceLocation = CritterCarts.modResource("textures/entity/scoochworm/head.png")
+		private const val ROTATION_CENTER = ScoochwormEntity.SIZE / 2.0
 
 		fun applyRotations(
 			poseStack: PoseStack,
 			bottom: Direction,
 			yaw: Float
 		) {
+			poseStack.translate(0.0, ROTATION_CENTER, 0.0)
+
 			when (bottom) {
 				Direction.DOWN -> Unit
 				Direction.UP -> poseStack.mulPose(Axis.ZP.rotationDegrees(180f))
@@ -61,6 +64,8 @@ class ScoochwormRenderer(
 
 			val surfaceYaw = if (bottom == Direction.UP) -yaw else yaw
 			poseStack.mulPose(Axis.YP.rotationDegrees(180f - surfaceYaw))
+			poseStack.translate(0.0, -ROTATION_CENTER, 0.0)
 		}
+
 	}
 }
