@@ -4,6 +4,8 @@ import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.math.Axis
 import dev.aaronhowser.mods.critter_carts.CritterCarts
 import dev.aaronhowser.mods.critter_carts.client.model.ScoochwormPartModel
+import dev.aaronhowser.mods.critter_carts.client.renderer.layer.ScoochwormChestLayer
+import dev.aaronhowser.mods.critter_carts.client.renderer.layer.ScoochwormSaddleLayer
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormPartEntity
 import net.minecraft.client.renderer.entity.EntityRendererProvider
@@ -17,6 +19,8 @@ class ScoochwormPartRenderer(
 
 	init {
 		withScale(ScoochwormEntity.SIZE)
+		addRenderLayer(ScoochwormChestLayer(this))
+		addRenderLayer(ScoochwormSaddleLayer(this))
 	}
 
 	override fun getTextureLocation(animatable: ScoochwormPartEntity): ResourceLocation = TEXTURE
@@ -39,6 +43,6 @@ class ScoochwormPartRenderer(
 	}
 
 	companion object {
-		val TEXTURE: ResourceLocation = CritterCarts.modResource("textures/entity/scoochworm_body.png")
+		val TEXTURE: ResourceLocation = CritterCarts.modResource("textures/entity/scoochworm/body.png")
 	}
 }
