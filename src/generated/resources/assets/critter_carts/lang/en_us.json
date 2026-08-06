@@ -2,5 +2,6 @@
   "block.critter_carts.scoochstem": "Scoochstem",
   "entity.critter_carts.scoochworm": "Scoochworm",
   "item.critter_carts.scoochworm_spawn_egg": "Scoochworm Spawn Egg",
-  "itemGroup.critter_carts": "Critter Carts"
+  "itemGroup.critter_carts": "Critter Carts",
+  "subtitles.critter_carts.scoochworm_footstep": "Scoochworm scooches"
 }

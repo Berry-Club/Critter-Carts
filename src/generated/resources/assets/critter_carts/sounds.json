@@ -3,6 +3,7 @@
     "sounds": [
       "critter_carts:entity/scoochworm/footstep_1",
       "critter_carts:entity/scoochworm/footstep_2"
-    ]
+    ],
+    "subtitle": "subtitles.critter_carts.scoochworm_footstep"
   }
 }

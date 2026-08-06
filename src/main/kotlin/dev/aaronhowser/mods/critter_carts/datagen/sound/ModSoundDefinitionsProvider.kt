@@ -13,6 +13,7 @@ class ModSoundDefinitionsProvider(
 
 	override fun registerSounds() {
 		val definition = definition()
+			.subtitle(ModSoundEvents.SCOOCHWORM_FOOTSTEP_SUBTITLE)
 			.with(
 				sound(CritterCarts.modResource("entity/scoochworm/footstep_1"))
 			)
