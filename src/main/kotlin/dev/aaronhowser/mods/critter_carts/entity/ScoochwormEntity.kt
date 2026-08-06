@@ -45,7 +45,8 @@ class ScoochwormEntity(
 	val scoochwormMoveControl = ScoochwormMoveControl(this)
 	private val movementPath = ScoochwormPath(PART_SPACING * ScoochwormSegments.MAX_COUNT)
 	private val bodySegments = ScoochwormSegments(this)
-	private var lastFootstepPosition: Vec3? = null
+
+	private var footstepPartIndex = HEAD_FOOTSTEP_INDEX
 	private var nextFootstepTick = 0
 
 	init {
@@ -71,40 +72,34 @@ class ScoochwormEntity(
 
 		if (isClientSide || !isMoving) return
 
-		playFootstepWhileMoving()
-
 		movementPath.record(position(), attachmentBottom, yRot)
 		bodySegments.update(movementPath)
+
+		playNextFootstep()
 	}
 
-	private fun playFootstepWhileMoving() {
-		val currentPosition = position()
-		val previousPosition = lastFootstepPosition
-		lastFootstepPosition = currentPosition
+	private fun playNextFootstep() {
+		if (tickCount < nextFootstepTick) return
 
-		if (previousPosition == null) {
-			nextFootstepTick = tickCount + randomFootstepDelay()
+		val footstepEntity = when (footstepPartIndex) {
+			HEAD_FOOTSTEP_INDEX -> this
+			else -> bodySegments.getBodyPart(footstepPartIndex)
+		} ?: return
+
+		footstepEntity.playSound(
+			ModSoundEvents.SCOOCHWORM_FOOTSTEP.get(),
+			0.35f,
+			random.nextRange(0.85f, 1.15f)
+		)
+
+		footstepPartIndex++
+		if (footstepPartIndex < bodySegments.size) {
+			nextFootstepTick = tickCount + FOOTSTEP_INTERVAL_TICKS
 			return
 		}
 
-		if (currentPosition.distanceToSqr(previousPosition) < 0.0001) return
-		if (tickCount < nextFootstepTick) return
-
-		playSound(
-			ModSoundEvents.SCOOCHWORM_FOOTSTEP.get(),
-			0.35f,
-			randomFootstepPitch()
-		)
-
-		nextFootstepTick = tickCount + randomFootstepDelay()
-	}
-
-	fun randomFootstepDelay(): Int {
-		return random.nextRange(10, 16)
-	}
-
-	fun randomFootstepPitch(): Float {
-		return random.nextRange(0.85f, 1.15f)
+		footstepPartIndex = HEAD_FOOTSTEP_INDEX
+		nextFootstepTick = tickCount + FOOTSTEP_CYCLE_PAUSE_TICKS
 	}
 
 	override fun remove(reason: RemovalReason) {
@@ -221,6 +216,10 @@ class ScoochwormEntity(
 	companion object {
 		const val SIZE = 14f / 16f
 		const val PART_SPACING = SIZE * 1.2
+
+		private const val HEAD_FOOTSTEP_INDEX = -1
+		private const val FOOTSTEP_INTERVAL_TICKS = 3
+		private const val FOOTSTEP_CYCLE_PAUSE_TICKS = 40
 
 		private const val SEGMENTS_TAG = "Segments"
 		private const val PATH_TAG = "Path"
