@@ -34,7 +34,7 @@ class ScoochwormMoveControl(
 
 		scoochworm.yRot = ScoochwormEntity.getMovementYaw(
 			currentTravelDirection,
-			scoochworm.attachmentBottom
+			scoochworm.supportDirection
 		)
 
 		scoochworm.yBodyRot = scoochworm.yRot

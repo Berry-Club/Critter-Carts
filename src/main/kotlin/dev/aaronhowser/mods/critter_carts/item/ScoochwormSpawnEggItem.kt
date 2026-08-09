@@ -67,7 +67,7 @@ class ScoochwormSpawnEggItem(
 						clickedFace
 					)
 				) {
-					spawnedEntity.attachTo(clickedPosition, clickedFace.opposite)
+					spawnedEntity.attachToSupport(clickedPosition, clickedFace.opposite)
 				}
 
 				if (player != null) {

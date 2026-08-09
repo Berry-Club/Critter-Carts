@@ -40,7 +40,7 @@ class ScoochwormPartRenderer(
 
 		ScoochwormRenderer.applyRotations(
 			poseStack,
-			animatable.attachmentBottom,
+			animatable.bottomDirection,
 			interpolatedYaw
 		)
 	}

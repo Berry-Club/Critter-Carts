@@ -55,9 +55,9 @@ class ScoochwormPartEntity(
 		get() = entityData.get(DATA_ATTACHMENT_TYPE)
 		set(value) = entityData.set(DATA_ATTACHMENT_TYPE, value)
 
-	var attachmentBottom: Direction
-		get() = entityData.get(DATA_ATTACHMENT_BOTTOM)
-		private set(value) = entityData.set(DATA_ATTACHMENT_BOTTOM, value)
+	var bottomDirection: Direction
+		get() = entityData.get(DATA_BOTTOM_DIRECTION)
+		private set(value) = entityData.set(DATA_BOTTOM_DIRECTION, value)
 
 	private fun getParent(): ScoochwormEntity? {
 		return level().getEntity(parentId) as? ScoochwormEntity
@@ -75,7 +75,7 @@ class ScoochwormPartEntity(
 
 	// Movement
 
-	fun moveAlongPath(pathPosition: Vec3, bottom: Direction) {
+	fun moveAlongPath(pathPosition: Vec3, newBottomDirection: Direction) {
 		val displacement = position().vectorTo(pathPosition)
 		var movementYaw = yRot
 
@@ -88,12 +88,12 @@ class ScoochwormPartEntity(
 
 			movementYaw = ScoochwormEntity.getMovementYaw(
 				travelDirection,
-				bottom
+				newBottomDirection
 			)
 		}
 
 		setPos(pathPosition)
-		attachmentBottom = bottom
+		bottomDirection = newBottomDirection
 		yRot = movementYaw
 	}
 
@@ -108,7 +108,7 @@ class ScoochwormPartEntity(
 			partialTick
 		).y
 
-		val attachmentDirection = attachmentBottom.opposite
+		val attachmentDirection = bottomDirection.opposite
 
 		return Vec3(
 			attachmentDirection.stepX * attachmentDistance,
@@ -201,7 +201,7 @@ class ScoochwormPartEntity(
 		builder.define(DATA_PARENT_ID, NO_PARENT)
 		builder.define(DATA_PART_INDEX, 0)
 		builder.define(DATA_ATTACHMENT_TYPE, ScoochwormAttachmentType.NONE)
-		builder.define(DATA_ATTACHMENT_BOTTOM, Direction.DOWN)
+		builder.define(DATA_BOTTOM_DIRECTION, Direction.DOWN)
 	}
 
 	override fun readAdditionalSaveData(tag: CompoundTag) {}
@@ -232,7 +232,7 @@ class ScoochwormPartEntity(
 				ModEntityDataSerializers.SCOOCHWORM_ATTACHMENT_TYPE.get()
 			)
 
-		private val DATA_ATTACHMENT_BOTTOM: EntityDataAccessor<Direction> =
+		private val DATA_BOTTOM_DIRECTION: EntityDataAccessor<Direction> =
 			SynchedEntityData.defineId(
 				ScoochwormPartEntity::class.java,
 				EntityDataSerializers.DIRECTION

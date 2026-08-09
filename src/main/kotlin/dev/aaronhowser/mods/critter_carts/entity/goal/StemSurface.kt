@@ -4,6 +4,6 @@ import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 
 data class StemSurface(
-	val stem: BlockPos,
-	val bottom: Direction
+	val supportPosition: BlockPos,
+	val supportDirection: Direction
 )

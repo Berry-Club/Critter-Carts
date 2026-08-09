@@ -59,52 +59,52 @@ class ScoochwormEntity(
 		moveControl = scoochwormMoveControl
 	}
 
-	var attachmentBottom: Direction
-		get() = entityData.get(DATA_ATTACHMENT_BOTTOM)
-		set(value) = entityData.set(DATA_ATTACHMENT_BOTTOM, value)
+	var supportDirection: Direction
+		get() = entityData.get(DATA_SUPPORT_DIRECTION)
+		set(value) = entityData.set(DATA_SUPPORT_DIRECTION, value)
 
-	var attachmentPosition: BlockPos?
-		get() = entityData.get(DATA_ATTACHMENT_POSITION).orElse(null)
-		private set(value) = entityData.set(DATA_ATTACHMENT_POSITION, Optional.ofNullable(value))
+	var supportPosition: BlockPos?
+		get() = entityData.get(DATA_SUPPORT_POSITION).orElse(null)
+		private set(value) = entityData.set(DATA_SUPPORT_POSITION, Optional.ofNullable(value))
 
-	var isMoving: Boolean
-		get() = entityData.get(DATA_IS_MOVING)
-		private set(value) = entityData.set(DATA_IS_MOVING, value)
+	var isTryingToMove: Boolean
+		get() = entityData.get(DATA_IS_TRYING_TO_MOVE)
+		private set(value) = entityData.set(DATA_IS_TRYING_TO_MOVE, value)
 
 	override fun registerGoals() {
 		goalSelector.addGoal(0, ScoochstemFollowGoal(this))
 	}
 
 	override fun aiStep() {
-		if (isServerSide && !isAttachedToValidBlock()) {
-			attachmentPosition = null
+		if (isServerSide && !hasValidSupport()) {
+			supportPosition = null
 		}
 
-		isNoGravity = attachmentPosition != null
+		isNoGravity = supportPosition != null
 
 		super.aiStep()
 
-		if (isClientSide || !isMoving) return
+		if (isClientSide || !isTryingToMove) return
 
-		movementPath.record(position(), attachmentBottom, yRot)
+		movementPath.record(position(), supportDirection, yRot)
 		bodySegments.update(movementPath)
 
 		playNextFootstep()
 	}
 
-	fun isAttachedToValidBlock(): Boolean {
-		val currentAttachmentPosition = attachmentPosition ?: return false
+	fun hasValidSupport(): Boolean {
+		val currentSupportPosition = supportPosition ?: return false
 
 		return supportsScoochwormTravel(
 			level(),
-			currentAttachmentPosition,
-			attachmentBottom.opposite
+			currentSupportPosition,
+			supportDirection.opposite
 		)
 	}
 
-	fun attachTo(position: BlockPos, bottom: Direction) {
-		attachmentBottom = bottom
-		attachmentPosition = position.immutable()
+	fun attachToSupport(position: BlockPos, direction: Direction) {
+		supportDirection = direction
+		supportPosition = position.immutable()
 	}
 
 	private fun playNextFootstep() {
@@ -150,8 +150,8 @@ class ScoochwormEntity(
 		if (growResult != null) return growResult
 
 		if (isServerSide) {
-			isMoving = !isMoving
-			if (!isMoving) deltaMovement = Vec3.ZERO
+			isTryingToMove = !isTryingToMove
+			if (!isTryingToMove) deltaMovement = Vec3.ZERO
 		}
 
 		return InteractionResult.sidedSuccess(isClientSide)
@@ -212,9 +212,9 @@ class ScoochwormEntity(
 
 	override fun defineSynchedData(builder: SynchedEntityData.Builder) {
 		super.defineSynchedData(builder)
-		builder.define(DATA_ATTACHMENT_BOTTOM, Direction.DOWN)
-		builder.define(DATA_ATTACHMENT_POSITION, Optional.empty())
-		builder.define(DATA_IS_MOVING, false)
+		builder.define(DATA_SUPPORT_DIRECTION, Direction.DOWN)
+		builder.define(DATA_SUPPORT_POSITION, Optional.empty())
+		builder.define(DATA_IS_TRYING_TO_MOVE, false)
 	}
 
 	override fun readAdditionalSaveData(tag: CompoundTag) {
@@ -222,11 +222,11 @@ class ScoochwormEntity(
 
 		movementPath.load(tag.getList(PATH_TAG, CompoundTag.TAG_COMPOUND.toInt()))
 		bodySegments.load(tag.getList(SEGMENTS_TAG, CompoundTag.TAG_COMPOUND.toInt()))
-		isMoving = tag.getBoolean(MOVING_TAG)
+		isTryingToMove = tag.getBoolean(TRYING_TO_MOVE_TAG)
 
-		attachmentBottom = Direction.from3DDataValue(tag.getInt(ATTACHMENT_BOTTOM_TAG))
-		attachmentPosition = if (tag.contains(ATTACHMENT_POSITION_TAG)) {
-			BlockPos.of(tag.getLong(ATTACHMENT_POSITION_TAG))
+		supportDirection = Direction.from3DDataValue(tag.getInt(SUPPORT_DIRECTION_TAG))
+		supportPosition = if (tag.contains(SUPPORT_POSITION_TAG)) {
+			BlockPos.of(tag.getLong(SUPPORT_POSITION_TAG))
 		} else {
 			null
 		}
@@ -240,12 +240,12 @@ class ScoochwormEntity(
 		super.addAdditionalSaveData(tag)
 		tag.put(PATH_TAG, movementPath.save())
 		tag.put(SEGMENTS_TAG, bodySegments.save())
-		tag.putBoolean(MOVING_TAG, isMoving)
-		tag.putInt(ATTACHMENT_BOTTOM_TAG, attachmentBottom.get3DDataValue())
+		tag.putBoolean(TRYING_TO_MOVE_TAG, isTryingToMove)
+		tag.putInt(SUPPORT_DIRECTION_TAG, supportDirection.get3DDataValue())
 
-		val currentAttachmentPosition = attachmentPosition
-		if (currentAttachmentPosition != null) {
-			tag.putLong(ATTACHMENT_POSITION_TAG, currentAttachmentPosition.asLong())
+		val currentSupportPosition = supportPosition
+		if (currentSupportPosition != null) {
+			tag.putLong(SUPPORT_POSITION_TAG, currentSupportPosition.asLong())
 		}
 	}
 
@@ -266,23 +266,23 @@ class ScoochwormEntity(
 
 		private const val SEGMENTS_TAG = "Segments"
 		private const val PATH_TAG = "Path"
-		private const val MOVING_TAG = "Moving"
-		private const val ATTACHMENT_BOTTOM_TAG = "AttachmentBottom"
-		private const val ATTACHMENT_POSITION_TAG = "AttachmentPosition"
+		private const val TRYING_TO_MOVE_TAG = "Moving"
+		private const val SUPPORT_DIRECTION_TAG = "AttachmentBottom"
+		private const val SUPPORT_POSITION_TAG = "AttachmentPosition"
 
-		private val DATA_ATTACHMENT_BOTTOM: EntityDataAccessor<Direction> =
+		private val DATA_SUPPORT_DIRECTION: EntityDataAccessor<Direction> =
 			SynchedEntityData.defineId(
 				ScoochwormEntity::class.java,
 				EntityDataSerializers.DIRECTION
 			)
 
-		private val DATA_ATTACHMENT_POSITION: EntityDataAccessor<Optional<BlockPos>> =
+		private val DATA_SUPPORT_POSITION: EntityDataAccessor<Optional<BlockPos>> =
 			SynchedEntityData.defineId(
 				ScoochwormEntity::class.java,
 				EntityDataSerializers.OPTIONAL_BLOCK_POS
 			)
 
-		private val DATA_IS_MOVING: EntityDataAccessor<Boolean> =
+		private val DATA_IS_TRYING_TO_MOVE: EntityDataAccessor<Boolean> =
 			SynchedEntityData.defineId(
 				ScoochwormEntity::class.java,
 				EntityDataSerializers.BOOLEAN
@@ -306,7 +306,7 @@ class ScoochwormEntity(
 
 		fun getMovementYaw(
 			travelDirection: Direction,
-			bottom: Direction
+			supportDirection: Direction
 		): Float {
 			if (travelDirection.axis != Direction.Axis.Y) {
 				return travelDirection.toYRot()
@@ -314,7 +314,7 @@ class ScoochwormEntity(
 
 			val movingUp = travelDirection == Direction.UP
 
-			return when (bottom) {
+			return when (supportDirection) {
 				Direction.NORTH -> if (movingUp) 180f else 0f
 				Direction.SOUTH -> if (movingUp) 0f else 180f
 				Direction.WEST -> if (movingUp) 90f else -90f
