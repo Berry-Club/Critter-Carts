@@ -59,12 +59,24 @@ class ScoochwormSpawnEggItem(
 
 		if (spawnedEntity != null) {
 			val player = context.player
-			if (spawnedEntity is ScoochwormEntity && player != null) {
-				val rotation = player.direction.toYRot()
-				spawnedEntity.yRot = rotation
-				spawnedEntity.yRotO = rotation
-				spawnedEntity.yBodyRot = rotation
-				spawnedEntity.yHeadRot = rotation
+			if (spawnedEntity is ScoochwormEntity) {
+				if (
+					ScoochwormEntity.supportsScoochwormTravel(
+						level,
+						clickedPosition,
+						clickedFace
+					)
+				) {
+					spawnedEntity.attachTo(clickedPosition, clickedFace.opposite)
+				}
+
+				if (player != null) {
+					val rotation = player.direction.toYRot()
+					spawnedEntity.yRot = rotation
+					spawnedEntity.yRotO = rotation
+					spawnedEntity.yBodyRot = rotation
+					spawnedEntity.yHeadRot = rotation
+				}
 			}
 
 			itemStack.shrink(1)
