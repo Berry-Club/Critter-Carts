@@ -37,7 +37,7 @@ class ScoochwormSegment(
 		private set
 	val attachment: ScoochwormPartAttachment
 		get() = when {
-			attachmentItem.isItem(ModItems.SADDLEBAG) -> ScoochwormPartAttachment.ITEM_STORAGE
+			attachmentItem.isItem(ModItems.SADDLEBAG) -> ScoochwormPartAttachment.CHEST
 			attachmentItem.isItem(ModItemTagsProvider.SCOOCHWORM_SADDLES) -> ScoochwormPartAttachment.SADDLE
 			else -> ScoochwormPartAttachment.NONE
 		}
@@ -128,7 +128,7 @@ class ScoochwormSegment(
 		return when (attachment) {
 			ScoochwormPartAttachment.NONE -> addAttachment(player, heldStack, bodyPart)
 			ScoochwormPartAttachment.SADDLE -> ride(player, bodyPart)
-			ScoochwormPartAttachment.ITEM_STORAGE -> openStorage(player)
+			ScoochwormPartAttachment.CHEST -> openChest(player)
 		}
 	}
 
@@ -143,7 +143,7 @@ class ScoochwormSegment(
 
 		val sound = when (attachment) {
 			ScoochwormPartAttachment.SADDLE -> SoundEvents.HORSE_SADDLE
-			ScoochwormPartAttachment.ITEM_STORAGE -> SoundEvents.DONKEY_CHEST
+			ScoochwormPartAttachment.CHEST -> SoundEvents.DONKEY_CHEST
 			ScoochwormPartAttachment.NONE -> return InteractionResult.PASS
 		}
 
@@ -165,7 +165,7 @@ class ScoochwormSegment(
 		return InteractionResult.CONSUME
 	}
 
-	private fun openStorage(player: Player): InteractionResult {
+	private fun openChest(player: Player): InteractionResult {
 		val menuProvider = SimpleMenuProvider(
 			{ containerId, playerInventory, _ ->
 				ChestMenu.threeRows(containerId, playerInventory, container)
@@ -272,7 +272,7 @@ class ScoochwormSegment(
 					}
 				}
 
-				ScoochwormPartAttachment.ITEM_STORAGE -> InteractionResult.SUCCESS
+				ScoochwormPartAttachment.CHEST -> InteractionResult.SUCCESS
 			}
 		}
 
@@ -283,7 +283,7 @@ class ScoochwormSegment(
 				}
 
 				heldStack.isItem(ModItems.SADDLEBAG) -> {
-					ScoochwormPartAttachment.ITEM_STORAGE
+					ScoochwormPartAttachment.CHEST
 				}
 
 				else -> null
