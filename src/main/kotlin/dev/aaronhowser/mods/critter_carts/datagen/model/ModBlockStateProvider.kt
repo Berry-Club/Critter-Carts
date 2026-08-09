@@ -27,73 +27,39 @@ class ModBlockStateProvider(
 		val top = CritterCarts.modResource("block/scoochstem/top")
 		val topDisabled = CritterCarts.modResource("block/scoochstem/top_disabled")
 
-		val sideModel = scoochstemFaceModel("scoochstem_side", side)
-		val sideDisabledModel = scoochstemFaceModel("scoochstem_side_disabled", sideDisabled)
-		val sideHorizontalModel = scoochstemFaceModel(
-			"scoochstem_side_horizontal",
-			side,
-			true
-		)
-		val sideHorizontalDisabledModel = scoochstemFaceModel(
-			"scoochstem_side_horizontal_disabled",
-			sideDisabled,
-			true
-		)
-		val topModel = scoochstemFaceModel("scoochstem_top", top)
-		val topDisabledModel = scoochstemFaceModel("scoochstem_top_disabled", topDisabled)
-		val topHorizontalModel = scoochstemFaceModel(
-			"scoochstem_top_horizontal",
-			top,
-			true
-		)
-		val topHorizontalDisabledModel = scoochstemFaceModel(
-			"scoochstem_top_horizontal_disabled",
-			topDisabled,
-			true
-		)
+		val sideModels = scoochstemFaceModels("scoochstem_side", side)
+		val disabledSideModels = scoochstemFaceModels("scoochstem_side_disabled", sideDisabled)
+		val topModels = scoochstemFaceModels("scoochstem_top", top)
+		val disabledTopModels = scoochstemFaceModels("scoochstem_top_disabled", topDisabled)
 
 		val multipartBuilder = getMultipartBuilder(scoochstem)
 
 		for (direction in Direction.entries) {
 			for (axis in Direction.Axis.entries) {
-				val isTop = direction.axis == axis
-				val rotateSideTexture = axis != Direction.Axis.Y
-					&& (direction.axis != Direction.Axis.Y || axis == Direction.Axis.X)
-				val enabledModel = when {
-					isTop && axis == Direction.Axis.Y -> topModel
-					isTop -> topHorizontalModel
-					rotateSideTexture -> sideHorizontalModel
-					else -> sideModel
-				}
-				val disabledModel = when {
-					isTop && axis == Direction.Axis.Y -> topDisabledModel
-					isTop -> topHorizontalDisabledModel
-					rotateSideTexture -> sideHorizontalDisabledModel
-					else -> sideDisabledModel
-				}
-				val disabledProperty = ScoochstemBlock.getDisabledProperty(direction)
-				val xRotation = getFaceXRotation(direction)
-				val yRotation = getFaceYRotation(direction)
+				for (disabled in listOf(false, true)) {
+					val isCap = direction.axis == axis
+					val faceModels = when {
+						isCap && disabled -> disabledTopModels
+						isCap -> topModels
+						disabled -> disabledSideModels
+						else -> sideModels
+					}
+					val model = if (shouldRotateTexture(axis, direction)) {
+						faceModels.second
+					} else {
+						faceModels.first
+					}
 
-				multipartBuilder
-					.part()
-					.modelFile(enabledModel)
-					.rotationX(xRotation)
-					.rotationY(yRotation)
-					.addModel()
-					.condition(RotatedPillarBlock.AXIS, axis)
-					.condition(disabledProperty, false)
-					.end()
-
-				multipartBuilder
-					.part()
-					.modelFile(disabledModel)
-					.rotationX(xRotation)
-					.rotationY(yRotation)
-					.addModel()
-					.condition(RotatedPillarBlock.AXIS, axis)
-					.condition(disabledProperty, true)
-					.end()
+					multipartBuilder
+						.part()
+						.modelFile(model)
+						.rotationX(getFaceXRotation(direction))
+						.rotationY(getFaceYRotation(direction))
+						.addModel()
+						.condition(RotatedPillarBlock.AXIS, axis)
+						.condition(ScoochstemBlock.getDisabledProperty(direction), disabled)
+						.end()
+				}
 			}
 		}
 
@@ -104,10 +70,20 @@ class ModBlockStateProvider(
 		simpleBlockItem(scoochstem, itemModel)
 	}
 
+	private fun scoochstemFaceModels(
+		name: String,
+		texture: ResourceLocation
+	): Pair<BlockModelBuilder, BlockModelBuilder> {
+		val regular = scoochstemFaceModel(name, texture, false)
+		val rotated = scoochstemFaceModel(name + "_rotated", texture, true)
+
+		return regular to rotated
+	}
+
 	private fun scoochstemFaceModel(
 		name: String,
 		texture: ResourceLocation,
-		rotateTexture: Boolean = false
+		rotateTexture: Boolean
 	): BlockModelBuilder {
 		return models()
 			.withExistingParent(name, mcLoc("block/block"))
@@ -125,6 +101,17 @@ class ModBlockStateProvider(
 					}
 				}
 			}
+	}
+
+	private fun shouldRotateTexture(
+		axis: Direction.Axis,
+		direction: Direction
+	): Boolean {
+		if (direction.axis == axis) return axis != Direction.Axis.Y
+		if (axis == Direction.Axis.Y) return false
+		if (direction.axis == Direction.Axis.Y) return axis == Direction.Axis.X
+
+		return true
 	}
 
 	private fun getFaceXRotation(direction: Direction): Int {
