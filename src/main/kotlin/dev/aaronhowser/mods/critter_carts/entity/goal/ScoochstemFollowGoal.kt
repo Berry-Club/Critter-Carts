@@ -117,7 +117,7 @@ class ScoochstemFollowGoal(
 		cornerPosition = null
 		directionAfterCorner = null
 		scoochworm.noPhysics = false
-		scoochworm.isNoGravity = !scoochworm.isMoving
+		scoochworm.isNoGravity = scoochworm.isAttachedToValidBlock()
 	}
 
 	private fun chooseNextSurface(surface: StemSurface, forward: Direction): StemSurface? {

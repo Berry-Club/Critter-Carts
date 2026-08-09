@@ -1,6 +1,7 @@
 package dev.aaronhowser.mods.critter_carts.entity
 
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isClientSide
+import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isBlock
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isItem
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isServerSide
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.nextRange
@@ -9,7 +10,9 @@ import dev.aaronhowser.mods.critter_carts.entity.data.attachment.ScoochwormAttac
 import dev.aaronhowser.mods.critter_carts.entity.data.ScoochwormPath
 import dev.aaronhowser.mods.critter_carts.entity.data.ScoochwormSegments
 import dev.aaronhowser.mods.critter_carts.entity.goal.ScoochstemFollowGoal
+import dev.aaronhowser.mods.critter_carts.registry.ModBlocks
 import dev.aaronhowser.mods.critter_carts.registry.ModSoundEvents
+import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.syncher.EntityDataAccessor
@@ -67,7 +70,7 @@ class ScoochwormEntity(
 	}
 
 	override fun aiStep() {
-		if (!isMoving) isNoGravity = true
+		isNoGravity = isAttachedToValidBlock()
 
 		super.aiStep()
 
@@ -77,6 +80,15 @@ class ScoochwormEntity(
 		bodySegments.update(movementPath)
 
 		playNextFootstep()
+	}
+
+	fun isAttachedToValidBlock(): Boolean {
+		val attachmentPosition = BlockPos.containing(
+			position().add(Vec3.atLowerCornerOf(attachmentBottom.normal))
+		)
+
+		return level().getBlockState(attachmentPosition)
+			.isBlock(ModBlocks.SCOOCHSTEM.get())
 	}
 
 	private fun playNextFootstep() {
