@@ -13,6 +13,7 @@ class ModItemModelProvider(
 
 	override fun registerModels() {
 		basicItem(ModItems.SADDLEBAG.get())
+		basicItem(ModItems.WICKER_BASKET.get())
 		spawnEggItem(ModItems.SCOOCHWORM_SPAWN_EGG.get())
 	}
 }
