@@ -70,10 +70,13 @@ class ScoochwormEntity(
 
 		super.aiStep()
 
-		if (isClientSide || !isMoving) return
+		if (isClientSide) return
+		if (!isMoving && !movementPath.isEmpty()) return
 
 		movementPath.record(position(), attachmentBottom, yRot)
 		bodySegments.update(movementPath)
+
+		if (!isMoving) return
 
 		playNextFootstep()
 	}
