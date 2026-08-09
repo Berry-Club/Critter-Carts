@@ -6,7 +6,7 @@ import net.minecraft.network.codec.StreamCodec
 
 enum class ScoochwormPartAttachment {
 	NONE,
-	CHEST,
+	ITEM_STORAGE,
 	SADDLE;
 
 	companion object {

@@ -4,6 +4,6 @@ import dev.aaronhowser.mods.critter_carts.CritterCarts
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormPartEntity
 import software.bernie.geckolib.model.DefaultedEntityGeoModel
 
-class ScoochwormChestModel : DefaultedEntityGeoModel<ScoochwormPartEntity>(
-	CritterCarts.modResource("scoochworm/chest")
+class ScoochwormSaddlebagModel : DefaultedEntityGeoModel<ScoochwormPartEntity>(
+	CritterCarts.modResource("scoochworm/saddlebag")
 )
