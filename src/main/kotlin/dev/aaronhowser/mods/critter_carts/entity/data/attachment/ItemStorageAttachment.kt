@@ -8,6 +8,7 @@ import net.minecraft.world.SimpleContainer
 import net.minecraft.world.SimpleMenuProvider
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.inventory.ChestMenu
+import net.minecraft.world.inventory.MenuType
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.component.ItemContainerContents
 
@@ -39,7 +40,13 @@ class ItemStorageAttachment(
 	): AttachmentInteractionResult {
 		val menuProvider = SimpleMenuProvider(
 			{ containerId, playerInventory, _ ->
-				ChestMenu.threeRows(containerId, playerInventory, container)
+				ChestMenu(
+					MenuType.GENERIC_9x1,
+					containerId,
+					playerInventory,
+					container,
+					CONTAINER_ROWS
+				)
 			},
 			itemStack.hoverName
 		)
@@ -58,6 +65,7 @@ class ItemStorageAttachment(
 	}
 
 	companion object {
-		private const val CONTAINER_SIZE = 27
+		private const val CONTAINER_ROWS = 1
+		private const val CONTAINER_SIZE = 9
 	}
 }
