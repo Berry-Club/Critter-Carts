@@ -17,9 +17,9 @@ object ModItems : AaronItemRegistry() {
 	val SADDLEBAG: DeferredItem<ItemWithTooltip> =
 		register(
 			"saddlebag",
-			builder = {
+			builder = { properties ->
 				ItemWithTooltip(
-					it,
+					properties,
 					ModMenuLang.SADDLE_NOT_INCLUDED.toComponent()
 				)
 			})
