@@ -87,8 +87,7 @@ class ScoochwormEntity(
 			position().add(Vec3.atLowerCornerOf(attachmentBottom.normal))
 		)
 
-		return level().getBlockState(attachmentPosition)
-			.isBlock(ModBlocks.SCOOCHSTEM.get())
+		return isValidBlock(level(), attachmentPosition)
 	}
 
 	private fun playNextFootstep() {
@@ -249,6 +248,11 @@ class ScoochwormEntity(
 				ScoochwormEntity::class.java,
 				EntityDataSerializers.BOOLEAN
 			)
+
+		fun isValidBlock(level: Level, position: BlockPos): Boolean {
+			return level.getBlockState(position)
+				.isBlock(ModBlocks.SCOOCHSTEM.get())
+		}
 
 		fun getMovementYaw(
 			travelDirection: Direction,

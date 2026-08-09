@@ -1,8 +1,6 @@
 package dev.aaronhowser.mods.critter_carts.entity.goal
 
-import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isBlock
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity
-import dev.aaronhowser.mods.critter_carts.registry.ModBlocks
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.world.entity.ai.goal.Goal
@@ -149,7 +147,7 @@ class ScoochstemFollowGoal(
 		)
 
 		if (
-			isScoochstem(forwardStem)
+			isValidBlock(forwardStem)
 			&& isTraversableSurface(climbingSurface)
 		) {
 			return climbingSurface
@@ -164,7 +162,7 @@ class ScoochstemFollowGoal(
 
 		val wrappingSurface = StemSurface(surface.stem, forward.opposite)
 		if (
-			isScoochstem(wrappingSurface.stem)
+			isValidBlock(wrappingSurface.stem)
 			&& hasNoCollision(forwardStem)
 			&& hasNoCollision(diagonalStem)
 		) {
@@ -197,7 +195,7 @@ class ScoochstemFollowGoal(
 					.add(Vec3.atLowerCornerOf(bottom.normal))
 			)
 
-			if (isScoochstem(stem)) return StemSurface(stem, bottom)
+			if (isValidBlock(stem)) return StemSurface(stem, bottom)
 		}
 
 		return null
@@ -210,7 +208,7 @@ class ScoochstemFollowGoal(
 	}
 
 	private fun isTraversableSurface(surface: StemSurface): Boolean {
-		if (!isScoochstem(surface.stem)) return false
+		if (!isValidBlock(surface.stem)) return false
 
 		val position = getEntityPosition(surface)
 		val bounds = scoochworm.boundingBox.move(
@@ -222,10 +220,8 @@ class ScoochstemFollowGoal(
 		return scoochworm.level().noCollision(scoochworm, bounds)
 	}
 
-	private fun isScoochstem(position: BlockPos): Boolean {
-		return scoochworm.level()
-			.getBlockState(position)
-			.isBlock(ModBlocks.SCOOCHSTEM.get())
+	private fun isValidBlock(position: BlockPos): Boolean {
+		return ScoochwormEntity.isValidBlock(scoochworm.level(), position)
 	}
 
 	private fun hasNoCollision(position: BlockPos): Boolean {
