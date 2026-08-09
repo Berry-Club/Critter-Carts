@@ -12,6 +12,7 @@ import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.level.block.RotatedPillarBlock
 import net.neoforged.neoforge.client.model.generators.BlockModelBuilder
 import net.neoforged.neoforge.client.model.generators.BlockStateProvider
+import net.neoforged.neoforge.client.model.generators.ModelBuilder
 import net.neoforged.neoforge.common.data.ExistingFileHelper
 
 class ModBlockStateProvider(
@@ -28,16 +29,46 @@ class ModBlockStateProvider(
 
 		val sideModel = scoochstemFaceModel("scoochstem_side", side)
 		val sideDisabledModel = scoochstemFaceModel("scoochstem_side_disabled", sideDisabled)
+		val sideHorizontalModel = scoochstemFaceModel(
+			"scoochstem_side_horizontal",
+			side,
+			true
+		)
+		val sideHorizontalDisabledModel = scoochstemFaceModel(
+			"scoochstem_side_horizontal_disabled",
+			sideDisabled,
+			true
+		)
 		val topModel = scoochstemFaceModel("scoochstem_top", top)
 		val topDisabledModel = scoochstemFaceModel("scoochstem_top_disabled", topDisabled)
+		val topHorizontalModel = scoochstemFaceModel(
+			"scoochstem_top_horizontal",
+			top,
+			true
+		)
+		val topHorizontalDisabledModel = scoochstemFaceModel(
+			"scoochstem_top_horizontal_disabled",
+			topDisabled,
+			true
+		)
 
 		val multipartBuilder = getMultipartBuilder(scoochstem)
 
 		for (direction in Direction.entries) {
 			for (axis in Direction.Axis.entries) {
 				val isTop = direction.axis == axis
-				val enabledModel = if (isTop) topModel else sideModel
-				val disabledModel = if (isTop) topDisabledModel else sideDisabledModel
+				val enabledModel = when {
+					isTop && axis == Direction.Axis.Y -> topModel
+					isTop -> topHorizontalModel
+					axis == Direction.Axis.Y -> sideModel
+					else -> sideHorizontalModel
+				}
+				val disabledModel = when {
+					isTop && axis == Direction.Axis.Y -> topDisabledModel
+					isTop -> topHorizontalDisabledModel
+					axis == Direction.Axis.Y -> sideDisabledModel
+					else -> sideHorizontalDisabledModel
+				}
 				val disabledProperty = ScoochstemBlock.getDisabledProperty(direction)
 				val xRotation = getFaceXRotation(direction)
 				val yRotation = getFaceYRotation(direction)
@@ -73,7 +104,8 @@ class ModBlockStateProvider(
 
 	private fun scoochstemFaceModel(
 		name: String,
-		texture: ResourceLocation
+		texture: ResourceLocation,
+		rotateTexture: Boolean = false
 	): BlockModelBuilder {
 		return models()
 			.withExistingParent(name, mcLoc("block/block"))
@@ -85,6 +117,10 @@ class ModBlockStateProvider(
 				face(Direction.NORTH) {
 					texture("#texture")
 					cullface(Direction.NORTH)
+
+					if (rotateTexture) {
+						rotation(ModelBuilder.FaceRotation.CLOCKWISE_90)
+					}
 				}
 			}
 	}
