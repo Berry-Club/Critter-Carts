@@ -3,7 +3,7 @@
     {
       "apply": {
         "model": "critter_carts:block/scoochstem_side",
-        "x": 270
+        "x": 90
       },
       "when": {
         "axis": "x",
@@ -13,7 +13,7 @@
     {
       "apply": {
         "model": "critter_carts:block/scoochstem_side_disabled",
-        "x": 270
+        "x": 90
       },
       "when": {
         "axis": "x",
@@ -23,7 +23,7 @@
     {
       "apply": {
         "model": "critter_carts:block/scoochstem_top",
-        "x": 270
+        "x": 90
       },
       "when": {
         "axis": "y",
@@ -33,7 +33,7 @@
     {
       "apply": {
         "model": "critter_carts:block/scoochstem_top_disabled",
-        "x": 270
+        "x": 90
       },
       "when": {
         "axis": "y",
@@ -43,7 +43,7 @@
     {
       "apply": {
         "model": "critter_carts:block/scoochstem_side",
-        "x": 270
+        "x": 90
       },
       "when": {
         "axis": "z",
@@ -53,7 +53,7 @@
     {
       "apply": {
         "model": "critter_carts:block/scoochstem_side_disabled",
-        "x": 270
+        "x": 90
       },
       "when": {
         "axis": "z",
@@ -63,7 +63,7 @@
     {
       "apply": {
         "model": "critter_carts:block/scoochstem_side",
-        "x": 90
+        "x": 270
       },
       "when": {
         "axis": "x",
@@ -73,7 +73,7 @@
     {
       "apply": {
         "model": "critter_carts:block/scoochstem_side_disabled",
-        "x": 90
+        "x": 270
       },
       "when": {
         "axis": "x",
@@ -83,7 +83,7 @@
     {
       "apply": {
         "model": "critter_carts:block/scoochstem_top",
-        "x": 90
+        "x": 270
       },
       "when": {
         "axis": "y",
@@ -93,7 +93,7 @@
     {
       "apply": {
         "model": "critter_carts:block/scoochstem_top_disabled",
-        "x": 90
+        "x": 270
       },
       "when": {
         "axis": "y",
@@ -103,7 +103,7 @@
     {
       "apply": {
         "model": "critter_carts:block/scoochstem_side",
-        "x": 90
+        "x": 270
       },
       "when": {
         "axis": "z",
@@ -113,7 +113,7 @@
     {
       "apply": {
         "model": "critter_carts:block/scoochstem_side_disabled",
-        "x": 90
+        "x": 270
       },
       "when": {
         "axis": "z",

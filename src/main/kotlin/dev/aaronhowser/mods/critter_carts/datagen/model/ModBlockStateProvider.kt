@@ -91,8 +91,8 @@ class ModBlockStateProvider(
 
 	private fun getFaceXRotation(direction: Direction): Int {
 		return when (direction) {
-			Direction.UP -> 90
-			Direction.DOWN -> 270
+			Direction.UP -> 270
+			Direction.DOWN -> 90
 			else -> 0
 		}
 	}
