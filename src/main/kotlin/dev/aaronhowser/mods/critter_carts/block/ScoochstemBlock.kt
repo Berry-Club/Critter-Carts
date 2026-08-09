@@ -48,7 +48,7 @@ class ScoochstemBlock(
 		itemAbility: ItemAbility,
 		simulate: Boolean
 	): BlockState? {
-		if (itemAbility != ItemAbilities.AXE_SCRAPE) return null
+		if (itemAbility != ItemAbilities.AXE_STRIP) return null
 
 		val disabledProperty = getDisabledProperty(context.clickedFace)
 		return state.setValue(disabledProperty, !state.getValue(disabledProperty))
