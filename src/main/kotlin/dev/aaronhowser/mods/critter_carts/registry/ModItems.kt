@@ -1,10 +1,8 @@
 package dev.aaronhowser.mods.critter_carts.registry
 
-import dev.aaronhowser.mods.aaron.item.ItemWithTooltip
-import dev.aaronhowser.mods.aaron.misc.AaronExtensions.toComponent
 import dev.aaronhowser.mods.aaron.registry.AaronItemRegistry
 import dev.aaronhowser.mods.critter_carts.CritterCarts
-import dev.aaronhowser.mods.critter_carts.datagen.language.ModMenuLang
+import dev.aaronhowser.mods.critter_carts.item.SaddlebagItem
 import dev.aaronhowser.mods.critter_carts.item.ScoochwormSpawnEggItem
 import dev.aaronhowser.mods.critter_carts.item.WickerBasketItem
 import net.neoforged.neoforge.registries.DeferredItem
@@ -15,14 +13,11 @@ object ModItems : AaronItemRegistry() {
 	val ITEM_REGISTRY: DeferredRegister.Items = DeferredRegister.createItems(CritterCarts.MOD_ID)
 	override fun getItemRegistry(): DeferredRegister.Items = ITEM_REGISTRY
 
-	val SADDLEBAG: DeferredItem<ItemWithTooltip> =
+	val SADDLEBAG: DeferredItem<SaddlebagItem> =
 		register(
 			"saddlebag",
 			builder = { properties ->
-				ItemWithTooltip(
-					properties,
-					ModMenuLang.SADDLE_NOT_INCLUDED.toComponent()
-				)
+				SaddlebagItem(properties)
 			})
 
 	val WICKER_BASKET: DeferredItem<WickerBasketItem> =
