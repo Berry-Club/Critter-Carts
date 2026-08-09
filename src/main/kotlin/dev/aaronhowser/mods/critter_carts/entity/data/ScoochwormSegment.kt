@@ -9,6 +9,7 @@ import dev.aaronhowser.mods.critter_carts.entity.data.attachment.AttachmentInter
 import dev.aaronhowser.mods.critter_carts.entity.data.attachment.NoAttachment
 import dev.aaronhowser.mods.critter_carts.entity.data.attachment.ScoochwormAttachment
 import dev.aaronhowser.mods.critter_carts.entity.data.attachment.ScoochwormAttachmentType
+import dev.aaronhowser.mods.critter_carts.entity.data.attachment.WickerBasketAttachment
 import dev.aaronhowser.mods.critter_carts.registry.ModEntityTypes
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.sounds.SoundEvents
@@ -128,6 +129,11 @@ class ScoochwormSegment {
 
 		val dropSource = bodyPart ?: entity
 		dropSource.spawnAtLocation(attachmentItem)
+	}
+
+	fun insertIntoWickerBasket(itemStack: ItemStack): ItemStack {
+		val wickerBasket = attachment as? WickerBasketAttachment ?: return itemStack
+		return wickerBasket.insert(itemStack)
 	}
 
 	private fun createBodyPart(

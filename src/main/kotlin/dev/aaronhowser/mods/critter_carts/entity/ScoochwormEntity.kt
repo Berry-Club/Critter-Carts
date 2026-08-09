@@ -27,6 +27,7 @@ import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.PathfinderMob
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier
 import net.minecraft.world.entity.ai.attributes.Attributes
+import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
@@ -83,12 +84,40 @@ class ScoochwormEntity(
 
 		super.aiStep()
 
+		if (isServerSide) {
+			eatTouchingItems()
+		}
+
 		if (isClientSide || !isTryingToMove) return
 
 		movementPath.record(position(), supportDirection, yRot)
 		bodySegments.update(movementPath)
 
 		playNextFootstep()
+	}
+
+	private fun eatTouchingItems() {
+		val touchingItems = level().getEntitiesOfClass(
+			ItemEntity::class.java,
+			boundingBox
+		)
+
+		for (itemEntity in touchingItems) {
+			if (itemEntity.hasPickUpDelay()) continue
+
+			val itemStack = itemEntity.item
+			val remainder = bodySegments.insertIntoWickerBaskets(itemStack)
+			if (remainder.count == itemStack.count) continue
+
+			if (remainder.isEmpty) {
+				itemEntity.discard()
+			} else {
+				itemEntity.item = remainder
+			}
+
+			playSound(SoundEvents.GENERIC_EAT, 1f, 1f)
+			gameEvent(GameEvent.EAT)
+		}
 	}
 
 	fun hasValidSupport(): Boolean {

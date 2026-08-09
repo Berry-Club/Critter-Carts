@@ -8,6 +8,7 @@ import net.minecraft.nbt.ListTag
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.player.Player
+import net.minecraft.world.item.ItemStack
 
 class ScoochwormSegments(
 	private val scoochworm: ScoochwormEntity
@@ -72,6 +73,17 @@ class ScoochwormSegments(
 		for (segment in segments) {
 			segment.dropAttachmentItem(scoochworm)
 		}
+	}
+
+	fun insertIntoWickerBaskets(itemStack: ItemStack): ItemStack {
+		var remainder = itemStack
+
+		for (segment in segments) {
+			remainder = segment.insertIntoWickerBasket(remainder)
+			if (remainder.isEmpty) break
+		}
+
+		return remainder
 	}
 
 	fun getSegment(partIndex: Int): ScoochwormSegment? {

@@ -41,6 +41,10 @@ class WickerBasketAttachment(
 		updateItemContents()
 	}
 
+	fun insert(itemStack: ItemStack): ItemStack {
+		return container.addItem(itemStack)
+	}
+
 	private fun updateItemContents() {
 		val contents = ItemContainerContents.fromItems(container.items)
 		itemStack.set(DataComponents.CONTAINER, contents)
