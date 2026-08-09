@@ -1,55 +1,32 @@
 package dev.aaronhowser.mods.critter_carts.entity.data
 
-import com.mojang.serialization.Codec
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.getEquipmentSlot
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isItem
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.nextRange
-import dev.aaronhowser.mods.critter_carts.datagen.tag.ModItemTagsProvider
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormPartEntity
+import dev.aaronhowser.mods.critter_carts.entity.data.attachment.AttachmentInteractionResult
+import dev.aaronhowser.mods.critter_carts.entity.data.attachment.NoAttachment
+import dev.aaronhowser.mods.critter_carts.entity.data.attachment.ScoochwormAttachment
+import dev.aaronhowser.mods.critter_carts.entity.data.attachment.ScoochwormAttachmentType
 import dev.aaronhowser.mods.critter_carts.registry.ModEntityTypes
-import dev.aaronhowser.mods.critter_carts.registry.ModItems
-import net.minecraft.core.component.DataComponents
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.nbt.NbtOps
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
-import net.minecraft.world.SimpleContainer
-import net.minecraft.world.SimpleMenuProvider
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.player.Player
-import net.minecraft.world.inventory.ChestMenu
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
-import net.minecraft.world.item.component.ItemContainerContents
 import net.minecraft.world.level.gameevent.GameEvent
 import net.minecraft.world.phys.Vec3
 
-class ScoochwormSegment(
-	attachmentItem: ItemStack = ItemStack.EMPTY
-) {
+class ScoochwormSegment {
 
-	var attachmentItem = attachmentItem
-		private set
+	private var attachment: ScoochwormAttachment = NoAttachment()
 
 	var bodyPart: ScoochwormPartEntity? = null
 		private set
-	val attachment: ScoochwormPartAttachment
-		get() = when {
-			attachmentItem.isItem(ModItems.SADDLEBAG) -> ScoochwormPartAttachment.CHEST
-			attachmentItem.isItem(ModItemTagsProvider.SCOOCHWORM_SADDLES) -> ScoochwormPartAttachment.SADDLE
-			else -> ScoochwormPartAttachment.NONE
-		}
-
-	val container = SimpleContainer(CONTAINER_SIZE)
-
-	init {
-		loadContainer()
-		container.addListener {
-			updateContainerComponent()
-		}
-	}
 
 	fun updateBodyPart(
 		scoochworm: ScoochwormEntity,
@@ -71,20 +48,28 @@ class ScoochwormSegment(
 		bodyPart = null
 	}
 
-	fun setAttachment(stack: ItemStack) {
-		attachmentItem = stack
-		loadContainer()
-		bodyPart?.attachment = attachment
+	private fun installAttachment(
+		itemStack: ItemStack,
+		player: Player,
+		bodyPart: ScoochwormPartEntity
+	) {
+		attachment = ScoochwormAttachment.fromItemStack(itemStack)
+		bodyPart.attachmentType = attachment.type
+
+		val equipSound = attachment.equipSound ?: return
+		bodyPart.playSound(
+			equipSound,
+			1f,
+			bodyPart.random.nextRange(0.8f, 1.2f)
+		)
+		bodyPart.gameEvent(GameEvent.EQUIP, player)
 	}
 
-	fun removeAttachment(): ItemStack {
-		updateContainerComponent()
-
-		val removedStack = attachmentItem
-		attachmentItem = ItemStack.EMPTY
-		container.clearContent()
-		bodyPart?.attachment = attachment
-		return removedStack
+	private fun removeAttachment(): ItemStack {
+		val removedItem = attachment.remove()
+		attachment = NoAttachment()
+		bodyPart?.attachmentType = attachment.type
+		return removedItem
 	}
 
 	fun interact(
@@ -106,7 +91,7 @@ class ScoochwormSegment(
 		}
 
 		if (
-			attachment != ScoochwormPartAttachment.NONE
+			attachment.type != ScoochwormAttachmentType.NONE
 			&& player.isShiftKeyDown
 			&& heldStack.isEmpty
 		) {
@@ -125,55 +110,16 @@ class ScoochwormSegment(
 			return InteractionResult.CONSUME
 		}
 
-		return when (attachment) {
-			ScoochwormPartAttachment.NONE -> addAttachment(player, heldStack, bodyPart)
-			ScoochwormPartAttachment.SADDLE -> ride(player, bodyPart)
-			ScoochwormPartAttachment.CHEST -> openChest(player)
+		return when (val result = attachment.interact(player, heldStack, bodyPart)) {
+			AttachmentInteractionResult.Pass -> InteractionResult.PASS
+			AttachmentInteractionResult.Consume -> InteractionResult.CONSUME
+
+			is AttachmentInteractionResult.Install -> {
+				installAttachment(result.itemStack, player, bodyPart)
+				heldStack.consume(1, player)
+				InteractionResult.CONSUME
+			}
 		}
-	}
-
-	private fun addAttachment(
-		player: Player,
-		heldStack: ItemStack,
-		bodyPart: ScoochwormPartEntity
-	): InteractionResult {
-		val attachment = getAttachment(heldStack) ?: return InteractionResult.PASS
-		setAttachment(heldStack.copyWithCount(1))
-		heldStack.consume(1, player)
-
-		val sound = when (attachment) {
-			ScoochwormPartAttachment.SADDLE -> SoundEvents.HORSE_SADDLE
-			ScoochwormPartAttachment.CHEST -> SoundEvents.DONKEY_CHEST
-			ScoochwormPartAttachment.NONE -> return InteractionResult.PASS
-		}
-
-		bodyPart.playSound(
-			sound,
-			1f,
-			bodyPart.random.nextRange(0.8f, 1.2f)
-		)
-		bodyPart.gameEvent(GameEvent.EQUIP, player)
-		return InteractionResult.CONSUME
-	}
-
-	private fun ride(
-		player: Player,
-		bodyPart: ScoochwormPartEntity
-	): InteractionResult {
-		if (player.isShiftKeyDown) return InteractionResult.PASS
-		if (!player.startRiding(bodyPart)) return InteractionResult.PASS
-		return InteractionResult.CONSUME
-	}
-
-	private fun openChest(player: Player): InteractionResult {
-		val menuProvider = SimpleMenuProvider(
-			{ containerId, playerInventory, _ ->
-				ChestMenu.threeRows(containerId, playerInventory, container)
-			},
-			ModItems.SADDLEBAG.get().description
-		)
-		player.openMenu(menuProvider)
-		return InteractionResult.CONSUME
 	}
 
 	fun dropAttachmentItem(entity: Entity) {
@@ -197,7 +143,7 @@ class ScoochwormSegment(
 		bodyPart.attachTo(
 			scoochworm,
 			partIndex,
-			attachment
+			attachment.type
 		)
 
 		bodyPart.moveTo(
@@ -212,94 +158,37 @@ class ScoochwormSegment(
 		return bodyPart
 	}
 
-	private fun loadContainer() {
-		val contents = attachmentItem.getOrDefault(
-			DataComponents.CONTAINER,
-			ItemContainerContents.EMPTY
-		)
-		contents.copyInto(container.items)
-	}
-
-	private fun updateContainerComponent() {
-		if (!attachmentItem.isItem(ModItems.SADDLEBAG)) return
-
-		val contents = ItemContainerContents.fromItems(container.items)
-		attachmentItem.set(DataComponents.CONTAINER, contents)
-	}
-
 	fun save(): CompoundTag {
-		val maybeTag = CODEC
-			.encodeStart(NbtOps.INSTANCE, this)
-			.result()
-
-		return maybeTag
-			.map { it as CompoundTag }
-			.orElseGet(::CompoundTag)
+		return attachment.save()
 	}
 
 	companion object {
-		private const val ATTACHMENT_ITEM_TAG = "AttachmentItem"
-		private const val CONTAINER_SIZE = 27
 		fun predictInteraction(
 			player: Player,
 			heldStack: ItemStack,
-			currentAttachment: ScoochwormPartAttachment
+			currentType: ScoochwormAttachmentType
 		): InteractionResult {
 			if (heldStack.isItem(Items.SHEARS)) return InteractionResult.SUCCESS
 
 			if (
-				currentAttachment != ScoochwormPartAttachment.NONE
+				currentType != ScoochwormAttachmentType.NONE
 				&& player.isShiftKeyDown
 				&& heldStack.isEmpty
 			) {
 				return InteractionResult.SUCCESS
 			}
 
-			return when (currentAttachment) {
-				ScoochwormPartAttachment.NONE -> {
-					if (getAttachment(heldStack) == null) {
-						InteractionResult.PASS
-					} else {
-						InteractionResult.SUCCESS
-					}
-				}
-
-				ScoochwormPartAttachment.SADDLE -> {
-					if (player.isShiftKeyDown) {
-						InteractionResult.PASS
-					} else {
-						InteractionResult.SUCCESS
-					}
-				}
-
-				ScoochwormPartAttachment.CHEST -> InteractionResult.SUCCESS
-			}
+			return ScoochwormAttachment.predictInteraction(
+				player,
+				heldStack,
+				currentType
+			)
 		}
-
-		private fun getAttachment(heldStack: ItemStack): ScoochwormPartAttachment? {
-			return when {
-				heldStack.isItem(ModItemTagsProvider.SCOOCHWORM_SADDLES) -> {
-					ScoochwormPartAttachment.SADDLE
-				}
-
-				heldStack.isItem(ModItems.SADDLEBAG) -> {
-					ScoochwormPartAttachment.CHEST
-				}
-
-				else -> null
-			}
-		}
-
-		val CODEC: Codec<ScoochwormSegment> = ItemStack.OPTIONAL_CODEC
-			.optionalFieldOf(ATTACHMENT_ITEM_TAG, ItemStack.EMPTY)
-			.xmap(::ScoochwormSegment, ScoochwormSegment::attachmentItem)
-			.codec()
 
 		fun load(tag: CompoundTag): ScoochwormSegment {
-			return CODEC
-				.parse(NbtOps.INSTANCE, tag)
-				.result()
-				.orElseGet(::ScoochwormSegment)
+			val segment = ScoochwormSegment()
+			segment.attachment = ScoochwormAttachment.load(tag)
+			return segment
 		}
 	}
 }

@@ -1,7 +1,7 @@
 package dev.aaronhowser.mods.critter_carts.entity
 
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isClientSide
-import dev.aaronhowser.mods.critter_carts.entity.data.ScoochwormPartAttachment
+import dev.aaronhowser.mods.critter_carts.entity.data.attachment.ScoochwormAttachmentType
 import dev.aaronhowser.mods.critter_carts.registry.ModEntityDataSerializers
 import net.minecraft.core.Direction
 import net.minecraft.nbt.CompoundTag
@@ -51,9 +51,9 @@ class ScoochwormPartEntity(
 		get() = entityData.get(DATA_PART_INDEX)
 		set(value) = entityData.set(DATA_PART_INDEX, value)
 
-	var attachment: ScoochwormPartAttachment
-		get() = entityData.get(DATA_ATTACHMENT)
-		set(value) = entityData.set(DATA_ATTACHMENT, value)
+	var attachmentType: ScoochwormAttachmentType
+		get() = entityData.get(DATA_ATTACHMENT_TYPE)
+		set(value) = entityData.set(DATA_ATTACHMENT_TYPE, value)
 
 	var attachmentBottom: Direction
 		get() = entityData.get(DATA_ATTACHMENT_BOTTOM)
@@ -66,11 +66,11 @@ class ScoochwormPartEntity(
 	fun attachTo(
 		parentEntity: ScoochwormEntity,
 		partIndex: Int,
-		attachment: ScoochwormPartAttachment
+		attachmentType: ScoochwormAttachmentType
 	) {
 		this.parentId = parentEntity.id
 		this.partIndex = partIndex
-		this.attachment = attachment
+		this.attachmentType = attachmentType
 	}
 
 	// Movement
@@ -180,7 +180,7 @@ class ScoochwormPartEntity(
 
 	override fun interact(player: Player, hand: InteractionHand): InteractionResult {
 		val parentEntity = getParent() ?: return InteractionResult.PASS
-		return parentEntity.interactWithPart(player, hand, partIndex, attachment)
+		return parentEntity.interactWithPart(player, hand, partIndex, attachmentType)
 	}
 
 	override fun canBeCollidedWith(): Boolean = true
@@ -200,7 +200,7 @@ class ScoochwormPartEntity(
 	override fun defineSynchedData(builder: SynchedEntityData.Builder) {
 		builder.define(DATA_PARENT_ID, NO_PARENT)
 		builder.define(DATA_PART_INDEX, 0)
-		builder.define(DATA_ATTACHMENT, ScoochwormPartAttachment.NONE)
+		builder.define(DATA_ATTACHMENT_TYPE, ScoochwormAttachmentType.NONE)
 		builder.define(DATA_ATTACHMENT_BOTTOM, Direction.DOWN)
 	}
 
@@ -226,10 +226,10 @@ class ScoochwormPartEntity(
 		private val DATA_PART_INDEX: EntityDataAccessor<Int> =
 			SynchedEntityData.defineId(ScoochwormPartEntity::class.java, EntityDataSerializers.INT)
 
-		private val DATA_ATTACHMENT: EntityDataAccessor<ScoochwormPartAttachment> =
+		private val DATA_ATTACHMENT_TYPE: EntityDataAccessor<ScoochwormAttachmentType> =
 			SynchedEntityData.defineId(
 				ScoochwormPartEntity::class.java,
-				ModEntityDataSerializers.SCOOCHWORM_PART_ATTACHMENT.get()
+				ModEntityDataSerializers.SCOOCHWORM_ATTACHMENT_TYPE.get()
 			)
 
 		private val DATA_ATTACHMENT_BOTTOM: EntityDataAccessor<Direction> =

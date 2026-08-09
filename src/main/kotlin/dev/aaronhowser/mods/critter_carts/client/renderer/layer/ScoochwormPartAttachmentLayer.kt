@@ -4,7 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.blaze3d.vertex.VertexConsumer
 import dev.aaronhowser.mods.aaron.misc.AaronDsls.withPose
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormPartEntity
-import dev.aaronhowser.mods.critter_carts.entity.data.ScoochwormPartAttachment
+import dev.aaronhowser.mods.critter_carts.entity.data.attachment.ScoochwormAttachmentType
 import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.RenderType
 import software.bernie.geckolib.cache.`object`.BakedGeoModel
@@ -14,7 +14,7 @@ import software.bernie.geckolib.renderer.layer.GeoRenderLayer
 
 abstract class ScoochwormPartAttachmentLayer(
 	renderer: GeoRenderer<ScoochwormPartEntity>,
-	private val attachment: ScoochwormPartAttachment,
+	private val attachmentType: ScoochwormAttachmentType,
 	private val attachmentModel: GeoModel<ScoochwormPartEntity>
 ) : GeoRenderLayer<ScoochwormPartEntity>(renderer) {
 
@@ -31,7 +31,7 @@ abstract class ScoochwormPartAttachmentLayer(
 		packedLight: Int,
 		packedOverlay: Int
 	) {
-		if (animatable.attachment != attachment) return
+		if (animatable.attachmentType != attachmentType) return
 
 		val texture = attachmentModel.getTextureResource(animatable, renderer)
 		val attachmentRenderType = renderer.getRenderType(
