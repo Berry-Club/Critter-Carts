@@ -67,7 +67,7 @@ class ScoochstemFollowGoal(
 		val nextSurface = chooseNextSurface(target, direction)
 		if (nextSurface == null) {
 			targetSurface = null
-			scoochworm.scoochwormMoveControl.stopMoving()
+			scoochworm.deltaMovement = Vec3.ZERO
 			return
 		}
 

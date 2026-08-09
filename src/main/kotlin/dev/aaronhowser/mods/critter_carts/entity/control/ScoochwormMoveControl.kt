@@ -25,12 +25,6 @@ class ScoochwormMoveControl(
 		setWantedPosition(x, y, z, speed)
 	}
 
-	fun stopMoving() {
-		operation = Operation.WAIT
-		travelDirection = null
-		scoochworm.deltaMovement = Vec3.ZERO
-	}
-
 	override fun tick() {
 		val currentTravelDirection = travelDirection
 		if (operation != Operation.MOVE_TO || currentTravelDirection == null) {
@@ -57,24 +51,11 @@ class ScoochwormMoveControl(
 			remainingDistance
 		)
 
-		val movement = Vec3(
+		scoochworm.deltaMovement = Vec3(
 			directionVector.x * movementSpeed,
 			directionVector.y * movementSpeed,
 			directionVector.z * movementSpeed
 		)
-
-		if (
-			!scoochworm.noPhysics
-			&& !scoochworm.level().noCollision(
-				scoochworm,
-				scoochworm.boundingBox.move(movement)
-			)
-		) {
-			stopMoving()
-			return
-		}
-
-		scoochworm.deltaMovement = movement
 
 		scoochworm.zza = 0f
 		scoochworm.xxa = 0f
