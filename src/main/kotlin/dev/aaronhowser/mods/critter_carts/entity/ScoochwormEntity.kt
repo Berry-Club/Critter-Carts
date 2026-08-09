@@ -39,7 +39,7 @@ import software.bernie.geckolib.animatable.GeoEntity
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache
 import software.bernie.geckolib.animatable.instance.SingletonAnimatableInstanceCache
 import software.bernie.geckolib.animation.AnimatableManager
-import java.util.Optional
+import java.util.*
 
 class ScoochwormEntity(
 	entityType: EntityType<ScoochwormEntity>,

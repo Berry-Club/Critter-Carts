@@ -1,9 +1,9 @@
 package dev.aaronhowser.mods.critter_carts.entity.data
 
-import net.minecraft.world.phys.Vec3
 import net.minecraft.core.Direction
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
+import net.minecraft.world.phys.Vec3
 import java.util.*
 
 class ScoochwormPath(
