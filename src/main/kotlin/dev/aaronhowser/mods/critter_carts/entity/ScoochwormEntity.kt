@@ -260,7 +260,7 @@ class ScoochwormEntity(
 			attachmentFace: Direction
 		): Boolean {
 			val blockState = level.getBlockState(position)
-			if (blockState.isBlock(ModBlockTagsProvider.SUPPORTS_SCOOCHWORM_TRAVEL)) return false
+			if (!blockState.isBlock(ModBlockTagsProvider.SUPPORTS_SCOOCHWORM_TRAVEL)) return false
 
 			val block = blockState.block
 			return if (block is ScoochwormTravelBlock) {
