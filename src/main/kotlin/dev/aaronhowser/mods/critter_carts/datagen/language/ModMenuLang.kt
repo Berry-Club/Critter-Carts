@@ -5,6 +5,6 @@ object ModMenuLang {
 	const val SADDLE_NOT_INCLUDED = "tooltip.critter_carts.saddle_not_included"
 
 	fun add(provider: ModLanguageProvider) {
-		provider.add(SADDLE_NOT_INCLUDED, "saddle not included")
+		provider.add(SADDLE_NOT_INCLUDED, "Saddle not included")
 	}
 }
