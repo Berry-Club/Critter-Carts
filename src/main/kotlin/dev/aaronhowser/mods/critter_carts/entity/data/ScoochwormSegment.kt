@@ -136,6 +136,16 @@ class ScoochwormSegment {
 		return wickerBasket.insert(itemStack)
 	}
 
+	fun clientTick() {
+		val bodyPart = bodyPart ?: return
+		attachment.clientTick(bodyPart)
+	}
+
+	fun serverTick() {
+		val bodyPart = bodyPart ?: return
+		attachment.serverTick(bodyPart)
+	}
+
 	private fun createBodyPart(
 		scoochworm: ScoochwormEntity,
 		partIndex: Int,

@@ -27,6 +27,10 @@ sealed class ScoochwormAttachment(
 		bodyPart: ScoochwormPartEntity
 	): AttachmentInteractionResult
 
+	open fun clientTick(bodyPart: ScoochwormPartEntity) {}
+
+	open fun serverTick(bodyPart: ScoochwormPartEntity) {}
+
 	protected open fun synchronizeItemStack() {}
 
 	fun remove(): ItemStack {

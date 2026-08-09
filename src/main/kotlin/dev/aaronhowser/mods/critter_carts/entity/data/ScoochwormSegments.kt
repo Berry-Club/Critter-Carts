@@ -86,6 +86,16 @@ class ScoochwormSegments(
 		return remainder
 	}
 
+	fun tick() {
+		for (segment in segments) {
+			if (scoochworm.isClientSide) {
+				segment.clientTick()
+			} else {
+				segment.serverTick()
+			}
+		}
+	}
+
 	fun getSegment(partIndex: Int): ScoochwormSegment? {
 		return segments.getOrNull(partIndex)
 	}

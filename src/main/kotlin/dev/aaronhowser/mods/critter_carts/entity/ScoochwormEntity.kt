@@ -83,6 +83,7 @@ class ScoochwormEntity(
 		isNoGravity = supportPosition != null
 
 		super.aiStep()
+		bodySegments.tick()
 
 		if (isServerSide) {
 			eatTouchingItems()
@@ -235,6 +236,10 @@ class ScoochwormEntity(
 	override fun getPistonPushReaction(): PushReaction = PushReaction.IGNORE
 	override fun knockback(strength: Double, x: Double, z: Double) {}
 	override fun push(entity: Entity) {}
+	override fun doPush(entity: Entity) {
+		if (entity is ItemEntity) return
+		super.doPush(entity)
+	}
 
 	// Entity data
 
