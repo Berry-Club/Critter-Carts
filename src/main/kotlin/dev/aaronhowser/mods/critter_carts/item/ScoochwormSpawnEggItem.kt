@@ -57,31 +57,31 @@ class ScoochwormSpawnEggItem(
 			clickedPosition != spawnPosition && clickedFace == Direction.UP
 		)
 
-		if (spawnedEntity != null) {
-			val player = context.player
-			if (spawnedEntity is ScoochwormEntity) {
-				if (
-					ScoochwormEntity.supportsScoochwormTravel(
-						level,
-						clickedPosition,
-						clickedFace
-					)
-				) {
-					spawnedEntity.attachToSupport(clickedPosition, clickedFace.opposite)
-				}
+		if (spawnedEntity == null) return InteractionResult.CONSUME
 
-				if (player != null) {
-					val rotation = player.direction.toYRot()
-					spawnedEntity.yRot = rotation
-					spawnedEntity.yRotO = rotation
-					spawnedEntity.yBodyRot = rotation
-					spawnedEntity.yHeadRot = rotation
-				}
+		val player = context.player
+		if (spawnedEntity is ScoochwormEntity) {
+			if (
+				ScoochwormEntity.supportsScoochwormTravel(
+					level,
+					clickedPosition,
+					clickedFace
+				)
+			) {
+				spawnedEntity.attachToSupport(clickedPosition, clickedFace.opposite)
 			}
 
-			itemStack.shrink(1)
-			level.gameEvent(player, GameEvent.ENTITY_PLACE, clickedPosition)
+			if (player != null) {
+				val rotation = player.direction.toYRot()
+				spawnedEntity.yRot = rotation
+				spawnedEntity.yRotO = rotation
+				spawnedEntity.yBodyRot = rotation
+				spawnedEntity.yHeadRot = rotation
+			}
 		}
+
+		itemStack.consume(1, player)
+		level.gameEvent(player, GameEvent.ENTITY_PLACE, clickedPosition)
 
 		return InteractionResult.CONSUME
 	}
