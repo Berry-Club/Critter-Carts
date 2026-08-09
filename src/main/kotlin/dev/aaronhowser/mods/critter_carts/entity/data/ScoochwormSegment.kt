@@ -8,6 +8,7 @@ import dev.aaronhowser.mods.critter_carts.datagen.tag.ModItemTagsProvider
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormPartEntity
 import dev.aaronhowser.mods.critter_carts.registry.ModEntityTypes
+import dev.aaronhowser.mods.critter_carts.registry.ModItems
 import net.minecraft.core.component.DataComponents
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtOps
@@ -36,7 +37,7 @@ class ScoochwormSegment(
 		private set
 	val attachment: ScoochwormPartAttachment
 		get() = when {
-			attachmentItem.isItem(ModItemTagsProvider.SCOOCHWORM_CHESTS) -> ScoochwormPartAttachment.CHEST
+			attachmentItem.isItem(ModItems.SADDLEBAG) -> ScoochwormPartAttachment.CHEST
 			attachmentItem.isItem(ModItemTagsProvider.SCOOCHWORM_SADDLES) -> ScoochwormPartAttachment.SADDLE
 			else -> ScoochwormPartAttachment.NONE
 		}
@@ -169,7 +170,7 @@ class ScoochwormSegment(
 			{ containerId, playerInventory, _ ->
 				ChestMenu.threeRows(containerId, playerInventory, container)
 			},
-			Items.CHEST.description
+			ModItems.SADDLEBAG.get().description
 		)
 		player.openMenu(menuProvider)
 		return InteractionResult.CONSUME
@@ -220,7 +221,7 @@ class ScoochwormSegment(
 	}
 
 	private fun updateContainerComponent() {
-		if (!attachmentItem.isItem(ModItemTagsProvider.SCOOCHWORM_CHESTS)) return
+		if (!attachmentItem.isItem(ModItems.SADDLEBAG)) return
 
 		val contents = ItemContainerContents.fromItems(container.items)
 		attachmentItem.set(DataComponents.CONTAINER, contents)
@@ -281,7 +282,7 @@ class ScoochwormSegment(
 					ScoochwormPartAttachment.SADDLE
 				}
 
-				heldStack.isItem(ModItemTagsProvider.SCOOCHWORM_CHESTS) -> {
+				heldStack.isItem(ModItems.SADDLEBAG) -> {
 					ScoochwormPartAttachment.CHEST
 				}
 

@@ -20,12 +20,10 @@ class ModItemTagsProvider(
 ) : ItemTagsProvider(output, lookupProvider, blockTags, CritterCarts.MOD_ID, existingFileHelper) {
 
 	override fun addTags(provider: HolderLookup.Provider) {
-		tag(SCOOCHWORM_CHESTS).add(Items.CHEST)
 		tag(SCOOCHWORM_SADDLES).add(Items.SADDLE)
 	}
 
 	companion object {
-		val SCOOCHWORM_CHESTS = create("scoochworm_chests")
 		val SCOOCHWORM_SADDLES = create("scoochworm_saddles")
 
 		private fun create(id: String): TagKey<Item> = ItemTags.create(CritterCarts.modResource(id))
