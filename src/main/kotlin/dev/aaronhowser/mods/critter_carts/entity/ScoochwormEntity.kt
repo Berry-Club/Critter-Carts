@@ -84,16 +84,21 @@ class ScoochwormEntity(
 	}
 
 	fun isAttachedToValidBlock(): Boolean {
-		val attachmentOffset = Vec3.atLowerCornerOf(attachmentBottom.normal)
-			.scale(SIZE / 2.0 + ATTACHMENT_PROBE_DEPTH)
-		val attachmentPosition = BlockPos.containing(
-			boundingBox.center.add(attachmentOffset)
-		)
+		val attachmentPosition = getAttachmentPosition()
 
 		return supportsScoochwormTravel(
 			level(),
 			attachmentPosition,
 			attachmentBottom.opposite
+		)
+	}
+
+	fun getAttachmentPosition(): BlockPos {
+		val attachmentOffset = Vec3.atLowerCornerOf(attachmentBottom.normal)
+			.scale(SIZE / 2.0 + ATTACHMENT_PROBE_DEPTH)
+
+		return BlockPos.containing(
+			boundingBox.center.add(attachmentOffset)
 		)
 	}
 
@@ -239,7 +244,7 @@ class ScoochwormEntity(
 		private const val HEAD_FOOTSTEP_INDEX = -1
 		private const val FOOTSTEP_INTERVAL_TICKS = 3
 		private const val FOOTSTEP_CYCLE_PAUSE_TICKS = 40
-		private const val ATTACHMENT_PROBE_DEPTH = 0.001
+		private const val ATTACHMENT_PROBE_DEPTH = 1.0 / 16.0
 
 		private const val SEGMENTS_TAG = "Segments"
 		private const val PATH_TAG = "Path"
