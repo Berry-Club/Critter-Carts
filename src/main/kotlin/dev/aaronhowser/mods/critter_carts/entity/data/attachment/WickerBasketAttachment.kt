@@ -23,6 +23,7 @@ class WickerBasketAttachment(
 			DataComponents.CONTAINER,
 			ItemContainerContents.EMPTY
 		)
+
 		contents.copyInto(container.items)
 
 		container.addListener {

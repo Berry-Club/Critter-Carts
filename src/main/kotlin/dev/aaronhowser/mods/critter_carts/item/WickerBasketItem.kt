@@ -26,4 +26,12 @@ class WickerBasketItem(
 		return Optional.of(BundleTooltip(bundleContents))
 	}
 
+	companion object {
+		val DEFAULT_PROPERTIES: () -> Properties = {
+			Properties()
+				.stacksTo(1)
+				.component(DataComponents.CONTAINER, ItemContainerContents.EMPTY)
+		}
+	}
+
 }

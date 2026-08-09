@@ -26,11 +26,7 @@ object ModItems : AaronItemRegistry() {
 			})
 
 	val WICKER_BASKET: DeferredItem<WickerBasketItem> =
-		register(
-			"wicker_basket",
-			builder = { properties ->
-				WickerBasketItem(properties)
-			})
+		register("wicker_basket", ::WickerBasketItem, WickerBasketItem.DEFAULT_PROPERTIES)
 
 	val SCOOCHWORM_SPAWN_EGG: DeferredItem<ScoochwormSpawnEggItem> =
 		register(
