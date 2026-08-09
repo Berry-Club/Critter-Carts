@@ -7,6 +7,7 @@ import net.minecraft.network.codec.StreamCodec
 enum class ScoochwormAttachmentType {
 	NONE,
 	ITEM_STORAGE,
+	WICKER_BASKET,
 	SADDLE;
 
 	companion object {

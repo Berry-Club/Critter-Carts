@@ -8,6 +8,7 @@ object ModItemLang {
 	fun add(provider: ModLanguageProvider) {
 		provider.apply {
 			addItem(ModItems.SADDLEBAG, "Saddlebag")
+			addItem(ModItems.WICKER_BASKET, "Wicker Basket")
 			addItem(ModItems.SCOOCHWORM_SPAWN_EGG, "Scoochworm Spawn Egg")
 			add(ModCreativeModeTabs.CREATIVE_TAB_TRANSLATION_KEY, "Critter Carts")
 		}

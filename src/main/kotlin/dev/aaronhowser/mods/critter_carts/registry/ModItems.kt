@@ -24,6 +24,16 @@ object ModItems : AaronItemRegistry() {
 				)
 			})
 
+	val WICKER_BASKET: DeferredItem<ItemWithTooltip> =
+		register(
+			"wicker_basket",
+			builder = { properties ->
+				ItemWithTooltip(
+					properties,
+					ModMenuLang.NO_MENU_ACCESS.toComponent()
+				)
+			})
+
 	val SCOOCHWORM_SPAWN_EGG: DeferredItem<ScoochwormSpawnEggItem> =
 		register(
 			"scoochworm_spawn_egg",
