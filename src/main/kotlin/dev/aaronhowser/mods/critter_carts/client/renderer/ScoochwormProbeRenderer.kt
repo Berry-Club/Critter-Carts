@@ -36,7 +36,7 @@ object ScoochwormProbeRenderer {
 			for (entity in level.entitiesForRendering()) {
 				if (entity !is ScoochwormEntity) continue
 
-				val probePosition = entity.getAttachmentPosition()
+				val probePosition = entity.attachmentPosition ?: continue
 				AaronRenderUtil.renderCubeThroughWalls(
 					poseStack,
 					probePosition.x + CUBE_INSET,

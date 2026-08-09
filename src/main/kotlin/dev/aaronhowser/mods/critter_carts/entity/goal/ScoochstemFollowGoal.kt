@@ -25,6 +25,8 @@ class ScoochstemFollowGoal(
 		if (!scoochworm.isMoving) return false
 
 		val surface = findCurrentSurface() ?: return false
+		scoochworm.attachTo(surface.stem, surface.bottom)
+
 		val direction = getTravelDirection(surface.bottom)
 		val nextSurface = chooseNextSurface(surface, direction) ?: return false
 
@@ -61,7 +63,7 @@ class ScoochstemFollowGoal(
 
 	private fun reachTarget(target: StemSurface, direction: Direction) {
 		scoochworm.setPos(getEntityPosition(target))
-		scoochworm.attachmentBottom = target.bottom
+		scoochworm.attachTo(target.stem, target.bottom)
 		currentSurface = target
 
 		val nextSurface = chooseNextSurface(target, direction)
@@ -76,7 +78,7 @@ class ScoochstemFollowGoal(
 
 	private fun reachCorner(target: StemSurface, position: Vec3) {
 		scoochworm.setPos(position)
-		scoochworm.attachmentBottom = target.bottom
+		scoochworm.attachTo(target.stem, target.bottom)
 		cornerPosition = null
 		travelDirection = directionAfterCorner
 		directionAfterCorner = null

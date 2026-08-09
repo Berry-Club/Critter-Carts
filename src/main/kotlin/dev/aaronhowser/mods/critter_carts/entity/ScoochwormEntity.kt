@@ -40,6 +40,7 @@ import software.bernie.geckolib.animatable.GeoEntity
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache
 import software.bernie.geckolib.animatable.instance.SingletonAnimatableInstanceCache
 import software.bernie.geckolib.animation.AnimatableManager
+import java.util.Optional
 
 class ScoochwormEntity(
 	entityType: EntityType<ScoochwormEntity>,
@@ -62,6 +63,10 @@ class ScoochwormEntity(
 		get() = entityData.get(DATA_ATTACHMENT_BOTTOM)
 		set(value) = entityData.set(DATA_ATTACHMENT_BOTTOM, value)
 
+	var attachmentPosition: BlockPos?
+		get() = entityData.get(DATA_ATTACHMENT_POSITION).orElse(null)
+		private set(value) = entityData.set(DATA_ATTACHMENT_POSITION, Optional.ofNullable(value))
+
 	var isMoving: Boolean
 		get() = entityData.get(DATA_IS_MOVING)
 		private set(value) = entityData.set(DATA_IS_MOVING, value)
@@ -71,7 +76,11 @@ class ScoochwormEntity(
 	}
 
 	override fun aiStep() {
-		isNoGravity = isAttachedToValidBlock()
+		if (isServerSide && !isAttachedToValidBlock()) {
+			attachmentPosition = null
+		}
+
+		isNoGravity = attachmentPosition != null
 
 		super.aiStep()
 
@@ -84,22 +93,18 @@ class ScoochwormEntity(
 	}
 
 	fun isAttachedToValidBlock(): Boolean {
-		val attachmentPosition = getAttachmentPosition()
+		val currentAttachmentPosition = attachmentPosition ?: return false
 
 		return supportsScoochwormTravel(
 			level(),
-			attachmentPosition,
+			currentAttachmentPosition,
 			attachmentBottom.opposite
 		)
 	}
 
-	fun getAttachmentPosition(): BlockPos {
-		val attachmentOffset = Vec3.atLowerCornerOf(attachmentBottom.normal)
-			.scale(SIZE / 2.0 + ATTACHMENT_PROBE_DEPTH)
-
-		return BlockPos.containing(
-			boundingBox.center.add(attachmentOffset)
-		)
+	fun attachTo(position: BlockPos, bottom: Direction) {
+		attachmentBottom = bottom
+		attachmentPosition = position.immutable()
 	}
 
 	private fun playNextFootstep() {
@@ -208,6 +213,7 @@ class ScoochwormEntity(
 	override fun defineSynchedData(builder: SynchedEntityData.Builder) {
 		super.defineSynchedData(builder)
 		builder.define(DATA_ATTACHMENT_BOTTOM, Direction.DOWN)
+		builder.define(DATA_ATTACHMENT_POSITION, Optional.empty())
 		builder.define(DATA_IS_MOVING, false)
 	}
 
@@ -244,7 +250,6 @@ class ScoochwormEntity(
 		private const val HEAD_FOOTSTEP_INDEX = -1
 		private const val FOOTSTEP_INTERVAL_TICKS = 3
 		private const val FOOTSTEP_CYCLE_PAUSE_TICKS = 40
-		private const val ATTACHMENT_PROBE_DEPTH = 1.0 / 16.0
 
 		private const val SEGMENTS_TAG = "Segments"
 		private const val PATH_TAG = "Path"
@@ -254,6 +259,12 @@ class ScoochwormEntity(
 			SynchedEntityData.defineId(
 				ScoochwormEntity::class.java,
 				EntityDataSerializers.DIRECTION
+			)
+
+		private val DATA_ATTACHMENT_POSITION: EntityDataAccessor<Optional<BlockPos>> =
+			SynchedEntityData.defineId(
+				ScoochwormEntity::class.java,
+				EntityDataSerializers.OPTIONAL_BLOCK_POS
 			)
 
 		private val DATA_IS_MOVING: EntityDataAccessor<Boolean> =
