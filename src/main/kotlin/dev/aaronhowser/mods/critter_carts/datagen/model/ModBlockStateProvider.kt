@@ -57,17 +57,19 @@ class ModBlockStateProvider(
 		for (direction in Direction.entries) {
 			for (axis in Direction.Axis.entries) {
 				val isTop = direction.axis == axis
+				val rotateSideTexture = axis != Direction.Axis.Y
+					&& (direction.axis != Direction.Axis.Y || axis == Direction.Axis.X)
 				val enabledModel = when {
 					isTop && axis == Direction.Axis.Y -> topModel
 					isTop -> topHorizontalModel
-					axis == Direction.Axis.Y -> sideModel
-					else -> sideHorizontalModel
+					rotateSideTexture -> sideHorizontalModel
+					else -> sideModel
 				}
 				val disabledModel = when {
 					isTop && axis == Direction.Axis.Y -> topDisabledModel
 					isTop -> topHorizontalDisabledModel
-					axis == Direction.Axis.Y -> sideDisabledModel
-					else -> sideHorizontalDisabledModel
+					rotateSideTexture -> sideHorizontalDisabledModel
+					else -> sideDisabledModel
 				}
 				val disabledProperty = ScoochstemBlock.getDisabledProperty(direction)
 				val xRotation = getFaceXRotation(direction)

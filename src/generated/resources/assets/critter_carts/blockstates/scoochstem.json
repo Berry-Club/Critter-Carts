@@ -42,7 +42,7 @@
     },
     {
       "apply": {
-        "model": "critter_carts:block/scoochstem_side_horizontal",
+        "model": "critter_carts:block/scoochstem_side",
         "x": 90
       },
       "when": {
@@ -52,7 +52,7 @@
     },
     {
       "apply": {
-        "model": "critter_carts:block/scoochstem_side_horizontal_disabled",
+        "model": "critter_carts:block/scoochstem_side_disabled",
         "x": 90
       },
       "when": {
@@ -102,7 +102,7 @@
     },
     {
       "apply": {
-        "model": "critter_carts:block/scoochstem_side_horizontal",
+        "model": "critter_carts:block/scoochstem_side",
         "x": 270
       },
       "when": {
@@ -112,7 +112,7 @@
     },
     {
       "apply": {
-        "model": "critter_carts:block/scoochstem_side_horizontal_disabled",
+        "model": "critter_carts:block/scoochstem_side_disabled",
         "x": 270
       },
       "when": {
