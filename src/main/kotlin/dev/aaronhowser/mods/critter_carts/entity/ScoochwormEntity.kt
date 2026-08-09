@@ -24,7 +24,6 @@ import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
-import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.PathfinderMob
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier
 import net.minecraft.world.entity.ai.attributes.Attributes
@@ -198,7 +197,7 @@ class ScoochwormEntity(
 	override fun canCollideWith(entity: Entity): Boolean {
 		return when {
 			entity is ScoochwormPartEntity -> entity.parentId != id
-			else -> entity is LivingEntity && !entity.isPassenger
+			else -> super.canCollideWith(entity)
 		}
 	}
 
