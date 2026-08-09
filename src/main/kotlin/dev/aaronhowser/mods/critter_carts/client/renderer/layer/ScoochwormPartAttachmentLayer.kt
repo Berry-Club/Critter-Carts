@@ -42,8 +42,6 @@ abstract class ScoochwormPartAttachmentLayer(
 		) ?: return
 
 		poseStack.withPose {
-			poseStack.translate(0.0, ATTACHMENT_OFFSET, 0.0)
-
 			renderer.reRender(
 				getDefaultBakedModel(animatable),
 				poseStack,
@@ -57,9 +55,5 @@ abstract class ScoochwormPartAttachmentLayer(
 				renderer.getRenderColor(animatable, partialTick, packedLight).argbInt()
 			)
 		}
-	}
-
-	companion object {
-		private const val ATTACHMENT_OFFSET = 1.0
 	}
 }
