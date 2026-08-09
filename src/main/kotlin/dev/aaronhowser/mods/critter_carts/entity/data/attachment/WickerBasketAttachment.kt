@@ -1,5 +1,6 @@
 package dev.aaronhowser.mods.critter_carts.entity.data.attachment
 
+import dev.aaronhowser.mods.critter_carts.config.ServerConfig
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormPartEntity
 import net.minecraft.core.Direction
 import net.minecraft.core.component.DataComponents
@@ -55,28 +56,39 @@ class WickerBasketAttachment(
 		}
 
 		upsideDownTicks++
-		if (upsideDownTicks < DROP_INTERVAL_TICKS) return
+		val dropInterval = ServerConfig.CONFIG.wickerBasketDropIntervalTicks.get()
+		if (upsideDownTicks < dropInterval) return
 
 		upsideDownTicks = 0
+		dropItems(bodyPart)
+	}
+
+	private fun dropItems(bodyPart: ScoochwormPartEntity) {
+		val configuredAmount = ServerConfig.CONFIG.wickerBasketDropAmount.get()
 
 		for (slot in 0 until container.containerSize) {
-			if (container.getItem(slot).isEmpty) continue
+			val itemStack = container.getItem(slot)
+			if (itemStack.isEmpty) continue
 
-			val droppedItem = container.removeItem(slot, 1)
-			val itemEntity = ItemEntity(
-				bodyPart.level(),
-				bodyPart.x,
-				bodyPart.y,
-				bodyPart.z,
-				droppedItem
-			)
-
-			itemEntity.setDeltaMovement(0.0, 0.0, 0.0)
-			itemEntity.setDefaultPickUpDelay()
-			bodyPart.level().addFreshEntity(itemEntity)
-
+			val amount = minOf(configuredAmount, itemStack.count)
+			val droppedItem = container.removeItem(slot, amount)
+			spawnDroppedItem(bodyPart, droppedItem)
 			return
 		}
+	}
+
+	private fun spawnDroppedItem(bodyPart: ScoochwormPartEntity, itemStack: ItemStack) {
+		val itemEntity = ItemEntity(
+			bodyPart.level(),
+			bodyPart.x,
+			bodyPart.y,
+			bodyPart.z,
+			itemStack
+		)
+
+		itemEntity.setDeltaMovement(0.0, 0.0, 0.0)
+		itemEntity.setDefaultPickUpDelay()
+		bodyPart.level().addFreshEntity(itemEntity)
 	}
 
 	private fun updateItemContents() {
@@ -86,6 +98,5 @@ class WickerBasketAttachment(
 
 	companion object {
 		private const val CONTAINER_SIZE = 27
-		private const val DROP_INTERVAL_TICKS = 10
 	}
 }
