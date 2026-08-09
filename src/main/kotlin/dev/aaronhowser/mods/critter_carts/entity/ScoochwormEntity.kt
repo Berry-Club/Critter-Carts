@@ -1,16 +1,15 @@
 package dev.aaronhowser.mods.critter_carts.entity
 
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isClientSide
-import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isBlock
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isItem
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isServerSide
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.nextRange
+import dev.aaronhowser.mods.critter_carts.block.ScoochwormTravelBlock
 import dev.aaronhowser.mods.critter_carts.entity.control.ScoochwormMoveControl
 import dev.aaronhowser.mods.critter_carts.entity.data.attachment.ScoochwormAttachmentType
 import dev.aaronhowser.mods.critter_carts.entity.data.ScoochwormPath
 import dev.aaronhowser.mods.critter_carts.entity.data.ScoochwormSegments
 import dev.aaronhowser.mods.critter_carts.entity.goal.ScoochstemFollowGoal
-import dev.aaronhowser.mods.critter_carts.registry.ModBlocks
 import dev.aaronhowser.mods.critter_carts.registry.ModSoundEvents
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
@@ -87,7 +86,7 @@ class ScoochwormEntity(
 			position().add(Vec3.atLowerCornerOf(attachmentBottom.normal))
 		)
 
-		return isValidBlock(
+		return supportsScoochwormTravel(
 			level(),
 			attachmentPosition,
 			attachmentBottom.opposite
@@ -253,13 +252,15 @@ class ScoochwormEntity(
 				EntityDataSerializers.BOOLEAN
 			)
 
-		fun isValidBlock(
+		fun supportsScoochwormTravel(
 			level: Level,
 			position: BlockPos,
 			attachmentFace: Direction
 		): Boolean {
-			return level.getBlockState(position)
-				.isBlock(ModBlocks.SCOOCHSTEM.get())
+			val block = level.getBlockState(position).block
+			if (block !is ScoochwormTravelBlock) return false
+
+			return block.supportsScoochwormTravel(level, attachmentFace)
 		}
 
 		fun getMovementYaw(

@@ -147,7 +147,7 @@ class ScoochstemFollowGoal(
 		)
 
 		if (
-			isValidBlock(forwardStem, surface.bottom)
+			isTravelSurface(forwardStem, surface.bottom)
 			&& isTraversableSurface(climbingSurface)
 		) {
 			return climbingSurface
@@ -162,7 +162,7 @@ class ScoochstemFollowGoal(
 
 		val wrappingSurface = StemSurface(surface.stem, forward.opposite)
 		if (
-			isValidBlock(wrappingSurface)
+			isTravelSurface(wrappingSurface)
 			&& hasNoCollision(forwardStem)
 			&& hasNoCollision(diagonalStem)
 		) {
@@ -195,7 +195,7 @@ class ScoochstemFollowGoal(
 					.add(Vec3.atLowerCornerOf(bottom.normal))
 			)
 
-			if (isValidBlock(stem, bottom)) return StemSurface(stem, bottom)
+			if (isTravelSurface(stem, bottom)) return StemSurface(stem, bottom)
 		}
 
 		return null
@@ -208,7 +208,7 @@ class ScoochstemFollowGoal(
 	}
 
 	private fun isTraversableSurface(surface: StemSurface): Boolean {
-		if (!isValidBlock(surface)) return false
+		if (!isTravelSurface(surface)) return false
 
 		val position = getEntityPosition(surface)
 		val bounds = scoochworm.boundingBox.move(
@@ -220,12 +220,12 @@ class ScoochstemFollowGoal(
 		return scoochworm.level().noCollision(scoochworm, bounds)
 	}
 
-	private fun isValidBlock(surface: StemSurface): Boolean {
-		return isValidBlock(surface.stem, surface.bottom)
+	private fun isTravelSurface(surface: StemSurface): Boolean {
+		return isTravelSurface(surface.stem, surface.bottom)
 	}
 
-	private fun isValidBlock(position: BlockPos, bottom: Direction): Boolean {
-		return ScoochwormEntity.isValidBlock(
+	private fun isTravelSurface(position: BlockPos, bottom: Direction): Boolean {
+		return ScoochwormEntity.supportsScoochwormTravel(
 			scoochworm.level(),
 			position,
 			bottom.opposite
