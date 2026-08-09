@@ -223,10 +223,10 @@ class ScoochwormEntity(
 
 	// Collision
 
-	override fun canBeCollidedWith(): Boolean = !isDeadOrDying
 	override fun canCollideWith(entity: Entity): Boolean {
-		return when {
-			entity is ScoochwormPartEntity -> entity.parentId != id
+		return when (entity) {
+			is ScoochwormEntity -> entity.id != id
+			is ScoochwormPartEntity -> entity.parentId != id
 			else -> super.canCollideWith(entity)
 		}
 	}

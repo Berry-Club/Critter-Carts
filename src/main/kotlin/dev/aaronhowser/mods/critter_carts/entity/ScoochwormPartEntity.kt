@@ -183,7 +183,6 @@ class ScoochwormPartEntity(
 		return parentEntity.interactWithPart(player, hand, partIndex, attachmentType)
 	}
 
-	override fun canBeCollidedWith(): Boolean = true
 	override fun canCollideWith(entity: Entity): Boolean {
 		return when (entity) {
 			is ScoochwormEntity -> entity.id != parentId
