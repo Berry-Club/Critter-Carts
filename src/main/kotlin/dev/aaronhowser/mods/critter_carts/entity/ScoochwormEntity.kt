@@ -224,6 +224,13 @@ class ScoochwormEntity(
 		bodySegments.load(tag.getList(SEGMENTS_TAG, CompoundTag.TAG_COMPOUND.toInt()))
 		isMoving = tag.getBoolean(MOVING_TAG)
 
+		attachmentBottom = Direction.from3DDataValue(tag.getInt(ATTACHMENT_BOTTOM_TAG))
+		attachmentPosition = if (tag.contains(ATTACHMENT_POSITION_TAG)) {
+			BlockPos.of(tag.getLong(ATTACHMENT_POSITION_TAG))
+		} else {
+			null
+		}
+
 		if (!movementPath.isEmpty()) {
 			bodySegments.update(movementPath)
 		}
@@ -234,6 +241,12 @@ class ScoochwormEntity(
 		tag.put(PATH_TAG, movementPath.save())
 		tag.put(SEGMENTS_TAG, bodySegments.save())
 		tag.putBoolean(MOVING_TAG, isMoving)
+		tag.putInt(ATTACHMENT_BOTTOM_TAG, attachmentBottom.get3DDataValue())
+
+		val currentAttachmentPosition = attachmentPosition
+		if (currentAttachmentPosition != null) {
+			tag.putLong(ATTACHMENT_POSITION_TAG, currentAttachmentPosition.asLong())
+		}
 	}
 
 	// Animation
@@ -254,6 +267,8 @@ class ScoochwormEntity(
 		private const val SEGMENTS_TAG = "Segments"
 		private const val PATH_TAG = "Path"
 		private const val MOVING_TAG = "Moving"
+		private const val ATTACHMENT_BOTTOM_TAG = "AttachmentBottom"
+		private const val ATTACHMENT_POSITION_TAG = "AttachmentPosition"
 
 		private val DATA_ATTACHMENT_BOTTOM: EntityDataAccessor<Direction> =
 			SynchedEntityData.defineId(
