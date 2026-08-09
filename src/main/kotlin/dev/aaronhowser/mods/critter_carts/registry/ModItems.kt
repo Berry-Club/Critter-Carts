@@ -6,6 +6,7 @@ import dev.aaronhowser.mods.aaron.registry.AaronItemRegistry
 import dev.aaronhowser.mods.critter_carts.CritterCarts
 import dev.aaronhowser.mods.critter_carts.datagen.language.ModMenuLang
 import dev.aaronhowser.mods.critter_carts.item.ScoochwormSpawnEggItem
+import dev.aaronhowser.mods.critter_carts.item.WickerBasketItem
 import net.neoforged.neoforge.registries.DeferredItem
 import net.neoforged.neoforge.registries.DeferredRegister
 
@@ -24,14 +25,11 @@ object ModItems : AaronItemRegistry() {
 				)
 			})
 
-	val WICKER_BASKET: DeferredItem<ItemWithTooltip> =
+	val WICKER_BASKET: DeferredItem<WickerBasketItem> =
 		register(
 			"wicker_basket",
 			builder = { properties ->
-				ItemWithTooltip(
-					properties,
-					ModMenuLang.NO_MENU_ACCESS.toComponent()
-				)
+				WickerBasketItem(properties)
 			})
 
 	val SCOOCHWORM_SPAWN_EGG: DeferredItem<ScoochwormSpawnEggItem> =
