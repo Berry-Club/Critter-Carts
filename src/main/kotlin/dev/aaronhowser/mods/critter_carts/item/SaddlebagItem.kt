@@ -1,5 +1,6 @@
 package dev.aaronhowser.mods.critter_carts.item
 
+import dev.aaronhowser.mods.aaron.misc.AaronExtensions.toGrayComponent
 import dev.aaronhowser.mods.critter_carts.datagen.language.ModMenuLang
 import net.minecraft.core.component.DataComponents
 import net.minecraft.network.chat.Component
@@ -34,6 +35,6 @@ class SaddlebagItem(
 		tooltipComponents: MutableList<Component>,
 		tooltipFlag: TooltipFlag
 	) {
-		tooltipComponents.add(Component.translatable(ModMenuLang.SADDLE_NOT_INCLUDED))
+		tooltipComponents += ModMenuLang.SADDLE_NOT_INCLUDED.toGrayComponent()
 	}
 }
