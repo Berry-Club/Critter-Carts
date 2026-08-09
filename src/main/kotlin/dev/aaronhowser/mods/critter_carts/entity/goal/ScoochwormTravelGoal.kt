@@ -7,13 +7,13 @@ import net.minecraft.world.entity.ai.goal.Goal
 import net.minecraft.world.phys.Vec3
 import java.util.*
 
-class ScoochstemFollowGoal(
+class ScoochwormTravelGoal(
 	private val scoochworm: ScoochwormEntity
 ) : Goal() {
 
-	private var currentSurface: StemSurface? = null
+	private var currentSurface: ScoochwormSupport? = null
 	private var travelDirection: Direction? = null
-	private var targetSurface: StemSurface? = null
+	private var targetSurface: ScoochwormSupport? = null
 	private var cornerPosition: Vec3? = null
 	private var directionAfterCorner: Direction? = null
 
@@ -61,7 +61,7 @@ class ScoochstemFollowGoal(
 		moveTowardTarget()
 	}
 
-	private fun reachTarget(target: StemSurface, direction: Direction) {
+	private fun reachTarget(target: ScoochwormSupport, direction: Direction) {
 		scoochworm.setPos(getEntityPosition(target))
 		scoochworm.attachToSupport(target.supportPosition, target.supportDirection)
 		currentSurface = target
@@ -76,7 +76,7 @@ class ScoochstemFollowGoal(
 		setTarget(target, nextSurface, direction)
 	}
 
-	private fun reachCorner(target: StemSurface, position: Vec3) {
+	private fun reachCorner(target: ScoochwormSupport, position: Vec3) {
 		scoochworm.setPos(position)
 		scoochworm.attachToSupport(target.supportPosition, target.supportDirection)
 		cornerPosition = null
@@ -85,8 +85,8 @@ class ScoochstemFollowGoal(
 	}
 
 	private fun setTarget(
-		from: StemSurface,
-		to: StemSurface,
+		from: ScoochwormSupport,
+		to: ScoochwormSupport,
 		approachDirection: Direction
 	) {
 		targetSurface = to
@@ -119,7 +119,7 @@ class ScoochstemFollowGoal(
 		scoochworm.noPhysics = false
 	}
 
-	private fun chooseNextSurface(surface: StemSurface, forward: Direction): StemSurface? {
+	private fun chooseNextSurface(surface: ScoochwormSupport, forward: Direction): ScoochwormSupport? {
 		val forwardSurface = surface.copy(
 			supportPosition = surface.supportPosition.relative(forward)
 		)
@@ -148,7 +148,7 @@ class ScoochstemFollowGoal(
 
 		val forwardStem = surface.supportPosition.relative(forward)
 		val diagonalStem = forwardStem.relative(surface.supportDirection.opposite)
-		val climbingSurface = StemSurface(
+		val climbingSurface = ScoochwormSupport(
 			diagonalStem,
 			forward
 		)
@@ -160,14 +160,14 @@ class ScoochstemFollowGoal(
 			return climbingSurface
 		}
 
-		val adjoiningSurface = StemSurface(
+		val adjoiningSurface = ScoochwormSupport(
 			surface.supportPosition.relative(surface.supportDirection.opposite),
 			forward
 		)
 
 		if (isTraversableSurface(adjoiningSurface)) return adjoiningSurface
 
-		val wrappingSurface = StemSurface(surface.supportPosition, forward.opposite)
+		val wrappingSurface = ScoochwormSupport(surface.supportPosition, forward.opposite)
 		if (
 			isTravelSurface(wrappingSurface)
 			&& hasNoCollision(forwardStem)
@@ -195,7 +195,7 @@ class ScoochstemFollowGoal(
 		)
 	}
 
-	private fun findCurrentSurface(): StemSurface? {
+	private fun findCurrentSurface(): ScoochwormSupport? {
 		for (supportDirection in Direction.entries) {
 			val stem = BlockPos.containing(
 				scoochworm.position()
@@ -203,7 +203,7 @@ class ScoochstemFollowGoal(
 			)
 
 			if (isTravelSurface(stem, supportDirection)) {
-				return StemSurface(stem, supportDirection)
+				return ScoochwormSupport(stem, supportDirection)
 			}
 		}
 
@@ -228,7 +228,7 @@ class ScoochstemFollowGoal(
 		return getInitialTravelDirection(supportDirection)
 	}
 
-	private fun isTraversableSurface(surface: StemSurface): Boolean {
+	private fun isTraversableSurface(surface: ScoochwormSupport): Boolean {
 		if (!isTravelSurface(surface)) return false
 
 		val position = getEntityPosition(surface)
@@ -241,7 +241,7 @@ class ScoochstemFollowGoal(
 		return scoochworm.level().noCollision(scoochworm, bounds)
 	}
 
-	private fun isTravelSurface(surface: StemSurface): Boolean {
+	private fun isTravelSurface(surface: ScoochwormSupport): Boolean {
 		return isTravelSurface(surface.supportPosition, surface.supportDirection)
 	}
 
@@ -260,7 +260,7 @@ class ScoochstemFollowGoal(
 			.isEmpty
 	}
 
-	private fun getEntityPosition(surface: StemSurface): Vec3 {
+	private fun getEntityPosition(surface: ScoochwormSupport): Vec3 {
 		val blockCenter = Vec3.atCenterOf(surface.supportPosition)
 		val center = blockCenter.subtract(
 			Vec3.atLowerCornerOf(surface.supportDirection.normal)
@@ -271,8 +271,8 @@ class ScoochstemFollowGoal(
 	}
 
 	private fun directionTo(
-		from: StemSurface,
-		to: StemSurface,
+		from: ScoochwormSupport,
+		to: ScoochwormSupport,
 		previousDirection: Direction
 	): Direction {
 		if (from.supportDirection != to.supportDirection) {

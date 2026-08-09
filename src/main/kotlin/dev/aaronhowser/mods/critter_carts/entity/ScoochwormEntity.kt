@@ -11,7 +11,7 @@ import dev.aaronhowser.mods.critter_carts.entity.control.ScoochwormMoveControl
 import dev.aaronhowser.mods.critter_carts.entity.data.ScoochwormPath
 import dev.aaronhowser.mods.critter_carts.entity.data.ScoochwormSegments
 import dev.aaronhowser.mods.critter_carts.entity.data.attachment.ScoochwormAttachmentType
-import dev.aaronhowser.mods.critter_carts.entity.goal.ScoochstemFollowGoal
+import dev.aaronhowser.mods.critter_carts.entity.goal.ScoochwormTravelGoal
 import dev.aaronhowser.mods.critter_carts.registry.ModSoundEvents
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
@@ -72,7 +72,7 @@ class ScoochwormEntity(
 		private set(value) = entityData.set(DATA_IS_TRYING_TO_MOVE, value)
 
 	override fun registerGoals() {
-		goalSelector.addGoal(0, ScoochstemFollowGoal(this))
+		goalSelector.addGoal(0, ScoochwormTravelGoal(this))
 	}
 
 	override fun aiStep() {
