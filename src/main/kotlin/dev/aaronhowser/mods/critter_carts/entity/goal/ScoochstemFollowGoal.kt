@@ -25,7 +25,7 @@ class ScoochstemFollowGoal(
 		if (!scoochworm.isMoving) return false
 
 		val surface = findCurrentSurface() ?: return false
-		val direction = getInitialTravelDirection(surface.bottom)
+		val direction = getTravelDirection(surface.bottom)
 		val nextSurface = chooseNextSurface(surface, direction) ?: return false
 
 		currentSurface = surface
@@ -115,7 +115,6 @@ class ScoochstemFollowGoal(
 		cornerPosition = null
 		directionAfterCorner = null
 		scoochworm.noPhysics = false
-		scoochworm.isNoGravity = scoochworm.isAttachedToValidBlock()
 	}
 
 	private fun chooseNextSurface(surface: StemSurface, forward: Direction): StemSurface? {
@@ -205,6 +204,18 @@ class ScoochstemFollowGoal(
 		val horizontal = Direction.fromYRot(scoochworm.yRot.toDouble())
 		if (horizontal.axis != bottom.axis) return horizontal
 		return if (bottom.axis == Direction.Axis.Y) Direction.NORTH else Direction.UP
+	}
+
+	private fun getTravelDirection(bottom: Direction): Direction {
+		val currentDirection = travelDirection
+		if (
+			currentDirection != null
+			&& currentDirection.axis != bottom.axis
+		) {
+			return currentDirection
+		}
+
+		return getInitialTravelDirection(bottom)
 	}
 
 	private fun isTraversableSurface(surface: StemSurface): Boolean {
