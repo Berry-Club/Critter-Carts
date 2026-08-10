@@ -1,0 +1,35 @@
+# Scoochworms
+
+Scoochworms are segmented creatures that carry players and items along [Scoochstem](@critter_carts:scoochstem) paths.
+
+## Movement
+
+Interact with a Scoochworm's head to toggle movement. A moving Scoochworm follows the surface beneath it and can transition between floors, walls, and ceilings when the Scoochstem path continues around a corner.
+
+At a flat branch, the Scoochworm first tries to continue forward. If forward travel is unavailable, it chooses an available left or right path. If both side paths are available, it chooses one randomly.
+
+Scoochworms stop when they reach the end of a valid path. Interact with the head to stop one manually.
+
+## Segments
+
+New Scoochworms begin with one body segment. Feeding the head a **Melon** adds another segment, up to a maximum of 16.
+
+Each segment can hold one attachment. Attachments are independent, so one Scoochworm can carry several inventories, saddles, or any mixture of the available types.
+
+The [Saddlebag](@critter_carts:saddlebag) provides an accessible 9-slot inventory. The [Wicker Basket](@critter_carts:wicker_basket) automatically collects dropped items and unloads them while upside down. A standard [Saddle](@minecraft:saddle) allows one player to ride its segment without controlling the Scoochworm.
+
+Using **Shears** on a segment removes it and all following segments. The shears take one point of durability, and attachments from the removed portion are dropped.
+
+## Interacting Safely
+
+Different parts have different interactions:
+
+| Target | Interaction | Result |
+| --- | --- | --- |
+| Head | Use | Starts or stops movement. |
+| Head or segment | Use with Melon | Adds one segment if the Scoochworm is not at maximum length. |
+| Segment | Use with attachment | Equips the attachment. |
+| Attached segment | Sneak-use with empty hand | Removes the attachment. |
+| Segment | Use with Shears | Removes that segment and everything behind it. |
+
+When a Scoochworm dies, attachments on all of its segments are dropped.
