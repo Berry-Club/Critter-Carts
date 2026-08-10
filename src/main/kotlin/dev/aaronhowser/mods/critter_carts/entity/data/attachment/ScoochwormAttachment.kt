@@ -97,7 +97,7 @@ sealed class ScoochwormAttachment(
 					if (player.isShiftKeyDown) InteractionResult.PASS else InteractionResult.SUCCESS
 				}
 
-				ScoochwormAttachmentType.ITEM_STORAGE -> InteractionResult.SUCCESS
+				ScoochwormAttachmentType.SADDLEBAGS -> InteractionResult.SUCCESS
 				ScoochwormAttachmentType.WICKER_BASKET -> InteractionResult.PASS
 			}
 		}

@@ -9,6 +9,6 @@ class ScoochwormSaddlebagLayer(
 	renderer: GeoRenderer<ScoochwormPartEntity>
 ) : ScoochwormPartAttachmentLayer(
 	renderer,
-	ScoochwormAttachmentType.ITEM_STORAGE,
+	ScoochwormAttachmentType.SADDLEBAGS,
 	ScoochwormSaddlebagModel()
 )

@@ -16,7 +16,7 @@ class ItemStorageAttachment(
 	saddlebag: ItemStack
 ) : ScoochwormAttachment(saddlebag) {
 
-	override val type = ScoochwormAttachmentType.ITEM_STORAGE
+	override val type = ScoochwormAttachmentType.SADDLEBAGS
 	override val equipSound: SoundEvent = SoundEvents.DONKEY_CHEST
 
 	private val container = SimpleContainer(CONTAINER_SIZE)
