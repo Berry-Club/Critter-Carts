@@ -16,6 +16,7 @@ class ScoochwormWanderGoal(
 	private var support: ScoochwormSupport? = null
 	private var travelDirection = Vec3.ZERO
 	private var nextTurnTick = 0
+	private var transitionTicks = 0
 
 	init {
 		flags = EnumSet.of(Flag.MOVE)
@@ -51,7 +52,7 @@ class ScoochwormWanderGoal(
 	override fun tick() {
 		val currentSupport = support ?: return
 
-		if (scoochworm.tickCount >= nextTurnTick) {
+		if (transitionTicks == 0 && scoochworm.tickCount >= nextTurnTick) {
 			turn(currentSupport.supportDirection)
 			nextTurnTick = scoochworm.tickCount + TURN_INTERVAL_TICKS
 		}
@@ -59,6 +60,11 @@ class ScoochwormWanderGoal(
 		val movementSpeed = scoochworm.getAttributeValue(Attributes.MOVEMENT_SPEED)
 		val movement = travelDirection.scale(movementSpeed)
 		val nextPosition = scoochworm.position().add(movement)
+		if (transitionTicks > 0) {
+			continueTransition(currentSupport, nextPosition, movement)
+			return
+		}
+
 		val wallDirection = getWallDirection(currentSupport, nextPosition)
 		if (wallDirection != null) {
 			val wallSupport = getWallSupport(currentSupport, wallDirection)
@@ -107,6 +113,8 @@ class ScoochwormWanderGoal(
 
 	override fun stop() {
 		scoochworm.noPhysics = false
+		scoochworm.isTraversingSurfaceCorner = false
+		transitionTicks = 0
 		support = null
 	}
 
@@ -127,9 +135,42 @@ class ScoochwormWanderGoal(
 	) {
 		support = newSupport
 		travelDirection = Vec3.atLowerCornerOf(newDirection.normal)
+		transitionTicks = TRANSITION_TICKS
+		scoochworm.noPhysics = true
+		scoochworm.isTraversingSurfaceCorner = true
 		scoochworm.attachToSupport(newSupport.supportPosition, newSupport.supportDirection)
 		snapToSurface(newSupport)
+		if (snapToEntry) {
+			snapToEntryEdge(newSupport, newDirection)
+		}
 		move(Vec3.ZERO)
+	}
+
+	private fun continueTransition(
+		currentSupport: ScoochwormSupport,
+		nextPosition: Vec3,
+		movement: Vec3
+	) {
+		val nextSupport = getSupportAt(nextPosition, currentSupport.supportDirection)
+		if (nextSupport != null) {
+			if (isStem(nextSupport)) {
+				handOffToStem(nextSupport)
+				transitionTicks = 0
+				scoochworm.noPhysics = false
+				scoochworm.isTraversingSurfaceCorner = false
+				return
+			}
+
+			support = nextSupport
+			scoochworm.attachToSupport(nextSupport.supportPosition, nextSupport.supportDirection)
+		}
+
+		move(movement)
+		transitionTicks--
+		if (transitionTicks == 0) {
+			scoochworm.noPhysics = false
+			scoochworm.isTraversingSurfaceCorner = false
+		}
 	}
 
 	private fun handOffToStem(stemSupport: ScoochwormSupport) {
@@ -258,6 +299,19 @@ class ScoochwormWanderGoal(
 		scoochworm.setPos(snappedCenter.subtract(0.0, ScoochwormEntity.SIZE / 2.0, 0.0))
 	}
 
+	private fun snapToEntryEdge(newSupport: ScoochwormSupport, travelDirection: Direction) {
+		val blockCenter = Vec3.atCenterOf(newSupport.supportPosition)
+		val currentCenter = scoochworm.position().add(0.0, ScoochwormEntity.SIZE / 2.0, 0.0)
+		val entryOffset = 0.5 + ScoochwormEntity.SIZE / 2.0 + SURFACE_CLEARANCE
+		val direction = travelDirection.normal
+		val entryCenter = Vec3(
+			if (direction.x == 0) currentCenter.x else blockCenter.x - direction.x * entryOffset,
+			if (direction.y == 0) currentCenter.y else blockCenter.y - direction.y * entryOffset,
+			if (direction.z == 0) currentCenter.z else blockCenter.z - direction.z * entryOffset
+		)
+		scoochworm.setPos(entryCenter.subtract(0.0, ScoochwormEntity.SIZE / 2.0, 0.0))
+	}
+
 	private fun isStem(surface: ScoochwormSupport): Boolean {
 		return ScoochwormEntity.supportsScoochwormTravel(
 			scoochworm.level(),
@@ -288,8 +342,10 @@ class ScoochwormWanderGoal(
 
 	companion object {
 		private const val TURN_INTERVAL_TICKS = 20
+		private const val TRANSITION_TICKS = 4
 		private const val MAX_TURN_RADIANS = Math.PI / 6.0
 		private const val SUPPORT_PROBE_DISTANCE = 0.05
+		private const val SURFACE_CLEARANCE = 0.001
 		private const val MINIMUM_DIRECTION_LENGTH_SQUARED = 0.000001
 	}
 }

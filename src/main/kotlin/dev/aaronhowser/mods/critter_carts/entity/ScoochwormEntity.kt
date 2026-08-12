@@ -56,6 +56,7 @@ class ScoochwormEntity(
 	private var footstepPartIndex = HEAD_FOOTSTEP_INDEX
 	private var nextFootstepTick = 0
 	var surfaceTravelDirection: Vec3? = null
+	var isTraversingSurfaceCorner = false
 
 	init {
 		moveControl = scoochwormMoveControl
@@ -232,6 +233,7 @@ class ScoochwormEntity(
 	}
 
 	override fun isPushable(): Boolean = false
+	override fun isInWall(): Boolean = !isTraversingSurfaceCorner && super.isInWall()
 	override fun isPushedByFluid(type: FluidType): Boolean = false
 	override fun getPistonPushReaction(): PushReaction = PushReaction.IGNORE
 	override fun knockback(strength: Double, x: Double, z: Double) {}
