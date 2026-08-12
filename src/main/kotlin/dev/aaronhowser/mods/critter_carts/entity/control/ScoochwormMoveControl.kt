@@ -28,7 +28,6 @@ class ScoochwormMoveControl(
 	override fun tick() {
 		val currentTravelDirection = travelDirection
 		if (operation != Operation.MOVE_TO || currentTravelDirection == null) {
-			scoochworm.stickToSurface()
 			scoochworm.zza = 0f
 			return
 		}
@@ -57,7 +56,6 @@ class ScoochwormMoveControl(
 			directionVector.y * movementSpeed,
 			directionVector.z * movementSpeed
 		)
-		scoochworm.stickToSurface()
 
 		scoochworm.zza = 0f
 		scoochworm.xxa = 0f

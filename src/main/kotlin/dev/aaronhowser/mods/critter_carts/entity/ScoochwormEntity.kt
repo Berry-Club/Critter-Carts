@@ -5,7 +5,6 @@ import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isClientSide
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isItem
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isServerSide
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.nextRange
-import dev.aaronhowser.mods.aaron.misc.AaronExtensions.toVec3
 import dev.aaronhowser.mods.critter_carts.block.ScoochwormTravelBlock
 import dev.aaronhowser.mods.critter_carts.datagen.tag.ModBlockTagsProvider
 import dev.aaronhowser.mods.critter_carts.entity.control.ScoochwormMoveControl
@@ -135,18 +134,6 @@ class ScoochwormEntity(
 	fun attachToSupport(position: BlockPos, direction: Direction) {
 		supportDirection = direction
 		supportPosition = position.immutable()
-	}
-
-	fun stickToSurface() {
-		if (supportPosition == null) return
-
-		val directionTowardSurface = supportDirection.normal.toVec3()
-		val currentSpeedThere = deltaMovement.dot(directionTowardSurface)
-		if (currentSpeedThere >= SURFACE_STICK_SPEED) return
-
-		deltaMovement = deltaMovement.add(
-			directionTowardSurface.scale(SURFACE_STICK_SPEED - currentSpeedThere)
-		)
 	}
 
 	private fun playNextFootstep() {
@@ -309,7 +296,6 @@ class ScoochwormEntity(
 		private const val HEAD_FOOTSTEP_INDEX = -1
 		private const val FOOTSTEP_INTERVAL_TICKS = 3
 		private const val FOOTSTEP_CYCLE_PAUSE_TICKS = 40
-		private const val SURFACE_STICK_SPEED = 0.08
 
 		private const val SEGMENTS_TAG = "Segments"
 		private const val PATH_TAG = "Path"
