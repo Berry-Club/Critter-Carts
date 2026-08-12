@@ -54,63 +54,39 @@ class ScoochwormWanderGoal(
 	override fun tick() {
 		val currentSupport = support ?: return
 
-		if (transitionTicks == 0 && scoochworm.tickCount >= nextTurnTick) {
-			turn(currentSupport.supportDirection)
-			nextTurnTick = scoochworm.tickCount + TURN_INTERVAL_TICKS
-		}
+		tryTurning(currentSupport)
 
 		val movementSpeed = scoochworm.getAttributeValue(Attributes.MOVEMENT_SPEED)
 		val movement = travelDirection.scale(movementSpeed)
 		val nextPosition = scoochworm.position().add(movement)
+
 		if (transitionTicks > 0) {
 			continueTransition(currentSupport, nextPosition, movement)
 			return
 		}
 
-		val wallDirection = getWallDirection(currentSupport, nextPosition)
-		if (wallDirection != null) {
-			val wallSupport = getWallSupport(currentSupport, wallDirection)
-			if (wallSupport != null) {
-				transitionTo(
-					wallSupport,
-					currentSupport.supportDirection.opposite,
-					false
-				)
-				return
-			}
-		}
+		if (tryTransitioningToWall(currentSupport, nextPosition)) return
 
 		val nextSupport = getSupportAt(nextPosition, currentSupport.supportDirection)
+		if (nextSupport != null) return moveOntoSupport(nextSupport, movement)
 
-		if (nextSupport != null) {
-			if (isStem(nextSupport)) {
-				handOffToStem(nextSupport)
-				return
-			}
-
-			support = nextSupport
-			scoochworm.attachToSupport(nextSupport.supportPosition, nextSupport.supportDirection)
-			move(movement)
-			return
-		}
-
-		val crossedDirection = getCrossedDirection(currentSupport, nextPosition)
-		if (crossedDirection == null) {
+		val edgeDirection = getCrossedDirection(currentSupport, nextPosition)
+		if (edgeDirection == null) {
 			move(movement)
 			return
 		}
 
 		val edgeSupport = ScoochwormSupport(
 			currentSupport.supportPosition,
-			crossedDirection.opposite
+			edgeDirection.opposite
 		)
+
 		if (isFreeSurface(edgeSupport)) {
 			transitionTo(edgeSupport, currentSupport.supportDirection, true)
-			return
+		} else {
+			travelDirection = travelDirection.scale(-1.0)
+			move(Vec3.ZERO)
 		}
-
-		travelDirection = travelDirection.scale(-1.0)
-		move(Vec3.ZERO)
 	}
 
 	override fun stop() {
@@ -121,13 +97,49 @@ class ScoochwormWanderGoal(
 	}
 
 	private fun turn(supportDirection: Direction) {
-		val angle = scoochworm.random.nextDouble() * MAX_TURN_RADIANS
+		val maximumTurnRadians = Math.PI / 6.0
+		val angle = scoochworm.random.nextDouble() * maximumTurnRadians
 		val signedAngle = if (scoochworm.random.nextBoolean()) angle else -angle
+
 		travelDirection = rotateAroundAxis(
 			travelDirection,
 			supportDirection.normal.toVec3(),
 			signedAngle
 		).normalize()
+	}
+
+	private fun tryTurning(currentSupport: ScoochwormSupport) {
+		if (transitionTicks > 0 || scoochworm.tickCount < nextTurnTick) return
+
+		turn(currentSupport.supportDirection)
+		nextTurnTick = scoochworm.tickCount + TURN_INTERVAL_TICKS
+	}
+
+	private fun tryTransitioningToWall(
+		currentSupport: ScoochwormSupport,
+		nextPosition: Vec3
+	): Boolean {
+		val wallDirection = getWallDirection(currentSupport, nextPosition) ?: return false
+		val wallSupport = getWallSupport(currentSupport, wallDirection) ?: return false
+
+		transitionTo(
+			wallSupport,
+			currentSupport.supportDirection.opposite,
+			false
+		)
+
+		return true
+	}
+
+	private fun moveOntoSupport(nextSupport: ScoochwormSupport, movement: Vec3) {
+		if (isStem(nextSupport)) {
+			handOffToStem(nextSupport)
+			return
+		}
+
+		support = nextSupport
+		scoochworm.attachToSupport(nextSupport.supportPosition, nextSupport.supportDirection)
+		move(movement)
 	}
 
 	private fun transitionTo(
@@ -210,15 +222,17 @@ class ScoochwormWanderGoal(
 	}
 
 	private fun getInitialDirection(supportDirection: Direction): Vec3 {
+		val minimumDirectionLengthSquared = 0.000001
+
 		val rememberedDirection = scoochworm.surfaceTravelDirection
 		if (rememberedDirection != null) {
 			val projected = projectOntoSurface(rememberedDirection, supportDirection)
-			if (projected.lengthSqr() > MINIMUM_DIRECTION_LENGTH_SQUARED) return projected.normalize()
+			if (projected.lengthSqr() > minimumDirectionLengthSquared) return projected.normalize()
 		}
 
 		val facing = Vec3.directionFromRotation(0f, scoochworm.yRot)
 		val projected = projectOntoSurface(facing, supportDirection)
-		if (projected.lengthSqr() > MINIMUM_DIRECTION_LENGTH_SQUARED) return projected.normalize()
+		if (projected.lengthSqr() > minimumDirectionLengthSquared) return projected.normalize()
 
 		return if (supportDirection.axis == Direction.Axis.Y) {
 			Vec3(0.0, 0.0, 1.0)
@@ -322,13 +336,17 @@ class ScoochwormWanderGoal(
 	private fun snapToEntryEdge(newSupport: ScoochwormSupport, travelDirection: Direction) {
 		val blockCenter = Vec3.atCenterOf(newSupport.supportPosition)
 		val currentCenter = scoochworm.position().add(0.0, ScoochwormEntity.SIZE / 2.0, 0.0)
-		val entryOffset = 0.5 + ScoochwormEntity.SIZE / 2.0 + SURFACE_CLEARANCE
+
+		val surfaceClearance = 0.001
+		val entryOffset = 0.5 + ScoochwormEntity.SIZE / 2.0 + surfaceClearance
+
 		val direction = travelDirection.normal
 		val entryCenter = Vec3(
 			if (direction.x == 0) currentCenter.x else blockCenter.x - direction.x * entryOffset,
 			if (direction.y == 0) currentCenter.y else blockCenter.y - direction.y * entryOffset,
 			if (direction.z == 0) currentCenter.z else blockCenter.z - direction.z * entryOffset
 		)
+
 		scoochworm.setPos(entryCenter.subtract(0.0, ScoochwormEntity.SIZE / 2.0, 0.0))
 	}
 
@@ -363,9 +381,6 @@ class ScoochwormWanderGoal(
 	companion object {
 		private const val TURN_INTERVAL_TICKS = 20
 		private const val TRANSITION_TICKS = 4
-		private const val MAX_TURN_RADIANS = Math.PI / 6.0
 		private const val SUPPORT_PROBE_DISTANCE = 0.05
-		private const val SURFACE_CLEARANCE = 0.001
-		private const val MINIMUM_DIRECTION_LENGTH_SQUARED = 0.000001
 	}
 }

@@ -33,13 +33,17 @@ class ScoochwormMoveControl(
 			return
 		}
 
-		scoochworm.yRot = ScoochwormEntity.getMovementYaw(
+		val movementYaw = ScoochwormEntity.getMovementYaw(
 			currentTravelDirection,
 			scoochworm.supportDirection
 		)
 
+		scoochworm.yRot = movementYaw
 		scoochworm.yBodyRot = scoochworm.yRot
-		scoochworm.speed = (speedModifier * scoochworm.getAttributeValue(Attributes.MOVEMENT_SPEED)).toFloat()
+
+		val movementSpeedAttribute = scoochworm.getAttributeValue(Attributes.MOVEMENT_SPEED)
+		val movementSpeed = speedModifier * movementSpeedAttribute
+		scoochworm.speed = movementSpeed.toFloat()
 
 		val directionVector = currentTravelDirection.normal.toVec3()
 		val remainingDistance = scoochworm.position()
@@ -47,21 +51,16 @@ class ScoochwormMoveControl(
 			.dot(directionVector)
 			.coerceAtLeast(0.0)
 
-		val movementSpeed = minOf(
-			scoochworm.speed.toDouble(),
+		val limitedMovementSpeed = minOf(
+			movementSpeed,
 			remainingDistance
 		)
 
-		scoochworm.deltaMovement = Vec3(
-			directionVector.x * movementSpeed,
-			directionVector.y * movementSpeed,
-			directionVector.z * movementSpeed
-		)
+		scoochworm.deltaMovement = directionVector.scale(limitedMovementSpeed)
 
 		scoochworm.zza = 0f
 		scoochworm.xxa = 0f
 
 		operation = Operation.WAIT
 	}
-
 }

@@ -47,11 +47,14 @@ class ScoochwormTravelGoal(
 	override fun tick() {
 		val target = targetSurface ?: return
 		val direction = travelDirection ?: return
+
 		val targetPosition = cornerPosition ?: getEntityPosition(target)
-		val distanceToTarget = scoochworm.position().vectorTo(targetPosition)
+		val displacement = scoochworm.position().vectorTo(targetPosition)
+		val distanceToTarget = displacement
 			.dot(direction.normal.toVec3())
 
-		if (distanceToTarget <= TARGET_DISTANCE) {
+		val targetDistance = 0.001
+		if (distanceToTarget <= targetDistance) {
 			if (cornerPosition == null) {
 				reachTarget(target, direction)
 			} else {
@@ -101,6 +104,7 @@ class ScoochwormTravelGoal(
 
 		val fromPosition = getEntityPosition(from)
 		val toPosition = getEntityPosition(to)
+
 		val corner = when (approachDirection.axis) {
 			Direction.Axis.X -> Vec3(toPosition.x, fromPosition.y, fromPosition.z)
 			Direction.Axis.Y -> Vec3(fromPosition.x, toPosition.y, fromPosition.z)
@@ -122,20 +126,22 @@ class ScoochwormTravelGoal(
 	}
 
 	private fun chooseNextSurface(surface: ScoochwormSupport, forward: Direction): ScoochwormSupport? {
-		val forwardSurface = surface.copy(
-			supportPosition = surface.supportPosition.relative(forward)
-		)
+		val supportPosition = surface.supportPosition
+		val supportDirection = surface.supportDirection
+
+		val forwardPosition = supportPosition.relative(forward)
+		val forwardSurface = surface.copy(supportPosition = forwardPosition)
+
 		if (isTraversableSurface(forwardSurface)) return forwardSurface
 
-		val left = rotateAroundSupport(forward, surface.supportDirection, false)
-		val right = rotateAroundSupport(forward, surface.supportDirection, true)
+		val left = rotateAroundSupport(forward, supportDirection, false)
+		val right = rotateAroundSupport(forward, supportDirection, true)
 
-		val leftSurface = surface.copy(
-			supportPosition = surface.supportPosition.relative(left)
-		)
-		val rightSurface = surface.copy(
-			supportPosition = surface.supportPosition.relative(right)
-		)
+		val leftPosition = supportPosition.relative(left)
+		val rightPosition = supportPosition.relative(right)
+
+		val leftSurface = surface.copy(supportPosition = leftPosition)
+		val rightSurface = surface.copy(supportPosition = rightPosition)
 
 		val hasLeft = isTraversableSurface(leftSurface)
 		val hasRight = isTraversableSurface(rightSurface)
@@ -148,31 +154,30 @@ class ScoochwormTravelGoal(
 			}
 		}
 
-		val forwardStem = surface.supportPosition.relative(forward)
-		val diagonalStem = forwardStem.relative(surface.supportDirection.opposite)
+		val diagonalStem = forwardPosition.relative(supportDirection.opposite)
 		val climbingSurface = ScoochwormSupport(
 			diagonalStem,
 			forward
 		)
 
 		if (
-			isTravelSurface(forwardStem, surface.supportDirection)
+			isTravelSurface(forwardPosition, supportDirection)
 			&& isTraversableSurface(climbingSurface)
 		) {
 			return climbingSurface
 		}
 
 		val adjoiningSurface = ScoochwormSupport(
-			surface.supportPosition.relative(surface.supportDirection.opposite),
+			supportPosition.relative(supportDirection.opposite),
 			forward
 		)
 
 		if (isTraversableSurface(adjoiningSurface)) return adjoiningSurface
 
-		val wrappingSurface = ScoochwormSupport(surface.supportPosition, forward.opposite)
+		val wrappingSurface = ScoochwormSupport(supportPosition, forward.opposite)
 		if (
 			isTravelSurface(wrappingSurface)
-			&& hasNoCollision(forwardStem)
+			&& hasNoCollision(forwardPosition)
 			&& hasNoCollision(diagonalStem)
 		) {
 			return wrappingSurface
@@ -320,7 +325,4 @@ class ScoochwormTravelGoal(
 		) ?: direction
 	}
 
-	companion object {
-		private const val TARGET_DISTANCE = 0.001
-	}
 }
