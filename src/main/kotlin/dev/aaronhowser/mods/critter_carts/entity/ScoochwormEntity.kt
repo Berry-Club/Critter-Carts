@@ -12,6 +12,7 @@ import dev.aaronhowser.mods.critter_carts.entity.data.ScoochwormPath
 import dev.aaronhowser.mods.critter_carts.entity.data.ScoochwormSegments
 import dev.aaronhowser.mods.critter_carts.entity.data.attachment.ScoochwormAttachmentType
 import dev.aaronhowser.mods.critter_carts.entity.goal.ScoochwormTravelGoal
+import dev.aaronhowser.mods.critter_carts.entity.goal.ScoochwormWanderGoal
 import dev.aaronhowser.mods.critter_carts.registry.ModSoundEvents
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
@@ -54,6 +55,7 @@ class ScoochwormEntity(
 
 	private var footstepPartIndex = HEAD_FOOTSTEP_INDEX
 	private var nextFootstepTick = 0
+	var surfaceTravelDirection: Vec3? = null
 
 	init {
 		moveControl = scoochwormMoveControl
@@ -73,6 +75,7 @@ class ScoochwormEntity(
 
 	override fun registerGoals() {
 		goalSelector.addGoal(0, ScoochwormTravelGoal(this))
+		goalSelector.addGoal(1, ScoochwormWanderGoal(this))
 	}
 
 	override fun aiStep() {
@@ -124,11 +127,8 @@ class ScoochwormEntity(
 	fun hasValidSupport(): Boolean {
 		val currentSupportPosition = supportPosition ?: return false
 
-		return supportsScoochwormTravel(
-			level(),
-			currentSupportPosition,
-			supportDirection.opposite
-		)
+		return supportsScoochwormTravel(level(), currentSupportPosition, supportDirection.opposite)
+			|| supportsFreeTravel(level(), currentSupportPosition, supportDirection.opposite)
 	}
 
 	fun attachToSupport(position: BlockPos, direction: Direction) {
@@ -335,6 +335,17 @@ class ScoochwormEntity(
 			} else {
 				true
 			}
+		}
+
+		fun supportsFreeTravel(
+			level: Level,
+			position: BlockPos,
+			attachmentFace: Direction
+		): Boolean {
+			val blockState = level.getBlockState(position)
+			if (blockState.isBlock(ModBlockTagsProvider.SUPPORTS_SCOOCHWORM_TRAVEL)) return false
+
+			return blockState.isFaceSturdy(level, position, attachmentFace)
 		}
 
 		fun getMovementYaw(
