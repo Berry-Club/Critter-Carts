@@ -1,5 +1,6 @@
 package dev.aaronhowser.mods.critter_carts.entity.control
 
+import dev.aaronhowser.mods.aaron.misc.AaronExtensions.toVec3
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity
 import net.minecraft.core.Direction
 import net.minecraft.world.entity.ai.attributes.Attributes
@@ -40,7 +41,7 @@ class ScoochwormMoveControl(
 		scoochworm.yBodyRot = scoochworm.yRot
 		scoochworm.speed = (speedModifier * scoochworm.getAttributeValue(Attributes.MOVEMENT_SPEED)).toFloat()
 
-		val directionVector = Vec3.atLowerCornerOf(currentTravelDirection.normal)
+		val directionVector = currentTravelDirection.normal.toVec3()
 		val remainingDistance = scoochworm.position()
 			.vectorTo(Vec3(wantedX, wantedY, wantedZ))
 			.dot(directionVector)

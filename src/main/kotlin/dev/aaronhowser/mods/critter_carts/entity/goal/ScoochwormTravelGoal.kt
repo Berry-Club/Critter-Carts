@@ -1,5 +1,6 @@
 package dev.aaronhowser.mods.critter_carts.entity.goal
 
+import dev.aaronhowser.mods.aaron.misc.AaronExtensions.toVec3
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
@@ -48,7 +49,7 @@ class ScoochwormTravelGoal(
 		val direction = travelDirection ?: return
 		val targetPosition = cornerPosition ?: getEntityPosition(target)
 		val distanceToTarget = scoochworm.position().vectorTo(targetPosition)
-			.dot(Vec3.atLowerCornerOf(direction.normal))
+			.dot(direction.normal.toVec3())
 
 		if (distanceToTarget <= TARGET_DISTANCE) {
 			if (cornerPosition == null) {
@@ -199,7 +200,7 @@ class ScoochwormTravelGoal(
 		for (supportDirection in Direction.entries) {
 			val stem = BlockPos.containing(
 				scoochworm.position()
-					.add(Vec3.atLowerCornerOf(supportDirection.normal))
+					.add(supportDirection.normal.toVec3())
 			)
 
 			if (isTravelSurface(stem, supportDirection)) {
@@ -263,7 +264,8 @@ class ScoochwormTravelGoal(
 	private fun getEntityPosition(surface: ScoochwormSupport): Vec3 {
 		val blockCenter = Vec3.atCenterOf(surface.supportPosition)
 		val center = blockCenter.subtract(
-			Vec3.atLowerCornerOf(surface.supportDirection.normal)
+			surface.supportDirection.normal
+				.toVec3()
 				.scale(0.5 + ScoochwormEntity.SIZE / 2.0)
 		)
 
