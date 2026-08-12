@@ -125,7 +125,7 @@ class ScoochwormWanderGoal(
 		val signedAngle = if (scoochworm.random.nextBoolean()) angle else -angle
 		travelDirection = rotateAroundAxis(
 			travelDirection,
-			Vec3.atLowerCornerOf(supportDirection.normal),
+			supportDirection.normal.toVec3(),
 			signedAngle
 		).normalize()
 	}
@@ -228,14 +228,14 @@ class ScoochwormWanderGoal(
 	}
 
 	private fun projectOntoSurface(direction: Vec3, supportDirection: Direction): Vec3 {
-		val normal = Vec3.atLowerCornerOf(supportDirection.normal)
+		val normal = supportDirection.normal.toVec3()
 		return direction.subtract(normal.scale(direction.dot(normal)))
 	}
 
 	private fun getSupportAt(position: Vec3, supportDirection: Direction): ScoochwormSupport? {
 		val center = position.add(0.0, ScoochwormEntity.SIZE / 2.0, 0.0)
 		val probe = center.add(
-			Vec3.atLowerCornerOf(supportDirection.normal)
+			supportDirection.normal.toVec3()
 				.scale(ScoochwormEntity.SIZE / 2.0 + SUPPORT_PROBE_DISTANCE)
 		)
 		val candidate = ScoochwormSupport(BlockPos.containing(probe), supportDirection)
@@ -278,7 +278,7 @@ class ScoochwormWanderGoal(
 	private fun getSupportBlockPosition(position: Vec3, supportDirection: Direction): BlockPos {
 		val center = position.add(0.0, ScoochwormEntity.SIZE / 2.0, 0.0)
 		val probe = center.add(
-			Vec3.atLowerCornerOf(supportDirection.normal)
+			supportDirection.normal.toVec3()
 				.scale(ScoochwormEntity.SIZE / 2.0 + SUPPORT_PROBE_DISTANCE)
 		)
 		return BlockPos.containing(probe)
@@ -306,7 +306,7 @@ class ScoochwormWanderGoal(
 
 	private fun snapToSurface(newSupport: ScoochwormSupport) {
 		val blockCenter = Vec3.atCenterOf(newSupport.supportPosition)
-		val normal = Vec3.atLowerCornerOf(newSupport.supportDirection.normal)
+		val normal = newSupport.supportDirection.normal.toVec3()
 		val desiredCenter = blockCenter.subtract(
 			normal.scale(0.5 + ScoochwormEntity.SIZE / 2.0)
 		)
