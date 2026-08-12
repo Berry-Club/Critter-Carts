@@ -1,5 +1,6 @@
 package dev.aaronhowser.mods.critter_carts.entity.goal
 
+import dev.aaronhowser.mods.aaron.misc.AaronExtensions.toVec3
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
@@ -8,6 +9,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.entity.ai.goal.Goal
 import net.minecraft.world.phys.Vec3
 import java.util.*
+import kotlin.math.abs
 
 class ScoochwormWanderGoal(
 	private val scoochworm: ScoochwormEntity
@@ -134,7 +136,7 @@ class ScoochwormWanderGoal(
 		snapToEntry: Boolean
 	) {
 		support = newSupport
-		travelDirection = Vec3.atLowerCornerOf(newDirection.normal)
+		travelDirection = curveDirectionOntoSurface(newSupport, newDirection)
 		transitionTicks = TRANSITION_TICKS
 		scoochworm.noPhysics = true
 		scoochworm.isTraversingSurfaceCorner = true
@@ -144,6 +146,24 @@ class ScoochwormWanderGoal(
 			snapToEntryEdge(newSupport, newDirection)
 		}
 		move(Vec3.ZERO)
+	}
+
+	private fun curveDirectionOntoSurface(
+		newSupport: ScoochwormSupport,
+		newDirection: Direction
+	): Vec3 {
+		val newSurfaceNormal = newSupport.supportDirection.normal.toVec3()
+
+		val directionAlongCorner = travelDirection.subtract(
+			newSurfaceNormal.scale(travelDirection.dot(newSurfaceNormal))
+		)
+
+		val directionIntoCorner = abs(travelDirection.dot(newSurfaceNormal))
+
+		val directionAroundCorner = newDirection.normal.toVec3()
+			.scale(directionIntoCorner)
+
+		return directionAlongCorner.add(directionAroundCorner).normalize()
 	}
 
 	private fun continueTransition(
