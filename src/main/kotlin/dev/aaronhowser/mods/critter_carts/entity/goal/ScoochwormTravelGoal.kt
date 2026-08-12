@@ -115,6 +115,7 @@ class ScoochwormTravelGoal(
 	override fun stop() {
 		targetSurface = null
 		currentSurface = null
+		travelDirection = null
 		cornerPosition = null
 		directionAfterCorner = null
 		scoochworm.noPhysics = false
@@ -212,6 +213,16 @@ class ScoochwormTravelGoal(
 	}
 
 	private fun getInitialTravelDirection(supportDirection: Direction): Direction {
+		val surfaceDirection = scoochworm.surfaceTravelDirection
+		if (surfaceDirection != null) {
+			scoochworm.surfaceTravelDirection = null
+			return Direction.entries
+				.filter { it.axis != supportDirection.axis }
+				.maxBy { direction ->
+					surfaceDirection.dot(direction.normal.toVec3())
+				}
+		}
+
 		val horizontal = Direction.fromYRot(scoochworm.yRot.toDouble())
 		if (horizontal.axis != supportDirection.axis) return horizontal
 		return if (supportDirection.axis == Direction.Axis.Y) Direction.NORTH else Direction.UP
