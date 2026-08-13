@@ -37,8 +37,6 @@ class ScoochwormPartEntity(
 	private var lerpZ = 0.0
 	private var lerpYRot = 0.0
 	private var lerpXRot = 0.0
-	var previousForwardDirection = Vec3(0.0, 0.0, 1.0)
-	var previousSupportDirection = Direction.DOWN
 
 	init {
 		noPhysics = true
@@ -62,14 +60,6 @@ class ScoochwormPartEntity(
 		get() = entityData.get(DATA_BOTTOM_DIRECTION)
 		private set(value) = entityData.set(DATA_BOTTOM_DIRECTION, value)
 
-	var forwardDirection: Vec3
-		get() = entityData.get(DATA_FORWARD_DIRECTION)
-		private set(value) {
-			if (value.lengthSqr() == 0.0) return
-
-			entityData.set(DATA_FORWARD_DIRECTION, value.normalize())
-		}
-
 	private fun getScoochworm(): ScoochwormEntity? {
 		return level().getEntity(parentId) as? ScoochwormEntity
 	}
@@ -86,11 +76,7 @@ class ScoochwormPartEntity(
 
 	// Movement
 
-	fun moveAlongPath(
-		pathPosition: Vec3,
-		newSupportDirection: Direction,
-		newForwardDirection: Vec3
-	) {
+	fun moveAlongPath(pathPosition: Vec3, newSupportDirection: Direction) {
 		val displacement = position().vectorTo(pathPosition)
 		var movementYaw = yRot
 
@@ -109,7 +95,6 @@ class ScoochwormPartEntity(
 
 		setPos(pathPosition)
 		supportDirection = newSupportDirection
-		forwardDirection = newForwardDirection
 		yRot = movementYaw
 	}
 
@@ -136,9 +121,6 @@ class ScoochwormPartEntity(
 	// Lifecycle
 
 	override fun tick() {
-		previousForwardDirection = forwardDirection
-		previousSupportDirection = supportDirection
-
 		super.tick()
 
 		if (isClientSide) {
@@ -222,7 +204,6 @@ class ScoochwormPartEntity(
 		builder.define(DATA_PART_INDEX, 0)
 		builder.define(DATA_ATTACHMENT_TYPE, ScoochwormAttachmentType.NONE)
 		builder.define(DATA_BOTTOM_DIRECTION, Direction.DOWN)
-		builder.define(DATA_FORWARD_DIRECTION, Vec3(0.0, 0.0, 1.0))
 	}
 
 	override fun readAdditionalSaveData(tag: CompoundTag) {}
@@ -257,12 +238,6 @@ class ScoochwormPartEntity(
 			SynchedEntityData.defineId(
 				ScoochwormPartEntity::class.java,
 				EntityDataSerializers.DIRECTION
-			)
-
-		private val DATA_FORWARD_DIRECTION: EntityDataAccessor<Vec3> =
-			SynchedEntityData.defineId(
-				ScoochwormPartEntity::class.java,
-				ModEntityDataSerializers.VEC3.get()
 			)
 	}
 

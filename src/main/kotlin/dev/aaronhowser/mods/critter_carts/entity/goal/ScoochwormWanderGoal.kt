@@ -225,25 +225,9 @@ class ScoochwormWanderGoal(
 
 	private fun move(movement: Vec3) {
 		scoochworm.deltaMovement = movement
-		scoochworm.forwardDirection = movementDirection
-
-		val nearestDirection = Direction.getNearest(
-			movementDirection.x,
-			movementDirection.y,
-			movementDirection.z
-		)
-
-		scoochworm.yRot = if (nearestDirection.axis == Direction.Axis.Y) {
-			ScoochwormEntity.getMovementYaw(
-				nearestDirection,
-				scoochworm.supportDirection
-			)
-		} else {
-			Mth.atan2(-movementDirection.x, movementDirection.z)
-				.times(Mth.RAD_TO_DEG)
-				.toFloat()
-		}
-
+		scoochworm.yRot = Mth.atan2(-movementDirection.x, movementDirection.z)
+			.times(Mth.RAD_TO_DEG)
+			.toFloat()
 		scoochworm.yBodyRot = scoochworm.yRot
 	}
 

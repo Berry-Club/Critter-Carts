@@ -12,23 +12,20 @@ class ScoochwormPath(
 
 	private val points = ArrayDeque<ScoochwormPathPoint>()
 
-	fun record(
-		headPosition: Vec3,
-		supportDirection: Direction,
-		forwardDirection: Vec3
-	) {
+	fun record(headPosition: Vec3, supportDirection: Direction, yaw: Float) {
 		if (points.isEmpty()) {
-			points.addFirst(ScoochwormPathPoint(headPosition, supportDirection, forwardDirection))
+			points.addFirst(ScoochwormPathPoint(headPosition, supportDirection))
 
+			val forwardDirection = Vec3.directionFromRotation(0f, yaw)
 			val tailPosition = headPosition.subtract(forwardDirection.scale(initialLength))
-			points.addLast(ScoochwormPathPoint(tailPosition, supportDirection, forwardDirection))
+			points.addLast(ScoochwormPathPoint(tailPosition, supportDirection))
 			return
 		}
 
 		val movedFarEnough = points.first.position
 			.distanceToSqr(headPosition) > MINIMUM_STEP_DISTANCE_SQUARED
 		if (movedFarEnough) {
-			points.addFirst(ScoochwormPathPoint(headPosition, supportDirection, forwardDirection))
+			points.addFirst(ScoochwormPathPoint(headPosition, supportDirection))
 		}
 
 		while (points.size > MAX_PATH_POINTS) {
@@ -54,24 +51,20 @@ class ScoochwormPath(
 				continue
 			}
 
-			val interpolationProgress = remainingDistance / segmentLength
-
-			val position = positionCloserToHead.position.lerp(
-				positionFartherFromHead.position,
-				interpolationProgress
+			return ScoochwormPathPoint(
+				positionCloserToHead.position.lerp(
+					positionFartherFromHead.position,
+					remainingDistance / segmentLength
+				),
+				positionCloserToHead.supportDirection
 			)
-
-			val supportDirection = positionCloserToHead.supportDirection
-
-			val forwardDirection = positionCloserToHead.forwardDirection.lerp(
-				positionFartherFromHead.forwardDirection,
-				interpolationProgress
-			).normalize()
-
-			return ScoochwormPathPoint(position, supportDirection, forwardDirection)
 		}
 
 		return positionCloserToHead
+	}
+
+	fun clear() {
+		points.clear()
 	}
 
 	fun isEmpty(): Boolean = points.isEmpty()
@@ -81,17 +74,10 @@ class ScoochwormPath(
 
 		for (pathPoint in points) {
 			val pointTag = CompoundTag()
-
 			pointTag.putDouble(X_TAG, pathPoint.position.x)
 			pointTag.putDouble(Y_TAG, pathPoint.position.y)
 			pointTag.putDouble(Z_TAG, pathPoint.position.z)
-
 			pointTag.putInt(BOTTOM_TAG, pathPoint.supportDirection.get3DDataValue())
-
-			pointTag.putDouble(FORWARD_X_TAG, pathPoint.forwardDirection.x)
-			pointTag.putDouble(FORWARD_Y_TAG, pathPoint.forwardDirection.y)
-			pointTag.putDouble(FORWARD_Z_TAG, pathPoint.forwardDirection.z)
-
 			tag.add(pointTag)
 		}
 
@@ -103,7 +89,6 @@ class ScoochwormPath(
 
 		for (index in tag.indices) {
 			val pointTag = tag.getCompound(index)
-
 			val position = Vec3(
 				pointTag.getDouble(X_TAG),
 				pointTag.getDouble(Y_TAG),
@@ -111,18 +96,7 @@ class ScoochwormPath(
 			)
 
 			val supportDirection = Direction.from3DDataValue(pointTag.getInt(BOTTOM_TAG))
-
-			val forwardDirection = if (pointTag.contains(FORWARD_X_TAG)) {
-				Vec3(
-					pointTag.getDouble(FORWARD_X_TAG),
-					pointTag.getDouble(FORWARD_Y_TAG),
-					pointTag.getDouble(FORWARD_Z_TAG)
-				)
-			} else {
-				Vec3(0.0, 0.0, 1.0)
-			}
-
-			points.addLast(ScoochwormPathPoint(position, supportDirection, forwardDirection))
+			points.addLast(ScoochwormPathPoint(position, supportDirection))
 		}
 	}
 
@@ -133,8 +107,5 @@ class ScoochwormPath(
 		private const val Y_TAG = "Y"
 		private const val Z_TAG = "Z"
 		private const val BOTTOM_TAG = "Bottom"
-		private const val FORWARD_X_TAG = "ForwardX"
-		private const val FORWARD_Y_TAG = "ForwardY"
-		private const val FORWARD_Z_TAG = "ForwardZ"
 	}
 }

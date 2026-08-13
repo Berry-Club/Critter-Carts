@@ -5,6 +5,5 @@ import net.minecraft.world.phys.Vec3
 
 data class ScoochwormPathPoint(
 	val position: Vec3,
-	val supportDirection: Direction,
-	val forwardDirection: Vec3
+	val supportDirection: Direction
 )

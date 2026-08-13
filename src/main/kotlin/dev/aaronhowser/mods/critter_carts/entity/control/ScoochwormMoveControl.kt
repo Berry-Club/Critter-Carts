@@ -46,7 +46,6 @@ class ScoochwormMoveControl(
 		scoochworm.speed = movementSpeed.toFloat()
 
 		val directionVector = currentDirection.normal.toVec3()
-		scoochworm.forwardDirection = directionVector
 		val remainingDistance = scoochworm.position()
 			.vectorTo(Vec3(wantedX, wantedY, wantedZ))
 			.dot(directionVector)

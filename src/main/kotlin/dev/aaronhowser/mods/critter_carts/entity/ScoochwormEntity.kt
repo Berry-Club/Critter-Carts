@@ -13,7 +13,6 @@ import dev.aaronhowser.mods.critter_carts.entity.data.ScoochwormSegments
 import dev.aaronhowser.mods.critter_carts.entity.data.attachment.ScoochwormAttachmentType
 import dev.aaronhowser.mods.critter_carts.entity.goal.ScoochwormTravelGoal
 import dev.aaronhowser.mods.critter_carts.entity.goal.ScoochwormWanderGoal
-import dev.aaronhowser.mods.critter_carts.registry.ModEntityDataSerializers
 import dev.aaronhowser.mods.critter_carts.registry.ModSoundEvents
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
@@ -58,8 +57,6 @@ class ScoochwormEntity(
 	private var nextFootstepTick = 0
 	var rememberedMovementDirection: Vec3? = null
 	var isTurningAroundCorner = false
-	var previousForwardDirection = Vec3(0.0, 0.0, 1.0)
-	var previousSupportDirection = Direction.DOWN
 
 	init {
 		moveControl = pathMoveControl
@@ -68,14 +65,6 @@ class ScoochwormEntity(
 	var supportDirection: Direction
 		get() = entityData.get(DATA_SUPPORT_DIRECTION)
 		set(value) = entityData.set(DATA_SUPPORT_DIRECTION, value)
-
-	var forwardDirection: Vec3
-		get() = entityData.get(DATA_FORWARD_DIRECTION)
-		set(value) {
-			if (value.lengthSqr() != 0.0) {
-				entityData.set(DATA_FORWARD_DIRECTION, value.normalize())
-			}
-		}
 
 	var supportPosition: BlockPos?
 		get() = entityData.get(DATA_SUPPORT_POSITION).orElse(null)
@@ -91,9 +80,6 @@ class ScoochwormEntity(
 	}
 
 	override fun aiStep() {
-		previousForwardDirection = forwardDirection
-		previousSupportDirection = supportDirection
-
 		if (isServerSide && !hasValidSupport()) {
 			supportPosition = null
 		}
@@ -111,7 +97,7 @@ class ScoochwormEntity(
 
 		// Record the path that the head has traveled,
 		// and then set each segment to be a set distance from the head along that path
-		movementPath.record(position(), supportDirection, forwardDirection)
+		movementPath.record(position(), supportDirection, yRot)
 		bodySegments.update(movementPath)
 
 		playNextFootstep()
@@ -264,7 +250,6 @@ class ScoochwormEntity(
 	override fun defineSynchedData(builder: SynchedEntityData.Builder) {
 		super.defineSynchedData(builder)
 		builder.define(DATA_SUPPORT_DIRECTION, Direction.DOWN)
-		builder.define(DATA_FORWARD_DIRECTION, Vec3(0.0, 0.0, 1.0))
 		builder.define(DATA_SUPPORT_POSITION, Optional.empty())
 		builder.define(DATA_IS_TRYING_TO_MOVE, false)
 	}
@@ -326,12 +311,6 @@ class ScoochwormEntity(
 			SynchedEntityData.defineId(
 				ScoochwormEntity::class.java,
 				EntityDataSerializers.DIRECTION
-			)
-
-		private val DATA_FORWARD_DIRECTION: EntityDataAccessor<Vec3> =
-			SynchedEntityData.defineId(
-				ScoochwormEntity::class.java,
-				ModEntityDataSerializers.VEC3.get()
 			)
 
 		private val DATA_SUPPORT_POSITION: EntityDataAccessor<Optional<BlockPos>> =
