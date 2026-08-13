@@ -10,31 +10,32 @@ class ScoochwormPath(
 	private val initialLength: Double
 ) {
 
-	private val positions = ArrayDeque<ScoochwormPathPoint>()
+	private val points = ArrayDeque<ScoochwormPathPoint>()
 
-	fun record(headPos: Vec3, bottom: Direction, yaw: Float) {
-		if (positions.isEmpty()) {
-			positions.addFirst(ScoochwormPathPoint(headPos, bottom))
+	fun record(headPosition: Vec3, supportDirection: Direction, yaw: Float) {
+		if (points.isEmpty()) {
+			points.addFirst(ScoochwormPathPoint(headPosition, supportDirection))
 
 			val forwardDirection = Vec3.directionFromRotation(0f, yaw)
-			val firstSegmentPos = headPos.subtract(forwardDirection.scale(initialLength))
-			positions.addLast(ScoochwormPathPoint(firstSegmentPos, bottom))
+			val tailPosition = headPosition.subtract(forwardDirection.scale(initialLength))
+			points.addLast(ScoochwormPathPoint(tailPosition, supportDirection))
 			return
 		}
 
-		val movedFarEnough = positions.first.position.distanceToSqr(headPos) > MINIMUM_STEP_DISTANCE_SQUARED
+		val movedFarEnough = points.first.position
+			.distanceToSqr(headPosition) > MINIMUM_STEP_DISTANCE_SQUARED
 		if (movedFarEnough) {
-			positions.addFirst(ScoochwormPathPoint(headPos, bottom))
+			points.addFirst(ScoochwormPathPoint(headPosition, supportDirection))
 		}
 
-		while (positions.size > MAX_PATH_POINTS) {
-			positions.removeLast()
+		while (points.size > MAX_PATH_POINTS) {
+			points.removeLast()
 		}
 	}
 
 	fun getPoint(distanceFromHead: Double): ScoochwormPathPoint {
 		var remainingDistance = distanceFromHead
-		val iterator = positions.iterator()
+		val iterator = points.iterator()
 		var positionCloserToHead = iterator.next()
 
 		// Keep going to more and more distant points
@@ -55,7 +56,7 @@ class ScoochwormPath(
 					positionFartherFromHead.position,
 					remainingDistance / segmentLength
 				),
-				positionCloserToHead.bottom
+				positionCloserToHead.supportDirection
 			)
 		}
 
@@ -63,20 +64,20 @@ class ScoochwormPath(
 	}
 
 	fun clear() {
-		positions.clear()
+		points.clear()
 	}
 
-	fun isEmpty(): Boolean = positions.isEmpty()
+	fun isEmpty(): Boolean = points.isEmpty()
 
 	fun save(): ListTag {
 		val tag = ListTag()
 
-		for (pathPoint in positions) {
+		for (pathPoint in points) {
 			val pointTag = CompoundTag()
 			pointTag.putDouble(X_TAG, pathPoint.position.x)
 			pointTag.putDouble(Y_TAG, pathPoint.position.y)
 			pointTag.putDouble(Z_TAG, pathPoint.position.z)
-			pointTag.putInt(BOTTOM_TAG, pathPoint.bottom.get3DDataValue())
+			pointTag.putInt(BOTTOM_TAG, pathPoint.supportDirection.get3DDataValue())
 			tag.add(pointTag)
 		}
 
@@ -84,7 +85,7 @@ class ScoochwormPath(
 	}
 
 	fun load(tag: ListTag) {
-		positions.clear()
+		points.clear()
 
 		for (index in tag.indices) {
 			val pointTag = tag.getCompound(index)
@@ -94,8 +95,8 @@ class ScoochwormPath(
 				pointTag.getDouble(Z_TAG)
 			)
 
-			val bottom = Direction.from3DDataValue(pointTag.getInt(BOTTOM_TAG))
-			positions.addLast(ScoochwormPathPoint(position, bottom))
+			val supportDirection = Direction.from3DDataValue(pointTag.getInt(BOTTOM_TAG))
+			points.addLast(ScoochwormPathPoint(position, supportDirection))
 		}
 	}
 

@@ -48,7 +48,7 @@ class ScoochwormSegments(
 		player: Player,
 		hand: InteractionHand,
 		partIndex: Int,
-		currentAttachment: ScoochwormAttachmentType
+		attachmentType: ScoochwormAttachmentType
 	): InteractionResult {
 		val heldStack = player.getItemInHand(hand)
 
@@ -56,7 +56,7 @@ class ScoochwormSegments(
 			return ScoochwormSegment.predictInteraction(
 				player,
 				heldStack,
-				currentAttachment
+				attachmentType
 			)
 		}
 

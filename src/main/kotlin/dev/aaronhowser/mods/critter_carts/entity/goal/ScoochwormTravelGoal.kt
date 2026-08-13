@@ -12,11 +12,11 @@ class ScoochwormTravelGoal(
 	private val scoochworm: ScoochwormEntity
 ) : Goal() {
 
-	private var currentSurface: ScoochwormSupport? = null
-	private var travelDirection: Direction? = null
-	private var targetSurface: ScoochwormSupport? = null
-	private var cornerPosition: Vec3? = null
-	private var directionAfterCorner: Direction? = null
+	private var currentSupport: ScoochwormSupport? = null
+	private var movementDirection: Direction? = null
+	private var nextSupport: ScoochwormSupport? = null
+	private var cornerTarget: Vec3? = null
+	private var cornerExitDirection: Direction? = null
 
 	init {
 		flags = EnumSet.of(Flag.MOVE)
@@ -25,19 +25,19 @@ class ScoochwormTravelGoal(
 	override fun canUse(): Boolean {
 		if (!scoochworm.isTryingToMove) return false
 
-		val surface = findCurrentSurface() ?: return false
-		scoochworm.attachToSupport(surface.supportPosition, surface.supportDirection)
+		val support = findCurrentSupport() ?: return false
+		scoochworm.attachToSupport(support.supportPosition, support.supportDirection)
 
-		val direction = getTravelDirection(surface.supportDirection)
-		val nextSurface = chooseNextSurface(surface, direction) ?: return false
+		val direction = getMovementDirection(support.supportDirection)
+		val destination = chooseNextSupport(support, direction) ?: return false
 
-		currentSurface = surface
-		setTarget(surface, nextSurface, direction)
+		currentSupport = support
+		startMovingTo(support, destination, direction)
 		return true
 	}
 
 	override fun canContinueToUse(): Boolean {
-		return scoochworm.isTryingToMove && targetSurface != null
+		return scoochworm.isTryingToMove && nextSupport != null
 	}
 
 	override fun start() {
@@ -45,10 +45,10 @@ class ScoochwormTravelGoal(
 	}
 
 	override fun tick() {
-		val target = targetSurface ?: return
-		val direction = travelDirection ?: return
+		val destination = nextSupport ?: return
+		val direction = movementDirection ?: return
 
-		val targetPosition = cornerPosition ?: getEntityPosition(target)
+		val targetPosition = cornerTarget ?: getPositionOnSupport(destination)
 		val displacement = scoochworm.position().vectorTo(targetPosition)
 		// Only check how far the worm has left to move along its current path. Sideways
 		// distance does not matter because the worm moves around a corner one step at a time.
@@ -57,55 +57,55 @@ class ScoochwormTravelGoal(
 
 		val targetDistance = 0.001
 		if (distanceToTarget <= targetDistance) {
-			if (cornerPosition == null) {
-				reachTarget(target, direction)
+			if (cornerTarget == null) {
+				arriveAtSupport(destination, direction)
 			} else {
-				reachCorner(target, targetPosition)
+				arriveAtCorner(destination, targetPosition)
 			}
 		}
 
-		moveTowardTarget()
+		requestMovement()
 	}
 
-	private fun reachTarget(target: ScoochwormSupport, direction: Direction) {
-		scoochworm.setPos(getEntityPosition(target))
-		scoochworm.attachToSupport(target.supportPosition, target.supportDirection)
-		currentSurface = target
+	private fun arriveAtSupport(destination: ScoochwormSupport, direction: Direction) {
+		scoochworm.setPos(getPositionOnSupport(destination))
+		scoochworm.attachToSupport(destination.supportPosition, destination.supportDirection)
+		currentSupport = destination
 
-		val nextSurface = chooseNextSurface(target, direction)
-		if (nextSurface == null) {
-			targetSurface = null
+		val followingSupport = chooseNextSupport(destination, direction)
+		if (followingSupport == null) {
+			nextSupport = null
 			scoochworm.deltaMovement = Vec3.ZERO
 			return
 		}
 
-		setTarget(target, nextSurface, direction)
+		startMovingTo(destination, followingSupport, direction)
 	}
 
-	private fun reachCorner(target: ScoochwormSupport, position: Vec3) {
+	private fun arriveAtCorner(destination: ScoochwormSupport, position: Vec3) {
 		scoochworm.setPos(position)
-		scoochworm.attachToSupport(target.supportPosition, target.supportDirection)
-		cornerPosition = null
-		travelDirection = directionAfterCorner
-		directionAfterCorner = null
+		scoochworm.attachToSupport(destination.supportPosition, destination.supportDirection)
+		cornerTarget = null
+		movementDirection = cornerExitDirection
+		cornerExitDirection = null
 	}
 
-	private fun setTarget(
+	private fun startMovingTo(
 		from: ScoochwormSupport,
 		to: ScoochwormSupport,
 		approachDirection: Direction
 	) {
-		targetSurface = to
+		nextSupport = to
 
 		if (from.supportDirection == to.supportDirection) {
-			cornerPosition = null
-			directionAfterCorner = null
-			travelDirection = directionTo(from, to, approachDirection)
+			cornerTarget = null
+			cornerExitDirection = null
+			movementDirection = getDirectionToSupport(from, to, approachDirection)
 			return
 		}
 
-		val fromPosition = getEntityPosition(from)
-		val toPosition = getEntityPosition(to)
+		val fromPosition = getPositionOnSupport(from)
+		val toPosition = getPositionOnSupport(to)
 
 		// When turning upwards or downwards, first move to the corner where the two paths
 		// meet. From there, move onto the new side. This stops the worm from taking a
@@ -116,109 +116,109 @@ class ScoochwormTravelGoal(
 			Direction.Axis.Z -> Vec3(fromPosition.x, fromPosition.y, toPosition.z)
 		}
 
-		cornerPosition = corner
-		directionAfterCorner = directionBetween(corner, toPosition)
-		travelDirection = approachDirection
+		cornerTarget = corner
+		cornerExitDirection = getDirectionBetween(corner, toPosition)
+		movementDirection = approachDirection
 	}
 
 	override fun stop() {
-		targetSurface = null
-		currentSurface = null
-		travelDirection = null
-		cornerPosition = null
-		directionAfterCorner = null
+		nextSupport = null
+		currentSupport = null
+		movementDirection = null
+		cornerTarget = null
+		cornerExitDirection = null
 		scoochworm.noPhysics = false
 	}
 
-	private fun chooseNextSurface(surface: ScoochwormSupport, forward: Direction): ScoochwormSupport? {
-		val supportPosition = surface.supportPosition
-		val supportDirection = surface.supportDirection
+	private fun chooseNextSupport(support: ScoochwormSupport, forward: Direction): ScoochwormSupport? {
+		val supportPosition = support.supportPosition
+		val supportDirection = support.supportDirection
 
 		val forwardPosition = supportPosition.relative(forward)
-		val forwardSurface = surface.copy(supportPosition = forwardPosition)
+		val forwardSupport = support.copy(supportPosition = forwardPosition)
 
-		if (isTraversableSurface(forwardSurface)) return forwardSurface
+		if (canMoveOnto(forwardSupport)) return forwardSupport
 
-		val left = rotateAroundSupport(forward, supportDirection, false)
-		val right = rotateAroundSupport(forward, supportDirection, true)
+		val left = turnAlongSurface(forward, supportDirection, false)
+		val right = turnAlongSurface(forward, supportDirection, true)
 
 		val leftPosition = supportPosition.relative(left)
 		val rightPosition = supportPosition.relative(right)
 
-		val leftSurface = surface.copy(supportPosition = leftPosition)
-		val rightSurface = surface.copy(supportPosition = rightPosition)
+		val leftSupport = support.copy(supportPosition = leftPosition)
+		val rightSupport = support.copy(supportPosition = rightPosition)
 
-		val hasLeft = isTraversableSurface(leftSurface)
-		val hasRight = isTraversableSurface(rightSurface)
+		val hasLeft = canMoveOnto(leftSupport)
+		val hasRight = canMoveOnto(rightSupport)
 
 		if (hasLeft || hasRight) {
 			return when {
-				hasLeft && hasRight -> if (scoochworm.random.nextBoolean()) leftSurface else rightSurface
-				hasLeft -> leftSurface
-				else -> rightSurface
+				hasLeft && hasRight -> if (scoochworm.random.nextBoolean()) leftSupport else rightSupport
+				hasLeft -> leftSupport
+				else -> rightSupport
 			}
 		}
 
 		// There is no stem to move to ahead, left, or right on this side. First try to
 		// turn upwards onto the side in front of the worm.
 		val upperForwardPosition = forwardPosition.relative(supportDirection.opposite)
-		val upwardTurnSurface = ScoochwormSupport(
+		val upwardTurnSupport = ScoochwormSupport(
 			upperForwardPosition,
 			forward
 		)
 
 		if (
-			isTravelSurface(forwardPosition, supportDirection)
-			&& isTraversableSurface(upwardTurnSurface)
+			isStemSupport(forwardPosition, supportDirection)
+			&& canMoveOnto(upwardTurnSupport)
 		) {
-			return upwardTurnSurface
+			return upwardTurnSupport
 		}
 
-		val nearbyUpwardTurnSurface = ScoochwormSupport(
+		val nearbyUpwardTurnSupport = ScoochwormSupport(
 			supportPosition.relative(supportDirection.opposite),
 			forward
 		)
 
-		if (isTraversableSurface(nearbyUpwardTurnSurface)) return nearbyUpwardTurnSurface
+		if (canMoveOnto(nearbyUpwardTurnSupport)) return nearbyUpwardTurnSupport
 
-		val downwardTurnSurface = ScoochwormSupport(supportPosition, forward.opposite)
+		val downwardTurnSupport = ScoochwormSupport(supportPosition, forward.opposite)
 		// If the worm cannot turn upwards, try turning downwards around the edge. It passes
 		// through both blocks in front during this turn, so both blocks need to be clear.
 		if (
-			isTravelSurface(downwardTurnSurface)
+			isStemSupport(downwardTurnSupport)
 			&& hasNoCollision(forwardPosition)
 			&& hasNoCollision(upperForwardPosition)
 		) {
-			return downwardTurnSurface
+			return downwardTurnSupport
 		}
 
 		return null
 	}
 
-	private fun moveTowardTarget() {
-		val current = currentSurface ?: return
-		val target = targetSurface ?: return
-		val direction = travelDirection ?: return
-		val position = cornerPosition ?: getEntityPosition(target)
+	private fun requestMovement() {
+		val current = currentSupport ?: return
+		val destination = nextSupport ?: return
+		val direction = movementDirection ?: return
+		val position = cornerTarget ?: getPositionOnSupport(destination)
 
-		scoochworm.scoochwormMoveControl.setWantedPosition(
+		scoochworm.pathMoveControl.setWantedPosition(
 			position.x,
 			position.y,
 			position.z,
 			direction,
-			current.supportDirection != target.supportDirection,
+			current.supportDirection != destination.supportDirection,
 			1.0
 		)
 	}
 
-	private fun findCurrentSurface(): ScoochwormSupport? {
+	private fun findCurrentSupport(): ScoochwormSupport? {
 		for (supportDirection in Direction.entries) {
 			val stem = BlockPos.containing(
 				scoochworm.position()
 					.add(supportDirection.normal.toVec3())
 			)
 
-			if (isTravelSurface(stem, supportDirection)) {
+			if (isStemSupport(stem, supportDirection)) {
 				return ScoochwormSupport(stem, supportDirection)
 			}
 		}
@@ -227,13 +227,13 @@ class ScoochwormTravelGoal(
 	}
 
 	private fun getInitialTravelDirection(supportDirection: Direction): Direction {
-		val surfaceDirection = scoochworm.surfaceTravelDirection
-		if (surfaceDirection != null) {
-			scoochworm.surfaceTravelDirection = null
+		val rememberedDirection = scoochworm.rememberedMovementDirection
+		if (rememberedDirection != null) {
+			scoochworm.rememberedMovementDirection = null
 			return Direction.entries
 				.filter { it.axis != supportDirection.axis }
 				.maxBy { direction ->
-					surfaceDirection.dot(direction.normal.toVec3())
+					rememberedDirection.dot(direction.normal.toVec3())
 				}
 		}
 
@@ -242,8 +242,8 @@ class ScoochwormTravelGoal(
 		return if (supportDirection.axis == Direction.Axis.Y) Direction.NORTH else Direction.UP
 	}
 
-	private fun getTravelDirection(supportDirection: Direction): Direction {
-		val currentDirection = travelDirection
+	private fun getMovementDirection(supportDirection: Direction): Direction {
+		val currentDirection = movementDirection
 		if (
 			currentDirection != null
 			&& currentDirection.axis != supportDirection.axis
@@ -254,10 +254,10 @@ class ScoochwormTravelGoal(
 		return getInitialTravelDirection(supportDirection)
 	}
 
-	private fun isTraversableSurface(surface: ScoochwormSupport): Boolean {
-		if (!isTravelSurface(surface)) return false
+	private fun canMoveOnto(support: ScoochwormSupport): Boolean {
+		if (!isStemSupport(support)) return false
 
-		val position = getEntityPosition(surface)
+		val position = getPositionOnSupport(support)
 		// Move a copy of the worm's hitbox to the target and make sure it fits there.
 		val bounds = scoochworm.boundingBox.move(
 			position.x - scoochworm.x,
@@ -268,11 +268,11 @@ class ScoochwormTravelGoal(
 		return scoochworm.level().noCollision(scoochworm, bounds)
 	}
 
-	private fun isTravelSurface(surface: ScoochwormSupport): Boolean {
-		return isTravelSurface(surface.supportPosition, surface.supportDirection)
+	private fun isStemSupport(support: ScoochwormSupport): Boolean {
+		return isStemSupport(support.supportPosition, support.supportDirection)
 	}
 
-	private fun isTravelSurface(position: BlockPos, supportDirection: Direction): Boolean {
+	private fun isStemSupport(position: BlockPos, supportDirection: Direction): Boolean {
 		return ScoochwormEntity.supportsScoochwormTravel(
 			scoochworm.level(),
 			position,
@@ -287,10 +287,10 @@ class ScoochwormTravelGoal(
 			.isEmpty
 	}
 
-	private fun getEntityPosition(surface: ScoochwormSupport): Vec3 {
-		val blockCenter = Vec3.atCenterOf(surface.supportPosition)
+	private fun getPositionOnSupport(support: ScoochwormSupport): Vec3 {
+		val blockCenter = Vec3.atCenterOf(support.supportPosition)
 		val center = blockCenter.subtract(
-			surface.supportDirection.normal
+			support.supportDirection.normal
 				.toVec3()
 				.scale(0.5 + ScoochwormEntity.SIZE / 2.0)
 		)
@@ -298,7 +298,7 @@ class ScoochwormTravelGoal(
 		return center.subtract(0.0, ScoochwormEntity.SIZE / 2.0, 0.0)
 	}
 
-	private fun directionTo(
+	private fun getDirectionToSupport(
 		from: ScoochwormSupport,
 		to: ScoochwormSupport,
 		previousDirection: Direction
@@ -311,16 +311,16 @@ class ScoochwormTravelGoal(
 			}
 		}
 
-		val displacement = getEntityPosition(from).vectorTo(getEntityPosition(to))
+		val displacement = getPositionOnSupport(from).vectorTo(getPositionOnSupport(to))
 		return Direction.getNearest(displacement.x, displacement.y, displacement.z)
 	}
 
-	private fun directionBetween(from: Vec3, to: Vec3): Direction {
+	private fun getDirectionBetween(from: Vec3, to: Vec3): Direction {
 		val displacement = from.vectorTo(to)
 		return Direction.getNearest(displacement.x, displacement.y, displacement.z)
 	}
 
-	private fun rotateAroundSupport(
+	private fun turnAlongSurface(
 		direction: Direction,
 		supportDirection: Direction,
 		clockwise: Boolean

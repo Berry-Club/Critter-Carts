@@ -41,7 +41,7 @@ class ScoochwormSegment {
 			this.bodyPart = bodyPart
 		}
 
-		bodyPart.moveAlongPath(pathPoint.position, pathPoint.bottom)
+		bodyPart.moveAlongPath(pathPoint.position, pathPoint.supportDirection)
 	}
 
 	fun discardBodyPart() {
@@ -183,12 +183,12 @@ class ScoochwormSegment {
 		fun predictInteraction(
 			player: Player,
 			heldStack: ItemStack,
-			currentType: ScoochwormAttachmentType
+			attachmentType: ScoochwormAttachmentType
 		): InteractionResult {
 			if (heldStack.isItem(Items.SHEARS)) return InteractionResult.SUCCESS
 
 			if (
-				currentType != ScoochwormAttachmentType.NONE
+				attachmentType != ScoochwormAttachmentType.NONE
 				&& player.isShiftKeyDown
 				&& heldStack.isEmpty
 			) {
@@ -198,7 +198,7 @@ class ScoochwormSegment {
 			return ScoochwormAttachment.predictInteraction(
 				player,
 				heldStack,
-				currentType
+				attachmentType
 			)
 		}
 

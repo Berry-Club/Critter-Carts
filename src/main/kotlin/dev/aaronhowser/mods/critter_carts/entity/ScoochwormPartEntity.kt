@@ -56,11 +56,11 @@ class ScoochwormPartEntity(
 		get() = entityData.get(DATA_ATTACHMENT_TYPE)
 		set(value) = entityData.set(DATA_ATTACHMENT_TYPE, value)
 
-	var bottomDirection: Direction
+	var supportDirection: Direction
 		get() = entityData.get(DATA_BOTTOM_DIRECTION)
 		private set(value) = entityData.set(DATA_BOTTOM_DIRECTION, value)
 
-	private fun getParent(): ScoochwormEntity? {
+	private fun getScoochworm(): ScoochwormEntity? {
 		return level().getEntity(parentId) as? ScoochwormEntity
 	}
 
@@ -76,25 +76,25 @@ class ScoochwormPartEntity(
 
 	// Movement
 
-	fun moveAlongPath(pathPosition: Vec3, newBottomDirection: Direction) {
+	fun moveAlongPath(pathPosition: Vec3, newSupportDirection: Direction) {
 		val displacement = position().vectorTo(pathPosition)
 		var movementYaw = yRot
 
 		if (displacement.lengthSqr() >= MINIMUM_MOVEMENT_DISTANCE_SQUARED) {
-			val travelDirection = Direction.getNearest(
+			val movementDirection = Direction.getNearest(
 				displacement.x,
 				displacement.y,
 				displacement.z
 			)
 
 			movementYaw = ScoochwormEntity.getMovementYaw(
-				travelDirection,
-				newBottomDirection
+				movementDirection,
+				newSupportDirection
 			)
 		}
 
 		setPos(pathPosition)
-		bottomDirection = newBottomDirection
+		supportDirection = newSupportDirection
 		yRot = movementYaw
 	}
 
@@ -109,7 +109,7 @@ class ScoochwormPartEntity(
 			partialTick
 		).y
 
-		val attachmentDirection = bottomDirection.opposite
+		val attachmentDirection = supportDirection.opposite
 
 		return Vec3(
 			attachmentDirection.stepX * attachmentDistance,
@@ -128,8 +128,8 @@ class ScoochwormPartEntity(
 			return
 		}
 
-		val parentEntity = getParent()
-		if (parentEntity != null && !parentEntity.isRemoved) {
+		val scoochworm = getScoochworm()
+		if (scoochworm != null && !scoochworm.isRemoved) {
 			missingParentTicks = 0
 			return
 		}
@@ -177,13 +177,13 @@ class ScoochwormPartEntity(
 	// Collision
 
 	override fun hurt(damageSource: DamageSource, amount: Float): Boolean {
-		val parentEntity = getParent() ?: return false
-		return parentEntity.hurt(damageSource, amount)
+		val scoochworm = getScoochworm() ?: return false
+		return scoochworm.hurt(damageSource, amount)
 	}
 
 	override fun interact(player: Player, hand: InteractionHand): InteractionResult {
-		val parentEntity = getParent() ?: return InteractionResult.PASS
-		return parentEntity.interactWithPart(player, hand, partIndex, attachmentType)
+		val scoochworm = getScoochworm() ?: return InteractionResult.PASS
+		return scoochworm.interactWithPart(player, hand, partIndex, attachmentType)
 	}
 
 	override fun canCollideWith(entity: Entity): Boolean {

@@ -11,30 +11,30 @@ class ScoochwormMoveControl(
 	private val scoochworm: ScoochwormEntity
 ) : MoveControl(scoochworm) {
 
-	private var travelDirection: Direction? = null
+	private var movementDirection: Direction? = null
 
 	fun setWantedPosition(
 		x: Double,
 		y: Double,
 		z: Double,
-		newTravelDirection: Direction,
+		newMovementDirection: Direction,
 		ignoreCollisions: Boolean,
 		speed: Double
 	) {
-		travelDirection = newTravelDirection
+		movementDirection = newMovementDirection
 		scoochworm.noPhysics = ignoreCollisions
 		setWantedPosition(x, y, z, speed)
 	}
 
 	override fun tick() {
-		val currentTravelDirection = travelDirection
-		if (operation != Operation.MOVE_TO || currentTravelDirection == null) {
+		val currentDirection = movementDirection
+		if (operation != Operation.MOVE_TO || currentDirection == null) {
 			scoochworm.zza = 0f
 			return
 		}
 
 		val movementYaw = ScoochwormEntity.getMovementYaw(
-			currentTravelDirection,
+			currentDirection,
 			scoochworm.supportDirection
 		)
 
@@ -45,7 +45,7 @@ class ScoochwormMoveControl(
 		val movementSpeed = speedModifier * movementSpeedAttribute
 		scoochworm.speed = movementSpeed.toFloat()
 
-		val directionVector = currentTravelDirection.normal.toVec3()
+		val directionVector = currentDirection.normal.toVec3()
 		val remainingDistance = scoochworm.position()
 			.vectorTo(Vec3(wantedX, wantedY, wantedZ))
 			.dot(directionVector)

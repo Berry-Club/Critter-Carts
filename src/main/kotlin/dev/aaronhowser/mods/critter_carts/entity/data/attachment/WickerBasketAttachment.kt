@@ -50,7 +50,7 @@ class WickerBasketAttachment(
 	}
 
 	override fun serverTick(bodyPart: ScoochwormPartEntity) {
-		if (bodyPart.bottomDirection != Direction.UP) {
+		if (bodyPart.supportDirection != Direction.UP) {
 			upsideDownTicks = 0
 			return
 		}
@@ -60,17 +60,17 @@ class WickerBasketAttachment(
 		if (upsideDownTicks < dropInterval) return
 
 		upsideDownTicks = 0
-		dropItems(bodyPart)
+		dropNextStack(bodyPart)
 	}
 
-	private fun dropItems(bodyPart: ScoochwormPartEntity) {
-		val configuredAmount = ServerConfig.CONFIG.wickerBasketDropAmount.get()
+	private fun dropNextStack(bodyPart: ScoochwormPartEntity) {
+		val maximumDropAmount = ServerConfig.CONFIG.wickerBasketDropAmount.get()
 
 		for (slot in 0 until container.containerSize) {
 			val itemStack = container.getItem(slot)
 			if (itemStack.isEmpty) continue
 
-			val amount = minOf(configuredAmount, itemStack.count)
+			val amount = minOf(maximumDropAmount, itemStack.count)
 			val droppedItem = container.removeItem(slot, amount)
 			spawnDroppedItem(bodyPart, droppedItem)
 			return

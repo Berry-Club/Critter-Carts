@@ -49,17 +49,17 @@ class ScoochwormEntity(
 ) : PathfinderMob(entityType, level), GeoEntity {
 
 	private val animatableInstanceCache = SingletonAnimatableInstanceCache(this)
-	val scoochwormMoveControl = ScoochwormMoveControl(this)
+	val pathMoveControl = ScoochwormMoveControl(this)
 	private val movementPath = ScoochwormPath(PART_SPACING * ScoochwormSegments.MAX_COUNT)
 	private val bodySegments = ScoochwormSegments(this)
 
 	private var footstepPartIndex = HEAD_FOOTSTEP_INDEX
 	private var nextFootstepTick = 0
-	var surfaceTravelDirection: Vec3? = null
-	var isTraversingSurfaceCorner = false
+	var rememberedMovementDirection: Vec3? = null
+	var isTurningAroundCorner = false
 
 	init {
-		moveControl = scoochwormMoveControl
+		moveControl = pathMoveControl
 	}
 
 	var supportDirection: Direction
@@ -193,20 +193,20 @@ class ScoochwormEntity(
 		player: Player,
 		hand: InteractionHand,
 		partIndex: Int?,
-		currentAttachment: ScoochwormAttachmentType?
+		attachmentType: ScoochwormAttachmentType?
 	): InteractionResult {
 		val heldStack = player.getItemInHand(hand)
 
 		val growResult = tryGrow(player, heldStack)
 		if (growResult != null) return growResult
 
-		if (partIndex == null || currentAttachment == null) return InteractionResult.PASS
+		if (partIndex == null || attachmentType == null) return InteractionResult.PASS
 
 		return bodySegments.interact(
 			player,
 			hand,
 			partIndex,
-			currentAttachment
+			attachmentType
 		)
 	}
 
@@ -235,7 +235,7 @@ class ScoochwormEntity(
 	}
 
 	override fun isPushable(): Boolean = false
-	override fun isInWall(): Boolean = !isTraversingSurfaceCorner && super.isInWall()
+	override fun isInWall(): Boolean = !isTurningAroundCorner && super.isInWall()
 	override fun isPushedByFluid(type: FluidType): Boolean = false
 	override fun getPistonPushReaction(): PushReaction = PushReaction.IGNORE
 	override fun knockback(strength: Double, x: Double, z: Double) {}
@@ -353,14 +353,14 @@ class ScoochwormEntity(
 		}
 
 		fun getMovementYaw(
-			travelDirection: Direction,
+			movementDirection: Direction,
 			supportDirection: Direction
 		): Float {
-			if (travelDirection.axis != Direction.Axis.Y) {
-				return travelDirection.toYRot()
+			if (movementDirection.axis != Direction.Axis.Y) {
+				return movementDirection.toYRot()
 			}
 
-			val movingUp = travelDirection == Direction.UP
+			val movingUp = movementDirection == Direction.UP
 
 			return when (supportDirection) {
 				Direction.NORTH -> if (movingUp) 180f else 0f

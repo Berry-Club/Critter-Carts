@@ -15,8 +15,8 @@ class ScoochwormWanderGoal(
 	private val scoochworm: ScoochwormEntity
 ) : Goal() {
 
-	private var support: ScoochwormSupport? = null
-	private var travelDirection = Vec3.ZERO
+	private var currentSupport: ScoochwormSupport? = null
+	private var movementDirection = Vec3.ZERO
 	private var nextTurnTick = 0
 	private var transitionTicks = 0
 
@@ -30,8 +30,8 @@ class ScoochwormWanderGoal(
 		val currentSupport = findCurrentSupport() ?: return false
 		if (isStem(currentSupport)) return false
 
-		support = currentSupport
-		travelDirection = getInitialDirection(currentSupport.supportDirection)
+		this.currentSupport = currentSupport
+		movementDirection = getInitialDirection(currentSupport.supportDirection)
 		scoochworm.attachToSupport(
 			currentSupport.supportPosition,
 			currentSupport.supportDirection
@@ -41,7 +41,7 @@ class ScoochwormWanderGoal(
 	}
 
 	override fun canContinueToUse(): Boolean {
-		val currentSupport = support ?: return false
+		val currentSupport = this.currentSupport ?: return false
 		return scoochworm.isTryingToMove && !isStem(currentSupport)
 	}
 
@@ -52,12 +52,12 @@ class ScoochwormWanderGoal(
 	}
 
 	override fun tick() {
-		val currentSupport = support ?: return
+		val currentSupport = this.currentSupport ?: return
 
 		tryTurning(currentSupport)
 
 		val movementSpeed = scoochworm.getAttributeValue(Attributes.MOVEMENT_SPEED)
-		val movement = travelDirection.scale(movementSpeed)
+		val movement = movementDirection.scale(movementSpeed)
 		val nextPosition = scoochworm.position().add(movement)
 
 		if (transitionTicks > 0) {
@@ -86,16 +86,16 @@ class ScoochwormWanderGoal(
 		if (isFreeSurface(downwardTurnSupport)) {
 			transitionTo(downwardTurnSupport, currentSupport.supportDirection, true)
 		} else {
-			travelDirection = travelDirection.scale(-1.0)
+			movementDirection = movementDirection.scale(-1.0)
 			move(Vec3.ZERO)
 		}
 	}
 
 	override fun stop() {
 		scoochworm.noPhysics = false
-		scoochworm.isTraversingSurfaceCorner = false
+		scoochworm.isTurningAroundCorner = false
 		transitionTicks = 0
-		support = null
+		currentSupport = null
 	}
 
 	private fun turn(supportDirection: Direction) {
@@ -103,8 +103,8 @@ class ScoochwormWanderGoal(
 		val angle = scoochworm.random.nextDouble() * maximumTurnRadians
 		val signedAngle = if (scoochworm.random.nextBoolean()) angle else -angle
 
-		travelDirection = rotateAroundAxis(
-			travelDirection,
+		movementDirection = rotateAroundAxis(
+			movementDirection,
 			supportDirection.normal.toVec3(),
 			signedAngle
 		).normalize()
@@ -145,7 +145,7 @@ class ScoochwormWanderGoal(
 			return
 		}
 
-		support = nextSupport
+		currentSupport = nextSupport
 		scoochworm.attachToSupport(nextSupport.supportPosition, nextSupport.supportDirection)
 		move(movement)
 	}
@@ -155,11 +155,11 @@ class ScoochwormWanderGoal(
 		newDirection: Direction,
 		snapToEntry: Boolean
 	) {
-		support = newSupport
-		travelDirection = curveDirectionOntoSurface(newSupport, newDirection)
+		currentSupport = newSupport
+		movementDirection = curveDirectionOntoSurface(newSupport, newDirection)
 		transitionTicks = TRANSITION_TICKS
 		scoochworm.noPhysics = true
-		scoochworm.isTraversingSurfaceCorner = true
+		scoochworm.isTurningAroundCorner = true
 		scoochworm.attachToSupport(newSupport.supportPosition, newSupport.supportDirection)
 		snapToSurface(newSupport)
 		if (snapToEntry) {
@@ -174,13 +174,13 @@ class ScoochwormWanderGoal(
 	): Vec3 {
 		val newSurfaceNormal = newSupport.supportDirection.normal.toVec3()
 
-		val directionAlongCorner = travelDirection.subtract(
-			newSurfaceNormal.scale(travelDirection.dot(newSurfaceNormal))
+		val directionAlongCorner = movementDirection.subtract(
+			newSurfaceNormal.scale(movementDirection.dot(newSurfaceNormal))
 		)
 
 		// Preserve the part of the old motion aimed into the corner, but redirect it onto
 		// the new surface so the turn keeps the same general speed and heading.
-		val directionIntoCorner = abs(travelDirection.dot(newSurfaceNormal))
+		val directionIntoCorner = abs(movementDirection.dot(newSurfaceNormal))
 
 		val directionAroundCorner = newDirection.normal.toVec3()
 			.scale(directionIntoCorner)
@@ -199,11 +199,11 @@ class ScoochwormWanderGoal(
 				handOffToStem(nextSupport)
 				transitionTicks = 0
 				scoochworm.noPhysics = false
-				scoochworm.isTraversingSurfaceCorner = false
+				scoochworm.isTurningAroundCorner = false
 				return
 			}
 
-			support = nextSupport
+			this.currentSupport = nextSupport
 			scoochworm.attachToSupport(nextSupport.supportPosition, nextSupport.supportDirection)
 		}
 
@@ -211,13 +211,13 @@ class ScoochwormWanderGoal(
 		transitionTicks--
 		if (transitionTicks == 0) {
 			scoochworm.noPhysics = false
-			scoochworm.isTraversingSurfaceCorner = false
+			scoochworm.isTurningAroundCorner = false
 		}
 	}
 
 	private fun handOffToStem(stemSupport: ScoochwormSupport) {
-		support = stemSupport
-		scoochworm.surfaceTravelDirection = travelDirection
+		currentSupport = stemSupport
+		scoochworm.rememberedMovementDirection = movementDirection
 		scoochworm.attachToSupport(stemSupport.supportPosition, stemSupport.supportDirection)
 		snapToSurface(stemSupport)
 		scoochworm.deltaMovement = Vec3.ZERO
@@ -225,7 +225,7 @@ class ScoochwormWanderGoal(
 
 	private fun move(movement: Vec3) {
 		scoochworm.deltaMovement = movement
-		scoochworm.yRot = Mth.atan2(-travelDirection.x, travelDirection.z)
+		scoochworm.yRot = Mth.atan2(-movementDirection.x, movementDirection.z)
 			.times(Mth.RAD_TO_DEG)
 			.toFloat()
 		scoochworm.yBodyRot = scoochworm.yRot
@@ -234,7 +234,7 @@ class ScoochwormWanderGoal(
 	private fun getInitialDirection(supportDirection: Direction): Vec3 {
 		val minimumDirectionLengthSquared = 0.000001
 
-		val rememberedDirection = scoochworm.surfaceTravelDirection
+		val rememberedDirection = scoochworm.rememberedMovementDirection
 		if (rememberedDirection != null) {
 			val projected = projectOntoSurface(rememberedDirection, supportDirection)
 			if (projected.lengthSqr() > minimumDirectionLengthSquared) return projected.normalize()
@@ -294,9 +294,9 @@ class ScoochwormWanderGoal(
 		val probeDistance = ScoochwormEntity.SIZE / 2.0 + SUPPORT_PROBE_DISTANCE
 		// Push the probe to the leading corner on every axis tangent to the current surface.
 		val leadingOffset = Vec3(
-			if (supportAxis == Direction.Axis.X) 0.0 else Mth.sign(travelDirection.x) * probeDistance,
-			if (supportAxis == Direction.Axis.Y) 0.0 else Mth.sign(travelDirection.y) * probeDistance,
-			if (supportAxis == Direction.Axis.Z) 0.0 else Mth.sign(travelDirection.z) * probeDistance
+			if (supportAxis == Direction.Axis.X) 0.0 else Mth.sign(movementDirection.x) * probeDistance,
+			if (supportAxis == Direction.Axis.Y) 0.0 else Mth.sign(movementDirection.y) * probeDistance,
+			if (supportAxis == Direction.Axis.Z) 0.0 else Mth.sign(movementDirection.z) * probeDistance
 		)
 		val leadingPosition = nextPosition.add(leadingOffset)
 		return getCrossedDirection(currentSupport, leadingPosition)
@@ -347,14 +347,14 @@ class ScoochwormWanderGoal(
 		scoochworm.setPos(snappedCenter.subtract(0.0, ScoochwormEntity.SIZE / 2.0, 0.0))
 	}
 
-	private fun snapToEntryEdge(newSupport: ScoochwormSupport, travelDirection: Direction) {
+	private fun snapToEntryEdge(newSupport: ScoochwormSupport, movementDirection: Direction) {
 		val blockCenter = Vec3.atCenterOf(newSupport.supportPosition)
 		val currentCenter = scoochworm.position().add(0.0, ScoochwormEntity.SIZE / 2.0, 0.0)
 
 		val surfaceClearance = 0.001
 		val entryOffset = 0.5 + ScoochwormEntity.SIZE / 2.0 + surfaceClearance
 
-		val direction = travelDirection.normal
+		val direction = movementDirection.normal
 		val entryCenter = Vec3(
 			if (direction.x == 0) currentCenter.x else blockCenter.x - direction.x * entryOffset,
 			if (direction.y == 0) currentCenter.y else blockCenter.y - direction.y * entryOffset,

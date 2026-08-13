@@ -41,11 +41,11 @@ sealed class ScoochwormAttachment(
 	fun save(): CompoundTag {
 		synchronizeItemStack()
 
-		val maybeTag = CODEC
+		val encodedTag = CODEC
 			.encodeStart(NbtOps.INSTANCE, itemStack)
 			.result()
 
-		return maybeTag
+		return encodedTag
 			.map { it as CompoundTag }
 			.orElseGet(::CompoundTag)
 	}
@@ -86,9 +86,9 @@ sealed class ScoochwormAttachment(
 		fun predictInteraction(
 			player: Player,
 			heldStack: ItemStack,
-			currentType: ScoochwormAttachmentType
+			attachmentType: ScoochwormAttachmentType
 		): InteractionResult {
-			return when (currentType) {
+			return when (attachmentType) {
 				ScoochwormAttachmentType.NONE -> {
 					if (canAttach(heldStack)) InteractionResult.SUCCESS else InteractionResult.PASS
 				}
