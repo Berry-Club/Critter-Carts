@@ -105,6 +105,7 @@ class ScoochwormSegments(
 	}
 
 	fun update(path: ScoochwormPath) {
+		// Each segment samples the same head path at a progressively larger distance.
 		for (partIndex in segments.indices) {
 			val segment = segments[partIndex]
 			val pathPoint = path.getPoint(getPartDistance(partIndex))

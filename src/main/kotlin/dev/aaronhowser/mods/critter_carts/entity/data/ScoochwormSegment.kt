@@ -5,11 +5,7 @@ import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isItem
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.nextRange
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormPartEntity
-import dev.aaronhowser.mods.critter_carts.entity.data.attachment.AttachmentInteractionResult
-import dev.aaronhowser.mods.critter_carts.entity.data.attachment.NoAttachment
-import dev.aaronhowser.mods.critter_carts.entity.data.attachment.ScoochwormAttachment
-import dev.aaronhowser.mods.critter_carts.entity.data.attachment.ScoochwormAttachmentType
-import dev.aaronhowser.mods.critter_carts.entity.data.attachment.WickerBasketAttachment
+import dev.aaronhowser.mods.critter_carts.entity.data.attachment.*
 import dev.aaronhowser.mods.critter_carts.registry.ModEntityTypes
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.sounds.SoundEvents
@@ -22,10 +18,14 @@ import net.minecraft.world.item.Items
 import net.minecraft.world.level.gameevent.GameEvent
 import net.minecraft.world.phys.Vec3
 
+// The segment is the actual thing that gets saved to the head entity
+// It holds the attachment etc
 class ScoochwormSegment {
 
 	private var attachment: ScoochwormAttachment = NoAttachment()
 
+	// The segment owns the entity, not the other way around
+	// The entity doesn't even save anything, actually
 	var bodyPart: ScoochwormPartEntity? = null
 		private set
 
@@ -116,6 +116,7 @@ class ScoochwormSegment {
 			AttachmentInteractionResult.Consume -> InteractionResult.CONSUME
 
 			is AttachmentInteractionResult.Install -> {
+				// Store a single-item copy in the attachment before consuming the held stack.
 				installAttachment(result.itemStack, player, bodyPart)
 				heldStack.consume(1, player)
 				InteractionResult.CONSUME

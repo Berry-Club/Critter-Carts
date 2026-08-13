@@ -37,6 +37,9 @@ class ScoochwormPath(
 		val iterator = positions.iterator()
 		var positionCloserToHead = iterator.next()
 
+		// Keep going to more and more distant points
+		// until it finds one that's farther
+		// then lerp it
 		while (iterator.hasNext()) {
 			val positionFartherFromHead = iterator.next()
 			val segmentLength = positionCloserToHead.position.distanceTo(positionFartherFromHead.position)

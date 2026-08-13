@@ -95,6 +95,8 @@ class ScoochwormEntity(
 
 		if (isClientSide || !isTryingToMove) return
 
+		// Record the path that the head has traveled,
+		// and then set each segment to be a set distance from the head along that path
 		movementPath.record(position(), supportDirection, yRot)
 		bodySegments.update(movementPath)
 

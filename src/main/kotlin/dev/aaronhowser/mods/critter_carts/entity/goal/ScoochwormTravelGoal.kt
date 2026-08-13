@@ -50,6 +50,8 @@ class ScoochwormTravelGoal(
 
 		val targetPosition = cornerPosition ?: getEntityPosition(target)
 		val displacement = scoochworm.position().vectorTo(targetPosition)
+		// Only check how far the worm has left to move along its current path. Sideways
+		// distance does not matter because the worm moves around a corner one step at a time.
 		val distanceToTarget = displacement
 			.dot(direction.normal.toVec3())
 
@@ -105,6 +107,9 @@ class ScoochwormTravelGoal(
 		val fromPosition = getEntityPosition(from)
 		val toPosition = getEntityPosition(to)
 
+		// When turning upwards or downwards, first move to the corner where the two paths
+		// meet. From there, move onto the new side. This stops the worm from taking a
+		// diagonal shortcut through the blocks.
 		val corner = when (approachDirection.axis) {
 			Direction.Axis.X -> Vec3(toPosition.x, fromPosition.y, fromPosition.z)
 			Direction.Axis.Y -> Vec3(fromPosition.x, toPosition.y, fromPosition.z)
@@ -154,33 +159,37 @@ class ScoochwormTravelGoal(
 			}
 		}
 
-		val diagonalStem = forwardPosition.relative(supportDirection.opposite)
-		val climbingSurface = ScoochwormSupport(
-			diagonalStem,
+		// There is no stem to move to ahead, left, or right on this side. First try to
+		// turn upwards onto the side in front of the worm.
+		val upperForwardPosition = forwardPosition.relative(supportDirection.opposite)
+		val upwardTurnSurface = ScoochwormSupport(
+			upperForwardPosition,
 			forward
 		)
 
 		if (
 			isTravelSurface(forwardPosition, supportDirection)
-			&& isTraversableSurface(climbingSurface)
+			&& isTraversableSurface(upwardTurnSurface)
 		) {
-			return climbingSurface
+			return upwardTurnSurface
 		}
 
-		val adjoiningSurface = ScoochwormSupport(
+		val nearbyUpwardTurnSurface = ScoochwormSupport(
 			supportPosition.relative(supportDirection.opposite),
 			forward
 		)
 
-		if (isTraversableSurface(adjoiningSurface)) return adjoiningSurface
+		if (isTraversableSurface(nearbyUpwardTurnSurface)) return nearbyUpwardTurnSurface
 
-		val wrappingSurface = ScoochwormSupport(supportPosition, forward.opposite)
+		val downwardTurnSurface = ScoochwormSupport(supportPosition, forward.opposite)
+		// If the worm cannot turn upwards, try turning downwards around the edge. It passes
+		// through both blocks in front during this turn, so both blocks need to be clear.
 		if (
-			isTravelSurface(wrappingSurface)
+			isTravelSurface(downwardTurnSurface)
 			&& hasNoCollision(forwardPosition)
-			&& hasNoCollision(diagonalStem)
+			&& hasNoCollision(upperForwardPosition)
 		) {
-			return wrappingSurface
+			return downwardTurnSurface
 		}
 
 		return null
@@ -249,6 +258,7 @@ class ScoochwormTravelGoal(
 		if (!isTravelSurface(surface)) return false
 
 		val position = getEntityPosition(surface)
+		// Move a copy of the worm's hitbox to the target and make sure it fits there.
 		val bounds = scoochworm.boundingBox.move(
 			position.x - scoochworm.x,
 			position.y - scoochworm.y,
@@ -318,6 +328,8 @@ class ScoochwormTravelGoal(
 		val first = if (clockwise) supportDirection.normal else direction.normal
 		val second = if (clockwise) direction.normal else supportDirection.normal
 
+		// Use the path and the side holding the worm to find left or right. This works the
+		// same way on a floor, wall, or ceiling.
 		return Direction.fromDelta(
 			first.y * second.z - first.z * second.y,
 			first.z * second.x - first.x * second.z,

@@ -15,6 +15,7 @@ import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityDimensions
 import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
@@ -157,6 +158,8 @@ class ScoochwormPartEntity(
 		this.lerpSteps = lerpSteps
 	}
 
+	// I don't really understand this but it's similar to how it's done in LivingEntity
+	// Or something.
 	private fun tickInterpolation() {
 		if (lerpSteps <= 0) return
 
