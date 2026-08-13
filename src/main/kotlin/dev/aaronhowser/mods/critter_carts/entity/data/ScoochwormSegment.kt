@@ -41,7 +41,11 @@ class ScoochwormSegment {
 			this.bodyPart = bodyPart
 		}
 
-		bodyPart.moveAlongPath(pathPoint.position, pathPoint.supportDirection)
+		bodyPart.moveAlongPath(
+			pathPoint.position,
+			pathPoint.supportDirection,
+			pathPoint.forwardDirection
+		)
 	}
 
 	fun discardBodyPart() {
