@@ -10,6 +10,7 @@ import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormPartEntity
 import net.minecraft.client.renderer.entity.EntityRendererProvider
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.util.Mth
 import software.bernie.geckolib.renderer.GeoEntityRenderer
 
 class ScoochwormPartRenderer(
@@ -33,13 +34,16 @@ class ScoochwormPartRenderer(
 		partialTick: Float,
 		nativeScale: Float
 	) {
+		val interpolatedYaw = Mth.rotLerp(
+			partialTick,
+			animatable.yRotO,
+			animatable.yRot
+		)
+
 		ScoochwormRenderer.applyRotations(
 			poseStack,
-			animatable.previousSupportDirection,
-			animatable.previousForwardDirection,
 			animatable.supportDirection,
-			animatable.forwardDirection,
-			partialTick
+			interpolatedYaw
 		)
 	}
 
