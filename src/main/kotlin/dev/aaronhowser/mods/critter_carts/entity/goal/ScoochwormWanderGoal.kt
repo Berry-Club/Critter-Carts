@@ -332,7 +332,7 @@ class ScoochwormWanderGoal(
 	}
 
 	private fun snapToSurface(newSupport: ScoochwormSupport) {
-		val blockCenter = Vec3.atCenterOf(newSupport.supportPosition)
+		val blockCenter = newSupport.supportPosition.center
 		val normal = newSupport.supportDirection.normal.toVec3()
 		val desiredCenter = blockCenter.subtract(
 			normal.scale(0.5 + ScoochwormEntity.SIZE / 2.0)
@@ -348,7 +348,7 @@ class ScoochwormWanderGoal(
 	}
 
 	private fun snapToEntryEdge(newSupport: ScoochwormSupport, movementDirection: Direction) {
-		val blockCenter = Vec3.atCenterOf(newSupport.supportPosition)
+		val blockCenter = newSupport.supportPosition.center
 		val currentCenter = scoochworm.position().add(0.0, ScoochwormEntity.SIZE / 2.0, 0.0)
 
 		val surfaceClearance = 0.001

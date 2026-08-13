@@ -288,7 +288,7 @@ class ScoochwormTravelGoal(
 	}
 
 	private fun getPositionOnSupport(support: ScoochwormSupport): Vec3 {
-		val blockCenter = Vec3.atCenterOf(support.supportPosition)
+		val blockCenter = support.supportPosition.center
 		val center = blockCenter.subtract(
 			support.supportDirection.normal
 				.toVec3()
