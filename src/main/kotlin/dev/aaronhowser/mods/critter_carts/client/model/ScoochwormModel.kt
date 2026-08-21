@@ -29,17 +29,15 @@ class ScoochwormModel : DefaultedEntityGeoModel<ScoochwormEntity>(
 		val headYaw = Mth.rotLerp(partialTick, animatable.yHeadRotO, animatable.yHeadRot)
 
 		val worldLookDirection = Vec3.directionFromRotation(entityData.headPitch, headYaw)
-		val localLookDirection = getLocalLookDirection(
-			worldLookDirection,
-			animatable.supportDirection,
-			bodyYaw
-		)
+		val localLookDirection = getLocalLookDirection(worldLookDirection, animatable.supportDirection, bodyYaw)
+
 		val isAttachedToWall = animatable.supportDirection.axis != Direction.Axis.Y
 		val horizontalLookDirection = if (isAttachedToWall) {
 			localLookDirection.x
 		} else {
 			-localLookDirection.x
 		}
+
 		val verticalLookDirection = if (isAttachedToWall) {
 			localLookDirection.y
 		} else {
