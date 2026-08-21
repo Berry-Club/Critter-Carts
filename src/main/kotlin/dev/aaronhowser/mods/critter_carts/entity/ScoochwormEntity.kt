@@ -32,6 +32,8 @@ import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.PathfinderMob
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier
 import net.minecraft.world.entity.ai.attributes.Attributes
+import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal
+import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
@@ -82,6 +84,8 @@ class ScoochwormEntity(
 	override fun registerGoals() {
 		goalSelector.addGoal(0, ScoochwormTravelGoal(this))
 		goalSelector.addGoal(1, ScoochwormWanderGoal(this))
+		goalSelector.addGoal(2, LookAtPlayerGoal(this, Player::class.java, 6f))
+		goalSelector.addGoal(3, RandomLookAroundGoal(this))
 	}
 
 	override fun aiStep() {
