@@ -37,6 +37,7 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.gameevent.GameEvent
 import net.minecraft.world.level.material.PushReaction
 import net.minecraft.world.phys.Vec3
@@ -235,6 +236,17 @@ class ScoochwormEntity(
 	}
 
 	// Collision
+
+	override fun checkFallDamage(
+		yMovement: Double,
+		onGround: Boolean,
+		blockState: BlockState,
+		blockPosition: BlockPos
+	) {
+		if (onGround && supportPosition != null) fallDistance = 0f
+
+		super.checkFallDamage(yMovement, onGround, blockState, blockPosition)
+	}
 
 	override fun canCollideWith(entity: Entity): Boolean {
 		return when (entity) {
