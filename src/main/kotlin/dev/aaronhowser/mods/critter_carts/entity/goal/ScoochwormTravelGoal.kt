@@ -131,68 +131,84 @@ class ScoochwormTravelGoal(
 	}
 
 	private fun chooseNextSupport(support: ScoochwormSupport, forward: Direction): ScoochwormSupport? {
-		val supportPosition = support.supportPosition
-		val supportDirection = support.supportDirection
+		return tryMoveForward(support, forward)
+			?: tryTurnAlongSurface(support, forward)
+			?: tryTurnUpwards(support, forward)
+			?: tryTurnDownwards(support, forward)
+	}
 
-		val forwardPosition = supportPosition.relative(forward)
-		val forwardSupport = support.copy(supportPosition = forwardPosition)
-
-		if (canMoveOnto(forwardSupport)) return forwardSupport
-
-		val left = turnAlongSurface(forward, supportDirection, false)
-		val right = turnAlongSurface(forward, supportDirection, true)
-
-		val leftPosition = supportPosition.relative(left)
-		val rightPosition = supportPosition.relative(right)
-
-		val leftSupport = support.copy(supportPosition = leftPosition)
-		val rightSupport = support.copy(supportPosition = rightPosition)
-
-		val hasLeft = canMoveOnto(leftSupport)
-		val hasRight = canMoveOnto(rightSupport)
-
-		if (hasLeft || hasRight) {
-			return when {
-				hasLeft && hasRight -> if (scoochworm.random.nextBoolean()) leftSupport else rightSupport
-				hasLeft -> leftSupport
-				else -> rightSupport
-			}
-		}
-
-		// There is no stem to move to ahead, left, or right on this side. First try to
-		// turn upwards onto the side in front of the worm.
-		val upperForwardPosition = forwardPosition.relative(supportDirection.opposite)
-		val upwardTurnSupport = ScoochwormSupport(
-			upperForwardPosition,
-			forward
+	private fun tryMoveForward(
+		support: ScoochwormSupport,
+		forward: Direction
+	): ScoochwormSupport? {
+		val forwardSupport = support.copy(
+			supportPosition = support.supportPosition.relative(forward)
 		)
 
-		if (
-			isStemSupport(forwardPosition, supportDirection)
-			&& canMoveOnto(upwardTurnSupport)
-		) {
-			return upwardTurnSupport
+		return if (canMoveOnto(forwardSupport)) forwardSupport else null
+	}
+
+	private fun tryTurnAlongSurface(
+		support: ScoochwormSupport,
+		forward: Direction
+	): ScoochwormSupport? {
+		val left = turnAlongSurface(forward, support.supportDirection, false)
+		val right = turnAlongSurface(forward, support.supportDirection, true)
+		val leftSupport = support.copy(
+			supportPosition = support.supportPosition.relative(left)
+		)
+		val rightSupport = support.copy(
+			supportPosition = support.supportPosition.relative(right)
+		)
+		val canTurnLeft = canMoveOnto(leftSupport)
+		val canTurnRight = canMoveOnto(rightSupport)
+
+		return when {
+			canTurnLeft && canTurnRight -> if (scoochworm.random.nextBoolean()) leftSupport else rightSupport
+			canTurnLeft -> leftSupport
+			canTurnRight -> rightSupport
+			else -> null
 		}
+	}
+
+	private fun tryTurnUpwards(
+		support: ScoochwormSupport,
+		forward: Direction
+	): ScoochwormSupport? {
+		val upperForwardPosition = support.supportPosition
+			.relative(forward)
+			.relative(support.supportDirection.opposite)
+
+		val upwardTurnSupport = ScoochwormSupport(upperForwardPosition, forward)
+
+		if (canMoveOnto(upwardTurnSupport)) return upwardTurnSupport
 
 		val nearbyUpwardTurnSupport = ScoochwormSupport(
-			supportPosition.relative(supportDirection.opposite),
+			support.supportPosition.relative(support.supportDirection.opposite),
 			forward
 		)
 
-		if (canMoveOnto(nearbyUpwardTurnSupport)) return nearbyUpwardTurnSupport
+		return if (canMoveOnto(nearbyUpwardTurnSupport)) nearbyUpwardTurnSupport else null
+	}
 
-		val downwardTurnSupport = ScoochwormSupport(supportPosition, forward.opposite)
-		// If the worm cannot turn upwards, try turning downwards around the edge. It passes
-		// through both blocks in front during this turn, so both blocks need to be clear.
-		if (
-			isStemSupport(downwardTurnSupport)
-			&& hasNoCollision(forwardPosition)
-			&& hasNoCollision(upperForwardPosition)
-		) {
-			return downwardTurnSupport
-		}
+	private fun tryTurnDownwards(
+		support: ScoochwormSupport,
+		forward: Direction
+	): ScoochwormSupport? {
+		val downwardTurnSupport = ScoochwormSupport(
+			support.supportPosition,
+			forward.opposite
+		)
 
-		return null
+		if (!isStemSupport(downwardTurnSupport)) return null
+
+		val forwardPosition = support.supportPosition.relative(forward)
+		if (!hasNoCollision(forwardPosition)) return null
+
+		val upperForwardPosition = forwardPosition.relative(support.supportDirection.opposite)
+		if (!hasNoCollision(upperForwardPosition)) return null
+
+		return downwardTurnSupport
 	}
 
 	private fun requestMovement() {
