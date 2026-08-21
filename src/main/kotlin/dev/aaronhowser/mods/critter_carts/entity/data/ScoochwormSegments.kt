@@ -32,15 +32,57 @@ class ScoochwormSegments(
 		}
 	}
 
-	fun removeFrom(partIndex: Int) {
-		if (!contains(partIndex)) return
+	fun canSplitAt(partIndex: Int): Boolean {
+		return partIndex in MIN_COUNT until segments.lastIndex
+	}
 
-		val remainingCount = partIndex.coerceAtLeast(MIN_COUNT)
+	fun splitAt(partIndex: Int): ScoochwormEntity? {
+		if (!canSplitAt(partIndex)) return null
 
-		while (segments.size > remainingCount) {
-			val segment = segments.removeLast()
-			segment.dropAttachmentItem(scoochworm)
-			segment.discardBodyPart()
+		val previousTail = segments.last()
+		val previousTailBodyPart = previousTail.bodyPart ?: return null
+		val newHeadPosition = previousTailBodyPart.position()
+		val newSupportDirection = previousTailBodyPart.supportDirection
+		val newYaw = previousTailBodyPart.yRot + 180f
+
+		val transferredSegments = segments
+			.subList(partIndex, segments.lastIndex)
+			.asReversed()
+			.toList()
+
+		val newPathPoints = mutableListOf(
+			ScoochwormPathPoint(newHeadPosition, newSupportDirection)
+		)
+
+		for (segmentIndex in segments.lastIndex - 1 downTo partIndex) {
+			val bodyPart = segments[segmentIndex].bodyPart ?: return null
+			val newPoint = ScoochwormPathPoint(bodyPart.position(), bodyPart.supportDirection)
+			newPathPoints.add(newPoint)
+		}
+
+		val newScoochworm = ScoochwormEntity.spawnFromSplit(
+			source = scoochworm,
+			headPosition = newHeadPosition,
+			supportDirection = newSupportDirection,
+			yaw = newYaw,
+			segments = transferredSegments,
+			pathPoints = newPathPoints
+		)
+
+		previousTail.dropAttachmentItem(scoochworm)
+		previousTail.discardBodyPart()
+		segments.subList(partIndex, segments.size).clear()
+
+		return newScoochworm
+	}
+
+	fun replaceWith(newSegments: List<ScoochwormSegment>) {
+		discard()
+		segments.clear()
+		segments.addAll(newSegments)
+
+		for (partIndex in segments.indices) {
+			segments[partIndex].reparentBodyPart(scoochworm, partIndex)
 		}
 	}
 
@@ -65,7 +107,7 @@ class ScoochwormSegments(
 			player,
 			hand,
 			heldStack,
-			onSheared = { removeFrom(partIndex) }
+			onSheared = { splitAt(partIndex) }
 		)
 	}
 

@@ -67,6 +67,14 @@ class ScoochwormPath(
 		points.clear()
 	}
 
+	fun setPoints(pathPoints: List<ScoochwormPathPoint>) {
+		points.clear()
+
+		for (pathPoint in pathPoints) {
+			points.addLast(pathPoint)
+		}
+	}
+
 	fun isEmpty(): Boolean = points.isEmpty()
 
 	fun save(): ListTag {

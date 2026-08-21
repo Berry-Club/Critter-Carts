@@ -5,14 +5,18 @@ import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isClientSide
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isItem
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isServerSide
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.nextRange
+import dev.aaronhowser.mods.aaron.misc.AaronExtensions.toVec3
 import dev.aaronhowser.mods.critter_carts.block.ScoochwormTravelBlock
 import dev.aaronhowser.mods.critter_carts.datagen.tag.ModBlockTagsProvider
 import dev.aaronhowser.mods.critter_carts.entity.control.ScoochwormMoveControl
 import dev.aaronhowser.mods.critter_carts.entity.data.ScoochwormPath
+import dev.aaronhowser.mods.critter_carts.entity.data.ScoochwormPathPoint
+import dev.aaronhowser.mods.critter_carts.entity.data.ScoochwormSegment
 import dev.aaronhowser.mods.critter_carts.entity.data.ScoochwormSegments
 import dev.aaronhowser.mods.critter_carts.entity.data.attachment.ScoochwormAttachmentType
 import dev.aaronhowser.mods.critter_carts.entity.goal.ScoochwormTravelGoal
 import dev.aaronhowser.mods.critter_carts.entity.goal.ScoochwormWanderGoal
+import dev.aaronhowser.mods.critter_carts.registry.ModEntityTypes
 import dev.aaronhowser.mods.critter_carts.registry.ModSoundEvents
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
@@ -200,6 +204,12 @@ class ScoochwormEntity(
 		val growResult = tryGrow(player, heldStack)
 		if (growResult != null) return growResult
 
+		if (heldStack.isItem(Items.SHEARS)) {
+			if (partIndex == null || !bodySegments.canSplitAt(partIndex)) {
+				return InteractionResult.PASS
+			}
+		}
+
 		if (partIndex == null || attachmentType == null) return InteractionResult.PASS
 
 		return bodySegments.interact(
@@ -300,6 +310,7 @@ class ScoochwormEntity(
 		private const val HEAD_FOOTSTEP_INDEX = -1
 		private const val FOOTSTEP_INTERVAL_TICKS = 3
 		private const val FOOTSTEP_CYCLE_PAUSE_TICKS = 40
+		private const val SUPPORT_PROBE_DISTANCE = 0.05
 
 		private const val SEGMENTS_TAG = "Segments"
 		private const val PATH_TAG = "Path"
@@ -324,6 +335,41 @@ class ScoochwormEntity(
 				ScoochwormEntity::class.java,
 				EntityDataSerializers.BOOLEAN
 			)
+
+		fun spawnFromSplit(
+			source: ScoochwormEntity,
+			headPosition: Vec3,
+			supportDirection: Direction,
+			yaw: Float,
+			segments: List<ScoochwormSegment>,
+			pathPoints: List<ScoochwormPathPoint>
+		): ScoochwormEntity {
+			val level = source.level()
+
+			val scoochworm = ScoochwormEntity(ModEntityTypes.SCOOCHWORM.get(), level)
+
+			scoochworm.moveTo(
+				headPosition.x,
+				headPosition.y,
+				headPosition.z,
+				yaw,
+				source.xRot
+			)
+
+			val supportPosition = getSupportBlockPosition(
+				headPosition,
+				supportDirection
+			)
+
+			scoochworm.attachToSupport(supportPosition, supportDirection)
+			level.addFreshEntity(scoochworm)
+
+			scoochworm.bodySegments.replaceWith(segments)
+			scoochworm.movementPath.setPoints(pathPoints)
+			scoochworm.isTryingToMove = source.isTryingToMove
+
+			return scoochworm
+		}
 
 		fun supportsScoochwormTravel(
 			level: Level,
@@ -350,6 +396,21 @@ class ScoochwormEntity(
 			if (blockState.isBlock(ModBlockTagsProvider.SUPPORTS_SCOOCHWORM_TRAVEL)) return false
 
 			return blockState.isFaceSturdy(level, position, attachmentFace)
+		}
+
+		fun getSupportBlockPosition(
+			position: Vec3,
+			supportDirection: Direction
+		): BlockPos {
+			// Entity positions are at their feet. Probe outward from the center far enough to
+			// land just inside the block that would be supporting this side of the worm.
+			val center = position.add(0.0, SIZE / 2.0, 0.0)
+			val probe = center.add(
+				supportDirection.normal.toVec3()
+					.scale(SIZE / 2.0 + SUPPORT_PROBE_DISTANCE)
+			)
+
+			return BlockPos.containing(probe)
 		}
 
 		fun getMovementYaw(

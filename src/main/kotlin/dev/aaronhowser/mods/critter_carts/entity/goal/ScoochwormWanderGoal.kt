@@ -257,14 +257,12 @@ class ScoochwormWanderGoal(
 	}
 
 	private fun getSupportAt(position: Vec3, supportDirection: Direction): ScoochwormSupport? {
-		// Entity positions are at their feet. Probe outward from the center far enough to
-		// land just inside the block that would be supporting this side of the worm.
-		val center = position.add(0.0, ScoochwormEntity.SIZE / 2.0, 0.0)
-		val probe = center.add(
-			supportDirection.normal.toVec3()
-				.scale(ScoochwormEntity.SIZE / 2.0 + SUPPORT_PROBE_DISTANCE)
+		val supportPosition = ScoochwormEntity.getSupportBlockPosition(
+			position,
+			supportDirection
 		)
-		val candidate = ScoochwormSupport(BlockPos.containing(probe), supportDirection)
+
+		val candidate = ScoochwormSupport(supportPosition, supportDirection)
 
 		return if (isAnySurface(candidate)) candidate else null
 	}
@@ -273,7 +271,11 @@ class ScoochwormWanderGoal(
 		currentSupport: ScoochwormSupport,
 		nextPosition: Vec3
 	): Direction? {
-		val nextSupport = getSupportBlockPosition(nextPosition, currentSupport.supportDirection)
+		val nextSupport = ScoochwormEntity.getSupportBlockPosition(
+			nextPosition,
+			currentSupport.supportDirection
+		)
+
 		val difference = nextSupport.subtract(currentSupport.supportPosition)
 		if (difference == BlockPos.ZERO) return null
 
@@ -300,15 +302,6 @@ class ScoochwormWanderGoal(
 		)
 		val leadingPosition = nextPosition.add(leadingOffset)
 		return getCrossedDirection(currentSupport, leadingPosition)
-	}
-
-	private fun getSupportBlockPosition(position: Vec3, supportDirection: Direction): BlockPos {
-		val center = position.add(0.0, ScoochwormEntity.SIZE / 2.0, 0.0)
-		val probe = center.add(
-			supportDirection.normal.toVec3()
-				.scale(ScoochwormEntity.SIZE / 2.0 + SUPPORT_PROBE_DISTANCE)
-		)
-		return BlockPos.containing(probe)
 	}
 
 	private fun getUpwardTurnSupport(

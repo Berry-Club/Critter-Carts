@@ -49,6 +49,10 @@ class ScoochwormSegment {
 		bodyPart = null
 	}
 
+	fun reparentBodyPart(scoochworm: ScoochwormEntity, partIndex: Int) {
+		bodyPart?.attachTo(scoochworm, partIndex, attachment.type)
+	}
+
 	private fun installAttachment(
 		itemStack: ItemStack,
 		player: Player,
