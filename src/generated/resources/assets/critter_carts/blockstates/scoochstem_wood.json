@@ -12,24 +12,12 @@
     },
     {
       "apply": {
-        "model": "critter_carts:block/scoochstem_side_rotated",
-        "x": 90
-      }
-    },
-    {
-      "apply": {
         "model": "critter_carts:block/scoochstem_side_disabled_rotated",
         "x": 90
       },
       "when": {
         "axis": "x",
         "down_disabled": "true"
-      }
-    },
-    {
-      "apply": {
-        "model": "critter_carts:block/scoochstem_side_disabled_rotated",
-        "x": 90
       }
     },
     {
@@ -44,24 +32,12 @@
     },
     {
       "apply": {
-        "model": "critter_carts:block/scoochstem_side",
-        "x": 90
-      }
-    },
-    {
-      "apply": {
         "model": "critter_carts:block/scoochstem_side_disabled",
         "x": 90
       },
       "when": {
         "axis": "y",
         "down_disabled": "true"
-      }
-    },
-    {
-      "apply": {
-        "model": "critter_carts:block/scoochstem_side_disabled",
-        "x": 90
       }
     },
     {
@@ -76,12 +52,6 @@
     },
     {
       "apply": {
-        "model": "critter_carts:block/scoochstem_side",
-        "x": 90
-      }
-    },
-    {
-      "apply": {
         "model": "critter_carts:block/scoochstem_side_disabled",
         "x": 90
       },
@@ -92,24 +62,12 @@
     },
     {
       "apply": {
-        "model": "critter_carts:block/scoochstem_side_disabled",
-        "x": 90
-      }
-    },
-    {
-      "apply": {
         "model": "critter_carts:block/scoochstem_side_rotated",
         "x": 270
       },
       "when": {
         "axis": "x",
         "up_disabled": "false"
-      }
-    },
-    {
-      "apply": {
-        "model": "critter_carts:block/scoochstem_side_rotated",
-        "x": 270
       }
     },
     {
@@ -124,24 +82,12 @@
     },
     {
       "apply": {
-        "model": "critter_carts:block/scoochstem_side_disabled_rotated",
-        "x": 270
-      }
-    },
-    {
-      "apply": {
         "model": "critter_carts:block/scoochstem_side",
         "x": 270
       },
       "when": {
         "axis": "y",
         "up_disabled": "false"
-      }
-    },
-    {
-      "apply": {
-        "model": "critter_carts:block/scoochstem_side",
-        "x": 270
       }
     },
     {
@@ -156,12 +102,6 @@
     },
     {
       "apply": {
-        "model": "critter_carts:block/scoochstem_side_disabled",
-        "x": 270
-      }
-    },
-    {
-      "apply": {
         "model": "critter_carts:block/scoochstem_side",
         "x": 270
       },
@@ -172,24 +112,12 @@
     },
     {
       "apply": {
-        "model": "critter_carts:block/scoochstem_side",
-        "x": 270
-      }
-    },
-    {
-      "apply": {
         "model": "critter_carts:block/scoochstem_side_disabled",
         "x": 270
       },
       "when": {
         "axis": "z",
         "up_disabled": "true"
-      }
-    },
-    {
-      "apply": {
-        "model": "critter_carts:block/scoochstem_side_disabled",
-        "x": 270
       }
     },
     {
@@ -203,21 +131,11 @@
     },
     {
       "apply": {
-        "model": "critter_carts:block/scoochstem_side_rotated"
-      }
-    },
-    {
-      "apply": {
         "model": "critter_carts:block/scoochstem_side_disabled_rotated"
       },
       "when": {
         "axis": "x",
         "north_disabled": "true"
-      }
-    },
-    {
-      "apply": {
-        "model": "critter_carts:block/scoochstem_side_disabled_rotated"
       }
     },
     {
@@ -231,21 +149,11 @@
     },
     {
       "apply": {
-        "model": "critter_carts:block/scoochstem_side"
-      }
-    },
-    {
-      "apply": {
         "model": "critter_carts:block/scoochstem_side_disabled"
       },
       "when": {
         "axis": "y",
         "north_disabled": "true"
-      }
-    },
-    {
-      "apply": {
-        "model": "critter_carts:block/scoochstem_side_disabled"
       }
     },
     {
@@ -259,11 +167,6 @@
     },
     {
       "apply": {
-        "model": "critter_carts:block/scoochstem_side_rotated"
-      }
-    },
-    {
-      "apply": {
         "model": "critter_carts:block/scoochstem_side_disabled_rotated"
       },
       "when": {
@@ -273,23 +176,12 @@
     },
     {
       "apply": {
-        "model": "critter_carts:block/scoochstem_side_disabled_rotated"
-      }
-    },
-    {
-      "apply": {
         "model": "critter_carts:block/scoochstem_side_rotated",
         "y": 180
       },
       "when": {
         "axis": "x",
         "south_disabled": "false"
-      }
-    },
-    {
-      "apply": {
-        "model": "critter_carts:block/scoochstem_side_rotated",
-        "y": 180
       }
     },
     {
@@ -304,24 +196,12 @@
     },
     {
       "apply": {
-        "model": "critter_carts:block/scoochstem_side_disabled_rotated",
-        "y": 180
-      }
-    },
-    {
-      "apply": {
         "model": "critter_carts:block/scoochstem_side",
         "y": 180
       },
       "when": {
         "axis": "y",
         "south_disabled": "false"
-      }
-    },
-    {
-      "apply": {
-        "model": "critter_carts:block/scoochstem_side",
-        "y": 180
       }
     },
     {
@@ -336,24 +216,12 @@
     },
     {
       "apply": {
-        "model": "critter_carts:block/scoochstem_side_disabled",
-        "y": 180
-      }
-    },
-    {
-      "apply": {
         "model": "critter_carts:block/scoochstem_side_rotated",
         "y": 180
       },
       "when": {
         "axis": "z",
         "south_disabled": "false"
-      }
-    },
-    {
-      "apply": {
-        "model": "critter_carts:block/scoochstem_side_rotated",
-        "y": 180
       }
     },
     {
@@ -368,24 +236,12 @@
     },
     {
       "apply": {
-        "model": "critter_carts:block/scoochstem_side_disabled_rotated",
-        "y": 180
-      }
-    },
-    {
-      "apply": {
         "model": "critter_carts:block/scoochstem_side_rotated",
         "y": 270
       },
       "when": {
         "axis": "x",
         "west_disabled": "false"
-      }
-    },
-    {
-      "apply": {
-        "model": "critter_carts:block/scoochstem_side_rotated",
-        "y": 270
       }
     },
     {
@@ -400,24 +256,12 @@
     },
     {
       "apply": {
-        "model": "critter_carts:block/scoochstem_side_disabled_rotated",
-        "y": 270
-      }
-    },
-    {
-      "apply": {
         "model": "critter_carts:block/scoochstem_side",
         "y": 270
       },
       "when": {
         "axis": "y",
         "west_disabled": "false"
-      }
-    },
-    {
-      "apply": {
-        "model": "critter_carts:block/scoochstem_side",
-        "y": 270
       }
     },
     {
@@ -432,24 +276,12 @@
     },
     {
       "apply": {
-        "model": "critter_carts:block/scoochstem_side_disabled",
-        "y": 270
-      }
-    },
-    {
-      "apply": {
         "model": "critter_carts:block/scoochstem_side_rotated",
         "y": 270
       },
       "when": {
         "axis": "z",
         "west_disabled": "false"
-      }
-    },
-    {
-      "apply": {
-        "model": "critter_carts:block/scoochstem_side_rotated",
-        "y": 270
       }
     },
     {
@@ -464,24 +296,12 @@
     },
     {
       "apply": {
-        "model": "critter_carts:block/scoochstem_side_disabled_rotated",
-        "y": 270
-      }
-    },
-    {
-      "apply": {
         "model": "critter_carts:block/scoochstem_side_rotated",
         "y": 90
       },
       "when": {
         "axis": "x",
         "east_disabled": "false"
-      }
-    },
-    {
-      "apply": {
-        "model": "critter_carts:block/scoochstem_side_rotated",
-        "y": 90
       }
     },
     {
@@ -496,24 +316,12 @@
     },
     {
       "apply": {
-        "model": "critter_carts:block/scoochstem_side_disabled_rotated",
-        "y": 90
-      }
-    },
-    {
-      "apply": {
         "model": "critter_carts:block/scoochstem_side",
         "y": 90
       },
       "when": {
         "axis": "y",
         "east_disabled": "false"
-      }
-    },
-    {
-      "apply": {
-        "model": "critter_carts:block/scoochstem_side",
-        "y": 90
       }
     },
     {
@@ -528,12 +336,6 @@
     },
     {
       "apply": {
-        "model": "critter_carts:block/scoochstem_side_disabled",
-        "y": 90
-      }
-    },
-    {
-      "apply": {
         "model": "critter_carts:block/scoochstem_side_rotated",
         "y": 90
       },
@@ -544,24 +346,12 @@
     },
     {
       "apply": {
-        "model": "critter_carts:block/scoochstem_side_rotated",
-        "y": 90
-      }
-    },
-    {
-      "apply": {
         "model": "critter_carts:block/scoochstem_side_disabled_rotated",
         "y": 90
       },
       "when": {
         "axis": "z",
         "east_disabled": "true"
-      }
-    },
-    {
-      "apply": {
-        "model": "critter_carts:block/scoochstem_side_disabled_rotated",
-        "y": 90
       }
     }
   ]
