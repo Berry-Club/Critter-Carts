@@ -8,7 +8,7 @@ enum class WormColor(color: String) {
 	RED("red"),
 	YELLOW("yellow"),
 	PURPLE("purple"),
-	LIGHT_BLUE("light_blue");
+	CYAN("cyan");
 
 	val headTexture = CritterCarts.modResource("textures/entity/scoochworm/$color/head.png")
 	val bodyTexture = CritterCarts.modResource("textures/entity/scoochworm/$color/body.png")
