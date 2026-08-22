@@ -2,7 +2,6 @@ package dev.aaronhowser.mods.critter_carts.datagen.model
 
 import dev.aaronhowser.mods.aaron.misc.AaronDsls.element
 import dev.aaronhowser.mods.aaron.misc.AaronDsls.face
-import dev.aaronhowser.mods.aaron.misc.AaronDsls.part
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.particle
 import dev.aaronhowser.mods.critter_carts.CritterCarts
 import dev.aaronhowser.mods.critter_carts.block.ScoochstemBlock
@@ -96,14 +95,14 @@ class ModBlockStateProvider(
 					}
 
 					multipartBuilder
-						.part {
-							modelFile(model)
-							rotationX(getFaceXRotation(direction))
-							rotationY(getFaceYRotation(direction))
-							addModel()
-								.condition(RotatedPillarBlock.AXIS, axis)
-								.condition(ScoochstemBlock.getDisabledProperty(direction), disabled)
-						}
+						.part()
+						.modelFile(model)
+						.rotationX(getFaceXRotation(direction))
+						.rotationY(getFaceYRotation(direction))
+						.addModel()
+						.condition(RotatedPillarBlock.AXIS, axis)
+						.condition(ScoochstemBlock.getDisabledProperty(direction), disabled)
+						.end()
 				}
 			}
 		}
