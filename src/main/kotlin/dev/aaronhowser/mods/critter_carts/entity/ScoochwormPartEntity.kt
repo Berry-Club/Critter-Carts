@@ -179,7 +179,7 @@ class ScoochwormPartEntity(
 		xRotO = xRot
 	}
 
-	// I don't really understand this but it's similar to how it's done in LivingEntity
+	// I don't really understand this, but it's similar to how it's done in LivingEntity
 	// Or something.
 	private fun tickInterpolation() {
 		if (lerpSteps <= 0) return
