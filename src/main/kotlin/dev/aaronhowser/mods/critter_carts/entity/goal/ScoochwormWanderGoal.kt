@@ -74,7 +74,9 @@ class ScoochwormWanderGoal(
 		// may be able to turn downwards onto the next side.
 		val edgeDirection = getCrossedDirection(currentSupport, nextPosition)
 		if (edgeDirection == null) {
-			move(movement)
+			if (!move(movement)) {
+				redirectFromCollision()
+			}
 			return
 		}
 
@@ -84,10 +86,11 @@ class ScoochwormWanderGoal(
 		)
 
 		if (isFreeSurface(downwardTurnSupport)) {
-			transitionTo(downwardTurnSupport, currentSupport.supportDirection, true)
+			if (!transitionTo(downwardTurnSupport, currentSupport.supportDirection, true)) {
+				redirectFromCollision()
+			}
 		} else {
-			movementDirection = movementDirection.scale(-1.0)
-			move(Vec3.ZERO)
+			redirectFromCollision()
 		}
 	}
 
@@ -130,18 +133,21 @@ class ScoochwormWanderGoal(
 			upwardTurnDirection
 		) ?: return false
 
-		transitionTo(
+		return transitionTo(
 			upwardTurnSupport,
 			currentSupport.supportDirection.opposite,
 			false
 		)
-
-		return true
 	}
 
 	private fun moveOntoSupport(nextSupport: ScoochwormSupport, movement: Vec3) {
 		if (isStem(nextSupport)) {
 			handOffToStem(nextSupport)
+			return
+		}
+
+		if (!canMove(movement)) {
+			redirectFromCollision()
 			return
 		}
 
@@ -154,18 +160,24 @@ class ScoochwormWanderGoal(
 		newSupport: ScoochwormSupport,
 		newDirection: Direction,
 		snapToEntry: Boolean
-	) {
+	): Boolean {
+		var destination = getPositionOnSurface(newSupport)
+		if (snapToEntry) {
+			destination = getPositionAtEntryEdge(destination, newSupport, newDirection)
+		}
+
+		if (!canOccupy(destination)) return false
+
 		currentSupport = newSupport
 		movementDirection = curveDirectionOntoSurface(newSupport, newDirection)
 		transitionTicks = TRANSITION_TICKS
-		scoochworm.noPhysics = true
+		scoochworm.noPhysics = false
 		scoochworm.isTurningAroundCorner = true
 		scoochworm.attachToSupport(newSupport.supportPosition, newSupport.supportDirection)
-		snapToSurface(newSupport)
-		if (snapToEntry) {
-			snapToEntryEdge(newSupport, newDirection)
-		}
+		scoochworm.setPos(destination)
 		move(Vec3.ZERO)
+
+		return true
 	}
 
 	private fun curveDirectionOntoSurface(
@@ -207,7 +219,13 @@ class ScoochwormWanderGoal(
 			scoochworm.attachToSupport(nextSupport.supportPosition, nextSupport.supportDirection)
 		}
 
-		move(movement)
+		if (!move(movement)) {
+			transitionTicks = 0
+			scoochworm.isTurningAroundCorner = false
+			redirectFromCollision()
+			return
+		}
+
 		transitionTicks--
 		if (transitionTicks == 0) {
 			scoochworm.noPhysics = false
@@ -223,12 +241,79 @@ class ScoochwormWanderGoal(
 		scoochworm.deltaMovement = Vec3.ZERO
 	}
 
-	private fun move(movement: Vec3) {
-		scoochworm.deltaMovement = movement
+	private fun move(movement: Vec3): Boolean {
+		val canMove = canMove(movement)
+		scoochworm.deltaMovement = if (canMove) movement else Vec3.ZERO
 		scoochworm.yRot = Mth.atan2(-movementDirection.x, movementDirection.z)
 			.times(Mth.RAD_TO_DEG)
 			.toFloat()
 		scoochworm.yBodyRot = scoochworm.yRot
+
+		return canMove
+	}
+
+	private fun redirectFromCollision() {
+		val support = currentSupport
+		if (support == null) {
+			move(Vec3.ZERO)
+			return
+		}
+
+		val surfaceNormal = support.supportDirection.normal.toVec3()
+		val movementSpeed = scoochworm.getAttributeValue(Attributes.MOVEMENT_SPEED)
+		val turnClockwiseFirst = scoochworm.random.nextBoolean()
+
+		var turnDegrees = COLLISION_TURN_STEP_DEGREES
+		while (turnDegrees <= MAXIMUM_COLLISION_TURN_DEGREES) {
+			val turnRadians = Math.toRadians(turnDegrees)
+			val firstAngle = if (turnClockwiseFirst) turnRadians else -turnRadians
+			val firstDirection = rotateAroundAxis(
+				movementDirection,
+				surfaceNormal,
+				firstAngle
+			).normalize()
+
+			if (canMove(firstDirection.scale(movementSpeed))) {
+				movementDirection = firstDirection
+				move(Vec3.ZERO)
+				return
+			}
+
+			val secondDirection = rotateAroundAxis(
+				movementDirection,
+				surfaceNormal,
+				-firstAngle
+			).normalize()
+
+			if (canMove(secondDirection.scale(movementSpeed))) {
+				movementDirection = secondDirection
+				move(Vec3.ZERO)
+				return
+			}
+
+			turnDegrees += COLLISION_TURN_STEP_DEGREES
+		}
+
+		move(Vec3.ZERO)
+	}
+
+	private fun canMove(movement: Vec3): Boolean {
+		if (movement == Vec3.ZERO) return true
+
+		val destinationBounds = scoochworm.boundingBox
+			.move(movement)
+			.deflate(COLLISION_TOLERANCE)
+
+		return scoochworm.level().noCollision(scoochworm, destinationBounds)
+	}
+
+	private fun canOccupy(position: Vec3): Boolean {
+		val offset = position.subtract(scoochworm.position())
+		val destinationBounds = scoochworm.boundingBox
+			.move(offset)
+			.deflate(COLLISION_TOLERANCE)
+
+		return scoochworm.level().noCollision(scoochworm, destinationBounds)
 	}
 
 	private fun getInitialDirection(supportDirection: Direction): Vec3 {
@@ -325,6 +410,10 @@ class ScoochwormWanderGoal(
 	}
 
 	private fun snapToSurface(newSupport: ScoochwormSupport) {
+		scoochworm.setPos(getPositionOnSurface(newSupport))
+	}
+
+	private fun getPositionOnSurface(newSupport: ScoochwormSupport): Vec3 {
 		val blockCenter = newSupport.supportPosition.center
 		val normal = newSupport.supportDirection.normal.toVec3()
 		val desiredCenter = blockCenter.subtract(
@@ -337,12 +426,16 @@ class ScoochwormWanderGoal(
 			if (normal.y == 0.0) currentCenter.y else desiredCenter.y,
 			if (normal.z == 0.0) currentCenter.z else desiredCenter.z
 		)
-		scoochworm.setPos(snappedCenter.subtract(0.0, ScoochwormEntity.SIZE / 2.0, 0.0))
+		return snappedCenter.subtract(0.0, ScoochwormEntity.SIZE / 2.0, 0.0)
 	}
 
-	private fun snapToEntryEdge(newSupport: ScoochwormSupport, movementDirection: Direction) {
+	private fun getPositionAtEntryEdge(
+		position: Vec3,
+		newSupport: ScoochwormSupport,
+		movementDirection: Direction
+	): Vec3 {
 		val blockCenter = newSupport.supportPosition.center
-		val currentCenter = scoochworm.position().add(0.0, ScoochwormEntity.SIZE / 2.0, 0.0)
+		val currentCenter = position.add(0.0, ScoochwormEntity.SIZE / 2.0, 0.0)
 
 		val surfaceClearance = 0.001
 		val entryOffset = 0.5 + ScoochwormEntity.SIZE / 2.0 + surfaceClearance
@@ -354,7 +447,7 @@ class ScoochwormWanderGoal(
 			if (direction.z == 0) currentCenter.z else blockCenter.z - direction.z * entryOffset
 		)
 
-		scoochworm.setPos(entryCenter.subtract(0.0, ScoochwormEntity.SIZE / 2.0, 0.0))
+		return entryCenter.subtract(0.0, ScoochwormEntity.SIZE / 2.0, 0.0)
 	}
 
 	private fun isStem(surface: ScoochwormSupport): Boolean {
@@ -390,5 +483,8 @@ class ScoochwormWanderGoal(
 		private const val TURN_INTERVAL_TICKS = 20
 		private const val TRANSITION_TICKS = 4
 		private const val SUPPORT_PROBE_DISTANCE = 0.05
+		private const val COLLISION_TOLERANCE = 0.001
+		private const val COLLISION_TURN_STEP_DEGREES = 5.0
+		private const val MAXIMUM_COLLISION_TURN_DEGREES = 90.0
 	}
 }
