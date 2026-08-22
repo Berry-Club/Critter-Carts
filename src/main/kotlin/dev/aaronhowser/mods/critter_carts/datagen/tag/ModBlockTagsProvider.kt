@@ -9,6 +9,7 @@ import net.minecraft.data.PackOutput
 import net.minecraft.tags.BlockTags
 import net.minecraft.tags.TagKey
 import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.Blocks
 import net.neoforged.neoforge.common.data.BlockTagsProvider
 import net.neoforged.neoforge.common.data.ExistingFileHelper
 import java.util.concurrent.CompletableFuture
@@ -20,6 +21,13 @@ class ModBlockTagsProvider(
 ) : BlockTagsProvider(output, lookupProvider, CritterCarts.MOD_ID, existingFileHelper) {
 
 	override fun addTags(provider: HolderLookup.Provider) {
+		tag(PREVENTS_SCOOCHWORM_WANDERING)
+			.addTag(BlockTags.ICE)
+			.add(
+				Blocks.SLIME_BLOCK,
+				Blocks.HONEY_BLOCK
+			)
+
 		tag(SUPPORTS_SCOOCHWORM_TRAVEL)
 			.add(
 				ModBlocks.SCOOCHSTEM,
@@ -50,6 +58,7 @@ class ModBlockTagsProvider(
 			TagKey.create(Registries.BLOCK, CritterCarts.modResource(name))
 
 		val SUPPORTS_SCOOCHWORM_TRAVEL = tk("supports_scoochworm_travel")
+		val PREVENTS_SCOOCHWORM_WANDERING = tk("prevents_scoochworm_wandering")
 	}
 
 }

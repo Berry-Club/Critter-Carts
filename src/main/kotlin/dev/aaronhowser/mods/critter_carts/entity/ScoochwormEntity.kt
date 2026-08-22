@@ -412,6 +412,7 @@ class ScoochwormEntity(
 		): Boolean {
 			val blockState = level.getBlockState(position)
 			if (blockState.isBlock(ModBlockTagsProvider.SUPPORTS_SCOOCHWORM_TRAVEL)) return false
+			if (blockState.isBlock(ModBlockTagsProvider.PREVENTS_SCOOCHWORM_WANDERING)) return false
 
 			return blockState.isFaceSturdy(level, position, attachmentFace)
 		}
