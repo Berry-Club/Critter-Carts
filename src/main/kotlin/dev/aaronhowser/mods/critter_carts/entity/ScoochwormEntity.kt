@@ -62,7 +62,7 @@ class ScoochwormEntity(
 	private val bodySegments = ScoochwormSegments(this)
 
 	private var footstepPartIndex = HEAD_FOOTSTEP_INDEX
-	private var nextFootstepTick = 0
+	private var nextFootstepTick = random.nextInt(FOOTSTEP_CYCLE_PAUSE_TICKS + 1)
 	var rememberedMovementDirection: Vec3? = null
 	var isTurningAroundCorner = false
 
