@@ -265,7 +265,7 @@ class ScoochwormEntity(
 	override fun isPushable(): Boolean = false
 	override fun isInWall(): Boolean = !isTurningAroundCorner && super.isInWall()
 	override fun isPushedByFluid(type: FluidType): Boolean = false
-	override fun getPistonPushReaction(): PushReaction = PushReaction.IGNORE
+	override fun getPistonPushReaction(): PushReaction = PushReaction.PUSH_ONLY
 	override fun knockback(strength: Double, x: Double, z: Double) {}
 	override fun push(entity: Entity) {}
 	override fun doPush(entity: Entity) {
