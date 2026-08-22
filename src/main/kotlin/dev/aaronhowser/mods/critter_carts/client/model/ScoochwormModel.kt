@@ -6,6 +6,7 @@ import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity
 import net.minecraft.core.Direction
 import net.minecraft.util.Mth
 import net.minecraft.world.phys.Vec3
+import org.joml.Quaternionf
 import org.joml.Vector3f
 import software.bernie.geckolib.animation.AnimationState
 import software.bernie.geckolib.constant.DataTickets
@@ -67,20 +68,30 @@ class ScoochwormModel : DefaultedEntityGeoModel<ScoochwormEntity>(
 		bodyYaw: Float
 	): Vector3f {
 		val lookDirection = worldLookDirection.toVector3f()
+		return getModelRotation(supportDirection, bodyYaw)
+			.conjugate()
+			.transform(lookDirection)
+	}
 
-		val modelRotation = when (supportDirection) {
-			Direction.DOWN -> Axis.YP.rotationDegrees(0f)
-			Direction.UP -> Axis.ZP.rotationDegrees(180f)
-			Direction.NORTH -> Axis.XP.rotationDegrees(90f)
-			Direction.SOUTH -> Axis.XP.rotationDegrees(-90f)
-			Direction.WEST -> Axis.ZP.rotationDegrees(-90f)
-			Direction.EAST -> Axis.ZP.rotationDegrees(90f)
+	companion object {
+		fun getModelRotation(
+			supportDirection: Direction,
+			bodyYaw: Float
+		): Quaternionf {
+			val modelRotation = when (supportDirection) {
+				Direction.DOWN -> Axis.YP.rotationDegrees(0f)
+				Direction.UP -> Axis.ZP.rotationDegrees(180f)
+				Direction.NORTH -> Axis.XP.rotationDegrees(90f)
+				Direction.SOUTH -> Axis.XP.rotationDegrees(-90f)
+				Direction.WEST -> Axis.ZP.rotationDegrees(-90f)
+				Direction.EAST -> Axis.ZP.rotationDegrees(90f)
+			}
+
+			val surfaceYaw = if (supportDirection == Direction.UP) -bodyYaw else bodyYaw
+			modelRotation.mul(Axis.YP.rotationDegrees(180f - surfaceYaw))
+
+			return modelRotation
 		}
-
-		val surfaceYaw = if (supportDirection == Direction.UP) -bodyYaw else bodyYaw
-		modelRotation.mul(Axis.YP.rotationDegrees(180f - surfaceYaw))
-
-		return modelRotation.conjugate().transform(lookDirection)
 	}
 
 }

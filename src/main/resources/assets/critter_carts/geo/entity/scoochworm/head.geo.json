@@ -47,7 +47,6 @@
 				},
 				{
 					"name": "face",
-					"parent": "bb_main",
 					"pivot": [0, 0, 0],
 					"cubes": [
 						{

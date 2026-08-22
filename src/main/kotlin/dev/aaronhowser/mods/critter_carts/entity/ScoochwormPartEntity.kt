@@ -65,6 +65,24 @@ class ScoochwormPartEntity(
 		return level().getEntity(parentId) as? ScoochwormEntity
 	}
 
+	fun getPartInFront(): Entity? {
+		if (partIndex == 0) return getScoochworm()
+
+		val nearbyParts = level().getEntitiesOfClass(
+			ScoochwormPartEntity::class.java,
+			boundingBox.inflate(ScoochwormEntity.PART_SPACING * 2)
+		)
+
+		for (nearbyPart in nearbyParts) {
+			if (nearbyPart.parentId != parentId) continue
+			if (nearbyPart.partIndex != partIndex - 1) continue
+
+			return nearbyPart
+		}
+
+		return null
+	}
+
 	fun attachTo(
 		parentEntity: ScoochwormEntity,
 		partIndex: Int,
