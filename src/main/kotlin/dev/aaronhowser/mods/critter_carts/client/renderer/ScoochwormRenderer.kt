@@ -2,7 +2,6 @@ package dev.aaronhowser.mods.critter_carts.client.renderer
 
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.math.Axis
-import dev.aaronhowser.mods.critter_carts.CritterCarts
 import dev.aaronhowser.mods.critter_carts.client.model.ScoochwormModel
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity
 import net.minecraft.client.renderer.entity.EntityRendererProvider
@@ -19,7 +18,9 @@ class ScoochwormRenderer(
 		withScale(ScoochwormEntity.SIZE)
 	}
 
-	override fun getTextureLocation(animatable: ScoochwormEntity): ResourceLocation = TEXTURE
+	override fun getTextureLocation(animatable: ScoochwormEntity): ResourceLocation {
+		return animatable.color.headTexture
+	}
 
 	override fun applyRotations(
 		animatable: ScoochwormEntity,
@@ -43,7 +44,6 @@ class ScoochwormRenderer(
 	}
 
 	companion object {
-		val TEXTURE: ResourceLocation = CritterCarts.modResource("textures/entity/scoochworm/head.png")
 		private const val ROTATION_CENTER = ScoochwormEntity.SIZE / 2.0
 
 		fun applyRotations(
