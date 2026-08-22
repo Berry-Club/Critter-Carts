@@ -1,12 +1,15 @@
 package dev.aaronhowser.mods.critter_carts.entity.goal
 
+import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isBlock
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.toVec3
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity
+import dev.aaronhowser.mods.critter_carts.datagen.tag.ModBlockTagsProvider
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.util.Mth
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.entity.ai.goal.Goal
+import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
 import java.util.*
 import kotlin.math.abs
@@ -62,6 +65,11 @@ class ScoochwormWanderGoal(
 
 		if (transitionTicks > 0) {
 			continueTransition(currentSupport, nextPosition, movement)
+			return
+		}
+
+		if (hasAvoidedSupport(nextPosition, currentSupport.supportDirection)) {
+			redirectFromCollision()
 			return
 		}
 
@@ -166,7 +174,7 @@ class ScoochwormWanderGoal(
 			destination = getPositionAtEntryEdge(destination, newSupport, newDirection)
 		}
 
-		if (!canOccupy(destination)) return false
+		if (!canOccupy(destination, newSupport.supportDirection)) return false
 
 		currentSupport = newSupport
 		movementDirection = curveDirectionOntoSurface(newSupport, newDirection)
@@ -300,20 +308,73 @@ class ScoochwormWanderGoal(
 	private fun canMove(movement: Vec3): Boolean {
 		if (movement == Vec3.ZERO) return true
 
+		val destination = scoochworm.position().add(movement)
+		if (hasAvoidedSupport(destination, scoochworm.supportDirection)) return false
+
 		val destinationBounds = scoochworm.boundingBox
 			.move(movement)
 			.deflate(COLLISION_TOLERANCE)
 
-		return scoochworm.level().noCollision(scoochworm, destinationBounds)
+		return canOccupy(destinationBounds)
 	}
 
-	private fun canOccupy(position: Vec3): Boolean {
+	private fun canOccupy(position: Vec3, supportDirection: Direction): Boolean {
+		if (hasAvoidedSupport(position, supportDirection)) return false
+
 		val offset = position.subtract(scoochworm.position())
 		val destinationBounds = scoochworm.boundingBox
 			.move(offset)
 			.deflate(COLLISION_TOLERANCE)
 
-		return scoochworm.level().noCollision(scoochworm, destinationBounds)
+		return canOccupy(destinationBounds)
+	}
+
+	private fun hasAvoidedSupport(
+		position: Vec3,
+		supportDirection: Direction
+	): Boolean {
+		val offset = position.subtract(scoochworm.position())
+		val supportProbe = supportDirection.normal.toVec3()
+			.scale(SUPPORT_PROBE_DISTANCE)
+		val supportBounds = scoochworm.boundingBox
+			.move(offset)
+			.deflate(COLLISION_TOLERANCE)
+			.expandTowards(supportProbe)
+		val minimumPosition = BlockPos.containing(
+			supportBounds.minX,
+			supportBounds.minY,
+			supportBounds.minZ
+		)
+		val maximumPosition = BlockPos.containing(
+			supportBounds.maxX,
+			supportBounds.maxY,
+			supportBounds.maxZ
+		)
+
+		for (supportPosition in BlockPos.betweenClosed(minimumPosition, maximumPosition)) {
+			val blockState = scoochworm.level().getBlockState(supportPosition)
+			if (blockState.isBlock(ModBlockTagsProvider.PREVENTS_SCOOCHWORM_WANDERING)) {
+				return true
+			}
+		}
+
+		return false
+	}
+
+	private fun canOccupy(bounds: AABB): Boolean {
+		if (!scoochworm.level().noCollision(scoochworm, bounds)) return false
+
+		val minimumPosition = BlockPos.containing(bounds.minX, bounds.minY, bounds.minZ)
+		val maximumPosition = BlockPos.containing(bounds.maxX, bounds.maxY, bounds.maxZ)
+
+		for (position in BlockPos.betweenClosed(minimumPosition, maximumPosition)) {
+			val blockState = scoochworm.level().getBlockState(position)
+			if (blockState.isBlock(ModBlockTagsProvider.PREVENTS_SCOOCHWORM_WANDERING)) {
+				return false
+			}
+		}
+
+		return true
 	}
 
 	private fun getInitialDirection(supportDirection: Direction): Vec3 {
