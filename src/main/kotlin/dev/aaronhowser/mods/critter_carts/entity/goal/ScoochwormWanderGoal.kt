@@ -65,30 +65,20 @@ class ScoochwormWanderGoal(
 			return
 		}
 
-		if (tryTurningUpwards(currentSupport, nextPosition)) return
+		if (tryMoveForward(currentSupport, nextPosition, movement)) return
 
-		val nextSupport = getSupportAt(nextPosition, currentSupport.supportDirection)
-		if (nextSupport != null) return moveOntoSupport(nextSupport, movement)
-
-		// Crossing into another block without finding support means we reached an edge and
-		// may be able to turn downwards onto the next side.
 		val edgeDirection = getCrossedDirection(currentSupport, nextPosition)
 		if (edgeDirection == null) {
 			move(movement)
 			return
 		}
 
-		val downwardTurnSupport = ScoochwormSupport(
-			currentSupport.supportPosition,
-			edgeDirection.opposite
-		)
+		if (tryTurnAlongSurface(currentSupport, edgeDirection)) return
+		if (tryTurnUpwards(currentSupport, edgeDirection)) return
+		if (tryTurnDownwards(currentSupport, edgeDirection)) return
 
-		if (isFreeSurface(downwardTurnSupport)) {
-			transitionTo(downwardTurnSupport, currentSupport.supportDirection, true)
-		} else {
-			movementDirection = movementDirection.scale(-1.0)
-			move(Vec3.ZERO)
-		}
+		movementDirection = movementDirection.scale(-1.0)
+		move(Vec3.ZERO)
 	}
 
 	override fun stop() {
@@ -117,24 +107,88 @@ class ScoochwormWanderGoal(
 		nextTurnTick = scoochworm.tickCount + TURN_INTERVAL_TICKS
 	}
 
-	private fun tryTurningUpwards(
+	private fun tryMoveForward(
 		currentSupport: ScoochwormSupport,
-		nextPosition: Vec3
+		nextPosition: Vec3,
+		movement: Vec3
 	): Boolean {
-		val upwardTurnDirection = getUpwardTurnDirection(
-			currentSupport,
-			nextPosition
-		) ?: return false
-		val upwardTurnSupport = getUpwardTurnSupport(
-			currentSupport,
-			upwardTurnDirection
-		) ?: return false
+		val nextSupport = getSupportAt(nextPosition, currentSupport.supportDirection)
+		if (nextSupport == null) return false
 
-		transitionTo(
-			upwardTurnSupport,
-			currentSupport.supportDirection.opposite,
-			false
+		moveOntoSupport(nextSupport, movement)
+		return true
+	}
+
+	private fun tryTurnAlongSurface(
+		support: ScoochwormSupport,
+		forward: Direction
+	): Boolean {
+		val left = turnAlongSurface(forward, support.supportDirection, false)
+		val right = turnAlongSurface(forward, support.supportDirection, true)
+		val leftSupport = support.copy(
+			supportPosition = support.supportPosition.relative(left)
 		)
+		val rightSupport = support.copy(
+			supportPosition = support.supportPosition.relative(right)
+		)
+		val canTurnLeft = isAnySurface(leftSupport)
+		val canTurnRight = isAnySurface(rightSupport)
+
+		val turnDirection = when {
+			canTurnLeft && canTurnRight -> if (scoochworm.random.nextBoolean()) left else right
+			canTurnLeft -> left
+			canTurnRight -> right
+			else -> return false
+		}
+
+		movementDirection = turnDirection.normal.toVec3()
+		move(Vec3.ZERO)
+		return true
+	}
+
+	private fun tryTurnUpwards(
+		support: ScoochwormSupport,
+		forward: Direction
+	): Boolean {
+		val upperForwardPosition = support.supportPosition
+			.relative(forward)
+			.relative(support.supportDirection.opposite)
+		val upwardTurnSupport = ScoochwormSupport(upperForwardPosition, forward)
+
+		if (isAnySurface(upwardTurnSupport)) {
+			transitionTo(upwardTurnSupport, support.supportDirection.opposite, false)
+			return true
+		}
+
+		val nearbyUpwardTurnSupport = ScoochwormSupport(
+			support.supportPosition.relative(support.supportDirection.opposite),
+			forward
+		)
+
+		if (!isAnySurface(nearbyUpwardTurnSupport)) return false
+
+		transitionTo(nearbyUpwardTurnSupport, support.supportDirection.opposite, false)
+		return true
+	}
+
+	private fun tryTurnDownwards(
+		support: ScoochwormSupport,
+		forward: Direction
+	): Boolean {
+		val downwardTurnSupport = ScoochwormSupport(
+			support.supportPosition,
+			forward.opposite
+		)
+
+		if (!isAnySurface(downwardTurnSupport)) return false
+
+		val forwardPosition = support.supportPosition.relative(forward)
+		if (!hasNoCollision(forwardPosition)) return false
+
+		val upperForwardPosition = forwardPosition.relative(support.supportDirection.opposite)
+		if (!hasNoCollision(upperForwardPosition)) return false
+
+		transitionTo(downwardTurnSupport, support.supportDirection, true)
 
 		return true
 	}
@@ -288,33 +342,6 @@ class ScoochwormWanderGoal(
 		return if (direction.axis == currentSupport.supportDirection.axis) null else direction
 	}
 
-	private fun getUpwardTurnDirection(
-		currentSupport: ScoochwormSupport,
-		nextPosition: Vec3
-	): Direction? {
-		val supportAxis = currentSupport.supportDirection.axis
-		val probeDistance = ScoochwormEntity.SIZE / 2.0 + SUPPORT_PROBE_DISTANCE
-		// Push the probe to the leading corner on every axis tangent to the current surface.
-		val leadingOffset = Vec3(
-			if (supportAxis == Direction.Axis.X) 0.0 else Mth.sign(movementDirection.x) * probeDistance,
-			if (supportAxis == Direction.Axis.Y) 0.0 else Mth.sign(movementDirection.y) * probeDistance,
-			if (supportAxis == Direction.Axis.Z) 0.0 else Mth.sign(movementDirection.z) * probeDistance
-		)
-		val leadingPosition = nextPosition.add(leadingOffset)
-		return getCrossedDirection(currentSupport, leadingPosition)
-	}
-
-	private fun getUpwardTurnSupport(
-		currentSupport: ScoochwormSupport,
-		crossedDirection: Direction
-	): ScoochwormSupport? {
-		val upwardTurnPosition = currentSupport.supportPosition
-			.relative(currentSupport.supportDirection.opposite)
-			.relative(crossedDirection)
-		val upwardTurnSupport = ScoochwormSupport(upwardTurnPosition, crossedDirection)
-		return if (isAnySurface(upwardTurnSupport)) upwardTurnSupport else null
-	}
-
 	private fun findCurrentSupport(): ScoochwormSupport? {
 		for (supportDirection in Direction.entries) {
 			val candidate = getSupportAt(scoochworm.position(), supportDirection) ?: continue
@@ -377,6 +404,28 @@ class ScoochwormWanderGoal(
 		return isStem(surface) || isFreeSurface(surface)
 	}
 
+	private fun hasNoCollision(position: BlockPos): Boolean {
+		val level = scoochworm.level()
+		return level.getBlockState(position)
+			.getCollisionShape(level, position)
+			.isEmpty
+	}
+
+	private fun turnAlongSurface(
+		direction: Direction,
+		supportDirection: Direction,
+		clockwise: Boolean
+	): Direction {
+		val first = if (clockwise) supportDirection.normal else direction.normal
+		val second = if (clockwise) direction.normal else supportDirection.normal
+
+		return Direction.fromDelta(
+			first.y * second.z - first.z * second.y,
+			first.z * second.x - first.x * second.z,
+			first.x * second.y - first.y * second.x
+		) ?: direction
+	}
+
 	private fun rotateAroundAxis(vector: Vec3, axis: Vec3, angle: Double): Vec3 {
 		val cosine = Mth.cos(angle.toFloat()).toDouble()
 		val sine = Mth.sin(angle.toFloat()).toDouble()
@@ -389,6 +438,5 @@ class ScoochwormWanderGoal(
 	companion object {
 		private const val TURN_INTERVAL_TICKS = 20
 		private const val TRANSITION_TICKS = 4
-		private const val SUPPORT_PROBE_DISTANCE = 0.05
 	}
 }
