@@ -1,6 +1,8 @@
 package dev.aaronhowser.mods.critter_carts.entity.goal
 
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isBlock
+import dev.aaronhowser.mods.aaron.misc.AaronExtensions.toDegrees
+import dev.aaronhowser.mods.aaron.misc.AaronExtensions.toRadians
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.toVec3
 import dev.aaronhowser.mods.critter_carts.datagen.tag.ModBlockTagsProvider
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity
@@ -13,6 +15,8 @@ import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
 import java.util.*
 import kotlin.math.abs
+import kotlin.math.cos
+import kotlin.math.sin
 
 class ScoochwormWanderGoal(
 	private val scoochworm: ScoochwormEntity
@@ -247,9 +251,7 @@ class ScoochwormWanderGoal(
 	private fun move(movement: Vec3): Boolean {
 		val canMove = canMove(movement)
 		scoochworm.deltaMovement = if (canMove) movement else Vec3.ZERO
-		scoochworm.yRot = Mth.atan2(-movementDirection.x, movementDirection.z)
-			.times(Mth.RAD_TO_DEG)
-			.toFloat()
+		scoochworm.yRot = Mth.atan2(-movementDirection.x, movementDirection.z).toDegrees().toFloat()
 		scoochworm.yBodyRot = scoochworm.yRot
 
 		return canMove
@@ -268,7 +270,7 @@ class ScoochwormWanderGoal(
 
 		var turnDegrees = COLLISION_TURN_STEP_DEGREES
 		while (turnDegrees <= MAXIMUM_COLLISION_TURN_DEGREES) {
-			val turnRadians = Math.toRadians(turnDegrees)
+			val turnRadians = turnDegrees.toRadians()
 			val turnSigns = doubleArrayOf(firstTurnSign, -firstTurnSign)
 
 			for (turnSign in turnSigns) {
@@ -503,8 +505,8 @@ class ScoochwormWanderGoal(
 	}
 
 	private fun rotateAroundAxis(vector: Vec3, axis: Vec3, angle: Double): Vec3 {
-		val cosine = Mth.cos(angle.toFloat()).toDouble()
-		val sine = Mth.sin(angle.toFloat()).toDouble()
+		val cosine = cos(angle)
+		val sine = sin(angle)
 		// Rodrigues' formula lets the same wandering turn work on every surface orientation.
 		return vector.scale(cosine)
 			.add(axis.cross(vector).scale(sine))
