@@ -18,4 +18,10 @@ object ModBlocks : AaronBlockRegistry() {
 		registerBlock("scoochstem") {
 			ScoochstemBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_LOG))
 		}
+
+	val SCOOCHSTEM_WOOD: DeferredBlock<ScoochstemBlock> =
+		registerBlock("scoochstem_wood") {
+			ScoochstemBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_WOOD))
+		}
+
 }

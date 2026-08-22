@@ -1,6 +1,7 @@
 package dev.aaronhowser.mods.critter_carts.datagen.tag
 
 import dev.aaronhowser.mods.critter_carts.CritterCarts
+import dev.aaronhowser.mods.critter_carts.registry.ModBlocks
 import net.minecraft.core.HolderLookup
 import net.minecraft.data.PackOutput
 import net.minecraft.data.tags.ItemTagsProvider
@@ -20,7 +21,20 @@ class ModItemTagsProvider(
 ) : ItemTagsProvider(output, lookupProvider, blockTags, CritterCarts.MOD_ID, existingFileHelper) {
 
 	override fun addTags(provider: HolderLookup.Provider) {
-		tag(SCOOCHWORM_SADDLES).add(Items.SADDLE)
+		tag(SCOOCHWORM_SADDLES)
+			.add(Items.SADDLE)
+
+		tag(ItemTags.LOGS)
+			.add(
+				ModBlocks.SCOOCHSTEM.asItem(),
+				ModBlocks.SCOOCHSTEM_WOOD.asItem()
+			)
+
+		tag(ItemTags.LOGS_THAT_BURN)
+			.add(
+				ModBlocks.SCOOCHSTEM.asItem(),
+				ModBlocks.SCOOCHSTEM_WOOD.asItem()
+			)
 	}
 
 	companion object {

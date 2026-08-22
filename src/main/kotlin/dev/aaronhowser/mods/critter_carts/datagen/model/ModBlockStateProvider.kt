@@ -21,6 +21,10 @@ class ModBlockStateProvider(
 ) : BlockStateProvider(output, CritterCarts.MOD_ID, existingFileHelper) {
 
 	override fun registerStatesAndModels() {
+		scoochstem()
+	}
+
+	private fun scoochstem() {
 		val scoochstem = ModBlocks.SCOOCHSTEM.get()
 		val side = CritterCarts.modResource("block/scoochstem/side")
 		val sideDisabled = CritterCarts.modResource("block/scoochstem/side_disabled")
@@ -68,6 +72,46 @@ class ModBlockStateProvider(
 			.particle(side)
 
 		simpleBlockItem(scoochstem, itemModel)
+
+		scoochstemWood(sideModels, disabledSideModels, side)
+	}
+
+	private fun scoochstemWood(
+		sideModels: Pair<BlockModelBuilder, BlockModelBuilder>,
+		disabledSideModels: Pair<BlockModelBuilder, BlockModelBuilder>,
+		sideTexture: ResourceLocation
+	) {
+		val scoochstemWood = ModBlocks.SCOOCHSTEM_WOOD.get()
+		val multipartBuilder = getMultipartBuilder(scoochstemWood)
+
+		for (direction in Direction.entries) {
+			for (axis in Direction.Axis.entries) {
+				for (disabled in listOf(false, true)) {
+					val faceModels = if (disabled) disabledSideModels else sideModels
+					val model = if (shouldRotateTexture(axis, direction)) {
+						faceModels.second
+					} else {
+						faceModels.first
+					}
+
+					multipartBuilder
+						.part()
+						.modelFile(model)
+						.rotationX(getFaceXRotation(direction))
+						.rotationY(getFaceYRotation(direction))
+						.addModel()
+						.condition(RotatedPillarBlock.AXIS, axis)
+						.condition(ScoochstemBlock.getDisabledProperty(direction), disabled)
+						.end()
+				}
+			}
+		}
+
+		val itemModel = models()
+			.cubeAll("scoochstem_wood", sideTexture)
+			.particle(sideTexture)
+
+		simpleBlockItem(scoochstemWood, itemModel)
 	}
 
 	private fun scoochstemFaceModels(

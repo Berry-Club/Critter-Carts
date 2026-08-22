@@ -16,6 +16,7 @@ class ModLanguageProvider(
 		ModMenuLang.add(this)
 
 		addBlock(ModBlocks.SCOOCHSTEM, "Scoochstem")
+		addBlock(ModBlocks.SCOOCHSTEM_WOOD, "Scoochstem Wood")
 		addEntityType(ModEntityTypes.SCOOCHWORM, "Scoochworm")
 		add(ModSoundEvents.SCOOCHWORM_FOOTSTEP_SUBTITLE, "Scoochworm scooches")
 	}

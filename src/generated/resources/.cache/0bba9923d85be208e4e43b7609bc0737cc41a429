@@ -1,5 +1,6 @@
-// 1.21.1	2026-08-09T00:06:00.8583228	Block States: critter_carts
+// 1.21.1	2026-08-21T19:12:09.9764562	Block States: critter_carts
 96540a8301f714c23667d81e7cdd2abdae7c812e assets/critter_carts/blockstates/scoochstem.json
+1988afa83a6b1fb0fe41919a404a645457cea0f3 assets/critter_carts/blockstates/scoochstem_wood.json
 6d4304da88ce88d851448a6c7fe7cd627ad2de1d assets/critter_carts/models/block/scoochstem.json
 e2f95d39eb95ed5d0e9288d76e7c65d1bd9efa05 assets/critter_carts/models/block/scoochstem_side.json
 0c0b6d0e576cb6e106f239988f01f196fbeb38ca assets/critter_carts/models/block/scoochstem_side_disabled.json
@@ -9,4 +10,6 @@ bc7404f358931a02b0e02daa5a4d2b5959763c0d assets/critter_carts/models/block/scooc
 0fcce34d2bacf28300cb8f436ca6b37b22e26047 assets/critter_carts/models/block/scoochstem_top_disabled.json
 e615cdb97f1818da7143cc1fbb1275d7e778e7fe assets/critter_carts/models/block/scoochstem_top_disabled_rotated.json
 d465b29baf5538f07383c4d0a51058877bd7ec16 assets/critter_carts/models/block/scoochstem_top_rotated.json
+bf4eefb09000c766a343de5d9598178daf2a41b7 assets/critter_carts/models/block/scoochstem_wood.json
 aa925f31dbadd99e8810eafb13156d8a40f6f2cb assets/critter_carts/models/item/scoochstem.json
+31aaf815f55e84c30cc002483ec2ad96ae113a6a assets/critter_carts/models/item/scoochstem_wood.json

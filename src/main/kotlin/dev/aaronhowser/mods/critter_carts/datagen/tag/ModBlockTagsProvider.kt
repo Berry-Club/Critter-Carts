@@ -21,11 +21,28 @@ class ModBlockTagsProvider(
 
 	override fun addTags(provider: HolderLookup.Provider) {
 		tag(SUPPORTS_SCOOCHWORM_TRAVEL)
-			.add(ModBlocks.SCOOCHSTEM)
+			.add(
+				ModBlocks.SCOOCHSTEM,
+				ModBlocks.SCOOCHSTEM_WOOD
+			)
 
-		tag(BlockTags.MINEABLE_WITH_AXE).add(ModBlocks.SCOOCHSTEM.get())
-		tag(BlockTags.LOGS).add(ModBlocks.SCOOCHSTEM.get())
-		tag(BlockTags.LOGS_THAT_BURN).add(ModBlocks.SCOOCHSTEM.get())
+		tag(BlockTags.MINEABLE_WITH_AXE)
+			.add(
+				ModBlocks.SCOOCHSTEM,
+				ModBlocks.SCOOCHSTEM_WOOD
+			)
+
+		tag(BlockTags.LOGS)
+			.add(
+				ModBlocks.SCOOCHSTEM,
+				ModBlocks.SCOOCHSTEM_WOOD
+			)
+
+		tag(BlockTags.LOGS_THAT_BURN)
+			.add(
+				ModBlocks.SCOOCHSTEM,
+				ModBlocks.SCOOCHSTEM_WOOD
+			)
 	}
 
 	companion object {
