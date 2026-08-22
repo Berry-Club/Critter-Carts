@@ -13,6 +13,7 @@ import dev.aaronhowser.mods.critter_carts.entity.data.ScoochwormPath
 import dev.aaronhowser.mods.critter_carts.entity.data.ScoochwormPathPoint
 import dev.aaronhowser.mods.critter_carts.entity.data.ScoochwormSegment
 import dev.aaronhowser.mods.critter_carts.entity.data.ScoochwormSegments
+import dev.aaronhowser.mods.critter_carts.entity.data.WormColor
 import dev.aaronhowser.mods.critter_carts.entity.data.attachment.ScoochwormAttachmentType
 import dev.aaronhowser.mods.critter_carts.entity.goal.ScoochwormLookAtMelonGoal
 import dev.aaronhowser.mods.critter_carts.entity.goal.ScoochwormTravelGoal
@@ -81,6 +82,13 @@ class ScoochwormEntity(
 	var isTryingToMove: Boolean
 		get() = entityData.get(DATA_IS_TRYING_TO_MOVE)
 		private set(value) = entityData.set(DATA_IS_TRYING_TO_MOVE, value)
+
+	var color: WormColor
+		get() = WormColor.fromOrdinal(entityData.get(DATA_COLOR))
+		set(value) {
+			entityData.set(DATA_COLOR, value.ordinal)
+			bodySegments.updateColor(value)
+		}
 
 	override fun registerGoals() {
 		goalSelector.addGoal(0, ScoochwormTravelGoal(this))
@@ -188,6 +196,11 @@ class ScoochwormEntity(
 	// Interaction
 
 	override fun mobInteract(player: Player, hand: InteractionHand): InteractionResult {
+		if (player.isShiftKeyDown) {
+			if (isServerSide) color = color.next()
+			return InteractionResult.sidedSuccess(isClientSide)
+		}
+
 		val heldStack = player.getItemInHand(hand)
 		val growResult = tryGrow(player, heldStack)
 		if (growResult != null) return growResult
@@ -280,6 +293,7 @@ class ScoochwormEntity(
 		builder.define(DATA_SUPPORT_DIRECTION, Direction.DOWN)
 		builder.define(DATA_SUPPORT_POSITION, Optional.empty())
 		builder.define(DATA_IS_TRYING_TO_MOVE, false)
+		builder.define(DATA_COLOR, WormColor.GREEN.ordinal)
 	}
 
 	override fun readAdditionalSaveData(tag: CompoundTag) {
@@ -288,6 +302,7 @@ class ScoochwormEntity(
 		movementPath.load(tag.getList(PATH_TAG, CompoundTag.TAG_COMPOUND.toInt()))
 		bodySegments.load(tag.getList(SEGMENTS_TAG, CompoundTag.TAG_COMPOUND.toInt()))
 		isTryingToMove = tag.getBoolean(TRYING_TO_MOVE_TAG)
+		color = WormColor.fromOrdinal(tag.getInt(COLOR_TAG))
 
 		supportDirection = Direction.from3DDataValue(tag.getInt(SUPPORT_DIRECTION_TAG))
 		supportPosition = if (tag.contains(SUPPORT_POSITION_TAG)) {
@@ -306,6 +321,7 @@ class ScoochwormEntity(
 		tag.put(PATH_TAG, movementPath.save())
 		tag.put(SEGMENTS_TAG, bodySegments.save())
 		tag.putBoolean(TRYING_TO_MOVE_TAG, isTryingToMove)
+		tag.putInt(COLOR_TAG, color.ordinal)
 		tag.putInt(SUPPORT_DIRECTION_TAG, supportDirection.get3DDataValue())
 
 		val currentSupportPosition = supportPosition
@@ -335,6 +351,7 @@ class ScoochwormEntity(
 		private const val TRYING_TO_MOVE_TAG = "Moving"
 		private const val SUPPORT_DIRECTION_TAG = "AttachmentBottom"
 		private const val SUPPORT_POSITION_TAG = "AttachmentPosition"
+		private const val COLOR_TAG = "Color"
 
 		private val DATA_SUPPORT_DIRECTION: EntityDataAccessor<Direction> =
 			SynchedEntityData.defineId(
@@ -352,6 +369,12 @@ class ScoochwormEntity(
 			SynchedEntityData.defineId(
 				ScoochwormEntity::class.java,
 				EntityDataSerializers.BOOLEAN
+			)
+
+		private val DATA_COLOR: EntityDataAccessor<Int> =
+			SynchedEntityData.defineId(
+				ScoochwormEntity::class.java,
+				EntityDataSerializers.INT
 			)
 
 		fun spawnFromSplit(
@@ -385,6 +408,7 @@ class ScoochwormEntity(
 			scoochworm.bodySegments.replaceWith(segments)
 			scoochworm.movementPath.setPoints(pathPoints)
 			scoochworm.isTryingToMove = source.isTryingToMove
+			scoochworm.color = source.color
 
 			return scoochworm
 		}

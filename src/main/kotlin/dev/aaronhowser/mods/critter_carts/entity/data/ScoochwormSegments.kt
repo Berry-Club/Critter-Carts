@@ -146,6 +146,13 @@ class ScoochwormSegments(
 		return getSegment(partIndex)?.bodyPart
 	}
 
+	fun updateColor(color: WormColor) {
+		for (segment in segments) {
+			val bodyPart = segment.bodyPart ?: continue
+			bodyPart.color = color
+		}
+	}
+
 	fun update(path: ScoochwormPath) {
 		// Each segment samples the same head path at a progressively larger distance.
 		for (partIndex in segments.indices) {

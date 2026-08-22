@@ -1,6 +1,7 @@
 package dev.aaronhowser.mods.critter_carts.entity
 
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isClientSide
+import dev.aaronhowser.mods.critter_carts.entity.data.WormColor
 import dev.aaronhowser.mods.critter_carts.entity.data.attachment.ScoochwormAttachmentType
 import dev.aaronhowser.mods.critter_carts.registry.ModEntityDataSerializers
 import net.minecraft.core.Direction
@@ -54,6 +55,10 @@ class ScoochwormPartEntity(
 		get() = entityData.get(DATA_ATTACHMENT_TYPE)
 		set(value) = entityData.set(DATA_ATTACHMENT_TYPE, value)
 
+	var color: WormColor
+		get() = WormColor.fromOrdinal(entityData.get(DATA_COLOR))
+		set(value) = entityData.set(DATA_COLOR, value.ordinal)
+
 	var supportDirection: Direction
 		get() = entityData.get(DATA_BOTTOM_DIRECTION)
 		private set(value) = entityData.set(DATA_BOTTOM_DIRECTION, value)
@@ -88,6 +93,7 @@ class ScoochwormPartEntity(
 		this.parentId = parentEntity.id
 		this.partIndex = partIndex
 		this.attachmentType = attachmentType
+		color = parentEntity.color
 	}
 
 	// Movement
@@ -222,6 +228,7 @@ class ScoochwormPartEntity(
 		builder.define(DATA_PART_INDEX, 0)
 		builder.define(DATA_ATTACHMENT_TYPE, ScoochwormAttachmentType.NONE)
 		builder.define(DATA_BOTTOM_DIRECTION, Direction.DOWN)
+		builder.define(DATA_COLOR, WormColor.GREEN.ordinal)
 	}
 
 	override fun readAdditionalSaveData(tag: CompoundTag) {}
@@ -255,6 +262,12 @@ class ScoochwormPartEntity(
 			SynchedEntityData.defineId(
 				ScoochwormPartEntity::class.java,
 				EntityDataSerializers.DIRECTION
+			)
+
+		private val DATA_COLOR: EntityDataAccessor<Int> =
+			SynchedEntityData.defineId(
+				ScoochwormPartEntity::class.java,
+				EntityDataSerializers.INT
 			)
 	}
 
