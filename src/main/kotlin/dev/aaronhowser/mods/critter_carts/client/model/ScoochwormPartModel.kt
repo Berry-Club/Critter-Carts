@@ -46,7 +46,7 @@ class ScoochwormPartModel : DefaultedEntityGeoModel<ScoochwormPartEntity>(
 			.transform(worldOffset.toVector3f())
 
 		val modelScale = MODEL_PIXELS_PER_BLOCK / ScoochwormEntity.SIZE
-		connection.posX = localOffset.x * modelScale / 2f
+		connection.posX = -localOffset.x * modelScale / 2f
 		connection.posY = localOffset.y * modelScale / 2f
 		connection.posZ = localOffset.z * modelScale / 2f
 	}
