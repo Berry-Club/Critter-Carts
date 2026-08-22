@@ -8,7 +8,6 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData
-import net.minecraft.util.Mth
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
 import net.minecraft.world.damagesource.DamageSource
@@ -36,8 +35,6 @@ class ScoochwormPartEntity(
 	private var lerpX = 0.0
 	private var lerpY = 0.0
 	private var lerpZ = 0.0
-	private var lerpYRot = 0.0
-	private var lerpXRot = 0.0
 
 	init {
 		noPhysics = true
@@ -174,9 +171,12 @@ class ScoochwormPartEntity(
 		lerpX = x
 		lerpY = y
 		lerpZ = z
-		lerpYRot = yRot.toDouble()
-		lerpXRot = xRot.toDouble()
 		this.lerpSteps = lerpSteps
+
+		this.yRot = yRot
+		this.xRot = xRot
+		yRotO = yRot
+		xRotO = xRot
 	}
 
 	// I don't really understand this but it's similar to how it's done in LivingEntity
@@ -187,9 +187,6 @@ class ScoochwormPartEntity(
 		val x = x + (lerpX - x) / lerpSteps
 		val y = y + (lerpY - y) / lerpSteps
 		val z = z + (lerpZ - z) / lerpSteps
-
-		yRot += Mth.wrapDegrees(lerpYRot - yRot).toFloat() / lerpSteps
-		xRot += ((lerpXRot - xRot) / lerpSteps).toFloat()
 
 		lerpSteps--
 		setPos(x, y, z)
@@ -242,7 +239,6 @@ class ScoochwormPartEntity(
 		private const val NO_PARENT = -1
 		private const val MAX_MISSING_PARENT_TICKS = 20
 		private const val MINIMUM_MOVEMENT_DISTANCE_SQUARED = 0.000001
-
 		private val DATA_PARENT_ID: EntityDataAccessor<Int> =
 			SynchedEntityData.defineId(ScoochwormPartEntity::class.java, EntityDataSerializers.INT)
 
