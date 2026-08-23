@@ -1,6 +1,12 @@
 {
-  "parent": "minecraft:block/cube_all",
+  "parent": "minecraft:block/cube",
   "textures": {
-    "all": "minecraft:block/green_wool"
+    "down": "critter_carts:block/scoochstem/top",
+    "east": "critter_carts:block/colored_scoochstem/green",
+    "north": "critter_carts:block/colored_scoochstem/green",
+    "particle": "critter_carts:block/colored_scoochstem/green",
+    "south": "critter_carts:block/colored_scoochstem/green",
+    "up": "critter_carts:block/scoochstem/top",
+    "west": "critter_carts:block/colored_scoochstem/green"
   }
 }

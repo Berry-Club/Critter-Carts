@@ -5,7 +5,6 @@ import dev.aaronhowser.mods.aaron.misc.AaronDsls.face
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.particle
 import dev.aaronhowser.mods.critter_carts.CritterCarts
 import dev.aaronhowser.mods.critter_carts.block.ScoochstemBlock
-import dev.aaronhowser.mods.critter_carts.entity.data.WormColor
 import dev.aaronhowser.mods.critter_carts.registry.ModBlocks
 import net.minecraft.core.Direction
 import net.minecraft.data.PackOutput
@@ -27,6 +26,7 @@ class ModBlockStateProvider(
 	}
 
 	private fun coloredScoochstems() {
+		val topTexture = modLoc("block/scoochstem/top")
 		val blocks = listOf(
 			ModBlocks.GREEN_SCOOCHSTEM.get(),
 			ModBlocks.BLUE_SCOOCHSTEM.get(),
@@ -38,9 +38,12 @@ class ModBlockStateProvider(
 
 		for (block in blocks) {
 			val color = block.color
-			val name = "${color.name.lowercase()}_scoochstem"
-			val texture = mcLoc("block/${color.name.lowercase()}_wool")
-			val model = models().cubeAll(name, texture)
+			val name = "${color.color}_scoochstem"
+			val sideTexture = modLoc("block/colored_scoochstem/${color.color}")
+
+			val model = models()
+				.cube(name, topTexture, topTexture, sideTexture, sideTexture, sideTexture, sideTexture)
+				.particle(sideTexture)
 
 			axisBlock(block, model, model)
 			simpleBlockItem(block, model)
@@ -49,10 +52,10 @@ class ModBlockStateProvider(
 
 	private fun scoochstem() {
 		val scoochstem = ModBlocks.SCOOCHSTEM.get()
-		val side = CritterCarts.modResource("block/scoochstem/side")
-		val sideDisabled = CritterCarts.modResource("block/scoochstem/side_disabled")
-		val top = CritterCarts.modResource("block/scoochstem/top")
-		val topDisabled = CritterCarts.modResource("block/scoochstem/top_disabled")
+		val side = modLoc("block/scoochstem/side")
+		val sideDisabled = modLoc("block/scoochstem/side_disabled")
+		val top = modLoc("block/scoochstem/top")
+		val topDisabled = modLoc("block/scoochstem/top_disabled")
 
 		val sideModels = scoochstemFaceModels("scoochstem_side", side)
 		val disabledSideModels = scoochstemFaceModels("scoochstem_side_disabled", sideDisabled)
