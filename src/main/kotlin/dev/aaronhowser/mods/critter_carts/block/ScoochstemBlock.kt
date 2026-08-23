@@ -6,6 +6,7 @@ import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.server.level.ServerLevel
+import net.minecraft.sounds.SoundSource
 import net.minecraft.util.RandomSource
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.ItemInteractionResult
@@ -17,7 +18,6 @@ import net.minecraft.world.level.BlockGetter
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
-import net.minecraft.world.level.block.LevelEvent
 import net.minecraft.world.level.block.RotatedPillarBlock
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.StateDefinition
@@ -59,7 +59,16 @@ class ScoochstemBlock : RotatedPillarBlock(Properties.ofFullCopy(Blocks.OAK_LOG)
 
 		level.setBlockAndUpdate(growthPosition, growthState)
 		level.scheduleTick(growthPosition, this, GROWTH_DELAY)
-		level.levelEvent(LevelEvent.PARTICLES_AND_SOUND_PLANT_GROWTH, growthPosition, 0)
+
+		val soundType = growthState.getSoundType(level, growthPosition, null)
+		level.playSound(
+			null,
+			growthPosition,
+			soundType.placeSound,
+			SoundSource.BLOCKS,
+			(soundType.volume + 1f) / 2f,
+			soundType.pitch * 0.8f
+		)
 	}
 
 	override fun createBlockStateDefinition(
