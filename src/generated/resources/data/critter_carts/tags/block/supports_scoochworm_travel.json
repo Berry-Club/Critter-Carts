@@ -2,11 +2,11 @@
   "values": [
     "critter_carts:scoochstem",
     "critter_carts:scoochstem_wood",
-    "critter_carts:green",
-    "critter_carts:blue",
-    "critter_carts:red",
-    "critter_carts:yellow",
-    "critter_carts:purple",
-    "critter_carts:cyan"
+    "critter_carts:green_scoochstem",
+    "critter_carts:blue_scoochstem",
+    "critter_carts:red_scoochstem",
+    "critter_carts:yellow_scoochstem",
+    "critter_carts:purple_scoochstem",
+    "critter_carts:cyan_scoochstem"
   ]
 }

@@ -1,6 +1,6 @@
-// 1.21.1	2026-08-22T22:57:00.0274324	Tags for minecraft:block mod id critter_carts
+// 1.21.1	2026-08-22T22:59:29.3248636	Tags for minecraft:block mod id critter_carts
 a845bb8b2b0c9c2fa1e4ba77eec0a2cb9682fd65 data/critter_carts/tags/block/prevents_scoochworm_wandering.json
-595a4e34281309be579ed1a1b7c1678ee4812d90 data/critter_carts/tags/block/supports_scoochworm_travel.json
-595a4e34281309be579ed1a1b7c1678ee4812d90 data/minecraft/tags/block/logs.json
-595a4e34281309be579ed1a1b7c1678ee4812d90 data/minecraft/tags/block/logs_that_burn.json
-595a4e34281309be579ed1a1b7c1678ee4812d90 data/minecraft/tags/block/mineable/axe.json
+92f43af64c890865b1046ddb0101ac479de52319 data/critter_carts/tags/block/supports_scoochworm_travel.json
+92f43af64c890865b1046ddb0101ac479de52319 data/minecraft/tags/block/logs.json
+92f43af64c890865b1046ddb0101ac479de52319 data/minecraft/tags/block/logs_that_burn.json
+92f43af64c890865b1046ddb0101ac479de52319 data/minecraft/tags/block/mineable/axe.json

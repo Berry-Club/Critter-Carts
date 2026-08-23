@@ -1,9 +1,9 @@
-// 1.21.1	2026-08-22T22:57:00.0239297	Loot Tables
-4f8223565c18a29418a94f11119bd097bf5d8f31 data/critter_carts/loot_table/blocks/blue.json
-d1cbe31741d7892f7492403275b52e17e2b8e8d2 data/critter_carts/loot_table/blocks/cyan.json
-8ff3ad644423c15c6073af8833b802882089a48a data/critter_carts/loot_table/blocks/green.json
-4983ef346e00e58c48d0c8ce59a90981fca638a4 data/critter_carts/loot_table/blocks/purple.json
-704ca50f01ddbe5558c89464ac14103fb2d93464 data/critter_carts/loot_table/blocks/red.json
+// 1.21.1	2026-08-22T22:59:29.3056777	Loot Tables
+76c082bd763a27ce9b96008fca4dab982993b987 data/critter_carts/loot_table/blocks/blue_scoochstem.json
+6911e2dafad4cdb13a1f5c22baa23a92b409ca14 data/critter_carts/loot_table/blocks/cyan_scoochstem.json
+fc0a3980a0cdccc6b3319d263adbdee815e18f7b data/critter_carts/loot_table/blocks/green_scoochstem.json
+cefe55b3ab4dc5a177cb2e84d5a580c04a758dfa data/critter_carts/loot_table/blocks/purple_scoochstem.json
+502a639861b2865bd1bd8391bbaa1e2a3aaf6a12 data/critter_carts/loot_table/blocks/red_scoochstem.json
 b9fa9c254786a56d8b86f59ae629fe55ba6a7108 data/critter_carts/loot_table/blocks/scoochstem.json
 1d8a9e1995e9aba5d41f913a59076b07067d9d48 data/critter_carts/loot_table/blocks/scoochstem_wood.json
-0a86bc66caaf67b9fb39ed963c5e185bab205dc4 data/critter_carts/loot_table/blocks/yellow.json
+a7ffe2675e242075495e0bd1d1ceea38e902d2ab data/critter_carts/loot_table/blocks/yellow_scoochstem.json

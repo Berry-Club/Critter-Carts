@@ -39,6 +39,6 @@ object ModBlocks : AaronBlockRegistry() {
 		coloredScoochstem(WormColor.CYAN)
 
 	private fun coloredScoochstem(wormColor: WormColor): DeferredBlock<ColoredScoochstemBlock> =
-		registerBlock(wormColor.color) { ColoredScoochstemBlock(wormColor) }
+		registerBlock(wormColor.color + "_scoochstem") { ColoredScoochstemBlock(wormColor) }
 
 }

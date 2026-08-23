@@ -11,11 +11,11 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "critter_carts:yellow"
+          "name": "critter_carts:blue_scoochstem"
         }
       ],
       "rolls": 1.0
     }
   ],
-  "random_sequence": "critter_carts:blocks/yellow"
+  "random_sequence": "critter_carts:blocks/blue_scoochstem"
 }
