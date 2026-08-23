@@ -97,10 +97,16 @@ class ScoochstemBlock : RotatedPillarBlock(Properties.ofFullCopy(Blocks.OAK_LOG)
 		}
 
 		if (level is ServerLevel) {
-			val growthRemaining = level.random.nextIntBetweenInclusive(MIN_INITIAL_GROWTH, MAX_INITIAL_GROWTH)
-
-			grow(level, position, growthDirection, growthRemaining)
 			stack.consume(1, player)
+
+			if (level.random.roll(INITIAL_GROWTH_CHANCE)) {
+				val growthRemaining = level.random.nextIntBetweenInclusive(
+					MIN_INITIAL_GROWTH,
+					MAX_INITIAL_GROWTH
+				)
+
+				grow(level, position, growthDirection, growthRemaining)
+			}
 		}
 
 		return ItemInteractionResult.sidedSuccess(level.isClientSide)
@@ -206,6 +212,7 @@ class ScoochstemBlock : RotatedPillarBlock(Properties.ofFullCopy(Blocks.OAK_LOG)
 		val GROWTH_REMAINING: IntegerProperty = IntegerProperty.create("growth_remaining", 0, 40)
 
 		private const val GROWTH_DELAY = 2
+		private const val INITIAL_GROWTH_CHANCE = 0.45f
 		private const val PARALLEL_GROWTH_CHANCE = 0.8f
 		private const val MIN_INITIAL_GROWTH = 30
 		private const val MAX_INITIAL_GROWTH = 40
