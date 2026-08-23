@@ -1,5 +1,6 @@
 package dev.aaronhowser.mods.critter_carts.block
 
+import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isBlock
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isItem
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.roll
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity
@@ -143,18 +144,10 @@ class ScoochstemBlock : RotatedPillarBlock(Properties.ofFullCopy(Blocks.OAK_LOG)
 		}
 
 		val forkDirection = getPerpendicularDirection(growthDirection, random)
-		val firstGrowthRemaining = random.nextIntBetweenInclusive(
-			MIN_BRANCH_GROWTH,
-			nextGrowthRemaining
-		)
+		val firstGrowthRemaining = random.nextIntBetweenInclusive(MIN_BRANCH_GROWTH, nextGrowthRemaining)
 
 		grow(level, position, forkDirection, firstGrowthRemaining)
-		grow(
-			level,
-			position,
-			forkDirection.opposite,
-			nextGrowthRemaining - firstGrowthRemaining
-		)
+		grow(level, position, forkDirection.opposite, nextGrowthRemaining - firstGrowthRemaining)
 	}
 
 	private fun getGrowthDirection(
@@ -165,8 +158,8 @@ class ScoochstemBlock : RotatedPillarBlock(Properties.ofFullCopy(Blocks.OAK_LOG)
 	): Direction {
 		val positiveDirection = Direction.get(Direction.AxisDirection.POSITIVE, state.getValue(AXIS))
 		val negativeDirection = positiveDirection.opposite
-		val positiveIsStem = level.getBlockState(position.relative(positiveDirection)).`is`(this)
-		val negativeIsStem = level.getBlockState(position.relative(negativeDirection)).`is`(this)
+		val positiveIsStem = level.getBlockState(position.relative(positiveDirection)).isBlock(this)
+		val negativeIsStem = level.getBlockState(position.relative(negativeDirection)).isBlock(this)
 
 		if (positiveIsStem && !negativeIsStem) return negativeDirection
 		if (negativeIsStem && !positiveIsStem) return positiveDirection
