@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "critter_carts:block/yellow_scoochstem",
+      "x": 90,
+      "y": 90
+    },
+    "axis=y": {
+      "model": "critter_carts:block/yellow_scoochstem"
+    },
+    "axis=z": {
+      "model": "critter_carts:block/yellow_scoochstem",
+      "x": 90
+    }
+  }
+}

@@ -31,25 +31,49 @@ class ModBlockTagsProvider(
 		tag(SUPPORTS_SCOOCHWORM_TRAVEL)
 			.add(
 				ModBlocks.SCOOCHSTEM,
-				ModBlocks.SCOOCHSTEM_WOOD
+				ModBlocks.SCOOCHSTEM_WOOD,
+				ModBlocks.GREEN_SCOOCHSTEM,
+				ModBlocks.BLUE_SCOOCHSTEM,
+				ModBlocks.RED_SCOOCHSTEM,
+				ModBlocks.YELLOW_SCOOCHSTEM,
+				ModBlocks.PURPLE_SCOOCHSTEM,
+				ModBlocks.CYAN_SCOOCHSTEM
 			)
 
 		tag(BlockTags.MINEABLE_WITH_AXE)
 			.add(
 				ModBlocks.SCOOCHSTEM,
-				ModBlocks.SCOOCHSTEM_WOOD
+				ModBlocks.SCOOCHSTEM_WOOD,
+				ModBlocks.GREEN_SCOOCHSTEM,
+				ModBlocks.BLUE_SCOOCHSTEM,
+				ModBlocks.RED_SCOOCHSTEM,
+				ModBlocks.YELLOW_SCOOCHSTEM,
+				ModBlocks.PURPLE_SCOOCHSTEM,
+				ModBlocks.CYAN_SCOOCHSTEM
 			)
 
 		tag(BlockTags.LOGS)
 			.add(
 				ModBlocks.SCOOCHSTEM,
-				ModBlocks.SCOOCHSTEM_WOOD
+				ModBlocks.SCOOCHSTEM_WOOD,
+				ModBlocks.GREEN_SCOOCHSTEM,
+				ModBlocks.BLUE_SCOOCHSTEM,
+				ModBlocks.RED_SCOOCHSTEM,
+				ModBlocks.YELLOW_SCOOCHSTEM,
+				ModBlocks.PURPLE_SCOOCHSTEM,
+				ModBlocks.CYAN_SCOOCHSTEM
 			)
 
 		tag(BlockTags.LOGS_THAT_BURN)
 			.add(
 				ModBlocks.SCOOCHSTEM,
-				ModBlocks.SCOOCHSTEM_WOOD
+				ModBlocks.SCOOCHSTEM_WOOD,
+				ModBlocks.GREEN_SCOOCHSTEM,
+				ModBlocks.BLUE_SCOOCHSTEM,
+				ModBlocks.RED_SCOOCHSTEM,
+				ModBlocks.YELLOW_SCOOCHSTEM,
+				ModBlocks.PURPLE_SCOOCHSTEM,
+				ModBlocks.CYAN_SCOOCHSTEM
 			)
 	}
 

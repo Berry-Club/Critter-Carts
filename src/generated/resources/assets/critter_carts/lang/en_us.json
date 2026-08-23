@@ -1,6 +1,12 @@
 {
+  "block.critter_carts.blue": "Blue Scoochstem",
+  "block.critter_carts.cyan": "Cyan Scoochstem",
+  "block.critter_carts.green": "Green Scoochstem",
+  "block.critter_carts.purple": "Purple Scoochstem",
+  "block.critter_carts.red": "Red Scoochstem",
   "block.critter_carts.scoochstem": "Scoochstem",
   "block.critter_carts.scoochstem_wood": "Scoochstem Wood",
+  "block.critter_carts.yellow": "Yellow Scoochstem",
   "entity.critter_carts.scoochworm": "Scoochworm",
   "item.critter_carts.saddlebag": "Saddlebag",
   "item.critter_carts.scoochworm_spawn_egg": "Scoochworm Spawn Egg",

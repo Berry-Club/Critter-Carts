@@ -2,7 +2,7 @@ package dev.aaronhowser.mods.critter_carts.entity.data
 
 import dev.aaronhowser.mods.critter_carts.CritterCarts
 
-enum class WormColor(color: String) {
+enum class WormColor(val color: String) {
 	GREEN("green"),
 	BLUE("blue"),
 	RED("red"),

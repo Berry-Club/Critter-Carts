@@ -5,6 +5,7 @@ import dev.aaronhowser.mods.aaron.misc.AaronDsls.face
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.particle
 import dev.aaronhowser.mods.critter_carts.CritterCarts
 import dev.aaronhowser.mods.critter_carts.block.ScoochstemBlock
+import dev.aaronhowser.mods.critter_carts.entity.data.WormColor
 import dev.aaronhowser.mods.critter_carts.registry.ModBlocks
 import net.minecraft.core.Direction
 import net.minecraft.data.PackOutput
@@ -22,6 +23,27 @@ class ModBlockStateProvider(
 
 	override fun registerStatesAndModels() {
 		scoochstem()
+		coloredScoochstems()
+	}
+
+	private fun coloredScoochstems() {
+		val blocks = listOf(
+			WormColor.GREEN to ModBlocks.GREEN_SCOOCHSTEM,
+			WormColor.BLUE to ModBlocks.BLUE_SCOOCHSTEM,
+			WormColor.RED to ModBlocks.RED_SCOOCHSTEM,
+			WormColor.YELLOW to ModBlocks.YELLOW_SCOOCHSTEM,
+			WormColor.PURPLE to ModBlocks.PURPLE_SCOOCHSTEM,
+			WormColor.CYAN to ModBlocks.CYAN_SCOOCHSTEM
+		)
+
+		for ((color, block) in blocks) {
+			val name = "${color.name.lowercase()}_scoochstem"
+			val texture = mcLoc("block/${color.name.lowercase()}_wool")
+			val model = models().cubeAll(name, texture)
+
+			axisBlock(block.get(), model, model)
+			simpleBlockItem(block.get(), model)
+		}
 	}
 
 	private fun scoochstem() {

@@ -17,6 +17,14 @@ class ModLanguageProvider(
 
 		addBlock(ModBlocks.SCOOCHSTEM, "Scoochstem")
 		addBlock(ModBlocks.SCOOCHSTEM_WOOD, "Scoochstem Wood")
+
+		addBlock(ModBlocks.GREEN_SCOOCHSTEM, "Green Scoochstem")
+		addBlock(ModBlocks.BLUE_SCOOCHSTEM, "Blue Scoochstem")
+		addBlock(ModBlocks.RED_SCOOCHSTEM, "Red Scoochstem")
+		addBlock(ModBlocks.YELLOW_SCOOCHSTEM, "Yellow Scoochstem")
+		addBlock(ModBlocks.PURPLE_SCOOCHSTEM, "Purple Scoochstem")
+		addBlock(ModBlocks.CYAN_SCOOCHSTEM, "Cyan Scoochstem")
+
 		addEntityType(ModEntityTypes.SCOOCHWORM, "Scoochworm")
 		add(ModSoundEvents.SCOOCHWORM_FOOTSTEP_SUBTITLE, "Scoochworm scooches")
 	}

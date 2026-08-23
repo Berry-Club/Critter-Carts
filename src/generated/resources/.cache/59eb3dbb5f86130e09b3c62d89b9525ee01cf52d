@@ -1,3 +1,9 @@
-// 1.21.1	2026-08-21T19:05:42.1818629	Loot Tables
+// 1.21.1	2026-08-22T22:57:00.0239297	Loot Tables
+4f8223565c18a29418a94f11119bd097bf5d8f31 data/critter_carts/loot_table/blocks/blue.json
+d1cbe31741d7892f7492403275b52e17e2b8e8d2 data/critter_carts/loot_table/blocks/cyan.json
+8ff3ad644423c15c6073af8833b802882089a48a data/critter_carts/loot_table/blocks/green.json
+4983ef346e00e58c48d0c8ce59a90981fca638a4 data/critter_carts/loot_table/blocks/purple.json
+704ca50f01ddbe5558c89464ac14103fb2d93464 data/critter_carts/loot_table/blocks/red.json
 b9fa9c254786a56d8b86f59ae629fe55ba6a7108 data/critter_carts/loot_table/blocks/scoochstem.json
 1d8a9e1995e9aba5d41f913a59076b07067d9d48 data/critter_carts/loot_table/blocks/scoochstem_wood.json
+0a86bc66caaf67b9fb39ed963c5e185bab205dc4 data/critter_carts/loot_table/blocks/yellow.json

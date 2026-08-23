@@ -1,6 +1,12 @@
 {
   "values": [
     "critter_carts:scoochstem",
-    "critter_carts:scoochstem_wood"
+    "critter_carts:scoochstem_wood",
+    "critter_carts:green",
+    "critter_carts:blue",
+    "critter_carts:red",
+    "critter_carts:yellow",
+    "critter_carts:purple",
+    "critter_carts:cyan"
   ]
 }

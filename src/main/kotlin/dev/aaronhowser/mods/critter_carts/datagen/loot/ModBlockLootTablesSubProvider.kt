@@ -14,6 +14,13 @@ class ModBlockLootTablesSubProvider(
 	override fun generate() {
 		dropSelf(ModBlocks.SCOOCHSTEM.get())
 		dropSelf(ModBlocks.SCOOCHSTEM_WOOD.get())
+
+		dropSelf(ModBlocks.GREEN_SCOOCHSTEM.get())
+		dropSelf(ModBlocks.BLUE_SCOOCHSTEM.get())
+		dropSelf(ModBlocks.RED_SCOOCHSTEM.get())
+		dropSelf(ModBlocks.YELLOW_SCOOCHSTEM.get())
+		dropSelf(ModBlocks.PURPLE_SCOOCHSTEM.get())
+		dropSelf(ModBlocks.CYAN_SCOOCHSTEM.get())
 	}
 
 	override fun getKnownBlocks(): Iterable<Block> {
