@@ -9,11 +9,7 @@ import dev.aaronhowser.mods.aaron.misc.AaronExtensions.toVec3
 import dev.aaronhowser.mods.critter_carts.block.ScoochwormTravelBlock
 import dev.aaronhowser.mods.critter_carts.datagen.tag.ModBlockTagsProvider
 import dev.aaronhowser.mods.critter_carts.entity.control.ScoochwormMoveControl
-import dev.aaronhowser.mods.critter_carts.entity.data.ScoochwormPath
-import dev.aaronhowser.mods.critter_carts.entity.data.ScoochwormPathPoint
-import dev.aaronhowser.mods.critter_carts.entity.data.ScoochwormSegment
-import dev.aaronhowser.mods.critter_carts.entity.data.ScoochwormSegments
-import dev.aaronhowser.mods.critter_carts.entity.data.WormColor
+import dev.aaronhowser.mods.critter_carts.entity.data.*
 import dev.aaronhowser.mods.critter_carts.entity.data.attachment.ScoochwormAttachmentType
 import dev.aaronhowser.mods.critter_carts.entity.goal.ScoochwormLookAtMelonGoal
 import dev.aaronhowser.mods.critter_carts.entity.goal.ScoochwormTravelGoal
@@ -105,6 +101,8 @@ class ScoochwormEntity(
 
 		isNoGravity = supportPosition != null
 
+		val positionBefore = position()
+
 		super.aiStep()
 		bodySegments.tick()
 
@@ -119,7 +117,10 @@ class ScoochwormEntity(
 		movementPath.record(position(), supportDirection, yRot)
 		bodySegments.update(movementPath)
 
-		playNextFootstep()
+		val moved = positionBefore.distanceToSqr(position()) > 0.000001
+		if (moved) {
+			playNextFootstep()
+		}
 	}
 
 	private fun eatTouchingItems() {
