@@ -10,7 +10,7 @@ import net.minecraft.world.level.block.RotatedPillarBlock
 import net.minecraft.world.level.block.state.BlockState
 
 class ColoredScoochstemBlock(
-	private val color: WormColor
+	val color: WormColor
 ) : RotatedPillarBlock(Properties.ofFullCopy(Blocks.OAK_LOG)), ScoochwormTravelBlock {
 
 	override fun supportsScoochwormTravel(

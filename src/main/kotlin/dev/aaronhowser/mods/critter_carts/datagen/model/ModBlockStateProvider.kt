@@ -28,21 +28,22 @@ class ModBlockStateProvider(
 
 	private fun coloredScoochstems() {
 		val blocks = listOf(
-			WormColor.GREEN to ModBlocks.GREEN_SCOOCHSTEM,
-			WormColor.BLUE to ModBlocks.BLUE_SCOOCHSTEM,
-			WormColor.RED to ModBlocks.RED_SCOOCHSTEM,
-			WormColor.YELLOW to ModBlocks.YELLOW_SCOOCHSTEM,
-			WormColor.PURPLE to ModBlocks.PURPLE_SCOOCHSTEM,
-			WormColor.CYAN to ModBlocks.CYAN_SCOOCHSTEM
+			ModBlocks.GREEN_SCOOCHSTEM.get(),
+			ModBlocks.BLUE_SCOOCHSTEM.get(),
+			ModBlocks.RED_SCOOCHSTEM.get(),
+			ModBlocks.YELLOW_SCOOCHSTEM.get(),
+			ModBlocks.PURPLE_SCOOCHSTEM.get(),
+			ModBlocks.CYAN_SCOOCHSTEM.get()
 		)
 
-		for ((color, block) in blocks) {
+		for (block in blocks) {
+			val color = block.color
 			val name = "${color.name.lowercase()}_scoochstem"
 			val texture = mcLoc("block/${color.name.lowercase()}_wool")
 			val model = models().cubeAll(name, texture)
 
-			axisBlock(block.get(), model, model)
-			simpleBlockItem(block.get(), model)
+			axisBlock(block, model, model)
+			simpleBlockItem(block, model)
 		}
 	}
 
