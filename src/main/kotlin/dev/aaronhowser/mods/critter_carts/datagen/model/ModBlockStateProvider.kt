@@ -9,6 +9,7 @@ import dev.aaronhowser.mods.critter_carts.registry.ModBlocks
 import net.minecraft.core.Direction
 import net.minecraft.data.PackOutput
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.RotatedPillarBlock
 import net.neoforged.neoforge.client.model.generators.BlockModelBuilder
 import net.neoforged.neoforge.client.model.generators.BlockStateProvider
@@ -57,41 +58,22 @@ class ModBlockStateProvider(
 		val top = modLoc("block/scoochstem/top")
 		val topDisabled = modLoc("block/scoochstem/top_disabled")
 
-		val sideModels = scoochstemFaceModels("scoochstem_side", side)
-		val disabledSideModels = scoochstemFaceModels("scoochstem_side_disabled", sideDisabled)
-		val topModels = scoochstemFaceModels("scoochstem_top", top)
-		val disabledTopModels = scoochstemFaceModels("scoochstem_top_disabled", topDisabled)
+		val sideModels =
+			scoochstemFaceModels("scoochstem_side", side)
+		val disabledSideModels =
+			scoochstemFaceModels("scoochstem_side_disabled", sideDisabled)
+		val endModels =
+			scoochstemFaceModels("scoochstem_top", top)
+		val disabledEndModels =
+			scoochstemFaceModels("scoochstem_top_disabled", topDisabled)
 
-		val multipartBuilder = getMultipartBuilder(scoochstem)
-
-		for (direction in Direction.entries) {
-			for (axis in Direction.Axis.entries) {
-				for (disabled in listOf(false, true)) {
-					val isCap = direction.axis == axis
-					val faceModels = when {
-						isCap && disabled -> disabledTopModels
-						isCap -> topModels
-						disabled -> disabledSideModels
-						else -> sideModels
-					}
-					val model = if (shouldRotateTexture(axis, direction)) {
-						faceModels.second
-					} else {
-						faceModels.first
-					}
-
-					multipartBuilder
-						.part()
-						.modelFile(model)
-						.rotationX(getFaceXRotation(direction))
-						.rotationY(getFaceYRotation(direction))
-						.addModel()
-						.condition(RotatedPillarBlock.AXIS, axis)
-						.condition(ScoochstemBlock.getDisabledProperty(direction), disabled)
-						.end()
-				}
-			}
-		}
+		scoochstemBlock(
+			block = scoochstem,
+			sideModels = sideModels,
+			disabledSideModels = disabledSideModels,
+			endModels = endModels,
+			disabledEndModels = disabledEndModels
+		)
 
 		val itemModel = models()
 			.cube("scoochstem", top, top, side, side, side, side)
@@ -99,55 +81,87 @@ class ModBlockStateProvider(
 
 		simpleBlockItem(scoochstem, itemModel)
 
-		scoochstemWood(sideModels, disabledSideModels, side)
+		val scoochstemWood = ModBlocks.SCOOCHSTEM_WOOD.get()
+		scoochstemBlock(
+			block = scoochstemWood,
+			sideModels = sideModels,
+			disabledSideModels = disabledSideModels,
+			endModels = sideModels,
+			disabledEndModels = disabledSideModels
+		)
+
+		val woodItemModel = models()
+			.cubeAll("scoochstem_wood", side)
+			.particle(side)
+
+		simpleBlockItem(scoochstemWood, woodItemModel)
 	}
 
-	private fun scoochstemWood(
+	private fun scoochstemBlock(
+		block: Block,
 		sideModels: Pair<BlockModelBuilder, BlockModelBuilder>,
 		disabledSideModels: Pair<BlockModelBuilder, BlockModelBuilder>,
-		sideTexture: ResourceLocation
+		endModels: Pair<BlockModelBuilder, BlockModelBuilder>,
+		disabledEndModels: Pair<BlockModelBuilder, BlockModelBuilder>
 	) {
-		val scoochstemWood = ModBlocks.SCOOCHSTEM_WOOD.get()
-		val multipartBuilder = getMultipartBuilder(scoochstemWood)
-
 		for (direction in Direction.entries) {
 			for (axis in Direction.Axis.entries) {
-				for (disabled in listOf(false, true)) {
-					val faceModels = if (disabled) disabledSideModels else sideModels
-					val model = if (shouldRotateTexture(axis, direction)) {
-						faceModels.second
-					} else {
-						faceModels.first
-					}
+				val isPillarEnd = direction.axis == axis
+				val enabledModels =
+					if (isPillarEnd) endModels else sideModels
+				val disabledModels =
+					if (isPillarEnd) disabledEndModels else disabledSideModels
 
-					multipartBuilder
-						.part()
-						.modelFile(model)
-						.rotationX(getFaceXRotation(direction))
-						.rotationY(getFaceYRotation(direction))
-						.addModel()
-						.condition(RotatedPillarBlock.AXIS, axis)
-						.condition(ScoochstemBlock.getDisabledProperty(direction), disabled)
-						.end()
-				}
+				addScoochstemFace(
+					block = block,
+					direction = direction,
+					axis = axis,
+					disabled = false,
+					faceModels = enabledModels
+				)
+				addScoochstemFace(
+					block = block,
+					direction = direction,
+					axis = axis,
+					disabled = true,
+					faceModels = disabledModels
+				)
 			}
 		}
+	}
 
-		val itemModel = models()
-			.cubeAll("scoochstem_wood", sideTexture)
-			.particle(sideTexture)
+	private fun addScoochstemFace(
+		block: Block,
+		direction: Direction,
+		axis: Direction.Axis,
+		disabled: Boolean,
+		faceModels: Pair<BlockModelBuilder, BlockModelBuilder>
+	) {
+		val faceModel = if (shouldRotateTexture(axis, direction)) {
+			faceModels.second
+		} else {
+			faceModels.first
+		}
 
-		simpleBlockItem(scoochstemWood, itemModel)
+		getMultipartBuilder(block)
+			.part()
+			.modelFile(faceModel)
+			.rotationX(getFaceXRotation(direction))
+			.rotationY(getFaceYRotation(direction))
+			.addModel()
+			.condition(RotatedPillarBlock.AXIS, axis)
+			.condition(ScoochstemBlock.getDisabledProperty(direction), disabled)
+			.end()
 	}
 
 	private fun scoochstemFaceModels(
 		name: String,
 		texture: ResourceLocation
 	): Pair<BlockModelBuilder, BlockModelBuilder> {
-		val regular = scoochstemFaceModel(name, texture, false)
-		val rotated = scoochstemFaceModel(name + "_rotated", texture, true)
+		val regularModel = scoochstemFaceModel(name, texture, false)
+		val rotatedModel = scoochstemFaceModel(name + "_rotated", texture, true)
 
-		return regular to rotated
+		return regularModel to rotatedModel
 	}
 
 	private fun scoochstemFaceModel(
