@@ -1,5 +1,6 @@
 package dev.aaronhowser.mods.critter_carts.block
 
+import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.world.item.context.UseOnContext
@@ -55,6 +56,7 @@ class ScoochstemBlock : RotatedPillarBlock(Properties.ofFullCopy(Blocks.OAK_LOG)
 
 	override fun supportsScoochwormTravel(
 		blockState: BlockState,
+		scoochworm: ScoochwormEntity,
 		level: Level,
 		position: BlockPos,
 		face: Direction

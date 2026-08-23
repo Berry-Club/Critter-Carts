@@ -486,6 +486,7 @@ class ScoochwormWanderGoal(
 
 	private fun isStem(surface: ScoochwormSupport): Boolean {
 		return ScoochwormEntity.supportsScoochwormTravel(
+			scoochworm,
 			scoochworm.level(),
 			surface.supportPosition,
 			surface.supportDirection.opposite

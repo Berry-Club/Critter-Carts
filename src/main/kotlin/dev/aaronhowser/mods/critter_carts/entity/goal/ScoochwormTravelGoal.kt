@@ -290,6 +290,7 @@ class ScoochwormTravelGoal(
 
 	private fun isStemSupport(position: BlockPos, supportDirection: Direction): Boolean {
 		return ScoochwormEntity.supportsScoochwormTravel(
+			scoochworm,
 			scoochworm.level(),
 			position,
 			supportDirection.opposite

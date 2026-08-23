@@ -149,7 +149,7 @@ class ScoochwormEntity(
 	fun hasValidSupport(): Boolean {
 		val currentSupportPosition = supportPosition ?: return false
 
-		return supportsScoochwormTravel(level(), currentSupportPosition, supportDirection.opposite)
+		return supportsScoochwormTravel(this, level(), currentSupportPosition, supportDirection.opposite)
 			|| supportsFreeTravel(level(), currentSupportPosition, supportDirection.opposite)
 	}
 
@@ -414,6 +414,7 @@ class ScoochwormEntity(
 		}
 
 		fun supportsScoochwormTravel(
+			scoochworm: ScoochwormEntity,
 			level: Level,
 			position: BlockPos,
 			attachmentFace: Direction
@@ -423,7 +424,7 @@ class ScoochwormEntity(
 
 			val block = blockState.block
 			return if (block is ScoochwormTravelBlock) {
-				block.supportsScoochwormTravel(blockState, level, position, attachmentFace)
+				block.supportsScoochwormTravel(blockState, scoochworm, level, position, attachmentFace)
 			} else {
 				true
 			}

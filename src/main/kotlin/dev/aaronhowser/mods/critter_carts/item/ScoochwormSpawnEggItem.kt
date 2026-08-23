@@ -63,6 +63,7 @@ class ScoochwormSpawnEggItem(
 		if (spawnedEntity is ScoochwormEntity) {
 			if (
 				ScoochwormEntity.supportsScoochwormTravel(
+					spawnedEntity,
 					level,
 					clickedPosition,
 					clickedFace
