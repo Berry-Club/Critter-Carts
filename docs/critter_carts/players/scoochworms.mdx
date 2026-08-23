@@ -8,7 +8,7 @@ Interact with a Scoochworm's head to toggle movement. A moving Scoochworm can cr
 
 When a wandering Scoochworm reaches Scoochstem, it follows the routed path while preserving its direction of travel. Scoochstem faces provide precise control over where it goes.
 
-At a flat branch, the Scoochworm first tries to continue forward. If forward travel is unavailable, it chooses an available left or right path. If both side paths are available, it chooses one randomly.
+At a branch, the Scoochworm first tries to continue forward. If forward travel is unavailable, it prioritizes climbing upward before choosing an available horizontal left or right path. If both horizontal paths are available, it chooses one randomly. It only turns downward when none of those routes are available.
 
 Scoochworms stop when they reach the end of a valid Scoochstem path. While wandering on ordinary blocks, they turn back from edges they cannot crawl around. Interact with the head to stop one manually.
 

@@ -132,8 +132,8 @@ class ScoochwormTravelGoal(
 
 	private fun chooseNextSupport(support: ScoochwormSupport, forward: Direction): ScoochwormSupport? {
 		return tryMoveForward(support, forward)
-			?: tryTurnAlongSurface(support, forward)
 			?: tryTurnUpwards(support, forward)
+			?: tryTurnAlongSurface(support, forward)
 			?: tryTurnDownwards(support, forward)
 	}
 
