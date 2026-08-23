@@ -13,6 +13,7 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import net.minecraft.world.item.context.UseOnContext
+import net.minecraft.world.level.BlockGetter
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
@@ -191,6 +192,9 @@ class ScoochstemBlock : RotatedPillarBlock(Properties.ofFullCopy(Blocks.OAK_LOG)
 	): Boolean {
 		return !blockState.getValue(getDisabledProperty(face))
 	}
+
+	override fun getFlammability(state: BlockState, level: BlockGetter, position: BlockPos, direction: Direction): Int = 5
+	override fun getFireSpreadSpeed(state: BlockState, level: BlockGetter, position: BlockPos, direction: Direction): Int = 5
 
 	companion object {
 		val NORTH_DISABLED: BooleanProperty = BooleanProperty.create("north_disabled")

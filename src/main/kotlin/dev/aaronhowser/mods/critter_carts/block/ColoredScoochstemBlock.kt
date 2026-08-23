@@ -4,6 +4,7 @@ import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity
 import dev.aaronhowser.mods.critter_carts.entity.data.WormColor
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
+import net.minecraft.world.level.BlockGetter
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.RotatedPillarBlock
@@ -22,4 +23,18 @@ class ColoredScoochstemBlock(
 	): Boolean {
 		return scoochworm.color == this.color
 	}
+
+	override fun getFlammability(
+		state: BlockState,
+		level: BlockGetter,
+		position: BlockPos,
+		direction: Direction
+	): Int = 5
+
+	override fun getFireSpreadSpeed(
+		state: BlockState,
+		level: BlockGetter,
+		position: BlockPos,
+		direction: Direction
+	): Int = 5
 }
