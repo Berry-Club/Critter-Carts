@@ -5,6 +5,7 @@ import net.minecraft.core.Direction
 import net.minecraft.world.item.context.UseOnContext
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.RotatedPillarBlock
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.StateDefinition
@@ -12,9 +13,7 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty
 import net.neoforged.neoforge.common.ItemAbilities
 import net.neoforged.neoforge.common.ItemAbility
 
-class ScoochstemBlock(
-	properties: Properties
-) : RotatedPillarBlock(properties), ScoochwormTravelBlock {
+class ScoochstemBlock : RotatedPillarBlock(Properties.ofFullCopy(Blocks.OAK_LOG)), ScoochwormTravelBlock {
 
 	init {
 		registerDefaultState(

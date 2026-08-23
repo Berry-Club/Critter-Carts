@@ -15,13 +15,9 @@ object ModBlocks : AaronBlockRegistry() {
 	override fun getItemRegistry(): DeferredRegister.Items = ModItems.ITEM_REGISTRY
 
 	val SCOOCHSTEM: DeferredBlock<ScoochstemBlock> =
-		registerBlock("scoochstem") {
-			ScoochstemBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_LOG))
-		}
+		registerBlock("scoochstem", ::ScoochstemBlock)
 
 	val SCOOCHSTEM_WOOD: DeferredBlock<ScoochstemBlock> =
-		registerBlock("scoochstem_wood") {
-			ScoochstemBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_WOOD))
-		}
+		registerBlock("scoochstem_wood", ::ScoochstemBlock)
 
 }
