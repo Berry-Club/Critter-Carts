@@ -33,7 +33,7 @@ class ModBlockStateProvider(
 			ModBlocks.BLUE_SCOOCHSTEM.get(),
 			ModBlocks.RED_SCOOCHSTEM.get(),
 			ModBlocks.YELLOW_SCOOCHSTEM.get(),
-			ModBlocks.PURPLE_SCOOCHSTEM.get(),
+			ModBlocks.MAGENTA_SCOOCHSTEM.get(),
 			ModBlocks.CYAN_SCOOCHSTEM.get()
 		)
 

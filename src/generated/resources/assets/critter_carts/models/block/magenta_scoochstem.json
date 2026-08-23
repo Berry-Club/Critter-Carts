@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "critter_carts:block/scoochstem/top",
+    "east": "critter_carts:block/colored_scoochstem/magenta",
+    "north": "critter_carts:block/colored_scoochstem/magenta",
+    "particle": "critter_carts:block/colored_scoochstem/magenta",
+    "south": "critter_carts:block/colored_scoochstem/magenta",
+    "up": "critter_carts:block/scoochstem/top",
+    "west": "critter_carts:block/colored_scoochstem/magenta"
+  }
+}

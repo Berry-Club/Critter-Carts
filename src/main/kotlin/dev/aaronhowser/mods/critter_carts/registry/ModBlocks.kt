@@ -32,8 +32,8 @@ object ModBlocks : AaronBlockRegistry() {
 	val YELLOW_SCOOCHSTEM: DeferredBlock<ColoredScoochstemBlock> =
 		coloredScoochstem(WormColor.YELLOW)
 
-	val PURPLE_SCOOCHSTEM: DeferredBlock<ColoredScoochstemBlock> =
-		coloredScoochstem(WormColor.PURPLE)
+	val MAGENTA_SCOOCHSTEM: DeferredBlock<ColoredScoochstemBlock> =
+		coloredScoochstem(WormColor.MAGENTA)
 
 	val CYAN_SCOOCHSTEM: DeferredBlock<ColoredScoochstemBlock> =
 		coloredScoochstem(WormColor.CYAN)

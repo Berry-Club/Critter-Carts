@@ -7,7 +7,7 @@ enum class WormColor(val color: String) {
 	BLUE("blue"),
 	RED("red"),
 	YELLOW("yellow"),
-	PURPLE("purple"),
+	MAGENTA("magenta"),
 	CYAN("cyan");
 
 	val headTexture = CritterCarts.modResource("textures/entity/scoochworm/$color/head.png")

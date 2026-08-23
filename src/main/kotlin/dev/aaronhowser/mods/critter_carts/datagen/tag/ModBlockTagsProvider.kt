@@ -36,7 +36,7 @@ class ModBlockTagsProvider(
 				ModBlocks.BLUE_SCOOCHSTEM,
 				ModBlocks.RED_SCOOCHSTEM,
 				ModBlocks.YELLOW_SCOOCHSTEM,
-				ModBlocks.PURPLE_SCOOCHSTEM,
+				ModBlocks.MAGENTA_SCOOCHSTEM,
 				ModBlocks.CYAN_SCOOCHSTEM
 			)
 
@@ -48,7 +48,7 @@ class ModBlockTagsProvider(
 				ModBlocks.BLUE_SCOOCHSTEM,
 				ModBlocks.RED_SCOOCHSTEM,
 				ModBlocks.YELLOW_SCOOCHSTEM,
-				ModBlocks.PURPLE_SCOOCHSTEM,
+				ModBlocks.MAGENTA_SCOOCHSTEM,
 				ModBlocks.CYAN_SCOOCHSTEM
 			)
 
@@ -60,7 +60,7 @@ class ModBlockTagsProvider(
 				ModBlocks.BLUE_SCOOCHSTEM,
 				ModBlocks.RED_SCOOCHSTEM,
 				ModBlocks.YELLOW_SCOOCHSTEM,
-				ModBlocks.PURPLE_SCOOCHSTEM,
+				ModBlocks.MAGENTA_SCOOCHSTEM,
 				ModBlocks.CYAN_SCOOCHSTEM
 			)
 
@@ -72,7 +72,7 @@ class ModBlockTagsProvider(
 				ModBlocks.BLUE_SCOOCHSTEM,
 				ModBlocks.RED_SCOOCHSTEM,
 				ModBlocks.YELLOW_SCOOCHSTEM,
-				ModBlocks.PURPLE_SCOOCHSTEM,
+				ModBlocks.MAGENTA_SCOOCHSTEM,
 				ModBlocks.CYAN_SCOOCHSTEM
 			)
 	}

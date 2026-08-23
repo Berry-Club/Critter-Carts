@@ -19,7 +19,7 @@ class ModBlockLootTablesSubProvider(
 		dropSelf(ModBlocks.BLUE_SCOOCHSTEM.get())
 		dropSelf(ModBlocks.RED_SCOOCHSTEM.get())
 		dropSelf(ModBlocks.YELLOW_SCOOCHSTEM.get())
-		dropSelf(ModBlocks.PURPLE_SCOOCHSTEM.get())
+		dropSelf(ModBlocks.MAGENTA_SCOOCHSTEM.get())
 		dropSelf(ModBlocks.CYAN_SCOOCHSTEM.get())
 	}
 

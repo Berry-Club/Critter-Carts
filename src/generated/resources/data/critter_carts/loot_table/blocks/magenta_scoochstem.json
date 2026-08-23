@@ -11,11 +11,11 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "critter_carts:purple_scoochstem"
+          "name": "critter_carts:magenta_scoochstem"
         }
       ],
       "rolls": 1.0
     }
   ],
-  "random_sequence": "critter_carts:blocks/purple_scoochstem"
+  "random_sequence": "critter_carts:blocks/magenta_scoochstem"
 }
