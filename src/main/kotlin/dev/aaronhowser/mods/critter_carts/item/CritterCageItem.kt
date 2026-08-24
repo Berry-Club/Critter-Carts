@@ -10,7 +10,6 @@ import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
-import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.Item
@@ -33,7 +32,7 @@ class CritterCageItem(properties: Properties) : Item(properties) {
 			val wormNbt = interactionTarget.getMinimalTag(stripUniqueness = false)
 			wormNbt.remove(ScoochwormEntity.PATH_TAG)
 
-			val filledCage = stack.copy()	// So it works in creative mode
+			val filledCage = stack.copy()    // So it works in creative mode
 			filledCage.set(ModDataComponents.ENTITY_DATA, CustomData.of(wormNbt))
 			player.setItemInHand(usedHand, filledCage)
 
