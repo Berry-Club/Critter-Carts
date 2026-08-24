@@ -206,7 +206,7 @@ class ScoochwormEntity(
 		val growResult = tryGrow(player, heldStack)
 		if (growResult != null) return growResult
 
-		if (isServerSide && !player.isSecondaryUseActive) {
+		if (!player.isSecondaryUseActive) {
 			isTryingToMove = !isTryingToMove
 			if (!isTryingToMove) deltaMovement = Vec3.ZERO
 
