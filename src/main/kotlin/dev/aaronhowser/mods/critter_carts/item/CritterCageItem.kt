@@ -31,6 +31,8 @@ class CritterCageItem(properties: Properties) : Item(properties) {
 
 		if (player.isServerSide) {
 			val wormNbt = interactionTarget.getMinimalTag(stripUniqueness = false)
+			wormNbt.remove(ScoochwormEntity.PATH_TAG)
+
 			val filledCage = stack.copy()	// So it works in creative mode
 			filledCage.set(ModDataComponents.ENTITY_DATA, CustomData.of(wormNbt))
 			player.setItemInHand(usedHand, filledCage)

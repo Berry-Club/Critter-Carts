@@ -350,7 +350,7 @@ class ScoochwormEntity(
 		private const val SUPPORT_PROBE_DISTANCE = 0.05
 
 		private const val SEGMENTS_TAG = "Segments"
-		private const val PATH_TAG = "Path"
+		const val PATH_TAG = "Path"
 		private const val TRYING_TO_MOVE_TAG = "Moving"
 		private const val SUPPORT_DIRECTION_TAG = "AttachmentBottom"
 		private const val SUPPORT_POSITION_TAG = "AttachmentPosition"
