@@ -197,21 +197,23 @@ class ScoochwormEntity(
 	// Interaction
 
 	override fun mobInteract(player: Player, hand: InteractionHand): InteractionResult {
-		if (player.isShiftKeyDown) {
-			if (isServerSide) color = color.next()
-			return InteractionResult.sidedSuccess(isClientSide)
-		}
+//		if (player.isShiftKeyDown) {
+//			if (isServerSide) color = color.next()
+//			return InteractionResult.sidedSuccess(isClientSide)
+//		}
 
 		val heldStack = player.getItemInHand(hand)
 		val growResult = tryGrow(player, heldStack)
 		if (growResult != null) return growResult
 
-		if (isServerSide) {
+		if (isServerSide && !player.isSecondaryUseActive) {
 			isTryingToMove = !isTryingToMove
 			if (!isTryingToMove) deltaMovement = Vec3.ZERO
+
+			return InteractionResult.sidedSuccess(isClientSide)
 		}
 
-		return InteractionResult.sidedSuccess(isClientSide)
+		return InteractionResult.PASS
 	}
 
 	fun interactWithPart(
