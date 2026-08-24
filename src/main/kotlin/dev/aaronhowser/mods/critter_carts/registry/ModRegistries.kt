@@ -12,7 +12,8 @@ object ModRegistries {
 			ModCreativeModeTabs.TABS_REGISTRY,
 			ModEntityTypes.ENTITY_TYPE_REGISTRY,
 			ModEntityDataSerializers.ENTITY_DATA_SERIALIZER_REGISTRY,
-			ModSoundEvents.SOUND_EVENT_REGISTRY
+			ModSoundEvents.SOUND_EVENT_REGISTRY,
+			ModDataComponents.DATA_COMPONENT_REGISTRY
 		)
 
 		for (registry in registries) {
