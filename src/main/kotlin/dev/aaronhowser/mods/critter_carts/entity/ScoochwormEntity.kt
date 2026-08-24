@@ -51,7 +51,7 @@ import java.util.*
 class ScoochwormEntity(
 	entityType: EntityType<ScoochwormEntity>,
 	level: Level
-) : PathfinderMob(entityType, level), GeoEntity {
+) : Mob(entityType, level), GeoEntity {
 
 	private val animatableInstanceCache = SingletonAnimatableInstanceCache(this)
 	val pathMoveControl = ScoochwormMoveControl(this)
