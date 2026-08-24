@@ -7,6 +7,7 @@ import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity
 import dev.aaronhowser.mods.critter_carts.registry.ModDataComponents
 import dev.aaronhowser.mods.critter_carts.registry.ModEntityTypes
 import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.Entity
@@ -61,7 +62,15 @@ class CritterCageItem(properties: Properties) : Item(properties) {
 			clickedPos
 		}
 
-		val success = placeScoochworm(stack, level, posToSpawn) != null
+		val success = placeScoochworm(
+			stack,
+			level,
+			posToSpawn,
+			clickedPos,
+			clickedFace,
+			context.player
+		) != null
+
 		if (!success) return InteractionResult.FAIL
 
 		stack.remove(ModDataComponents.ENTITY_DATA)
@@ -75,12 +84,22 @@ class CritterCageItem(properties: Properties) : Item(properties) {
 		private fun placeScoochworm(
 			stack: ItemStack,
 			level: Level,
-			pos: BlockPos
+			spawnPos: BlockPos,
+			clickedPos: BlockPos,
+			clickedFace: Direction,
+			player: Player?
 		): ScoochwormEntity? {
 			val entityData = stack.get(ModDataComponents.ENTITY_DATA) ?: return null
 			val entity = ScoochwormEntity(ModEntityTypes.SCOOCHWORM.get(), level)
 			entity.load(entityData.copyTag())
-			entity.setPos(pos.bottomCenter)
+			entity.setPos(spawnPos.bottomCenter)
+			ScoochwormEntity.finishPlacement(
+				entity,
+				level,
+				clickedPos,
+				clickedFace,
+				player
+			)
 			level.addFreshEntity(entity)
 			return entity
 		}

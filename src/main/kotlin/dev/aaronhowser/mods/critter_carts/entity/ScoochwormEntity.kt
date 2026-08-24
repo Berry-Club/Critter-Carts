@@ -445,6 +445,46 @@ class ScoochwormEntity(
 			return blockState.isFaceSturdy(level, position, attachmentFace)
 		}
 
+		fun finishPlacement(
+			worm: ScoochwormEntity,
+			level: Level,
+			clickedPos: BlockPos,
+			clickedFace: Direction,
+			player: Player?
+		) {
+			val clickedSupportDirection = clickedFace.opposite
+			if (canAttachTo(worm, level, clickedPos, clickedFace)) {
+				worm.attachToSupport(clickedPos, clickedSupportDirection)
+			} else {
+				for (supportDirection in Direction.entries) {
+					val supportPosition = getSupportBlockPosition(worm.position(), supportDirection)
+					val attachmentFace = supportDirection.opposite
+					if (!canAttachTo(worm, level, supportPosition, attachmentFace)) continue
+
+					worm.attachToSupport(supportPosition, supportDirection)
+					break
+				}
+			}
+
+			if (player == null) return
+
+			val rotation = player.direction.toYRot()
+			worm.yRot = rotation
+			worm.yRotO = rotation
+			worm.yBodyRot = rotation
+			worm.yHeadRot = rotation
+		}
+
+		private fun canAttachTo(
+			worm: ScoochwormEntity,
+			level: Level,
+			position: BlockPos,
+			attachmentFace: Direction
+		): Boolean {
+			return supportsScoochwormTravel(worm, level, position, attachmentFace)
+				|| supportsFreeTravel(level, position, attachmentFace)
+		}
+
 		fun getSupportBlockPosition(
 			position: Vec3,
 			supportDirection: Direction
