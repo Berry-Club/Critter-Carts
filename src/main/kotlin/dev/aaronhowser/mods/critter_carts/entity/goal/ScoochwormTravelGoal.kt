@@ -217,7 +217,7 @@ class ScoochwormTravelGoal(
 		val direction = movementDirection ?: return
 		val position = cornerTarget ?: getPositionOnSupport(destination)
 
-		scoochworm.pathMoveControl.setWantedPosition(
+		scoochworm.stemMoveControl.setWantedPosition(
 			position.x,
 			position.y,
 			position.z,

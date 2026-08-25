@@ -7,7 +7,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.entity.ai.control.MoveControl
 import net.minecraft.world.phys.Vec3
 
-class ScoochwormMoveControl(
+class ScoochwormStemMoveControl(
 	private val scoochworm: ScoochwormEntity
 ) : MoveControl(scoochworm) {
 

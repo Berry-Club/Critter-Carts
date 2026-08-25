@@ -8,7 +8,7 @@ import dev.aaronhowser.mods.aaron.misc.AaronExtensions.nextRange
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.toVec3
 import dev.aaronhowser.mods.critter_carts.block.ScoochwormTravelBlock
 import dev.aaronhowser.mods.critter_carts.datagen.tag.ModBlockTagsProvider
-import dev.aaronhowser.mods.critter_carts.entity.control.ScoochwormMoveControl
+import dev.aaronhowser.mods.critter_carts.entity.control.ScoochwormStemMoveControl
 import dev.aaronhowser.mods.critter_carts.entity.data.*
 import dev.aaronhowser.mods.critter_carts.entity.data.attachment.ScoochwormAttachmentType
 import dev.aaronhowser.mods.critter_carts.entity.goal.ScoochwormLookAtMelonGoal
@@ -54,7 +54,7 @@ class ScoochwormEntity(
 ) : Mob(entityType, level), GeoEntity {
 
 	private val animatableInstanceCache = SingletonAnimatableInstanceCache(this)
-	val pathMoveControl = ScoochwormMoveControl(this)
+	val stemMoveControl = ScoochwormStemMoveControl(this)
 	private val movementPath = ScoochwormPath()
 	private val bodySegments = ScoochwormSegments(this)
 
@@ -64,7 +64,7 @@ class ScoochwormEntity(
 	var isTurningAroundCorner = false
 
 	init {
-		moveControl = pathMoveControl
+		moveControl = stemMoveControl
 	}
 
 	var supportDirection: Direction
