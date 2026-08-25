@@ -15,6 +15,7 @@ import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
 import java.util.*
 import kotlin.math.abs
+import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -24,6 +25,9 @@ class ScoochwormWanderGoal(
 
 	private var currentSupport: ScoochwormSupport? = null
 	private var movementDirection = Vec3.ZERO
+	private var homePosition: Vec3? = null
+	private var turnSign = 1.0
+	private var nextHomeTick = 0
 	private var nextTurnTick = 0
 	private var transitionTicks = 0
 
@@ -38,6 +42,7 @@ class ScoochwormWanderGoal(
 		if (isStem(currentSupport)) return false
 
 		movementDirection = getInitialDirection(currentSupport.supportDirection)
+		updateHome()
 		attachTo(currentSupport)
 
 		return true
@@ -109,22 +114,66 @@ class ScoochwormWanderGoal(
 	}
 
 	private fun turn(supportDirection: Direction) {
-		val maximumTurnRadians = Math.PI / 6.0
-		val angle = scoochworm.random.nextDouble() * maximumTurnRadians
-		val signedAngle = if (scoochworm.random.nextBoolean()) angle else -angle
+		val turnRange = MAXIMUM_ARC_TURN_RADIANS - MINIMUM_ARC_TURN_RADIANS
+		val angle = MINIMUM_ARC_TURN_RADIANS + scoochworm.random.nextDouble() * turnRange
+		val surfaceNormal = supportDirection.normal.toVec3()
 
 		movementDirection = rotateAroundAxis(
 			movementDirection,
-			supportDirection.normal.toVec3(),
-			signedAngle
+			surfaceNormal,
+			angle * turnSign
+		).normalize()
+
+		steerTowardHome(surfaceNormal)
+	}
+
+	private fun steerTowardHome(surfaceNormal: Vec3) {
+		val homePosition = homePosition ?: return
+		val horizontalOffset = Vec3(
+			homePosition.x - scoochworm.x,
+			0.0,
+			homePosition.z - scoochworm.z
+		)
+		val horizontalDistance = horizontalOffset.length()
+		if (horizontalDistance <= HOME_STEERING_DISTANCE) return
+
+		val directionTowardHome = projectOntoSurface(horizontalOffset, scoochworm.supportDirection)
+		if (directionTowardHome.lengthSqr() <= MINIMUM_DIRECTION_LENGTH_SQUARED) return
+
+		val desiredDirection = directionTowardHome.normalize()
+		val signedAngle = atan2(
+			surfaceNormal.dot(movementDirection.cross(desiredDirection)),
+			movementDirection.dot(desiredDirection)
+		)
+		val steeringStrength = ((horizontalDistance - HOME_STEERING_DISTANCE) / HOME_STEERING_RANGE)
+			.coerceIn(0.0, 1.0)
+		val steeringAngle = signedAngle.coerceIn(
+			-MAXIMUM_HOME_TURN_RADIANS * steeringStrength,
+			MAXIMUM_HOME_TURN_RADIANS * steeringStrength
+		)
+
+		movementDirection = rotateAroundAxis(
+			movementDirection,
+			surfaceNormal,
+			steeringAngle
 		).normalize()
 	}
 
 	private fun tryTurning(currentSupport: ScoochwormSupport) {
 		if (transitionTicks > 0 || scoochworm.tickCount < nextTurnTick) return
 
+		updateHome()
 		turn(currentSupport.supportDirection)
 		nextTurnTick = scoochworm.tickCount + TURN_INTERVAL_TICKS
+	}
+
+	private fun updateHome() {
+		if (homePosition != null && scoochworm.tickCount < nextHomeTick) return
+
+		homePosition = scoochworm.position()
+		turnSign = if (scoochworm.random.nextBoolean()) 1.0 else -1.0
+		nextHomeTick = scoochworm.tickCount + HOME_DURATION_MINIMUM_TICKS +
+			scoochworm.random.nextInt(HOME_DURATION_RANGE_TICKS + 1)
 	}
 
 	private fun tryTurningUpwards(
@@ -516,7 +565,15 @@ class ScoochwormWanderGoal(
 
 	companion object {
 		private const val TURN_INTERVAL_TICKS = 20
+		private const val HOME_DURATION_MINIMUM_TICKS = 1200
+		private const val HOME_DURATION_RANGE_TICKS = 1200
 		private const val TRANSITION_TICKS = 4
+		private const val HOME_STEERING_DISTANCE = 12.0
+		private const val HOME_STEERING_RANGE = 12.0
+		private const val MINIMUM_DIRECTION_LENGTH_SQUARED = 0.000001
+		private val MINIMUM_ARC_TURN_RADIANS = 8.0.toRadians()
+		private val MAXIMUM_ARC_TURN_RADIANS = 16.0.toRadians()
+		private val MAXIMUM_HOME_TURN_RADIANS = 35.0.toRadians()
 		private const val SUPPORT_PROBE_DISTANCE = 0.05
 		private const val COLLISION_TOLERANCE = 0.001
 		private const val COLLISION_TURN_STEP_DEGREES = 5.0
