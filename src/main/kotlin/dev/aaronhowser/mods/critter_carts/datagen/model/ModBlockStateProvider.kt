@@ -178,7 +178,14 @@ class ModBlockStateProvider(
 		disabled: Boolean,
 		faceModels: Pair<BlockModelBuilder, BlockModelBuilder>
 	) {
-		val faceModel = if (shouldRotateTexture(axis, direction)) {
+		val shouldRotateTexture = when {
+			direction.axis == axis -> axis != Direction.Axis.Y
+			axis == Direction.Axis.Y -> false
+			direction.axis == Direction.Axis.Y -> axis == Direction.Axis.X
+			else -> true
+		}
+
+		val faceModel = if (shouldRotateTexture) {
 			faceModels.second
 		} else {
 			faceModels.first
@@ -226,17 +233,6 @@ class ModBlockStateProvider(
 					}
 				}
 			}
-	}
-
-	private fun shouldRotateTexture(
-		axis: Direction.Axis,
-		direction: Direction
-	): Boolean {
-		if (direction.axis == axis) return axis != Direction.Axis.Y
-		if (axis == Direction.Axis.Y) return false
-		if (direction.axis == Direction.Axis.Y) return axis == Direction.Axis.X
-
-		return true
 	}
 
 	private fun getFaceXRotation(direction: Direction): Int {
