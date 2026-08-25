@@ -5,6 +5,9 @@ import dev.aaronhowser.mods.critter_carts.CritterCarts
 import dev.aaronhowser.mods.critter_carts.block.ColoredScoochstemBlock
 import dev.aaronhowser.mods.critter_carts.block.ScoochstemBlock
 import dev.aaronhowser.mods.critter_carts.entity.data.WormColor
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.HugeMushroomBlock
+import net.minecraft.world.level.block.state.BlockBehaviour
 import net.neoforged.neoforge.registries.DeferredBlock
 import net.neoforged.neoforge.registries.DeferredRegister
 
@@ -19,6 +22,11 @@ object ModBlocks : AaronBlockRegistry() {
 
 	val SCOOCHSTEM_WOOD: DeferredBlock<ScoochstemBlock> =
 		registerBlock("scoochstem_wood", ::ScoochstemBlock)
+
+	val APPLE_SLICE: DeferredBlock<HugeMushroomBlock> =
+		registerBlock("apple_slice") {
+			HugeMushroomBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.RED_MUSHROOM_BLOCK))
+		}
 
 	val GREEN_SCOOCHSTEM: DeferredBlock<ColoredScoochstemBlock> =
 		coloredScoochstem(WormColor.GREEN)

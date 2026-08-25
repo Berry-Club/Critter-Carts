@@ -17,6 +17,7 @@ class ModLanguageProvider(
 
 		addBlock(ModBlocks.SCOOCHSTEM, "Scoochstem")
 		addBlock(ModBlocks.SCOOCHSTEM_WOOD, "Scoochstem Wood")
+		addBlock(ModBlocks.APPLE_SLICE, "Apple Slice")
 
 		addBlock(ModBlocks.GREEN_SCOOCHSTEM, "Green Scoochstem")
 		addBlock(ModBlocks.BLUE_SCOOCHSTEM, "Blue Scoochstem")

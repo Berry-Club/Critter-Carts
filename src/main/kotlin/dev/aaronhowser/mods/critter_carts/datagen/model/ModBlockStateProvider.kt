@@ -10,6 +10,7 @@ import net.minecraft.core.Direction
 import net.minecraft.data.PackOutput
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.HugeMushroomBlock
 import net.minecraft.world.level.block.RotatedPillarBlock
 import net.neoforged.neoforge.client.model.generators.BlockModelBuilder
 import net.neoforged.neoforge.client.model.generators.BlockStateProvider
@@ -22,8 +23,48 @@ class ModBlockStateProvider(
 ) : BlockStateProvider(output, CritterCarts.MOD_ID, existingFileHelper) {
 
 	override fun registerStatesAndModels() {
+		appleSlice()
 		scoochstem()
 		coloredScoochstems()
+	}
+
+	private fun appleSlice() {
+		val block = ModBlocks.APPLE_SLICE.get()
+		val outsideModel = models().getExistingFile(mcLoc("block/red_mushroom_block"))
+
+		for (direction in Direction.entries) {
+			val property = when (direction) {
+				Direction.NORTH -> HugeMushroomBlock.NORTH
+				Direction.EAST -> HugeMushroomBlock.EAST
+				Direction.SOUTH -> HugeMushroomBlock.SOUTH
+				Direction.WEST -> HugeMushroomBlock.WEST
+				Direction.UP -> HugeMushroomBlock.UP
+				Direction.DOWN -> HugeMushroomBlock.DOWN
+			}
+
+			getMultipartBuilder(block)
+				.part()
+				.modelFile(outsideModel)
+				.rotationX(getFaceXRotation(direction))
+				.rotationY(getFaceYRotation(direction))
+				.addModel()
+				.condition(property, true)
+				.end()
+		}
+
+		getMultipartBuilder(block)
+			.part()
+			.modelFile(models().getExistingFile(mcLoc("block/mushroom_block_inside")))
+			.addModel()
+			.condition(HugeMushroomBlock.NORTH, false)
+			.condition(HugeMushroomBlock.EAST, false)
+			.condition(HugeMushroomBlock.SOUTH, false)
+			.condition(HugeMushroomBlock.WEST, false)
+			.condition(HugeMushroomBlock.UP, false)
+			.condition(HugeMushroomBlock.DOWN, false)
+			.end()
+
+		simpleBlockItem(block, models().cubeAll("apple_slice", mcLoc("block/red_mushroom_block")))
 	}
 
 	private fun coloredScoochstems() {
