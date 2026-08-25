@@ -55,7 +55,7 @@ class ScoochwormEntity(
 
 	private val animatableInstanceCache = SingletonAnimatableInstanceCache(this)
 	val pathMoveControl = ScoochwormMoveControl(this)
-	private val movementPath = ScoochwormPath(PART_SPACING * ScoochwormSegments.MAX_COUNT)
+	private val movementPath = ScoochwormPath()
 	private val bodySegments = ScoochwormSegments(this)
 
 	private var footstepPartIndex = HEAD_FOOTSTEP_INDEX
@@ -114,7 +114,7 @@ class ScoochwormEntity(
 
 		// Record the path that the head has traveled,
 		// and then set each segment to be a set distance from the head along that path
-		movementPath.record(position(), supportDirection, yRot)
+		movementPath.record(position(), supportDirection)
 		bodySegments.update(movementPath)
 
 		val moved = positionBefore.distanceToSqr(position()) > 0.000001

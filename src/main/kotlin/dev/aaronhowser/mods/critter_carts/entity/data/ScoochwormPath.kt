@@ -6,19 +6,13 @@ import net.minecraft.nbt.ListTag
 import net.minecraft.world.phys.Vec3
 import java.util.*
 
-class ScoochwormPath(
-	private val initialLength: Double
-) {
+class ScoochwormPath {
 
 	private val points = ArrayDeque<ScoochwormPathPoint>()
 
-	fun record(headPosition: Vec3, supportDirection: Direction, yaw: Float) {
+	fun record(headPosition: Vec3, supportDirection: Direction) {
 		if (points.isEmpty()) {
 			points.addFirst(ScoochwormPathPoint(headPosition, supportDirection))
-
-			val forwardDirection = Vec3.directionFromRotation(0f, yaw)
-			val tailPosition = headPosition.subtract(forwardDirection.scale(initialLength))
-			points.addLast(ScoochwormPathPoint(tailPosition, supportDirection))
 			return
 		}
 
@@ -33,7 +27,7 @@ class ScoochwormPath(
 		}
 	}
 
-	fun getPoint(distanceFromHead: Double): ScoochwormPathPoint {
+	fun getPoint(distanceFromHead: Double): ScoochwormPathPoint? {
 		var remainingDistance = distanceFromHead
 		val iterator = points.iterator()
 		var positionCloserToHead = iterator.next()
@@ -60,7 +54,7 @@ class ScoochwormPath(
 			)
 		}
 
-		return positionCloserToHead
+		return null
 	}
 
 	fun clear() {
