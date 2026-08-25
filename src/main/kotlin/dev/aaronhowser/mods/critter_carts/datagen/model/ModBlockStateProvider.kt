@@ -145,6 +145,36 @@ class ModBlockStateProvider(
 		endModels: Pair<BlockModelBuilder, BlockModelBuilder>,
 		disabledEndModels: Pair<BlockModelBuilder, BlockModelBuilder>
 	) {
+		fun addScoochstemFace(
+			direction: Direction,
+			axis: Direction.Axis,
+			disabled: Boolean,
+			faceModels: Pair<BlockModelBuilder, BlockModelBuilder>
+		) {
+			val shouldRotateTexture = when {
+				direction.axis == axis -> axis != Direction.Axis.Y
+				axis == Direction.Axis.Y -> false
+				direction.axis == Direction.Axis.Y -> axis == Direction.Axis.X
+				else -> true
+			}
+
+			val faceModel = if (shouldRotateTexture) {
+				faceModels.second
+			} else {
+				faceModels.first
+			}
+
+			getMultipartBuilder(block)
+				.part()
+				.modelFile(faceModel)
+				.rotationX(getFaceXRotation(direction))
+				.rotationY(getFaceYRotation(direction))
+				.addModel()
+				.condition(RotatedPillarBlock.AXIS, axis)
+				.condition(ScoochstemBlock.getDisabledProperty(direction), disabled)
+				.end()
+		}
+
 		for (direction in Direction.entries) {
 			for (axis in Direction.Axis.entries) {
 				val isPillarEnd = direction.axis == axis
@@ -154,14 +184,12 @@ class ModBlockStateProvider(
 					if (isPillarEnd) disabledEndModels else disabledSideModels
 
 				addScoochstemFace(
-					block = block,
 					direction = direction,
 					axis = axis,
 					disabled = false,
 					faceModels = enabledModels
 				)
 				addScoochstemFace(
-					block = block,
 					direction = direction,
 					axis = axis,
 					disabled = true,
@@ -171,68 +199,36 @@ class ModBlockStateProvider(
 		}
 	}
 
-	private fun addScoochstemFace(
-		block: Block,
-		direction: Direction,
-		axis: Direction.Axis,
-		disabled: Boolean,
-		faceModels: Pair<BlockModelBuilder, BlockModelBuilder>
-	) {
-		val shouldRotateTexture = when {
-			direction.axis == axis -> axis != Direction.Axis.Y
-			axis == Direction.Axis.Y -> false
-			direction.axis == Direction.Axis.Y -> axis == Direction.Axis.X
-			else -> true
-		}
-
-		val faceModel = if (shouldRotateTexture) {
-			faceModels.second
-		} else {
-			faceModels.first
-		}
-
-		getMultipartBuilder(block)
-			.part()
-			.modelFile(faceModel)
-			.rotationX(getFaceXRotation(direction))
-			.rotationY(getFaceYRotation(direction))
-			.addModel()
-			.condition(RotatedPillarBlock.AXIS, axis)
-			.condition(ScoochstemBlock.getDisabledProperty(direction), disabled)
-			.end()
-	}
-
 	private fun scoochstemFaceModels(
 		name: String,
 		texture: ResourceLocation
 	): Pair<BlockModelBuilder, BlockModelBuilder> {
-		val regularModel = scoochstemFaceModel(name, texture, false)
-		val rotatedModel = scoochstemFaceModel(name + "_rotated", texture, true)
+		fun scoochstemFaceModel(
+			modelName: String,
+			rotateTexture: Boolean
+		): BlockModelBuilder {
+			return models()
+				.withExistingParent(modelName, mcLoc("block/block"))
+				.texture("texture", texture)
+				.particle(texture)
+				.element {
+					from(0f, 0f, 0f)
+					to(16f, 16f, 16f)
+					face(Direction.NORTH) {
+						texture("#texture")
+						cullface(Direction.NORTH)
 
-		return regularModel to rotatedModel
-	}
-
-	private fun scoochstemFaceModel(
-		name: String,
-		texture: ResourceLocation,
-		rotateTexture: Boolean
-	): BlockModelBuilder {
-		return models()
-			.withExistingParent(name, mcLoc("block/block"))
-			.texture("texture", texture)
-			.particle(texture)
-			.element {
-				from(0f, 0f, 0f)
-				to(16f, 16f, 16f)
-				face(Direction.NORTH) {
-					texture("#texture")
-					cullface(Direction.NORTH)
-
-					if (rotateTexture) {
-						rotation(ModelBuilder.FaceRotation.CLOCKWISE_90)
+						if (rotateTexture) {
+							rotation(ModelBuilder.FaceRotation.CLOCKWISE_90)
+						}
 					}
 				}
-			}
+		}
+
+		val regularModel = scoochstemFaceModel(name, false)
+		val rotatedModel = scoochstemFaceModel(name + "_rotated", true)
+
+		return regularModel to rotatedModel
 	}
 
 	private fun getFaceXRotation(direction: Direction): Int {
