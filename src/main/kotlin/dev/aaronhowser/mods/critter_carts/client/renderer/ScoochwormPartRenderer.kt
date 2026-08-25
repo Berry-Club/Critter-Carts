@@ -46,6 +46,16 @@ class ScoochwormPartRenderer(
 			animatable.supportDirection,
 			interpolatedYaw
 		)
+
+		val partScale = getPartScale(animatable.partIndex)
+		poseStack.scale(partScale, partScale, partScale)
 	}
 
+	private fun getPartScale(partIndex: Int): Float {
+		return 1f - PART_SCALE_DECREMENT * (partIndex + 1)
+	}
+
+	companion object {
+		private const val PART_SCALE_DECREMENT = 0.001f
+	}
 }
