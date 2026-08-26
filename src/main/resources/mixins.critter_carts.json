@@ -4,6 +4,7 @@
 	"package": "dev.aaronhowser.mods.critter_carts.mixin",
 	"mixins": [],
 	"client": [
+		"client.AbstractClientPlayerMixin",
 		"client.LivingEntityRendererMixin"
 	],
 	"injectors": {

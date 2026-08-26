@@ -1,8 +1,10 @@
 package dev.aaronhowser.mods.critter_carts.effect
 
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isHolder
+import dev.aaronhowser.mods.critter_carts.CritterCarts
 import dev.aaronhowser.mods.critter_carts.entity.data.WormColor
 import dev.aaronhowser.mods.critter_carts.registry.ModMobEffectTags
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.effect.MobEffect
 import net.minecraft.world.effect.MobEffectCategory
 import net.minecraft.world.entity.LivingEntity
@@ -26,5 +28,11 @@ class AaronMobEffect : MobEffect(
 
 			livingEntity.removeEffect(effect)
 		}
+	}
+
+	companion object {
+		@JvmField
+		val SKIN: ResourceLocation =
+			CritterCarts.modResource("textures/entity/player/aaron.png")
 	}
 }

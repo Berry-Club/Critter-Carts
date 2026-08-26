@@ -38,7 +38,9 @@ class CritterCarts(
 		@JvmField
 		val LOGGER: Logger = LogManager.getLogger(MOD_ID)
 
-		fun modResource(path: String): ResourceLocation = ResourceLocation.fromNamespaceAndPath(MOD_ID, path)
+		@JvmStatic
+		fun modResource(path: String): ResourceLocation =
+			ResourceLocation.fromNamespaceAndPath(MOD_ID, path)
 	}
 
 }

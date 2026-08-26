@@ -1,0 +1,32 @@
+package dev.aaronhowser.mods.critter_carts.mixin.client;
+
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import dev.aaronhowser.mods.critter_carts.effect.AaronMobEffect;
+import dev.aaronhowser.mods.critter_carts.registry.ModMobEffects;
+import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.resources.PlayerSkin;
+import org.spongepowered.asm.mixin.Mixin;
+
+@Mixin(AbstractClientPlayer.class)
+public abstract class AbstractClientPlayerMixin {
+
+	@WrapMethod(method = "getSkin")
+	private PlayerSkin critterCarts$useAaronSkin(Operation<PlayerSkin> original) {
+		PlayerSkin originalSkin = original.call();
+		AbstractClientPlayer player = (AbstractClientPlayer) (Object) this;
+
+		if (!player.hasEffect(ModMobEffects.INSTANCE.getAARON())) {
+			return originalSkin;
+		}
+
+		return new PlayerSkin(
+			AaronMobEffect.SKIN,
+			null,
+			originalSkin.capeTexture(),
+			originalSkin.elytraTexture(),
+			PlayerSkin.Model.WIDE,
+			true
+		);
+	}
+}
