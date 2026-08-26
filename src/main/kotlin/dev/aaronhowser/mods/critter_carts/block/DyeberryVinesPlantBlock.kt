@@ -57,7 +57,7 @@ class DyeberryVinesPlantBlock : CaveVinesPlantBlock(Properties.ofFullCopy(Blocks
 		position: BlockPos,
 		state: BlockState
 	): ItemStack {
-		return DyeberryVinesBlock.getDyeberryStack(state.getValue(DyeberryVinesBlock.COLOR))
+		return state.getValue(DyeberryVinesBlock.COLOR).getDyeberryStack()
 	}
 
 	override fun useWithoutItem(

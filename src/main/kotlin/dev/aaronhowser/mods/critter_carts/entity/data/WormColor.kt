@@ -2,10 +2,12 @@ package dev.aaronhowser.mods.critter_carts.entity.data
 
 import com.mojang.serialization.Codec
 import dev.aaronhowser.mods.critter_carts.CritterCarts
+import dev.aaronhowser.mods.critter_carts.registry.ModItems
 import io.netty.buffer.ByteBuf
 import net.minecraft.network.codec.ByteBufCodecs
 import net.minecraft.network.codec.StreamCodec
 import net.minecraft.util.StringRepresentable
+import net.minecraft.world.item.ItemStack
 
 enum class WormColor(
 	val colorName: String,
@@ -26,6 +28,18 @@ enum class WormColor(
 
 	fun next(): WormColor {
 		return entries[(ordinal + 1) % entries.size]
+	}
+
+	fun getDyeberryStack(): ItemStack {
+		return when (this) {
+			GREEN -> ModItems.GREEN_DYEBERRY
+			BLUE -> ModItems.BLUE_DYEBERRY
+			RED -> ModItems.RED_DYEBERRY
+			YELLOW -> ModItems.YELLOW_DYEBERRY
+			MAGENTA -> ModItems.MAGENTA_DYEBERRY
+			CYAN -> ModItems.CYAN_DYEBERRY
+			AARON -> ModItems.AARONBERRY
+		}.toStack()
 	}
 
 	companion object {

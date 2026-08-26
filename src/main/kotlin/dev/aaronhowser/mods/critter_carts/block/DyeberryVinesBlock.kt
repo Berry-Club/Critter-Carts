@@ -2,7 +2,6 @@ package dev.aaronhowser.mods.critter_carts.block
 
 import dev.aaronhowser.mods.critter_carts.entity.data.WormColor
 import dev.aaronhowser.mods.critter_carts.registry.ModBlocks
-import dev.aaronhowser.mods.critter_carts.registry.ModItems
 import dev.aaronhowser.mods.critter_carts.world.DyeberryVineReplacement
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
@@ -80,7 +79,7 @@ class DyeberryVinesBlock : CaveVinesBlock(Properties.ofFullCopy(Blocks.CAVE_VINE
 		position: BlockPos,
 		state: BlockState
 	): ItemStack {
-		return getDyeberryStack(state.getValue(COLOR))
+		return state.getValue(COLOR).getDyeberryStack()
 	}
 
 	override fun useWithoutItem(
@@ -103,20 +102,6 @@ class DyeberryVinesBlock : CaveVinesBlock(Properties.ofFullCopy(Blocks.CAVE_VINE
 
 		val COLOR: EnumProperty<WormColor> = EnumProperty.create("color", WormColor::class.java)
 
-		fun getDyeberryStack(color: WormColor): ItemStack {
-			val item = when (color) {
-				WormColor.GREEN -> ModItems.GREEN_DYEBERRY
-				WormColor.BLUE -> ModItems.BLUE_DYEBERRY
-				WormColor.RED -> ModItems.RED_DYEBERRY
-				WormColor.YELLOW -> ModItems.YELLOW_DYEBERRY
-				WormColor.MAGENTA -> ModItems.MAGENTA_DYEBERRY
-				WormColor.CYAN -> ModItems.CYAN_DYEBERRY
-				WormColor.AARON -> ModItems.AARONBERRY
-			}
-
-			return item.toStack()
-		}
-
 		fun harvest(
 			entity: Entity?,
 			state: BlockState,
@@ -126,7 +111,7 @@ class DyeberryVinesBlock : CaveVinesBlock(Properties.ofFullCopy(Blocks.CAVE_VINE
 			if (!state.getValue(BERRIES)) return InteractionResult.PASS
 
 			val color = state.getValue(COLOR)
-			popResource(level, position, getDyeberryStack(color))
+			popResource(level, position, color.getDyeberryStack())
 
 			val pitch = Mth.randomBetween(level.random, 0.8f, 1.2f)
 			level.playSound(
