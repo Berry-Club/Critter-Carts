@@ -9,7 +9,6 @@ import dev.aaronhowser.mods.critter_carts.registry.ModEntityTypes
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer
 import net.minecraft.client.renderer.MultiBufferSource
-import net.minecraft.core.Direction
 import net.minecraft.world.item.ItemDisplayContext
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.component.CustomData
@@ -36,7 +35,6 @@ class CritterCageItemRenderer : BlockEntityWithoutLevelRenderer(
 		renderCage(poseStack, buffer, packedLight, packedOverlay)
 
 		val scoochworm = getScoochworm(stack) ?: return
-		prepareScoochworm(scoochworm, displayContext)
 
 		poseStack.withPose {
 			poseStack.translate(0.5, 0.05, 0.5)
@@ -91,27 +89,6 @@ class CritterCageItemRenderer : BlockEntityWithoutLevelRenderer(
 		return scoochworm
 	}
 
-	private fun prepareScoochworm(
-		scoochworm: ScoochwormEntity,
-		displayContext: ItemDisplayContext
-	) {
-		val yaw = when (displayContext) {
-			ItemDisplayContext.THIRD_PERSON_RIGHT_HAND,
-			ItemDisplayContext.THIRD_PERSON_LEFT_HAND -> THIRD_PERSON_YAW
-
-			else -> DEFAULT_YAW
-		}
-
-		scoochworm.supportDirection = Direction.DOWN
-		scoochworm.yRot = yaw
-		scoochworm.yRotO = yaw
-		scoochworm.yBodyRot = yaw
-		scoochworm.yHeadRot = yaw
-		scoochworm.yHeadRotO = yaw
-		scoochworm.xRot = 0f
-		scoochworm.xRotO = 0f
-	}
-
 	object ClientItemExtensions : IClientItemExtensions {
 		private val renderer = CritterCageItemRenderer()
 
@@ -120,8 +97,4 @@ class CritterCageItemRenderer : BlockEntityWithoutLevelRenderer(
 		}
 	}
 
-	companion object {
-		private const val THIRD_PERSON_YAW = 0f
-		private const val DEFAULT_YAW = 180f
-	}
 }
