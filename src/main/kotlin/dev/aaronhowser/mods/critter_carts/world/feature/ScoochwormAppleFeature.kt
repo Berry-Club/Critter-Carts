@@ -12,6 +12,7 @@ import net.minecraft.world.entity.MobSpawnType
 import net.minecraft.world.level.WorldGenLevel
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.CaveVinesBlock
 import net.minecraft.world.level.block.HugeMushroomBlock
 import net.minecraft.world.level.block.RotatedPillarBlock
 import net.minecraft.world.level.block.state.BlockState
@@ -96,6 +97,7 @@ class ScoochwormAppleFeature : Feature<NoneFeatureConfiguration>(NoneFeatureConf
 			}
 		}
 
+		val stemPos = center.above(APPLE_RADIUS + 1)
 		val stemState = ModBlocks.SCOOCHSTEM.get()
 			.defaultBlockState()
 			.setValue(RotatedPillarBlock.AXIS, Direction.Axis.Y)
@@ -104,15 +106,16 @@ class ScoochwormAppleFeature : Feature<NoneFeatureConfiguration>(NoneFeatureConf
 				level.random.nextIntBetweenInclusive(ScoochstemBlock.MIN_INITIAL_GROWTH, ScoochstemBlock.MAX_INITIAL_GROWTH)
 			)
 
-		val stemPos = center.above(APPLE_RADIUS + 1)
-
-		level.setBlock(
-			stemPos,
-			stemState,
-			Block.UPDATE_CLIENTS
-		)
-
+		level.setBlock(stemPos, stemState, Block.UPDATE_CLIENTS)
 		level.scheduleTick(stemPos, stemState.block, 3)
+
+		val berryPos = center.above(APPLE_RADIUS - 1)
+		val berryState = Blocks.CAVE_VINES
+			.defaultBlockState()
+			.setValue(CaveVinesBlock.BERRIES, true)
+
+		level.setBlock(berryPos, berryState, Block.UPDATE_CLIENTS)
+
 	}
 
 	private fun spawnScoochworm(level: WorldGenLevel, floorPosition: BlockPos) {
