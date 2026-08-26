@@ -29,7 +29,7 @@ class ScoochwormAppleFeature : Feature<NoneFeatureConfiguration>(NoneFeatureConf
 		if (!isExposed(level, center)) return false
 
 		placeApple(level, center)
-		spawnScoochworm(level, center.below(INTERIOR_FLOOR_OFFSET))
+		spawnScoochworm(level, center.below(APPLE_RADIUS))
 		sendTeleportMessage(level, center)
 
 		return true
@@ -99,7 +99,11 @@ class ScoochwormAppleFeature : Feature<NoneFeatureConfiguration>(NoneFeatureConf
 			.defaultBlockState()
 			.setValue(RotatedPillarBlock.AXIS, Direction.Axis.Y)
 
-		level.setBlock(center.above(), stemState, Block.UPDATE_CLIENTS)
+		level.setBlock(
+			center.above(APPLE_RADIUS + 1),
+			stemState,
+			Block.UPDATE_CLIENTS
+		)
 	}
 
 	private fun spawnScoochworm(level: WorldGenLevel, floorPosition: BlockPos) {
@@ -167,8 +171,7 @@ class ScoochwormAppleFeature : Feature<NoneFeatureConfiguration>(NoneFeatureConf
 	}
 
 	companion object {
-		private const val APPLE_RADIUS = 3
-		private const val INTERIOR_FLOOR_OFFSET = 3
+		private const val APPLE_RADIUS = 2
 		private const val VERTICAL_SEARCH_RANGE = 24
 	}
 }
