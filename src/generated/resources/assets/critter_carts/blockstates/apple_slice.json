@@ -11,6 +11,15 @@
     },
     {
       "apply": {
+        "model": "minecraft:block/mushroom_block_inside",
+        "x": 90
+      },
+      "when": {
+        "down": "false"
+      }
+    },
+    {
+      "apply": {
         "model": "minecraft:block/red_mushroom_block",
         "x": 270
       },
@@ -20,10 +29,27 @@
     },
     {
       "apply": {
+        "model": "minecraft:block/mushroom_block_inside",
+        "x": 270
+      },
+      "when": {
+        "up": "false"
+      }
+    },
+    {
+      "apply": {
         "model": "minecraft:block/red_mushroom_block"
       },
       "when": {
         "north": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "minecraft:block/mushroom_block_inside"
+      },
+      "when": {
+        "north": "false"
       }
     },
     {
@@ -37,11 +63,29 @@
     },
     {
       "apply": {
+        "model": "minecraft:block/mushroom_block_inside",
+        "y": 180
+      },
+      "when": {
+        "south": "false"
+      }
+    },
+    {
+      "apply": {
         "model": "minecraft:block/red_mushroom_block",
         "y": 270
       },
       "when": {
         "west": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "minecraft:block/mushroom_block_inside",
+        "y": 270
+      },
+      "when": {
+        "west": "false"
       }
     },
     {
@@ -55,15 +99,11 @@
     },
     {
       "apply": {
-        "model": "minecraft:block/mushroom_block_inside"
+        "model": "minecraft:block/mushroom_block_inside",
+        "y": 90
       },
       "when": {
-        "down": "false",
-        "east": "false",
-        "north": "false",
-        "south": "false",
-        "up": "false",
-        "west": "false"
+        "east": "false"
       }
     }
   ]

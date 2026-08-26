@@ -173,6 +173,7 @@ class ModBlockStateProvider(
 	private fun appleSlice() {
 		val block = ModBlocks.APPLE_SLICE.get()
 		val outsideModel = models().getExistingFile(mcLoc("block/red_mushroom_block"))
+		val insideModel = models().getExistingFile(mcLoc("block/mushroom_block_inside"))
 
 		for (direction in Direction.entries) {
 			val property = when (direction) {
@@ -192,19 +193,16 @@ class ModBlockStateProvider(
 				.addModel()
 				.condition(property, true)
 				.end()
-		}
 
-		getMultipartBuilder(block)
-			.part()
-			.modelFile(models().getExistingFile(mcLoc("block/mushroom_block_inside")))
-			.addModel()
-			.condition(HugeMushroomBlock.NORTH, false)
-			.condition(HugeMushroomBlock.EAST, false)
-			.condition(HugeMushroomBlock.SOUTH, false)
-			.condition(HugeMushroomBlock.WEST, false)
-			.condition(HugeMushroomBlock.UP, false)
-			.condition(HugeMushroomBlock.DOWN, false)
-			.end()
+			getMultipartBuilder(block)
+				.part()
+				.modelFile(insideModel)
+				.rotationX(getFaceXRotation(direction))
+				.rotationY(getFaceYRotation(direction))
+				.addModel()
+				.condition(property, false)
+				.end()
+		}
 
 		simpleBlockItem(block, models().cubeAll("apple_slice", mcLoc("block/red_mushroom_block")))
 	}
