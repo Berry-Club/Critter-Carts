@@ -6,6 +6,7 @@ import dev.aaronhowser.mods.aaron.misc.AaronDsls.transform
 import dev.aaronhowser.mods.aaron.misc.AaronDsls.transforms
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.particle
 import dev.aaronhowser.mods.critter_carts.CritterCarts
+import dev.aaronhowser.mods.critter_carts.block.CritterCageBlock
 import dev.aaronhowser.mods.critter_carts.block.ScoochstemBlock
 import dev.aaronhowser.mods.critter_carts.registry.ModBlocks
 import dev.aaronhowser.mods.critter_carts.registry.ModItems
@@ -19,6 +20,7 @@ import net.minecraft.world.level.block.HugeMushroomBlock
 import net.minecraft.world.level.block.RotatedPillarBlock
 import net.neoforged.neoforge.client.model.generators.BlockModelBuilder
 import net.neoforged.neoforge.client.model.generators.BlockStateProvider
+import net.neoforged.neoforge.client.model.generators.ConfiguredModel
 import net.neoforged.neoforge.client.model.generators.ModelBuilder
 import net.neoforged.neoforge.client.model.generators.ModelFile
 import net.neoforged.neoforge.common.data.ExistingFileHelper
@@ -96,7 +98,25 @@ class ModBlockStateProvider(
 			}
 		}
 
-		simpleBlock(ModBlocks.CRITTER_CAGE.get(), model)
+		getVariantBuilder(ModBlocks.CRITTER_CAGE.get()).forAllStates { state ->
+			val down = state.getValue(CritterCageBlock.DOWN)
+			val forward = state.getValue(CritterCageBlock.FORWARD)
+			val configuredModel = ConfiguredModel.builder().modelFile(model)
+
+			when (down) {
+				Direction.DOWN -> configuredModel
+					.rotationY(horizontalRotation(forward))
+				Direction.UP -> configuredModel
+					.rotationX(180)
+					.rotationY((horizontalRotation(forward) + 180) % 360)
+				Direction.NORTH -> configuredModel.rotationX(90)
+				Direction.EAST -> configuredModel.rotationX(90).rotationY(90)
+				Direction.SOUTH -> configuredModel.rotationX(90).rotationY(180)
+				Direction.WEST -> configuredModel.rotationX(90).rotationY(270)
+			}
+
+			configuredModel.build()
+		}
 
 		itemModels()
 			.getBuilder(ModItems.CRITTER_CAGE.id.path)
@@ -127,6 +147,16 @@ class ModBlockStateProvider(
 					rotation(0f, 180f, 0f)
 				}
 			}
+	}
+
+	private fun horizontalRotation(direction: Direction): Int {
+		return when (direction) {
+			Direction.NORTH -> 0
+			Direction.EAST -> 90
+			Direction.SOUTH -> 180
+			Direction.WEST -> 270
+			else -> 0
+		}
 	}
 
 	private fun appleSlice() {

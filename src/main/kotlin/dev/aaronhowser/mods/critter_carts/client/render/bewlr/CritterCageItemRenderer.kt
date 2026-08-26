@@ -1,6 +1,7 @@
 package dev.aaronhowser.mods.critter_carts.client.render.bewlr
 
 import com.mojang.blaze3d.vertex.PoseStack
+import dev.aaronhowser.mods.aaron.misc.AaronDsls.withPose
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity
 import dev.aaronhowser.mods.critter_carts.registry.ModBlocks
 import dev.aaronhowser.mods.critter_carts.registry.ModDataComponents
@@ -37,24 +38,22 @@ class CritterCageItemRenderer : BlockEntityWithoutLevelRenderer(
 		val scoochworm = getScoochworm(stack) ?: return
 		prepareScoochworm(scoochworm, displayContext)
 
-		poseStack.pushPose()
-		poseStack.translate(0.5, 0.05, 0.5)
-		poseStack.scale(HEAD_SCALE, HEAD_SCALE, HEAD_SCALE)
+		poseStack.withPose {
+			poseStack.translate(0.5, 0.05, 0.5)
 
-		val entityRenderer = Minecraft.getInstance()
-			.entityRenderDispatcher
-			.getRenderer(scoochworm)
+			val entityRenderer = Minecraft.getInstance()
+				.entityRenderDispatcher
+				.getRenderer(scoochworm)
 
-		entityRenderer.render(
-			scoochworm,
-			scoochworm.yRot,
-			0f,
-			poseStack,
-			buffer,
-			packedLight
-		)
-
-		poseStack.popPose()
+			entityRenderer.render(
+				scoochworm,
+				scoochworm.yRot,
+				0f,
+				poseStack,
+				buffer,
+				packedLight
+			)
+		}
 	}
 
 	private fun renderCage(
@@ -99,6 +98,7 @@ class CritterCageItemRenderer : BlockEntityWithoutLevelRenderer(
 		val yaw = when (displayContext) {
 			ItemDisplayContext.THIRD_PERSON_RIGHT_HAND,
 			ItemDisplayContext.THIRD_PERSON_LEFT_HAND -> THIRD_PERSON_YAW
+
 			else -> DEFAULT_YAW
 		}
 
@@ -121,7 +121,6 @@ class CritterCageItemRenderer : BlockEntityWithoutLevelRenderer(
 	}
 
 	companion object {
-		private const val HEAD_SCALE = 0.65f
 		private const val THIRD_PERSON_YAW = 0f
 		private const val DEFAULT_YAW = 180f
 	}

@@ -37,7 +37,6 @@ class CritterCageBlockRenderer(
 
 		poseStack.withPose {
 			poseStack.translate(0.5, 0.05, 0.5)
-			poseStack.scale(HEAD_SCALE, HEAD_SCALE, HEAD_SCALE)
 			Minecraft.getInstance().entityRenderDispatcher.getRenderer(worm).render(
 				worm,
 				yaw,
@@ -49,7 +48,4 @@ class CritterCageBlockRenderer(
 		}
 	}
 
-	companion object {
-		private const val HEAD_SCALE = 0.65f
-	}
 }
