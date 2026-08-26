@@ -47,7 +47,7 @@ class CritterCageBlock : BaseEntityBlock(
 		val down = context.clickedFace.opposite
 		val forward = context.nearestLookingDirections.first { direction ->
 			direction.axis != down.axis
-		}
+		}.opposite
 
 		return defaultBlockState()
 			.setValue(DOWN, down)
