@@ -1,6 +1,7 @@
 package dev.aaronhowser.mods.critter_carts.client.render.block_entity
 
 import com.mojang.blaze3d.vertex.PoseStack
+import dev.aaronhowser.mods.aaron.misc.AaronDsls.withPose
 import dev.aaronhowser.mods.critter_carts.block.CritterCageBlock
 import dev.aaronhowser.mods.critter_carts.block.CritterCageBlockEntity
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity
@@ -26,6 +27,7 @@ class CritterCageBlockRenderer(
 
 		val worm = blockEntity.getScoochworm() ?: return
 		worm.supportDirection = down
+
 		val yaw = ScoochwormEntity.getMovementYaw(forward, down)
 		worm.yRot = yaw
 		worm.yRotO = yaw
@@ -33,18 +35,18 @@ class CritterCageBlockRenderer(
 		worm.yHeadRot = yaw
 		worm.yHeadRotO = yaw
 
-		poseStack.pushPose()
-		poseStack.translate(0.5, 0.05, 0.5)
-		poseStack.scale(HEAD_SCALE, HEAD_SCALE, HEAD_SCALE)
-		Minecraft.getInstance().entityRenderDispatcher.getRenderer(worm).render(
-			worm,
-			yaw,
-			partialTick,
-			poseStack,
-			bufferSource,
-			packedLight
-		)
-		poseStack.popPose()
+		poseStack.withPose {
+			poseStack.translate(0.5, 0.05, 0.5)
+			poseStack.scale(HEAD_SCALE, HEAD_SCALE, HEAD_SCALE)
+			Minecraft.getInstance().entityRenderDispatcher.getRenderer(worm).render(
+				worm,
+				yaw,
+				partialTick,
+				poseStack,
+				bufferSource,
+				packedLight
+			)
+		}
 	}
 
 	companion object {
