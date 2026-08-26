@@ -9,6 +9,7 @@ class ServerConfig(
 
 	lateinit var wickerBasketDropIntervalTicks: ModConfigSpec.IntValue
 	lateinit var wickerBasketDropAmount: ModConfigSpec.IntValue
+	lateinit var dyeberryVineReplacementChance: ModConfigSpec.DoubleValue
 
 	init {
 		general()
@@ -22,6 +23,10 @@ class ServerConfig(
 		wickerBasketDropAmount = builder
 			.comment("The number of items an upside-down Wicker Basket attempts to drop each interval.")
 			.defineInRange("wickerBasketDropAmount", 1, 1, Int.MAX_VALUE)
+
+		dyeberryVineReplacementChance = builder
+			.comment("The chance that a berry-bearing cave vine is replaced with a dyeberry vine.")
+			.defineInRange("dyeberryVineReplacementChance", 0.1, 0.0, 1.0)
 	}
 
 	companion object {
