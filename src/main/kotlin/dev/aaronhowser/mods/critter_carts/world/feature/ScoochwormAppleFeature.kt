@@ -10,11 +10,7 @@ import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.Style
 import net.minecraft.world.entity.MobSpawnType
 import net.minecraft.world.level.WorldGenLevel
-import net.minecraft.world.level.block.Block
-import net.minecraft.world.level.block.Blocks
-import net.minecraft.world.level.block.CaveVinesBlock
-import net.minecraft.world.level.block.HugeMushroomBlock
-import net.minecraft.world.level.block.RotatedPillarBlock
+import net.minecraft.world.level.block.*
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.properties.BooleanProperty
 import net.minecraft.world.level.levelgen.feature.Feature

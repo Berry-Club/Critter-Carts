@@ -15,33 +15,33 @@ import org.spongepowered.asm.mixin.Mixin;
 public abstract class LivingEntityRendererMixin {
 
 	@WrapMethod(
-			method = "render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V"
+		method = "render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V"
 	)
 	private void critterCarts$tintDyedEntity(
-			LivingEntity entity,
-			float entityYaw,
-			float partialTick,
-			PoseStack poseStack,
-			MultiBufferSource bufferSource,
-			int packedLight,
-			Operation<Void> original
+		LivingEntity entity,
+		float entityYaw,
+		float partialTick,
+		PoseStack poseStack,
+		MultiBufferSource bufferSource,
+		int packedLight,
+		Operation<Void> original
 	) {
 		WormColor wormColor = ModMobEffects.INSTANCE.getDyeColor(entity);
 
 		if (wormColor != null) {
 			bufferSource = new TintingMultiBufferSource(
-					bufferSource,
-					wormColor.getTintColor()
+				bufferSource,
+				wormColor.getTintColor()
 			);
 		}
 
 		original.call(
-				entity,
-				entityYaw,
-				partialTick,
-				poseStack,
-				bufferSource,
-				packedLight
+			entity,
+			entityYaw,
+			partialTick,
+			poseStack,
+			bufferSource,
+			packedLight
 		);
 	}
 }

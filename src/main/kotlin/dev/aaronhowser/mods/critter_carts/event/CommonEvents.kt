@@ -6,8 +6,8 @@ import dev.aaronhowser.mods.critter_carts.registry.ModEntityTypes
 import dev.aaronhowser.mods.critter_carts.registry.ModPotions
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
-import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent
 import net.neoforged.neoforge.event.brewing.RegisterBrewingRecipesEvent
+import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent
 
 @EventBusSubscriber(modid = CritterCarts.MOD_ID)
 object CommonEvents {

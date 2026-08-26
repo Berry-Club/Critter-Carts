@@ -5,14 +5,14 @@ import dev.aaronhowser.mods.critter_carts.datagen.language.ModLanguageProvider
 import dev.aaronhowser.mods.critter_carts.datagen.loot.ModLootTableProvider
 import dev.aaronhowser.mods.critter_carts.datagen.model.ModBlockStateProvider
 import dev.aaronhowser.mods.critter_carts.datagen.model.ModItemModelProvider
-import dev.aaronhowser.mods.critter_carts.datagen.worldgen.ModBiomeModifiers
-import dev.aaronhowser.mods.critter_carts.datagen.worldgen.ModConfiguredFeatures
-import dev.aaronhowser.mods.critter_carts.datagen.worldgen.ModPlacedFeatures
 import dev.aaronhowser.mods.critter_carts.datagen.sound.ModSoundDefinitionsProvider
 import dev.aaronhowser.mods.critter_carts.datagen.tag.ModBlockTagsProvider
 import dev.aaronhowser.mods.critter_carts.datagen.tag.ModEntityTypeTagsProvider
 import dev.aaronhowser.mods.critter_carts.datagen.tag.ModItemTagsProvider
 import dev.aaronhowser.mods.critter_carts.datagen.tag.ModMobEffectTagsProvider
+import dev.aaronhowser.mods.critter_carts.datagen.worldgen.ModBiomeModifiers
+import dev.aaronhowser.mods.critter_carts.datagen.worldgen.ModConfiguredFeatures
+import dev.aaronhowser.mods.critter_carts.datagen.worldgen.ModPlacedFeatures
 import net.minecraft.core.RegistrySetBuilder
 import net.minecraft.core.registries.Registries
 import net.neoforged.bus.api.SubscribeEvent
