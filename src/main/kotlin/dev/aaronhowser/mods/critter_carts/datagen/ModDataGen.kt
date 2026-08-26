@@ -5,14 +5,21 @@ import dev.aaronhowser.mods.critter_carts.datagen.language.ModLanguageProvider
 import dev.aaronhowser.mods.critter_carts.datagen.loot.ModLootTableProvider
 import dev.aaronhowser.mods.critter_carts.datagen.model.ModBlockStateProvider
 import dev.aaronhowser.mods.critter_carts.datagen.model.ModItemModelProvider
+import dev.aaronhowser.mods.critter_carts.datagen.worldgen.ModBiomeModifiers
+import dev.aaronhowser.mods.critter_carts.datagen.worldgen.ModConfiguredFeatures
+import dev.aaronhowser.mods.critter_carts.datagen.worldgen.ModPlacedFeatures
 import dev.aaronhowser.mods.critter_carts.datagen.sound.ModSoundDefinitionsProvider
 import dev.aaronhowser.mods.critter_carts.datagen.tag.ModBlockTagsProvider
 import dev.aaronhowser.mods.critter_carts.datagen.tag.ModEntityTypeTagsProvider
 import dev.aaronhowser.mods.critter_carts.datagen.tag.ModItemTagsProvider
 import dev.aaronhowser.mods.critter_carts.datagen.tag.ModMobEffectTagsProvider
+import net.minecraft.core.RegistrySetBuilder
+import net.minecraft.core.registries.Registries
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
+import net.neoforged.neoforge.common.data.DatapackBuiltinEntriesProvider
 import net.neoforged.neoforge.data.event.GatherDataEvent
+import net.neoforged.neoforge.registries.NeoForgeRegistries
 
 @EventBusSubscriber(modid = CritterCarts.MOD_ID)
 object ModDataGen {
@@ -21,6 +28,19 @@ object ModDataGen {
 	fun onGatherData(event: GatherDataEvent) {
 		val generator = event.generator
 		val output = generator.packOutput
+
+		generator.addProvider(
+			event.includeServer(),
+			DatapackBuiltinEntriesProvider(
+				output,
+				event.lookupProvider,
+				RegistrySetBuilder()
+					.add(Registries.CONFIGURED_FEATURE, ModConfiguredFeatures::bootstrap)
+					.add(Registries.PLACED_FEATURE, ModPlacedFeatures::bootstrap)
+					.add(NeoForgeRegistries.Keys.BIOME_MODIFIERS, ModBiomeModifiers::bootstrap),
+				setOf(CritterCarts.MOD_ID)
+			)
+		)
 
 		generator.addProvider(
 			event.includeClient(),
