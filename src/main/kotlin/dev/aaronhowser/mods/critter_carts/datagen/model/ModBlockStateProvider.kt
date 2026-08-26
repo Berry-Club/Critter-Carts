@@ -38,12 +38,19 @@ class ModBlockStateProvider(
 	}
 
 	private fun dyeberryVines() {
+		val headModel = models()
+			.cross("dyeberry_vines", mcLoc("block/cave_vines"))
+			.renderType(RenderType.CUTOUT.name)
+		val plantModel = models()
+			.cross("dyeberry_vines_plant", mcLoc("block/cave_vines_plant"))
+			.renderType(RenderType.CUTOUT.name)
+
 		val headBuilder = getVariantBuilder(ModBlocks.DYEBERRY_VINES.get())
 		headBuilder
 			.partialState()
 			.with(CaveVines.BERRIES, false)
 			.modelForState()
-			.modelFile(models().getExistingFile(mcLoc("block/cave_vines")))
+			.modelFile(headModel)
 			.addModel()
 
 		val plantBuilder = getVariantBuilder(ModBlocks.DYEBERRY_VINES_PLANT.get())
@@ -51,7 +58,7 @@ class ModBlockStateProvider(
 			.partialState()
 			.with(CaveVines.BERRIES, false)
 			.modelForState()
-			.modelFile(models().getExistingFile(mcLoc("block/cave_vines_plant")))
+			.modelFile(plantModel)
 			.addModel()
 
 		for (color in WormColor.entries) {

@@ -5,6 +5,7 @@
 	"mixins": [
 		"BlockColumnFeatureMixin",
 		"CaveVinesBlockMixin",
+		"GrowingPlantBlockMixin",
 		"GrowingPlantBodyBlockMixin",
 		"GrowingPlantHeadBlockMixin"
 	],

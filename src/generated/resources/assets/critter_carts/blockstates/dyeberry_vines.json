@@ -1,7 +1,7 @@
 {
   "variants": {
     "berries=false": {
-      "model": "minecraft:block/cave_vines"
+      "model": "critter_carts:block/dyeberry_vines"
     },
     "berries=true,color=aaron": {
       "model": "critter_carts:block/dyeberry_vines_aaron_lit"
