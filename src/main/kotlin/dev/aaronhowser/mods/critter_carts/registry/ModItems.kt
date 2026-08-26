@@ -2,19 +2,16 @@ package dev.aaronhowser.mods.critter_carts.registry
 
 import dev.aaronhowser.mods.aaron.registry.AaronItemRegistry
 import dev.aaronhowser.mods.critter_carts.CritterCarts
+import dev.aaronhowser.mods.critter_carts.entity.data.WormColor
 import dev.aaronhowser.mods.critter_carts.item.CritterCageItem
+import dev.aaronhowser.mods.critter_carts.item.DyeberryItem
 import dev.aaronhowser.mods.critter_carts.item.ScoochwormSpawnEggItem
 import dev.aaronhowser.mods.critter_carts.item.StorageAttachmentItem
-import dev.aaronhowser.mods.critter_carts.entity.data.WormColor
-import net.minecraft.world.effect.MobEffectInstance
-import net.minecraft.world.food.FoodProperties
 import net.minecraft.world.item.Item
 import net.neoforged.neoforge.registries.DeferredItem
 import net.neoforged.neoforge.registries.DeferredRegister
 
 object ModItems : AaronItemRegistry() {
-
-	private const val DYEBERRY_DURATION = 20 * 60
 
 	val ITEM_REGISTRY: DeferredRegister.Items = DeferredRegister.createItems(CritterCarts.MOD_ID)
 	override fun getItemRegistry(): DeferredRegister.Items = ITEM_REGISTRY
@@ -51,29 +48,11 @@ object ModItems : AaronItemRegistry() {
 	val CYAN_DYEBERRY: DeferredItem<Item> = registerDyeberry(WormColor.CYAN)
 
 	private fun registerDyeberry(wormColor: WormColor): DeferredItem<Item> {
-		return basic("${wormColor.colorName}_dyeberry") {
-			val foodProperties = FoodProperties.Builder()
-				.nutrition(2)
-				.saturationModifier(0.1f)
-				.alwaysEdible()
-				.effect(
-					{ MobEffectInstance(ModMobEffects.getDyedEffect(wormColor), DYEBERRY_DURATION) },
-					1f
-				)
-				.build()
-
-			Item.Properties().food(foodProperties)
-		}
+		return register(
+			wormColor.colorName + "_dyeberry",
+			::DyeberryItem,
+			DyeberryItem.getProperties(wormColor)
+		)
 	}
 
-	fun getDyeberry(wormColor: WormColor): DeferredItem<Item> {
-		return when (wormColor) {
-			WormColor.GREEN -> GREEN_DYEBERRY
-			WormColor.BLUE -> BLUE_DYEBERRY
-			WormColor.RED -> RED_DYEBERRY
-			WormColor.YELLOW -> YELLOW_DYEBERRY
-			WormColor.MAGENTA -> MAGENTA_DYEBERRY
-			WormColor.CYAN -> CYAN_DYEBERRY
-		}
-	}
 }

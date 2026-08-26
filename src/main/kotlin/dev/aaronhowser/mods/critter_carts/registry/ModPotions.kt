@@ -1,6 +1,7 @@
 package dev.aaronhowser.mods.critter_carts.registry
 
 import dev.aaronhowser.mods.critter_carts.CritterCarts
+import dev.aaronhowser.mods.critter_carts.item.DyeberryItem
 import net.minecraft.core.registries.Registries
 import net.minecraft.world.effect.MobEffectInstance
 import net.minecraft.world.item.alchemy.Potion
@@ -12,23 +13,21 @@ import java.util.function.Supplier
 
 object ModPotions {
 
-	private const val POTION_DURATION = 20 * 60 * 5
-
 	val POTION_REGISTRY: DeferredRegister<Potion> =
 		DeferredRegister.create(Registries.POTION, CritterCarts.MOD_ID)
 
 	val DYED_GREEN: DeferredHolder<Potion, Potion> =
-		register("dyed_green") { MobEffectInstance(ModMobEffects.DYED_GREEN, POTION_DURATION) }
+		register("dyed_green") { MobEffectInstance(ModMobEffects.DYED_GREEN, DyeberryItem.POTION_DURATION) }
 	val DYED_BLUE: DeferredHolder<Potion, Potion> =
-		register("dyed_blue") { MobEffectInstance(ModMobEffects.DYED_BLUE, POTION_DURATION) }
+		register("dyed_blue") { MobEffectInstance(ModMobEffects.DYED_BLUE, DyeberryItem.POTION_DURATION) }
 	val DYED_RED: DeferredHolder<Potion, Potion> =
-		register("dyed_red") { MobEffectInstance(ModMobEffects.DYED_RED, POTION_DURATION) }
+		register("dyed_red") { MobEffectInstance(ModMobEffects.DYED_RED, DyeberryItem.POTION_DURATION) }
 	val DYED_YELLOW: DeferredHolder<Potion, Potion> =
-		register("dyed_yellow") { MobEffectInstance(ModMobEffects.DYED_YELLOW, POTION_DURATION) }
+		register("dyed_yellow") { MobEffectInstance(ModMobEffects.DYED_YELLOW, DyeberryItem.POTION_DURATION) }
 	val DYED_MAGENTA: DeferredHolder<Potion, Potion> =
-		register("dyed_magenta") { MobEffectInstance(ModMobEffects.DYED_MAGENTA, POTION_DURATION) }
+		register("dyed_magenta") { MobEffectInstance(ModMobEffects.DYED_MAGENTA, DyeberryItem.POTION_DURATION) }
 	val DYED_CYAN: DeferredHolder<Potion, Potion> =
-		register("dyed_cyan") { MobEffectInstance(ModMobEffects.DYED_CYAN, POTION_DURATION) }
+		register("dyed_cyan") { MobEffectInstance(ModMobEffects.DYED_CYAN, DyeberryItem.POTION_DURATION) }
 
 	private fun register(
 		name: String,
