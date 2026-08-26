@@ -35,6 +35,10 @@ class CritterCageItemRenderer : BlockEntityWithoutLevelRenderer(
 		renderCage(poseStack, buffer, packedLight, packedOverlay)
 
 		val scoochworm = getScoochworm(stack) ?: return
+		scoochworm.yRot = 180f
+		scoochworm.yRotO = 180f
+		scoochworm.yBodyRot = 180f
+		scoochworm.yBodyRotO = 180f
 
 		poseStack.withPose {
 			poseStack.translate(0.5, 0.05, 0.5)
