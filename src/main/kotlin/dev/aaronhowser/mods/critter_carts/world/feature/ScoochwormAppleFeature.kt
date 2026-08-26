@@ -99,11 +99,15 @@ class ScoochwormAppleFeature : Feature<NoneFeatureConfiguration>(NoneFeatureConf
 			.defaultBlockState()
 			.setValue(RotatedPillarBlock.AXIS, Direction.Axis.Y)
 
+		val stemPos = center.above(APPLE_RADIUS + 1)
+
 		level.setBlock(
-			center.above(APPLE_RADIUS + 1),
+			stemPos,
 			stemState,
 			Block.UPDATE_CLIENTS
 		)
+
+		level.scheduleTick(stemPos, stemState.block, 1)
 	}
 
 	private fun spawnScoochworm(level: WorldGenLevel, floorPosition: BlockPos) {
