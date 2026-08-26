@@ -1,13 +1,13 @@
 package dev.aaronhowser.mods.critter_carts.world.feature
 
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.withClickToRunCommand
-import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity
 import dev.aaronhowser.mods.critter_carts.registry.ModBlocks
 import dev.aaronhowser.mods.critter_carts.registry.ModEntityTypes
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.Style
+import net.minecraft.world.entity.MobSpawnType
 import net.minecraft.world.level.WorldGenLevel
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
@@ -107,22 +107,16 @@ class ScoochwormAppleFeature : Feature<NoneFeatureConfiguration>(NoneFeatureConf
 	}
 
 	private fun spawnScoochworm(level: WorldGenLevel, floorPosition: BlockPos) {
-		val scoochworm = ScoochwormEntity(ModEntityTypes.SCOOCHWORM.get(), level.level)
-		val spawnPosition = floorPosition.above()
-
-		scoochworm.moveTo(
-			spawnPosition.x + 0.5,
-			spawnPosition.y.toDouble(),
-			spawnPosition.z + 0.5,
-			level.random.nextFloat() * 360f,
-			0f
-		)
+		val scoochworm = ModEntityTypes.SCOOCHWORM.get()
+			.spawn(
+				level.level,
+				floorPosition.above(),
+				MobSpawnType.STRUCTURE
+			) ?: return
 
 		scoochworm.attachToSupport(floorPosition, Direction.DOWN)
 		scoochworm.setPersistenceRequired()
 		scoochworm.isTryingToMove = true
-
-		level.addFreshEntity(scoochworm)
 	}
 
 	private fun sendTeleportMessage(level: WorldGenLevel, position: BlockPos) {
