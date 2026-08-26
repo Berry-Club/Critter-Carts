@@ -4,9 +4,9 @@ import dev.aaronhowser.mods.critter_carts.registry.ModBlocks
 import net.minecraft.core.HolderLookup
 import net.minecraft.core.registries.Registries
 import net.minecraft.data.loot.BlockLootSubProvider
+import net.minecraft.world.flag.FeatureFlags
 import net.minecraft.world.item.Items
 import net.minecraft.world.item.enchantment.Enchantments
-import net.minecraft.world.flag.FeatureFlags
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.storage.loot.entries.LootItem
 import net.minecraft.world.level.storage.loot.functions.ApplyBonusCount
@@ -30,6 +30,12 @@ class ModBlockLootTablesSubProvider(
 		dropSelf(ModBlocks.YELLOW_SCOOCHSTEM.get())
 		dropSelf(ModBlocks.MAGENTA_SCOOCHSTEM.get())
 		dropSelf(ModBlocks.CYAN_SCOOCHSTEM.get())
+
+		for (block in ModBlocks.BLOCK_REGISTRY.entries) {
+			if (block.id.path.endsWith("dyeberry_vines") || block.id.path.endsWith("dyeberry_vines_plant")) {
+				add(block.get(), noDrop())
+			}
+		}
 	}
 
 	private fun appleSlice() {
