@@ -46,6 +46,7 @@ object ModItems : AaronItemRegistry() {
 	val YELLOW_DYEBERRY: DeferredItem<Item> = registerDyeberry(WormColor.YELLOW)
 	val MAGENTA_DYEBERRY: DeferredItem<Item> = registerDyeberry(WormColor.MAGENTA)
 	val CYAN_DYEBERRY: DeferredItem<Item> = registerDyeberry(WormColor.CYAN)
+	val AARONBERRY: DeferredItem<Item> = basic("aaronberry")
 
 	private fun registerDyeberry(wormColor: WormColor): DeferredItem<Item> {
 		return register(

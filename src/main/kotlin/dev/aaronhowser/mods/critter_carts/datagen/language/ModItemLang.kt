@@ -15,6 +15,7 @@ object ModItemLang {
 			addItem(ModItems.YELLOW_DYEBERRY, "Yellow Dyeberry")
 			addItem(ModItems.MAGENTA_DYEBERRY, "Magenta Dyeberry")
 			addItem(ModItems.CYAN_DYEBERRY, "Cyan Dyeberry")
+			addItem(ModItems.AARONBERRY, "Aaronberry")
 			addItem(ModItems.SCOOCHWORM_SPAWN_EGG, "Scoochworm Spawn Egg")
 			add(ModCreativeModeTabs.CREATIVE_TAB_TRANSLATION_KEY, "Critter Carts")
 		}

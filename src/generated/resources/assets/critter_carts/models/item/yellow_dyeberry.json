@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "critter_carts:item/yellow_dyeberry"
+    "layer0": "critter_carts:item/dyeberry/yellow"
   }
 }
