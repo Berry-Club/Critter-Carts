@@ -25,7 +25,11 @@ object DyeberryVineReplacement {
 		if (!state.getValue(CaveVines.BERRIES)) return state
 		if (random.nextDouble() >= ServerConfig.CONFIG.dyeberryVineReplacementChance.get()) return state
 
-		val color = colors.random(random)
+		val color = if (random.nextFloat() < AARON_CHANCE) {
+			WormColor.AARON
+		} else {
+			colors.random(random)
+		}
 		val replacementBlock = if (isPlant) {
 			ModBlocks.DYEBERRY_VINES_PLANT.get()
 		} else {
@@ -46,4 +50,6 @@ object DyeberryVineReplacement {
 
 		return replacementState
 	}
+
+	private const val AARON_CHANCE = 0.01f
 }

@@ -26,7 +26,7 @@ class ServerConfig(
 
 		dyeberryVineReplacementChance = builder
 			.comment("The chance that a berry-bearing cave vine is replaced with a dyeberry vine.")
-			.defineInRange("dyeberryVineReplacementChance", 0.1, 0.0, 1.0)
+			.defineInRange("dyeberryVineReplacementChance", 0.05, 0.0, 1.0)
 	}
 
 	companion object {
