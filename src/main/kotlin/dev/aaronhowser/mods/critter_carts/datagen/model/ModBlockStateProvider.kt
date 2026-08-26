@@ -128,28 +128,34 @@ class ModBlockStateProvider(
 				}
 
 				transform(ItemDisplayContext.GROUND) {
-					translation(0f, 2f, 0f)
-					scale(0.5f)
-				}
-
-				transform(ItemDisplayContext.HEAD) {
-					rotation(0f, 180f, 0f)
-					translation(0f, 13f, 7f)
-				}
-
-				transform(ItemDisplayContext.THIRD_PERSON_RIGHT_HAND) {
-					translation(0f, 3f, 1f)
-					scale(0.55f)
-				}
-
-				transform(ItemDisplayContext.FIRST_PERSON_RIGHT_HAND) {
-					rotation(0f, -90f, 25f)
-					translation(1.13f, 3.2f, 1.13f)
-					scale(0.68f)
+					translation(0f, 3f, 0f)
+					scale(0.25f)
 				}
 
 				transform(ItemDisplayContext.FIXED) {
-					rotation(0f, 180f, 0f)
+					scale(0.5f)
+				}
+
+				transform(ItemDisplayContext.THIRD_PERSON_RIGHT_HAND) {
+					rotation(75f, 45f, 0f)
+					translation(0f, 2.5f, 0f)
+					scale(0.375f)
+				}
+
+				transform(ItemDisplayContext.THIRD_PERSON_LEFT_HAND) {
+					rotation(75f, 225f, 0f)
+					translation(0f, 2.5f, 0f)
+					scale(0.375f)
+				}
+
+				transform(ItemDisplayContext.FIRST_PERSON_RIGHT_HAND) {
+					rotation(0f, 45f, 0f)
+					scale(0.4f)
+				}
+
+				transform(ItemDisplayContext.FIRST_PERSON_LEFT_HAND) {
+					rotation(0f, 225f, 0f)
+					scale(0.4f)
 				}
 			}
 	}
