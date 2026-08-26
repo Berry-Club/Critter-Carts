@@ -2,6 +2,7 @@ package dev.aaronhowser.mods.critter_carts.registry
 
 import dev.aaronhowser.mods.aaron.registry.AaronDataComponentRegistry
 import dev.aaronhowser.mods.critter_carts.CritterCarts
+import dev.aaronhowser.mods.critter_carts.entity.data.WormColor
 import net.minecraft.core.component.DataComponentType
 import net.minecraft.core.registries.Registries
 import net.minecraft.world.item.component.CustomData
@@ -18,4 +19,6 @@ object ModDataComponents : AaronDataComponentRegistry() {
 	val ENTITY_DATA: DeferredHolder<DataComponentType<*>, DataComponentType<CustomData>> =
 		register("entity_data", CustomData.CODEC, CustomData.STREAM_CODEC)
 
+	val WORM_COLOR: DeferredHolder<DataComponentType<*>, DataComponentType<WormColor>> =
+		register("worm_color", WormColor.CODEC, WormColor.STREAM_CODEC)
 }
