@@ -211,8 +211,8 @@ class ModBlockStateProvider(
 
 		for (block in blocks) {
 			val color = block.color
-			val name = "${color.color}_scoochstem"
-			val sideTexture = modLoc("block/colored_scoochstem/${color.color}")
+			val name = "${color.colorName}_scoochstem"
+			val sideTexture = modLoc("block/colored_scoochstem/${color.colorName}")
 
 			val model = models()
 				.cube(name, topTexture, topTexture, sideTexture, sideTexture, sideTexture, sideTexture)
