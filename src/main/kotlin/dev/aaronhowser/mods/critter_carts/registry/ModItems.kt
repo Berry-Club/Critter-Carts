@@ -50,7 +50,8 @@ object ModItems : AaronItemRegistry() {
 	private fun registerDyeberry(wormColor: WormColor): DeferredItem<Item> {
 		return register(
 			wormColor.colorName + "_dyeberry",
-			{ DyeberryItem(wormColor) }
+			::DyeberryItem,
+			DyeberryItem.getProperties(wormColor)
 		)
 	}
 
