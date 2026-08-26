@@ -143,7 +143,7 @@ class ModBlockStateProvider(
 				}
 
 				transform(ItemDisplayContext.THIRD_PERSON_LEFT_HAND) {
-					rotation(75f, 225f, 0f)
+					rotation(75f, 45f, 0f)
 					translation(0f, 2.5f, 0f)
 					scale(0.375f)
 				}
@@ -154,7 +154,7 @@ class ModBlockStateProvider(
 				}
 
 				transform(ItemDisplayContext.FIRST_PERSON_LEFT_HAND) {
-					rotation(0f, 225f, 0f)
+					rotation(0f, 45f, 0f)
 					scale(0.4f)
 				}
 			}
