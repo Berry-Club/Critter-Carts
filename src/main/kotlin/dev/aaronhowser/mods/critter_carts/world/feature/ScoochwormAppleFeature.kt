@@ -1,6 +1,7 @@
 package dev.aaronhowser.mods.critter_carts.world.feature
 
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.withClickToRunCommand
+import dev.aaronhowser.mods.critter_carts.block.ScoochstemBlock
 import dev.aaronhowser.mods.critter_carts.registry.ModBlocks
 import dev.aaronhowser.mods.critter_carts.registry.ModEntityTypes
 import net.minecraft.core.BlockPos
@@ -98,6 +99,10 @@ class ScoochwormAppleFeature : Feature<NoneFeatureConfiguration>(NoneFeatureConf
 		val stemState = ModBlocks.SCOOCHSTEM.get()
 			.defaultBlockState()
 			.setValue(RotatedPillarBlock.AXIS, Direction.Axis.Y)
+			.setValue(
+				ScoochstemBlock.GROWTH_REMAINING,
+				level.random.nextIntBetweenInclusive(ScoochstemBlock.MIN_INITIAL_GROWTH, ScoochstemBlock.MAX_INITIAL_GROWTH)
+			)
 
 		val stemPos = center.above(APPLE_RADIUS + 1)
 

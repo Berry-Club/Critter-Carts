@@ -219,8 +219,8 @@ class ScoochstemBlock : RotatedPillarBlock(Properties.ofFullCopy(Blocks.OAK_LOG)
 		private const val GROWTH_DELAY = 2
 		private const val INITIAL_GROWTH_CHANCE = 0.45f
 		private const val PARALLEL_GROWTH_CHANCE = 0.8f
-		private const val MIN_INITIAL_GROWTH = 30
-		private const val MAX_INITIAL_GROWTH = 40
+		const val MIN_INITIAL_GROWTH = 30
+		const val MAX_INITIAL_GROWTH = 40
 		private const val MIN_GROWTH_COST = 4
 		private const val MAX_GROWTH_COST = 8
 		private const val MIN_BRANCH_GROWTH = 1
