@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cross",
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "cross": "critter_carts:block/dyeberry_vines/yellow_lit"
+  }
+}

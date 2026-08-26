@@ -2,6 +2,6 @@
   "parent": "minecraft:block/cross",
   "render_type": "minecraft:cutout",
   "textures": {
-    "cross": "critter_carts:block/dyeberry_vines/cave_vines_lit"
+    "cross": "critter_carts:block/dyeberry_vines/aaron_plant_lit"
   }
 }

@@ -7,7 +7,9 @@ import dev.aaronhowser.mods.aaron.misc.AaronDsls.transforms
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.particle
 import dev.aaronhowser.mods.critter_carts.CritterCarts
 import dev.aaronhowser.mods.critter_carts.block.CritterCageBlock
+import dev.aaronhowser.mods.critter_carts.block.DyeberryVinesBlock
 import dev.aaronhowser.mods.critter_carts.block.ScoochstemBlock
+import dev.aaronhowser.mods.critter_carts.entity.data.WormColor
 import dev.aaronhowser.mods.critter_carts.registry.ModBlocks
 import dev.aaronhowser.mods.critter_carts.registry.ModItems
 import net.minecraft.client.renderer.RenderType
@@ -36,42 +38,50 @@ class ModBlockStateProvider(
 	}
 
 	private fun dyeberryVines() {
-		val headModel = models()
-			.cross("dyeberry_vines", modLoc("block/dyeberry_vines/cave_vines"))
-			.renderType(RenderType.CUTOUT.name)
-		val headLitModel = models()
-			.cross("dyeberry_vines_lit", modLoc("block/dyeberry_vines/cave_vines_lit"))
-			.renderType(RenderType.CUTOUT.name)
-		val plantModel = models()
-			.cross("dyeberry_vines_plant", modLoc("block/dyeberry_vines/cave_vines_plant"))
-			.renderType(RenderType.CUTOUT.name)
-		val plantLitModel = models()
-			.cross("dyeberry_vines_plant_lit", modLoc("block/dyeberry_vines/cave_vines_plant_lit"))
-			.renderType(RenderType.CUTOUT.name)
-
-		getVariantBuilder(ModBlocks.DYEBERRY_VINES.get())
+		val headBuilder = getVariantBuilder(ModBlocks.DYEBERRY_VINES.get())
+		headBuilder
 			.partialState()
 			.with(CaveVines.BERRIES, false)
 			.modelForState()
-			.modelFile(headModel)
-			.addModel()
-			.partialState()
-			.with(CaveVines.BERRIES, true)
-			.modelForState()
-			.modelFile(headLitModel)
+			.modelFile(models().getExistingFile(mcLoc("block/cave_vines")))
 			.addModel()
 
-		getVariantBuilder(ModBlocks.DYEBERRY_VINES_PLANT.get())
+		val plantBuilder = getVariantBuilder(ModBlocks.DYEBERRY_VINES_PLANT.get())
+		plantBuilder
 			.partialState()
 			.with(CaveVines.BERRIES, false)
 			.modelForState()
-			.modelFile(plantModel)
+			.modelFile(models().getExistingFile(mcLoc("block/cave_vines_plant")))
 			.addModel()
-			.partialState()
-			.with(CaveVines.BERRIES, true)
-			.modelForState()
-			.modelFile(plantLitModel)
-			.addModel()
+
+		for (color in WormColor.entries) {
+			val colorName = color.colorName
+			val headLitModel = models()
+				.cross("dyeberry_vines_${colorName}_lit", modLoc("block/dyeberry_vines/${colorName}_lit"))
+				.renderType(RenderType.CUTOUT.name)
+			val plantLitModel = models()
+				.cross(
+					"dyeberry_vines_${colorName}_plant_lit",
+					modLoc("block/dyeberry_vines/${colorName}_plant_lit")
+				)
+				.renderType(RenderType.CUTOUT.name)
+
+			headBuilder
+				.partialState()
+				.with(CaveVines.BERRIES, true)
+				.with(DyeberryVinesBlock.COLOR, color)
+				.modelForState()
+				.modelFile(headLitModel)
+				.addModel()
+
+			plantBuilder
+				.partialState()
+				.with(CaveVines.BERRIES, true)
+				.with(DyeberryVinesBlock.COLOR, color)
+				.modelForState()
+				.modelFile(plantLitModel)
+				.addModel()
+		}
 	}
 
 	private fun critterCage() {

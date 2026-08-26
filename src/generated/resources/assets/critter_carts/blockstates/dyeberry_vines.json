@@ -1,10 +1,28 @@
 {
   "variants": {
     "berries=false": {
-      "model": "critter_carts:block/dyeberry_vines"
+      "model": "minecraft:block/cave_vines"
     },
-    "berries=true": {
-      "model": "critter_carts:block/dyeberry_vines_lit"
+    "berries=true,color=aaron": {
+      "model": "critter_carts:block/dyeberry_vines_aaron_lit"
+    },
+    "berries=true,color=blue": {
+      "model": "critter_carts:block/dyeberry_vines_blue_lit"
+    },
+    "berries=true,color=cyan": {
+      "model": "critter_carts:block/dyeberry_vines_cyan_lit"
+    },
+    "berries=true,color=green": {
+      "model": "critter_carts:block/dyeberry_vines_green_lit"
+    },
+    "berries=true,color=magenta": {
+      "model": "critter_carts:block/dyeberry_vines_magenta_lit"
+    },
+    "berries=true,color=red": {
+      "model": "critter_carts:block/dyeberry_vines_red_lit"
+    },
+    "berries=true,color=yellow": {
+      "model": "critter_carts:block/dyeberry_vines_yellow_lit"
     }
   }
 }
