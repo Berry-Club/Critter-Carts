@@ -3,7 +3,9 @@
 	"minVersion": "0.8",
 	"package": "dev.aaronhowser.mods.critter_carts.mixin",
 	"mixins": [],
-	"client": [],
+	"client": [
+		"client.LivingEntityRendererMixin"
+	],
 	"injectors": {
 		"defaultRequire": 1
 	}
