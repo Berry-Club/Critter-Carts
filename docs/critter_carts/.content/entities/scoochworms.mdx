@@ -1,41 +1,41 @@
-# Scoochworms
+---
+title: Scoochworms
+id: critter_carts:scoochworms
+related_entities: [critter_carts:scoochworm]
+type: entity
+---
 
 Scoochworms are segmented creatures that carry players and items across solid surfaces and along [Scoochstem](@critter_carts:scoochstem) paths.
 
 ## Movement
 
-Interact with a Scoochworm's head to toggle movement. A moving Scoochworm can crawl across the sturdy faces of ordinary solid blocks, wandering with small random turns as it travels. It follows surfaces around corners and can move between floors, walls, and ceilings.
+Interact with a Scoochworm's head to start or stop it. A moving Scoochworm wanders across solid surfaces and can crawl around corners between floors, walls, and ceilings.
 
-When a wandering Scoochworm reaches Scoochstem, it follows the routed path while preserving its direction of travel. Scoochstem faces provide precise control over where it goes.
+When it reaches [Scoochstem](@critter_carts:scoochstem), it follows the path in its current direction.
 
 At a flat branch, the Scoochworm first tries to continue forward. If forward travel is unavailable, it chooses an available left or right path. If both side paths are available, it chooses one randomly.
 
-Scoochworms stop when they reach the end of a valid Scoochstem path. While wandering on ordinary blocks, they turn back from edges they cannot crawl around. Interact with the head to stop one manually.
-
-## Behavior
-
-Scoochworms look around while idle and watch nearby players. A player holding a **Melon** in either hand gets their attention first.
+Scoochworms stop at the end of a valid Scoochstem path and turn away from edges they cannot crawl around while wandering.
 
 ## Segments
 
 New Scoochworms begin with one body segment. Feeding the head a **Melon** adds another segment, up to a maximum of 16.
 
-Each segment can hold one attachment. Attachments are independent, so one Scoochworm can carry several inventories, saddles, or any mixture of the available types.
+Each segment can hold one attachment.
 
 The [Saddlebag](@critter_carts:saddlebag) provides an accessible 9-slot inventory. The [Wicker Basket](@critter_carts:wicker_basket) automatically collects dropped items and unloads them while upside down. A standard [Saddle](@minecraft:saddle) allows one player to ride its segment without controlling the Scoochworm.
 
 Using **Shears** on a middle segment splits the Scoochworm in two. The original keeps the segments before the cut, while the tail reverses direction and becomes the head of a new Scoochworm. Attachments remain on the transferred segments, but the old tail's attachment drops because that segment becomes the new head. The shears take one point of durability.
 
-The first and last body segments cannot be used as split points; both resulting Scoochworms must retain at least one body segment.
+The first and last body segments cannot be split.
 
 ## Interacting Safely
-
-Different parts have different interactions:
 
 | Target | Interaction | Result |
 | --- | --- | --- |
 | Head | Use | Starts or stops movement. |
 | Head or segment | Use with Melon | Adds one segment if the Scoochworm is not at maximum length. |
+| Head or segment | Use with Dyeberry | Changes the entire Scoochworm to the berry's color. |
 | Segment | Use with attachment | Equips the attachment. |
 | Attached segment | Sneak-use with empty hand | Removes the attachment. |
 | Middle segment | Use with Shears | Splits the Scoochworm into two creatures. |
