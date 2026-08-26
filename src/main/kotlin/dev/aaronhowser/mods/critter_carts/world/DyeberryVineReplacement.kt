@@ -1,0 +1,46 @@
+package dev.aaronhowser.mods.critter_carts.world
+
+import dev.aaronhowser.mods.critter_carts.block.DyeberryVinesBlock
+import dev.aaronhowser.mods.critter_carts.config.ServerConfig
+import dev.aaronhowser.mods.critter_carts.entity.data.WormColor
+import dev.aaronhowser.mods.critter_carts.registry.ModBlocks
+import net.minecraft.util.RandomSource
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.CaveVines
+import net.minecraft.world.level.block.GrowingPlantHeadBlock
+import net.minecraft.world.level.block.state.BlockState
+
+object DyeberryVineReplacement {
+
+	private val colors = WormColor.entries.filter { it != WormColor.AARON }
+
+	@JvmStatic
+	fun replace(state: BlockState, random: RandomSource): BlockState {
+		val isHead = state.`is`(Blocks.CAVE_VINES)
+		val isPlant = state.`is`(Blocks.CAVE_VINES_PLANT)
+
+		if (!isHead && !isPlant) return state
+		if (!state.getValue(CaveVines.BERRIES)) return state
+		if (random.nextDouble() >= ServerConfig.CONFIG.dyeberryVineReplacementChance.get()) return state
+
+		val color = colors[random.nextInt(colors.size)]
+		val replacementBlock = if (isPlant) {
+			ModBlocks.DYEBERRY_VINES_PLANT.get()
+		} else {
+			ModBlocks.DYEBERRY_VINES.get()
+		}
+		var replacement = replacementBlock
+			.defaultBlockState()
+			.setValue(CaveVines.BERRIES, true)
+			.setValue(DyeberryVinesBlock.COLOR, color)
+
+		if (isHead) {
+			replacement = replacement.setValue(
+				GrowingPlantHeadBlock.AGE,
+				state.getValue(GrowingPlantHeadBlock.AGE)
+			)
+		}
+
+		return replacement
+	}
+}
