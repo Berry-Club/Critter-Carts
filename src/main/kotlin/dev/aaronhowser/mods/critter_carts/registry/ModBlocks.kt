@@ -2,9 +2,7 @@ package dev.aaronhowser.mods.critter_carts.registry
 
 import dev.aaronhowser.mods.aaron.registry.AaronBlockRegistry
 import dev.aaronhowser.mods.critter_carts.CritterCarts
-import dev.aaronhowser.mods.critter_carts.block.ColoredScoochstemBlock
-import dev.aaronhowser.mods.critter_carts.block.CritterCageBlock
-import dev.aaronhowser.mods.critter_carts.block.ScoochstemBlock
+import dev.aaronhowser.mods.critter_carts.block.*
 import dev.aaronhowser.mods.critter_carts.entity.data.WormColor
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.HugeMushroomBlock
@@ -49,6 +47,12 @@ object ModBlocks : AaronBlockRegistry() {
 
 	val CYAN_SCOOCHSTEM: DeferredBlock<ColoredScoochstemBlock> =
 		coloredScoochstem(WormColor.CYAN)
+
+	val DYEBERRY_VINES: DeferredBlock<DyeberryVinesBlock> =
+		registerBlockWithoutItem("dyeberry_vines", ::DyeberryVinesBlock)
+
+	val DYEBERRY_VINES_PLANT: DeferredBlock<DyeberryVinesPlantBlock> =
+		registerBlockWithoutItem("dyeberry_vines_plant", ::DyeberryVinesPlantBlock)
 
 	private fun coloredScoochstem(wormColor: WormColor): DeferredBlock<ColoredScoochstemBlock> =
 		registerBlock(wormColor.colorName + "_scoochstem") { ColoredScoochstemBlock(wormColor) }
