@@ -49,10 +49,7 @@ class ScoochwormLookAtFoodGoal(
 		var nearestDistanceSquared = LOOK_DISTANCE_SQUARED
 
 		for (entity in nearbyEntities) {
-			if (entity.isSpectator
-				|| !entity.isAlive
-				|| !isHoldingFood(entity)
-			) continue
+			if (entity.isSpectator || !entity.isAlive || !isHoldingFood(entity)) continue
 
 			val distanceSquared = scoochworm.distanceToSqr(entity)
 			if (distanceSquared > nearestDistanceSquared) continue
