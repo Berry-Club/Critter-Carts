@@ -28,6 +28,7 @@ class ScoochwormWanderGoal(
 	private var homePosition: Vec3? = null
 	private var turnSign = 1.0
 	private var nextHomeTick = 0
+	private var nextTurnSignChangeTick = 0
 	private var nextTurnTick = 0
 	private var transitionTicks = 0
 
@@ -163,6 +164,7 @@ class ScoochwormWanderGoal(
 		if (transitionTicks > 0 || scoochworm.tickCount < nextTurnTick) return
 
 		updateHome()
+		updateTurnSign()
 		turn(currentSupport.supportDirection)
 		nextTurnTick = scoochworm.tickCount + TURN_INTERVAL_TICKS
 	}
@@ -171,9 +173,21 @@ class ScoochwormWanderGoal(
 		if (homePosition != null && scoochworm.tickCount < nextHomeTick) return
 
 		homePosition = scoochworm.position()
-		turnSign = if (scoochworm.random.nextBoolean()) 1.0 else -1.0
 		nextHomeTick = scoochworm.tickCount + HOME_DURATION_MINIMUM_TICKS +
 			scoochworm.random.nextInt(HOME_DURATION_RANGE_TICKS + 1)
+	}
+
+	private fun updateTurnSign() {
+		if (nextTurnSignChangeTick != 0 && scoochworm.tickCount < nextTurnSignChangeTick) return
+
+		turnSign = if (nextTurnSignChangeTick == 0) {
+			if (scoochworm.random.nextBoolean()) 1.0 else -1.0
+		} else {
+			-turnSign
+		}
+
+		nextTurnSignChangeTick = scoochworm.tickCount + TURN_SIGN_DURATION_MINIMUM_TICKS +
+			scoochworm.random.nextInt(TURN_SIGN_DURATION_RANGE_TICKS + 1)
 	}
 
 	private fun tryTurningUpwards(
@@ -567,6 +581,8 @@ class ScoochwormWanderGoal(
 		private const val TURN_INTERVAL_TICKS = 20
 		private const val HOME_DURATION_MINIMUM_TICKS = 1200
 		private const val HOME_DURATION_RANGE_TICKS = 1200
+		private const val TURN_SIGN_DURATION_MINIMUM_TICKS = 300
+		private const val TURN_SIGN_DURATION_RANGE_TICKS = 600
 		private const val TRANSITION_TICKS = 4
 		private const val HOME_STEERING_DISTANCE = 12.0
 		private const val HOME_STEERING_RANGE = 12.0
