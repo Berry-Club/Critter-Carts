@@ -19,7 +19,16 @@ class DyeberryItem(properties: Properties) : Item(properties) {
 				.saturationModifier(0.1f)
 				.alwaysEdible()
 				.effect(
-					{ MobEffectInstance(ModMobEffects.getDyedEffect(wormColor), EAT_DURATION) },
+					{
+						MobEffectInstance(
+							ModMobEffects.getDyedEffect(wormColor),
+							EAT_DURATION,
+							0,
+							false,
+							false,
+							true
+						)
+					},
 					1f
 				)
 				.build()

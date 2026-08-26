@@ -2,7 +2,9 @@ package dev.aaronhowser.mods.critter_carts.registry
 
 import dev.aaronhowser.mods.critter_carts.CritterCarts
 import dev.aaronhowser.mods.critter_carts.item.DyeberryItem
+import net.minecraft.core.Holder
 import net.minecraft.core.registries.Registries
+import net.minecraft.world.effect.MobEffect
 import net.minecraft.world.effect.MobEffectInstance
 import net.minecraft.world.item.alchemy.Potion
 import net.minecraft.world.item.alchemy.Potions
@@ -17,17 +19,28 @@ object ModPotions {
 		DeferredRegister.create(Registries.POTION, CritterCarts.MOD_ID)
 
 	val DYED_GREEN: DeferredHolder<Potion, Potion> =
-		register("dyed_green") { MobEffectInstance(ModMobEffects.DYED_GREEN, DyeberryItem.POTION_DURATION) }
+		register("dyed_green") { createEffect(ModMobEffects.DYED_GREEN) }
 	val DYED_BLUE: DeferredHolder<Potion, Potion> =
-		register("dyed_blue") { MobEffectInstance(ModMobEffects.DYED_BLUE, DyeberryItem.POTION_DURATION) }
+		register("dyed_blue") { createEffect(ModMobEffects.DYED_BLUE) }
 	val DYED_RED: DeferredHolder<Potion, Potion> =
-		register("dyed_red") { MobEffectInstance(ModMobEffects.DYED_RED, DyeberryItem.POTION_DURATION) }
+		register("dyed_red") { createEffect(ModMobEffects.DYED_RED) }
 	val DYED_YELLOW: DeferredHolder<Potion, Potion> =
-		register("dyed_yellow") { MobEffectInstance(ModMobEffects.DYED_YELLOW, DyeberryItem.POTION_DURATION) }
+		register("dyed_yellow") { createEffect(ModMobEffects.DYED_YELLOW) }
 	val DYED_MAGENTA: DeferredHolder<Potion, Potion> =
-		register("dyed_magenta") { MobEffectInstance(ModMobEffects.DYED_MAGENTA, DyeberryItem.POTION_DURATION) }
+		register("dyed_magenta") { createEffect(ModMobEffects.DYED_MAGENTA) }
 	val DYED_CYAN: DeferredHolder<Potion, Potion> =
-		register("dyed_cyan") { MobEffectInstance(ModMobEffects.DYED_CYAN, DyeberryItem.POTION_DURATION) }
+		register("dyed_cyan") { createEffect(ModMobEffects.DYED_CYAN) }
+
+	private fun createEffect(effect: Holder<MobEffect>): MobEffectInstance {
+		return MobEffectInstance(
+			effect,
+			DyeberryItem.POTION_DURATION,
+			0,
+			false,
+			false,
+			true
+		)
+	}
 
 	private fun register(
 		name: String,
