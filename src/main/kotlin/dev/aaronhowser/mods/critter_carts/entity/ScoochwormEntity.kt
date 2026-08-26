@@ -78,7 +78,9 @@ class ScoochwormEntity(
 
 	var isTryingToMove: Boolean
 		get() = entityData.get(DATA_IS_TRYING_TO_MOVE)
-		private set(value) = entityData.set(DATA_IS_TRYING_TO_MOVE, value)
+		set(value) {
+			if (isServerSide) entityData.set(DATA_IS_TRYING_TO_MOVE, value)
+		}
 
 	var color: WormColor
 		get() = WormColor.fromOrdinal(entityData.get(DATA_COLOR))
