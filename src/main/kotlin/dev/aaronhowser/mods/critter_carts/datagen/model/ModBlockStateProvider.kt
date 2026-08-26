@@ -122,6 +122,11 @@ class ModBlockStateProvider(
 			.getBuilder(ModItems.CRITTER_CAGE.id.path)
 			.parent(ModelFile.UncheckedModelFile("builtin/entity"))
 			.transforms {
+				transform(ItemDisplayContext.GUI) {
+					rotation(30f, 225f, 0f)
+					scale(0.625f)
+				}
+
 				transform(ItemDisplayContext.GROUND) {
 					translation(0f, 2f, 0f)
 					scale(0.5f)
