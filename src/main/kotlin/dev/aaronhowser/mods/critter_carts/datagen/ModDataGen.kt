@@ -9,6 +9,7 @@ import dev.aaronhowser.mods.critter_carts.datagen.sound.ModSoundDefinitionsProvi
 import dev.aaronhowser.mods.critter_carts.datagen.tag.ModBlockTagsProvider
 import dev.aaronhowser.mods.critter_carts.datagen.tag.ModEntityTypeTagsProvider
 import dev.aaronhowser.mods.critter_carts.datagen.tag.ModItemTagsProvider
+import dev.aaronhowser.mods.critter_carts.datagen.tag.ModMobEffectTagsProvider
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.neoforge.data.event.GatherDataEvent
@@ -66,6 +67,15 @@ object ModDataGen {
 			ModEntityTypeTagsProvider(
 				output,
 				event.lookupProvider
+			)
+		)
+
+		generator.addProvider(
+			event.includeServer(),
+			ModMobEffectTagsProvider(
+				output,
+				event.lookupProvider,
+				event.existingFileHelper
 			)
 		)
 	}
