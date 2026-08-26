@@ -14,6 +14,7 @@ import dev.aaronhowser.mods.critter_carts.entity.data.attachment.ScoochwormAttac
 import dev.aaronhowser.mods.critter_carts.entity.goal.ScoochwormLookAtMelonGoal
 import dev.aaronhowser.mods.critter_carts.entity.goal.ScoochwormTravelGoal
 import dev.aaronhowser.mods.critter_carts.entity.goal.ScoochwormWanderGoal
+import dev.aaronhowser.mods.critter_carts.registry.ModDataComponents
 import dev.aaronhowser.mods.critter_carts.registry.ModEntityTypes
 import dev.aaronhowser.mods.critter_carts.registry.ModSoundEvents
 import net.minecraft.core.BlockPos
@@ -197,11 +198,6 @@ class ScoochwormEntity(
 	// Interaction
 
 	override fun mobInteract(player: Player, hand: InteractionHand): InteractionResult {
-//		if (player.isShiftKeyDown) {
-//			if (isServerSide) color = color.next()
-//			return InteractionResult.sidedSuccess(isClientSide)
-//		}
-
 		val heldStack = player.getItemInHand(hand)
 		val growResult = tryGrow(player, heldStack)
 		if (growResult != null) return growResult
@@ -230,6 +226,18 @@ class ScoochwormEntity(
 		if (heldStack.isItem(Items.SHEARS)) {
 			if (partIndex == null || !bodySegments.canSplitAt(partIndex)) {
 				return InteractionResult.PASS
+			}
+		}
+
+		if (heldStack.has(ModDataComponents.WORM_COLOR)) {
+			val newColor = heldStack.getOrDefault(ModDataComponents.WORM_COLOR, WormColor.GREEN)
+			if (newColor != color) {
+				if (isServerSide) {
+					color = newColor
+					heldStack.consume(1, player)
+				}
+
+				return InteractionResult.sidedSuccess(isClientSide)
 			}
 		}
 
