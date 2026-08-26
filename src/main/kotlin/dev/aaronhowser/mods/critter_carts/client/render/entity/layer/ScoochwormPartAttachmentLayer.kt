@@ -1,4 +1,4 @@
-package dev.aaronhowser.mods.critter_carts.client.renderer.layer
+package dev.aaronhowser.mods.critter_carts.client.render.entity.layer
 
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.blaze3d.vertex.VertexConsumer

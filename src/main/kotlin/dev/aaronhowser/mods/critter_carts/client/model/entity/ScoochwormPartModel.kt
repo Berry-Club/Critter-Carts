@@ -1,4 +1,4 @@
-package dev.aaronhowser.mods.critter_carts.client.model
+package dev.aaronhowser.mods.critter_carts.client.model.entity
 
 import dev.aaronhowser.mods.critter_carts.CritterCarts
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity

@@ -1,10 +1,10 @@
 package dev.aaronhowser.mods.critter_carts.event
 
 import dev.aaronhowser.mods.critter_carts.CritterCarts
-import dev.aaronhowser.mods.critter_carts.client.renderer.CritterCageItemRenderer
-import dev.aaronhowser.mods.critter_carts.client.renderer.CritterCageBlockRenderer
-import dev.aaronhowser.mods.critter_carts.client.renderer.ScoochwormPartRenderer
-import dev.aaronhowser.mods.critter_carts.client.renderer.ScoochwormRenderer
+import dev.aaronhowser.mods.critter_carts.client.render.bewlr.CritterCageItemRenderer
+import dev.aaronhowser.mods.critter_carts.client.render.block_entity.CritterCageBlockRenderer
+import dev.aaronhowser.mods.critter_carts.client.render.entity.ScoochwormPartRenderer
+import dev.aaronhowser.mods.critter_carts.client.render.entity.ScoochwormRenderer
 import dev.aaronhowser.mods.critter_carts.registry.ModEntityTypes
 import dev.aaronhowser.mods.critter_carts.registry.ModBlockEntityTypes
 import dev.aaronhowser.mods.critter_carts.registry.ModItems

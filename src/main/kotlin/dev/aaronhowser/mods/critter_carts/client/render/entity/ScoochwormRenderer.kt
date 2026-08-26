@@ -1,8 +1,8 @@
-package dev.aaronhowser.mods.critter_carts.client.renderer
+package dev.aaronhowser.mods.critter_carts.client.render.entity
 
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.math.Axis
-import dev.aaronhowser.mods.critter_carts.client.model.ScoochwormModel
+import dev.aaronhowser.mods.critter_carts.client.model.entity.ScoochwormModel
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity
 import net.minecraft.client.renderer.entity.EntityRendererProvider
 import net.minecraft.core.Direction

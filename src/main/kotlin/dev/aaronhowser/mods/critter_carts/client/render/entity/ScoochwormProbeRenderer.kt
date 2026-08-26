@@ -1,4 +1,4 @@
-package dev.aaronhowser.mods.critter_carts.client.renderer
+package dev.aaronhowser.mods.critter_carts.client.render.entity
 
 import dev.aaronhowser.mods.aaron.client.render.AaronRenderUtil
 import dev.aaronhowser.mods.aaron.misc.AaronDsls.withPose

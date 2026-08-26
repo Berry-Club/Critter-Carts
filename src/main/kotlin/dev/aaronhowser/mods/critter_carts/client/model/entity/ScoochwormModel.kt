@@ -1,4 +1,4 @@
-package dev.aaronhowser.mods.critter_carts.client.model
+package dev.aaronhowser.mods.critter_carts.client.model.entity
 
 import com.mojang.math.Axis
 import dev.aaronhowser.mods.critter_carts.CritterCarts
