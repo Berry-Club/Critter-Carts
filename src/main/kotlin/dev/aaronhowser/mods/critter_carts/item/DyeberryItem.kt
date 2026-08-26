@@ -1,6 +1,7 @@
 package dev.aaronhowser.mods.critter_carts.item
 
 import dev.aaronhowser.mods.critter_carts.entity.data.WormColor
+import dev.aaronhowser.mods.critter_carts.registry.ModDataComponents
 import dev.aaronhowser.mods.critter_carts.registry.ModMobEffects
 import net.minecraft.world.effect.MobEffectInstance
 import net.minecraft.world.food.FoodProperties
@@ -23,7 +24,9 @@ class DyeberryItem(properties: Properties) : Item(properties) {
 				)
 				.build()
 
-			return Properties().food(foodProperties)
+			return Properties()
+				.food(foodProperties)
+				.component(ModDataComponents.WORM_COLOR, wormColor)
 		}
 	}
 
