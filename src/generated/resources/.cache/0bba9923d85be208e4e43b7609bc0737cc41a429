@@ -1,4 +1,4 @@
-// 1.21.1	2026-08-25T21:30:38.4147763	Block States: critter_carts
+// 1.21.1	2026-08-25T22:02:26.5030894	Block States: critter_carts
 c2b27575804c0cf81b73fcc8a8b522cd48aabbaf assets/critter_carts/blockstates/apple_slice.json
 8de7fb75e6eb64985ddf71c0ef44429ec2cfb20a assets/critter_carts/blockstates/blue_scoochstem.json
 fffa2a126dfc2d14dbc74a04e8be1a40e34df4b1 assets/critter_carts/blockstates/critter_cage.json
@@ -11,7 +11,7 @@ ac6b5a900286da3353f0ebe4e13f56bf1a0318dd assets/critter_carts/blockstates/red_sc
 a7b902038bf1205a1e89568020ff6fc6f8e5f76b assets/critter_carts/blockstates/yellow_scoochstem.json
 7be2e3396385d849e09e89b0f6d4fe069f52794b assets/critter_carts/models/block/apple_slice.json
 65d69ebab6e72a88e9a5b8d1c291cf7b60f5cc09 assets/critter_carts/models/block/blue_scoochstem.json
-e0f7b66a84e6588f01abbbce75b1803ffe5d46e2 assets/critter_carts/models/block/critter_cage_block.json
+139a0bc906b3707df35363b73d9e4575e80bc2ca assets/critter_carts/models/block/critter_cage_block.json
 26ae5b8aeb409a8a8f3b3568a9fbe3830a2e88a8 assets/critter_carts/models/block/cyan_scoochstem.json
 0beceb21d348225ed0c16a55f6f87fb4d820436e assets/critter_carts/models/block/green_scoochstem.json
 1b31656f89107e3d6224ff6d4e75ee42e16fbad5 assets/critter_carts/models/block/magenta_scoochstem.json
@@ -29,6 +29,7 @@ bf4eefb09000c766a343de5d9598178daf2a41b7 assets/critter_carts/models/block/scooc
 1284281f5174180cc53c605391f121c5ac1792c2 assets/critter_carts/models/block/yellow_scoochstem.json
 bbda7bb33900e5dbbea0c6413075076b8a37eb68 assets/critter_carts/models/item/apple_slice.json
 81bf1072cec699a512ec164612433782f916473d assets/critter_carts/models/item/blue_scoochstem.json
+d1038b29864d40de2d1ef378ce7499e9e9289807 assets/critter_carts/models/item/critter_cage.json
 29cab006c376dbee5daea48031a3b0581c89a907 assets/critter_carts/models/item/cyan_scoochstem.json
 8f31d8b41add727ce2a8a60a8da70944548028a2 assets/critter_carts/models/item/green_scoochstem.json
 2493905db8dd7517a3737faf6cdf480ea499175c assets/critter_carts/models/item/magenta_scoochstem.json

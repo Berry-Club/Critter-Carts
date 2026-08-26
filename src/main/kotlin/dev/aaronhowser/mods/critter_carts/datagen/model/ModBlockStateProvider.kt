@@ -2,14 +2,19 @@ package dev.aaronhowser.mods.critter_carts.datagen.model
 
 import dev.aaronhowser.mods.aaron.misc.AaronDsls.element
 import dev.aaronhowser.mods.aaron.misc.AaronDsls.face
+import dev.aaronhowser.mods.aaron.misc.AaronDsls.transform
+import dev.aaronhowser.mods.aaron.misc.AaronDsls.transforms
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.particle
 import dev.aaronhowser.mods.critter_carts.CritterCarts
 import dev.aaronhowser.mods.critter_carts.block.ScoochstemBlock
 import dev.aaronhowser.mods.critter_carts.registry.ModBlocks
+import dev.aaronhowser.mods.critter_carts.registry.ModItems
+import net.minecraft.client.renderer.RenderType
 import net.minecraft.core.Direction
 import net.minecraft.data.PackOutput
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.level.block.Block
+import net.minecraft.world.item.ItemDisplayContext
 import net.minecraft.world.level.block.HugeMushroomBlock
 import net.minecraft.world.level.block.RotatedPillarBlock
 import net.neoforged.neoforge.client.model.generators.BlockModelBuilder
@@ -24,14 +29,104 @@ class ModBlockStateProvider(
 ) : BlockStateProvider(output, CritterCarts.MOD_ID, existingFileHelper) {
 
 	override fun registerStatesAndModels() {
-		simpleBlock(
-			ModBlocks.CRITTER_CAGE.get(),
-			models().getBuilder("critter_cage_block")
-				.parent(ModelFile.UncheckedModelFile("builtin/entity"))
-		)
+		critterCage()
 		appleSlice()
 		scoochstem()
 		coloredScoochstems()
+	}
+
+	private fun critterCage() {
+		val bottomTexture = modLoc("block/critter_cage/critter_cage_bottom")
+		val sideTexture = modLoc("block/critter_cage/critter_cage_side")
+		val topTexture = modLoc("block/critter_cage/critter_cage_top")
+		val model = models()
+			.withExistingParent("critter_cage_block", mcLoc("block/block"))
+			.renderType(RenderType.CUTOUT.name)
+			.texture("bottom", bottomTexture)
+			.texture("side", sideTexture)
+			.texture("top", topTexture)
+			.particle(sideTexture)
+
+		for (direction in Direction.entries) {
+			val texture = when (direction) {
+				Direction.DOWN -> "#bottom"
+				Direction.UP -> "#top"
+				else -> "#side"
+			}
+
+			model.element {
+				when (direction) {
+					Direction.DOWN -> {
+						from(0f, 0f, 0f)
+						to(16f, 0f, 16f)
+					}
+
+					Direction.UP -> {
+						from(0f, 16f, 0f)
+						to(16f, 16f, 16f)
+					}
+
+					Direction.NORTH -> {
+						from(0f, 0f, 0f)
+						to(16f, 16f, 0f)
+					}
+
+					Direction.SOUTH -> {
+						from(0f, 0f, 16f)
+						to(16f, 16f, 16f)
+					}
+
+					Direction.WEST -> {
+						from(0f, 0f, 0f)
+						to(0f, 16f, 16f)
+					}
+
+					Direction.EAST -> {
+						from(16f, 0f, 0f)
+						to(16f, 16f, 16f)
+					}
+				}
+
+				face(direction) {
+					texture(texture)
+				}
+				face(direction.opposite) {
+					texture(texture)
+				}
+			}
+		}
+
+		simpleBlock(ModBlocks.CRITTER_CAGE.get(), model)
+
+		itemModels()
+			.getBuilder(ModItems.CRITTER_CAGE.id.path)
+			.parent(ModelFile.UncheckedModelFile("builtin/entity"))
+			.transforms {
+				transform(ItemDisplayContext.GROUND) {
+					translation(0f, 2f, 0f)
+					scale(0.5f)
+				}
+
+				transform(ItemDisplayContext.HEAD) {
+					rotation(0f, 180f, 0f)
+					translation(0f, 13f, 7f)
+				}
+
+				transform(ItemDisplayContext.THIRD_PERSON_RIGHT_HAND) {
+					translation(0f, 3f, 1f)
+					scale(0.55f)
+				}
+
+				transform(ItemDisplayContext.FIRST_PERSON_RIGHT_HAND) {
+					rotation(0f, -90f, 25f)
+					translation(1.13f, 3.2f, 1.13f)
+					scale(0.68f)
+				}
+
+				transform(ItemDisplayContext.FIXED) {
+					rotation(0f, 180f, 0f)
+				}
+			}
 	}
 
 	private fun appleSlice() {

@@ -1,16 +1,14 @@
 package dev.aaronhowser.mods.critter_carts.client.renderer
 
 import com.mojang.blaze3d.vertex.PoseStack
-import dev.aaronhowser.mods.critter_carts.CritterCarts
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity
+import dev.aaronhowser.mods.critter_carts.registry.ModBlocks
 import dev.aaronhowser.mods.critter_carts.registry.ModDataComponents
 import dev.aaronhowser.mods.critter_carts.registry.ModEntityTypes
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer
 import net.minecraft.client.renderer.MultiBufferSource
-import net.minecraft.client.resources.model.ModelResourceLocation
 import net.minecraft.core.Direction
-import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.ItemDisplayContext
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.component.CustomData
@@ -34,7 +32,7 @@ class CritterCageItemRenderer : BlockEntityWithoutLevelRenderer(
 		packedLight: Int,
 		packedOverlay: Int
 	) {
-		renderCage(stack, poseStack, buffer, packedLight, packedOverlay)
+		renderCage(poseStack, buffer, packedLight, packedOverlay)
 
 		val scoochworm = getScoochworm(stack) ?: return
 		prepareScoochworm(scoochworm, displayContext)
@@ -60,32 +58,19 @@ class CritterCageItemRenderer : BlockEntityWithoutLevelRenderer(
 	}
 
 	private fun renderCage(
-		stack: ItemStack,
 		poseStack: PoseStack,
 		buffer: MultiBufferSource,
 		packedLight: Int,
 		packedOverlay: Int
 	) {
-		val itemRenderer = Minecraft.getInstance().itemRenderer
-		val modelManager = itemRenderer.itemModelShaper.modelManager
-		val baseModel = modelManager.getModel(
-			ModelResourceLocation.standalone(BASE_MODEL_LOCATION)
-		)
-
 		poseStack.pushPose()
-		poseStack.translate(0.5, 0.5, 0.5)
-
-		itemRenderer.render(
-			stack,
-			ItemDisplayContext.NONE,
-			false,
+		Minecraft.getInstance().blockRenderer.renderSingleBlock(
+			ModBlocks.CRITTER_CAGE.get().defaultBlockState(),
 			poseStack,
 			buffer,
 			packedLight,
-			packedOverlay,
-			baseModel
+			packedOverlay
 		)
-
 		poseStack.popPose()
 	}
 
@@ -136,8 +121,6 @@ class CritterCageItemRenderer : BlockEntityWithoutLevelRenderer(
 	}
 
 	companion object {
-		val BASE_MODEL_LOCATION: ResourceLocation = CritterCarts.modResource("item/critter_cage_base")
-
 		private const val HEAD_SCALE = 0.65f
 		private const val THIRD_PERSON_YAW = 0f
 		private const val DEFAULT_YAW = 180f

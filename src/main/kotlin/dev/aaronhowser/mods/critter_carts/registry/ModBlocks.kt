@@ -22,7 +22,7 @@ object ModBlocks : AaronBlockRegistry() {
 		registerBlock("scoochstem", ::ScoochstemBlock)
 
 	val CRITTER_CAGE: DeferredBlock<CritterCageBlock> =
-		BLOCK_REGISTRY.register("critter_cage", ::CritterCageBlock)
+		registerBlockWithoutItem("critter_cage", ::CritterCageBlock)
 
 	val SCOOCHSTEM_WOOD: DeferredBlock<ScoochstemBlock> =
 		registerBlock("scoochstem_wood", ::ScoochstemBlock)
