@@ -33,6 +33,10 @@ class ModItemTagsProvider(
 				ModItems.MAGENTA_DYEBERRY,
 			)
 
+		tag(SCOOCHWORM_LOOK_AT)
+			.add(Items.MELON)
+			.addTag(DYEBERRIES)
+
 		tag(SCOOCHWORM_SADDLES)
 			.add(Items.SADDLE)
 
@@ -51,6 +55,7 @@ class ModItemTagsProvider(
 
 	companion object {
 		val DYEBERRIES = create("dyeberries")
+		val SCOOCHWORM_LOOK_AT = create("scoochworm_look_at")
 		val SCOOCHWORM_SADDLES = create("scoochworm_saddles")
 
 		private fun create(id: String): TagKey<Item> = ItemTags.create(CritterCarts.modResource(id))

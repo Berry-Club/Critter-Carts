@@ -11,7 +11,7 @@ import dev.aaronhowser.mods.critter_carts.datagen.tag.ModBlockTagsProvider
 import dev.aaronhowser.mods.critter_carts.entity.control.ScoochwormStemMoveControl
 import dev.aaronhowser.mods.critter_carts.entity.data.*
 import dev.aaronhowser.mods.critter_carts.entity.data.attachment.ScoochwormAttachmentType
-import dev.aaronhowser.mods.critter_carts.entity.goal.ScoochwormLookAtMelonGoal
+import dev.aaronhowser.mods.critter_carts.entity.goal.ScoochwormLookAtFoodGoal
 import dev.aaronhowser.mods.critter_carts.entity.goal.ScoochwormTravelGoal
 import dev.aaronhowser.mods.critter_carts.entity.goal.ScoochwormWanderGoal
 import dev.aaronhowser.mods.critter_carts.registry.ModDataComponents
@@ -90,7 +90,7 @@ class ScoochwormEntity(
 	override fun registerGoals() {
 		goalSelector.addGoal(0, ScoochwormTravelGoal(this))
 		goalSelector.addGoal(1, ScoochwormWanderGoal(this))
-		goalSelector.addGoal(2, ScoochwormLookAtMelonGoal(this))
+		goalSelector.addGoal(2, ScoochwormLookAtFoodGoal(this))
 		goalSelector.addGoal(3, LookAtPlayerGoal(this, Player::class.java, 6f))
 		goalSelector.addGoal(4, RandomLookAroundGoal(this))
 	}
