@@ -6,7 +6,12 @@ import net.minecraft.world.effect.MobEffectInstance
 import net.minecraft.world.food.FoodProperties
 import net.minecraft.world.item.Item
 
-class DyeberryItem(properties: Properties) : Item(properties) {
+class DyeberryItem(
+	val color: WormColor,
+	properties: Properties
+) : Item(properties) {
+
+	constructor(color: WormColor) : this(color, getProperties(color))
 
 	companion object {
 		const val EAT_DURATION = 20 * 60
