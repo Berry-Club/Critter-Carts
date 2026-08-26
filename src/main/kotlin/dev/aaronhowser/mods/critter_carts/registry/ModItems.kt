@@ -7,7 +7,6 @@ import dev.aaronhowser.mods.critter_carts.item.CritterCageItem
 import dev.aaronhowser.mods.critter_carts.item.DyeberryItem
 import dev.aaronhowser.mods.critter_carts.item.ScoochwormSpawnEggItem
 import dev.aaronhowser.mods.critter_carts.item.StorageAttachmentItem
-import net.minecraft.world.item.Item
 import net.neoforged.neoforge.registries.DeferredItem
 import net.neoforged.neoforge.registries.DeferredRegister
 
@@ -40,17 +39,27 @@ object ModItems : AaronItemRegistry() {
 				)
 			})
 
-	val GREEN_DYEBERRY: DeferredItem<Item> = registerDyeberry(WormColor.GREEN)
-	val BLUE_DYEBERRY: DeferredItem<Item> = registerDyeberry(WormColor.BLUE)
-	val RED_DYEBERRY: DeferredItem<Item> = registerDyeberry(WormColor.RED)
-	val YELLOW_DYEBERRY: DeferredItem<Item> = registerDyeberry(WormColor.YELLOW)
-	val MAGENTA_DYEBERRY: DeferredItem<Item> = registerDyeberry(WormColor.MAGENTA)
-	val CYAN_DYEBERRY: DeferredItem<Item> = registerDyeberry(WormColor.CYAN)
-	val AARONBERRY: DeferredItem<Item> = basic("aaronberry")
+	val GREEN_DYEBERRY: DeferredItem<DyeberryItem> =
+		registerDyeberry(WormColor.GREEN)
+	val BLUE_DYEBERRY: DeferredItem<DyeberryItem> =
+		registerDyeberry(WormColor.BLUE)
+	val RED_DYEBERRY: DeferredItem<DyeberryItem> =
+		registerDyeberry(WormColor.RED)
+	val YELLOW_DYEBERRY: DeferredItem<DyeberryItem> =
+		registerDyeberry(WormColor.YELLOW)
+	val MAGENTA_DYEBERRY: DeferredItem<DyeberryItem> =
+		registerDyeberry(WormColor.MAGENTA)
+	val CYAN_DYEBERRY: DeferredItem<DyeberryItem> =
+		registerDyeberry(WormColor.CYAN)
+	val AARONBERRY: DeferredItem<DyeberryItem> =
+		registerDyeberry(WormColor.AARON, "aaronberry")
 
-	private fun registerDyeberry(wormColor: WormColor): DeferredItem<Item> {
+	private fun registerDyeberry(
+		wormColor: WormColor,
+		name: String = wormColor.colorName + "_dyeberry"
+	): DeferredItem<DyeberryItem> {
 		return register(
-			wormColor.colorName + "_dyeberry",
+			name,
 			::DyeberryItem
 		) { DyeberryItem.getProperties(wormColor) }
 	}

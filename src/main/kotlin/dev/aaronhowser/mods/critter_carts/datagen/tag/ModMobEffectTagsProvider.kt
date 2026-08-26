@@ -31,7 +31,8 @@ class ModMobEffectTagsProvider(
 				ModMobEffects.DYED_RED.key,
 				ModMobEffects.DYED_YELLOW.key,
 				ModMobEffects.DYED_MAGENTA.key,
-				ModMobEffects.DYED_CYAN.key
+				ModMobEffects.DYED_CYAN.key,
+				ModMobEffects.AARON.key
 			)
 	}
 }

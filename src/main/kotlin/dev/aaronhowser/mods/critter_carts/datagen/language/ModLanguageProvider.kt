@@ -35,6 +35,7 @@ class ModLanguageProvider(
 		addEffect(ModMobEffects.DYED_YELLOW, "Dyed Yellow")
 		addEffect(ModMobEffects.DYED_MAGENTA, "Dyed Magenta")
 		addEffect(ModMobEffects.DYED_CYAN, "Dyed Cyan")
+		addEffect(ModMobEffects.AARON, "Aaron.")
 
 		addPotion("dyed_green", "Green")
 		addPotion("dyed_blue", "Blue")

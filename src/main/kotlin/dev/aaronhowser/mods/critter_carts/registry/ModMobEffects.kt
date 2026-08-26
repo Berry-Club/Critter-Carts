@@ -2,8 +2,10 @@ package dev.aaronhowser.mods.critter_carts.registry
 
 import dev.aaronhowser.mods.aaron.registry.AaronMobEffectsRegistry
 import dev.aaronhowser.mods.critter_carts.CritterCarts
+import dev.aaronhowser.mods.critter_carts.effect.AaronMobEffect
 import dev.aaronhowser.mods.critter_carts.effect.DyedMobEffect
 import dev.aaronhowser.mods.critter_carts.entity.data.WormColor
+import net.minecraft.core.Holder
 import net.minecraft.core.registries.Registries
 import net.minecraft.world.effect.MobEffect
 import net.minecraft.world.entity.LivingEntity
@@ -29,6 +31,8 @@ object ModMobEffects : AaronMobEffectsRegistry() {
 		registerDyed(WormColor.MAGENTA)
 	val DYED_CYAN: DeferredHolder<MobEffect, DyedMobEffect> =
 		registerDyed(WormColor.CYAN)
+	val AARON: DeferredHolder<MobEffect, AaronMobEffect> =
+		register("aaron", ::AaronMobEffect)
 
 	private fun registerDyed(
 		wormColor: WormColor
@@ -38,7 +42,7 @@ object ModMobEffects : AaronMobEffectsRegistry() {
 		}
 	}
 
-	fun getDyedEffect(wormColor: WormColor): DeferredHolder<MobEffect, DyedMobEffect> {
+	fun getDyedEffect(wormColor: WormColor): Holder<MobEffect> {
 		return when (wormColor) {
 			WormColor.GREEN -> DYED_GREEN
 			WormColor.BLUE -> DYED_BLUE
@@ -46,6 +50,7 @@ object ModMobEffects : AaronMobEffectsRegistry() {
 			WormColor.YELLOW -> DYED_YELLOW
 			WormColor.MAGENTA -> DYED_MAGENTA
 			WormColor.CYAN -> DYED_CYAN
+			WormColor.AARON -> AARON
 		}
 	}
 
