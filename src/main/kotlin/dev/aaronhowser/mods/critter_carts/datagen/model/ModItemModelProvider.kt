@@ -14,6 +14,12 @@ class ModItemModelProvider(
 	override fun registerModels() {
 		basicItem(ModItems.SADDLEBAG.get())
 		basicItem(ModItems.WICKER_BASKET.get())
+		basicItem(ModItems.GREEN_DYEBERRY.get())
+		basicItem(ModItems.BLUE_DYEBERRY.get())
+		basicItem(ModItems.RED_DYEBERRY.get())
+		basicItem(ModItems.YELLOW_DYEBERRY.get())
+		basicItem(ModItems.MAGENTA_DYEBERRY.get())
+		basicItem(ModItems.CYAN_DYEBERRY.get())
 		spawnEggItem(ModItems.SCOOCHWORM_SPAWN_EGG.get())
 	}
 }

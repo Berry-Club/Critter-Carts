@@ -36,6 +36,22 @@ class ModLanguageProvider(
 		addEffect(ModMobEffects.DYED_MAGENTA, "Dyed Magenta")
 		addEffect(ModMobEffects.DYED_CYAN, "Dyed Cyan")
 
+		addPotion("dyed_green", "Green")
+		addPotion("dyed_blue", "Blue")
+		addPotion("dyed_red", "Red")
+		addPotion("dyed_yellow", "Yellow")
+		addPotion("dyed_magenta", "Magenta")
+		addPotion("dyed_cyan", "Cyan")
+
 		add(ModSoundEvents.SCOOCHWORM_FOOTSTEP_SUBTITLE, "Scoochworm scooches")
+	}
+
+	private fun addPotion(potionName: String, colorName: String) {
+		val potionKey = "${CritterCarts.MOD_ID}.$potionName"
+
+		add("item.minecraft.potion.effect.$potionKey", "Potion of $colorName Dyeing")
+		add("item.minecraft.splash_potion.effect.$potionKey", "Splash Potion of $colorName Dyeing")
+		add("item.minecraft.lingering_potion.effect.$potionKey", "Lingering Potion of $colorName Dyeing")
+		add("item.minecraft.tipped_arrow.effect.$potionKey", "Arrow of $colorName Dyeing")
 	}
 }

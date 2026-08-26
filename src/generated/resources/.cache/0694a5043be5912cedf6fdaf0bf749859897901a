@@ -1,4 +1,10 @@
-// 1.21.1	2026-08-25T22:02:26.5050899	Item Models: critter_carts
+// 1.21.1	2026-08-26T12:55:00.6605128	Item Models: critter_carts
+35a2221c7d045bbb87e4955112d2e31f77dad02a assets/critter_carts/models/item/blue_dyeberry.json
+15790839333c70afd5a948ebaf3cbdd4875ce6ee assets/critter_carts/models/item/cyan_dyeberry.json
+82e0d865d06e1303827515d17d656a7cba066e5d assets/critter_carts/models/item/green_dyeberry.json
+178e02b33aa8056ef3859e493d319d651782a99b assets/critter_carts/models/item/magenta_dyeberry.json
+e080ccb17334fcc07a479a8039e0b03719ea823b assets/critter_carts/models/item/red_dyeberry.json
 4fd5bfdf5d07370eed83469e28154d079a99ba3a assets/critter_carts/models/item/saddlebag.json
 63ec6c618a3a23eab4cab9c52d7d3250de9b516e assets/critter_carts/models/item/scoochworm_spawn_egg.json
 368e4ab19353bc4cfce465921f747d20db158194 assets/critter_carts/models/item/wicker_basket.json
+09d006407fbf19f69d7894ad86d589e71b6cd16f assets/critter_carts/models/item/yellow_dyeberry.json

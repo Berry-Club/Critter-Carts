@@ -38,6 +38,17 @@ object ModMobEffects : AaronMobEffectsRegistry() {
 		}
 	}
 
+	fun getDyedEffect(wormColor: WormColor): DeferredHolder<MobEffect, DyedMobEffect> {
+		return when (wormColor) {
+			WormColor.GREEN -> DYED_GREEN
+			WormColor.BLUE -> DYED_BLUE
+			WormColor.RED -> DYED_RED
+			WormColor.YELLOW -> DYED_YELLOW
+			WormColor.MAGENTA -> DYED_MAGENTA
+			WormColor.CYAN -> DYED_CYAN
+		}
+	}
+
 	fun getDyeColor(entity: LivingEntity): WormColor? {
 		for (effectInstance in entity.activeEffects) {
 			val effect = effectInstance.effect.value()

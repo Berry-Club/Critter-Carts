@@ -9,6 +9,12 @@ object ModItemLang {
 		provider.apply {
 			addItem(ModItems.SADDLEBAG, "Saddlebag")
 			addItem(ModItems.WICKER_BASKET, "Wicker Basket")
+			addItem(ModItems.GREEN_DYEBERRY, "Green Dyeberry")
+			addItem(ModItems.BLUE_DYEBERRY, "Blue Dyeberry")
+			addItem(ModItems.RED_DYEBERRY, "Red Dyeberry")
+			addItem(ModItems.YELLOW_DYEBERRY, "Yellow Dyeberry")
+			addItem(ModItems.MAGENTA_DYEBERRY, "Magenta Dyeberry")
+			addItem(ModItems.CYAN_DYEBERRY, "Cyan Dyeberry")
 			addItem(ModItems.SCOOCHWORM_SPAWN_EGG, "Scoochworm Spawn Egg")
 			add(ModCreativeModeTabs.CREATIVE_TAB_TRANSLATION_KEY, "Critter Carts")
 		}
