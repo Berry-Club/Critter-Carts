@@ -117,8 +117,10 @@ class ScoochwormAppleFeature : Feature<NoneFeatureConfiguration>(NoneFeatureConf
 			level.random.nextFloat() * 360f,
 			0f
 		)
+
 		scoochworm.attachToSupport(floorPosition, Direction.DOWN)
 		scoochworm.setPersistenceRequired()
+		scoochworm.isTryingToMove = true
 
 		level.addFreshEntity(scoochworm)
 	}
