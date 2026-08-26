@@ -112,7 +112,7 @@ class ScoochwormAppleFeature : Feature<NoneFeatureConfiguration>(NoneFeatureConf
 			Block.UPDATE_CLIENTS
 		)
 
-		level.scheduleTick(stemPos, stemState.block, 1)
+		level.scheduleTick(stemPos, stemState.block, 3)
 	}
 
 	private fun spawnScoochworm(level: WorldGenLevel, floorPosition: BlockPos) {
