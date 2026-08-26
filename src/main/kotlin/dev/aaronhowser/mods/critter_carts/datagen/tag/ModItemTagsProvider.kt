@@ -1,7 +1,9 @@
 package dev.aaronhowser.mods.critter_carts.datagen.tag
 
+import dev.aaronhowser.mods.aaron.misc.AaronExtensions.add
 import dev.aaronhowser.mods.critter_carts.CritterCarts
 import dev.aaronhowser.mods.critter_carts.registry.ModBlocks
+import dev.aaronhowser.mods.critter_carts.registry.ModItems
 import net.minecraft.core.HolderLookup
 import net.minecraft.data.PackOutput
 import net.minecraft.data.tags.ItemTagsProvider
@@ -21,6 +23,16 @@ class ModItemTagsProvider(
 ) : ItemTagsProvider(output, lookupProvider, blockTags, CritterCarts.MOD_ID, existingFileHelper) {
 
 	override fun addTags(provider: HolderLookup.Provider) {
+		tag(DYEBERRIES)
+			.add(
+				ModItems.RED_DYEBERRY,
+				ModItems.BLUE_DYEBERRY,
+				ModItems.GREEN_DYEBERRY,
+				ModItems.CYAN_DYEBERRY,
+				ModItems.YELLOW_DYEBERRY,
+				ModItems.MAGENTA_DYEBERRY,
+			)
+
 		tag(SCOOCHWORM_SADDLES)
 			.add(Items.SADDLE)
 
@@ -38,6 +50,7 @@ class ModItemTagsProvider(
 	}
 
 	companion object {
+		val DYEBERRIES = create("dyeberries")
 		val SCOOCHWORM_SADDLES = create("scoochworm_saddles")
 
 		private fun create(id: String): TagKey<Item> = ItemTags.create(CritterCarts.modResource(id))
