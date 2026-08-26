@@ -1,10 +1,13 @@
 package dev.aaronhowser.mods.critter_carts.world.feature
 
+import dev.aaronhowser.mods.aaron.misc.AaronExtensions.withClickToRunCommand
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity
 import dev.aaronhowser.mods.critter_carts.registry.ModBlocks
 import dev.aaronhowser.mods.critter_carts.registry.ModEntityTypes
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
+import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.Style
 import net.minecraft.world.level.WorldGenLevel
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
@@ -27,6 +30,7 @@ class ScoochwormAppleFeature : Feature<NoneFeatureConfiguration>(NoneFeatureConf
 
 		placeApple(level, center)
 		spawnScoochworm(level, center.below(INTERIOR_FLOOR_OFFSET))
+		sendTeleportMessage(level, center)
 
 		return true
 	}
@@ -113,6 +117,16 @@ class ScoochwormAppleFeature : Feature<NoneFeatureConfiguration>(NoneFeatureConf
 		scoochworm.setPersistenceRequired()
 
 		level.addFreshEntity(scoochworm)
+	}
+
+	private fun sendTeleportMessage(level: WorldGenLevel, position: BlockPos) {
+		val message = Component.literal("[${position.x}, ${position.y}, ${position.z}]")
+			.withStyle(
+				Style.EMPTY
+					.withClickToRunCommand("/tp @s ${position.x} ${position.y} ${position.z}")
+			)
+
+		level.level.server.playerList.broadcastSystemMessage(message, false)
 	}
 
 	private fun getInternalFace(xOffset: Int, yOffset: Int, zOffset: Int): Direction? {
