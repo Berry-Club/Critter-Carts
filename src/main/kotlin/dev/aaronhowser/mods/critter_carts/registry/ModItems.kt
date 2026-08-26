@@ -60,7 +60,13 @@ object ModItems : AaronItemRegistry() {
 	): DeferredItem<DyeberryItem> {
 		return register(
 			name,
-			::DyeberryItem
+			{ properties ->
+				DyeberryItem(
+					ModBlocks.DYEBERRY_VINES.get(),
+					wormColor,
+					properties
+				)
+			}
 		) { DyeberryItem.getProperties(wormColor) }
 	}
 

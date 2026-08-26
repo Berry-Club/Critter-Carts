@@ -1,13 +1,27 @@
 package dev.aaronhowser.mods.critter_carts.item
 
 import dev.aaronhowser.mods.critter_carts.entity.data.WormColor
+import dev.aaronhowser.mods.critter_carts.block.DyeberryVinesBlock
 import dev.aaronhowser.mods.critter_carts.registry.ModDataComponents
 import dev.aaronhowser.mods.critter_carts.registry.ModMobEffects
 import net.minecraft.world.effect.MobEffectInstance
 import net.minecraft.world.food.FoodProperties
-import net.minecraft.world.item.Item
+import net.minecraft.world.item.ItemNameBlockItem
+import net.minecraft.world.item.context.BlockPlaceContext
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.state.BlockState
 
-class DyeberryItem(properties: Properties) : Item(properties) {
+class DyeberryItem(
+	block: Block,
+	private val wormColor: WormColor,
+	properties: Properties
+) : ItemNameBlockItem(block, properties) {
+
+	override fun getPlacementState(context: BlockPlaceContext): BlockState? {
+		val placementState = super.getPlacementState(context) ?: return null
+
+		return placementState.setValue(DyeberryVinesBlock.COLOR, wormColor)
+	}
 
 	companion object {
 		const val EAT_DURATION = 20 * 60
