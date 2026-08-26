@@ -43,6 +43,12 @@ class ModBlockTagsProvider(
 		tag(SCOOCHSTEM_REPLACEABLE)
 			.addTag(BlockTags.MOSS_REPLACEABLE)
 
+		tag(BlockTags.CLIMBABLE)
+			.add(
+				ModBlocks.DYEBERRY_VINES,
+				ModBlocks.DYEBERRY_VINES_PLANT
+			)
+
 		tag(BlockTags.MINEABLE_WITH_AXE)
 			.add(
 				ModBlocks.SCOOCHSTEM,
