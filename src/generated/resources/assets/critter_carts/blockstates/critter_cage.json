@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "critter_carts:block/critter_cage_block"
+    }
+  }
+}

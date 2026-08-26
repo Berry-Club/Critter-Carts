@@ -20,7 +20,11 @@ object ModItems : AaronItemRegistry() {
 		register("wicker_basket", StorageAttachmentItem::wickerBasket, StorageAttachmentItem.DEFAULT_PROPERTIES)
 
 	val CRITTER_CAGE: DeferredItem<CritterCageItem> =
-		register("critter_cage", ::CritterCageItem, PROPERTIES_SINGLE_STACK)
+		register(
+			"critter_cage",
+			{ properties -> CritterCageItem(ModBlocks.CRITTER_CAGE.get(), properties) },
+			PROPERTIES_SINGLE_STACK
+		)
 
 	val SCOOCHWORM_SPAWN_EGG: DeferredItem<ScoochwormSpawnEggItem> =
 		register(

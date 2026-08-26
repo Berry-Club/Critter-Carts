@@ -15,6 +15,7 @@ import net.minecraft.world.level.block.RotatedPillarBlock
 import net.neoforged.neoforge.client.model.generators.BlockModelBuilder
 import net.neoforged.neoforge.client.model.generators.BlockStateProvider
 import net.neoforged.neoforge.client.model.generators.ModelBuilder
+import net.neoforged.neoforge.client.model.generators.ModelFile
 import net.neoforged.neoforge.common.data.ExistingFileHelper
 
 class ModBlockStateProvider(
@@ -23,6 +24,11 @@ class ModBlockStateProvider(
 ) : BlockStateProvider(output, CritterCarts.MOD_ID, existingFileHelper) {
 
 	override fun registerStatesAndModels() {
+		simpleBlock(
+			ModBlocks.CRITTER_CAGE.get(),
+			models().getBuilder("critter_cage_block")
+				.parent(ModelFile.UncheckedModelFile("builtin/entity"))
+		)
 		appleSlice()
 		scoochstem()
 		coloredScoochstems()

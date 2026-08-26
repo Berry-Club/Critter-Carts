@@ -9,6 +9,7 @@ object ModRegistries {
 		val registries: List<DeferredRegister<*>> = listOf(
 			ModItems.ITEM_REGISTRY,
 			ModBlocks.BLOCK_REGISTRY,
+			ModBlockEntityTypes.BLOCK_ENTITY_REGISTRY,
 			ModCreativeModeTabs.TABS_REGISTRY,
 			ModEntityTypes.ENTITY_TYPE_REGISTRY,
 			ModEntityDataSerializers.ENTITY_DATA_SERIALIZER_REGISTRY,

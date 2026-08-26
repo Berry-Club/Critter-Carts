@@ -12,13 +12,13 @@ import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
-import net.minecraft.world.item.Item
+import net.minecraft.world.item.BlockItem
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.component.CustomData
-import net.minecraft.world.item.context.UseOnContext
 import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.Block
 
-class CritterCageItem(properties: Properties) : Item(properties) {
+class CritterCageItem(block: Block, properties: Properties) : BlockItem(block, properties) {
 
 	override fun interactLivingEntity(
 		stack: ItemStack,
@@ -42,47 +42,10 @@ class CritterCageItem(properties: Properties) : Item(properties) {
 		return InteractionResult.sidedSuccess(player.isClientSide)
 	}
 
-	override fun useOn(context: UseOnContext): InteractionResult {
-		val stack = context.itemInHand
-		if (!stack.has(ModDataComponents.ENTITY_DATA)) return InteractionResult.PASS
-
-		val level = context.level
-
-		val clickedPos = context.clickedPos
-		val clickedFace = context.clickedFace
-		val clickedState = level.getBlockState(clickedPos)
-
-		val posToSpawn = if (clickedState.isSuffocating(level, clickedPos)) {
-			val relative = clickedPos.relative(clickedFace)
-			if (level.getBlockState(relative).isSuffocating(level, relative)) {
-				return InteractionResult.FAIL
-			}
-
-			relative
-		} else {
-			clickedPos
-		}
-
-		val success = placeScoochworm(
-			stack,
-			level,
-			posToSpawn,
-			clickedPos,
-			clickedFace,
-			context.player
-		) != null
-
-		if (!success) return InteractionResult.FAIL
-
-		stack.remove(ModDataComponents.ENTITY_DATA)
-
-		return InteractionResult.SUCCESS
-	}
-
 	override fun isFoil(stack: ItemStack): Boolean = stack.has(ModDataComponents.ENTITY_DATA)
 
 	companion object {
-		private fun placeScoochworm(
+		fun placeScoochworm(
 			stack: ItemStack,
 			level: Level,
 			spawnPos: BlockPos,

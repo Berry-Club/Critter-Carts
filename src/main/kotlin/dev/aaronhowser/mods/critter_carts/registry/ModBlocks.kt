@@ -3,6 +3,7 @@ package dev.aaronhowser.mods.critter_carts.registry
 import dev.aaronhowser.mods.aaron.registry.AaronBlockRegistry
 import dev.aaronhowser.mods.critter_carts.CritterCarts
 import dev.aaronhowser.mods.critter_carts.block.ColoredScoochstemBlock
+import dev.aaronhowser.mods.critter_carts.block.CritterCageBlock
 import dev.aaronhowser.mods.critter_carts.block.ScoochstemBlock
 import dev.aaronhowser.mods.critter_carts.entity.data.WormColor
 import net.minecraft.world.level.block.Blocks
@@ -19,6 +20,9 @@ object ModBlocks : AaronBlockRegistry() {
 
 	val SCOOCHSTEM: DeferredBlock<ScoochstemBlock> =
 		registerBlock("scoochstem", ::ScoochstemBlock)
+
+	val CRITTER_CAGE: DeferredBlock<CritterCageBlock> =
+		BLOCK_REGISTRY.register("critter_cage", ::CritterCageBlock)
 
 	val SCOOCHSTEM_WOOD: DeferredBlock<ScoochstemBlock> =
 		registerBlock("scoochstem_wood", ::ScoochstemBlock)

@@ -19,6 +19,7 @@ class ModBlockLootTablesSubProvider(
 ) : BlockLootSubProvider(setOf(), FeatureFlags.REGISTRY.allFlags(), provider) {
 
 	override fun generate() {
+		add(ModBlocks.CRITTER_CAGE.get(), noDrop())
 		dropSelf(ModBlocks.SCOOCHSTEM.get())
 		dropSelf(ModBlocks.SCOOCHSTEM_WOOD.get())
 		appleSlice()
