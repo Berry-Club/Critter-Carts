@@ -6,7 +6,6 @@ import dev.aaronhowser.mods.critter_carts.registry.ModMobEffects
 import net.minecraft.world.effect.MobEffectInstance
 import net.minecraft.world.food.FoodProperties
 import net.minecraft.world.item.Item
-import java.util.function.Supplier
 
 class DyeberryItem(properties: Properties) : Item(properties) {
 
@@ -14,7 +13,7 @@ class DyeberryItem(properties: Properties) : Item(properties) {
 		const val EAT_DURATION = 20 * 60
 		const val POTION_DURATION = 20 * 60 * 5
 
-		fun getProperties(wormColor: WormColor): Supplier<Properties> {
+		fun getProperties(wormColor: WormColor): Properties {
 			val foodProperties = FoodProperties.Builder()
 				.nutrition(2)
 				.saturationModifier(0.1f)
@@ -25,11 +24,9 @@ class DyeberryItem(properties: Properties) : Item(properties) {
 				)
 				.build()
 
-			return Supplier {
-				Properties()
-					.food(foodProperties)
-					.component(ModDataComponents.WORM_COLOR, wormColor)
-			}
+			return Properties()
+				.food(foodProperties)
+				.component(ModDataComponents.WORM_COLOR, wormColor)
 		}
 	}
 
