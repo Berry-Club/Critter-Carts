@@ -1,5 +1,6 @@
 package dev.aaronhowser.mods.critter_carts.effect
 
+import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isHolder
 import dev.aaronhowser.mods.critter_carts.entity.data.WormColor
 import dev.aaronhowser.mods.critter_carts.registry.ModMobEffectTags
 import net.minecraft.world.effect.MobEffect
@@ -17,15 +18,13 @@ class DyedMobEffect(
 		livingEntity: LivingEntity,
 		amplifier: Int
 	) {
-		super.onEffectStarted(livingEntity, amplifier)
-
 		val activeEffects = livingEntity.activeEffects.toList()
 
 		for (effectInstance in activeEffects) {
 			val effect = effectInstance.effect
 
 			if (effect.value() === this) continue
-			if (!effect.`is`(ModMobEffectTags.DYES_ENTITY)) continue
+			if (!effect.isHolder(ModMobEffectTags.DYES_ENTITY)) continue
 
 			livingEntity.removeEffect(effect)
 		}
