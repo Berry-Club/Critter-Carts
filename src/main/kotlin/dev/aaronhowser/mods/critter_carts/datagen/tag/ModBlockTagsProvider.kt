@@ -40,6 +40,9 @@ class ModBlockTagsProvider(
 				ModBlocks.CYAN_SCOOCHSTEM
 			)
 
+		tag(SCOOCHSTEM_REPLACEABLE)
+			.addTag(BlockTags.MOSS_REPLACEABLE)
+
 		tag(BlockTags.MINEABLE_WITH_AXE)
 			.add(
 				ModBlocks.SCOOCHSTEM,
@@ -83,6 +86,7 @@ class ModBlockTagsProvider(
 
 		val SUPPORTS_SCOOCHWORM_TRAVEL = tk("supports_scoochworm_travel")
 		val PREVENTS_SCOOCHWORM_WANDERING = tk("prevents_scoochworm_wandering")
+		val SCOOCHSTEM_REPLACEABLE = tk("scooch_replaceable")
 	}
 
 }

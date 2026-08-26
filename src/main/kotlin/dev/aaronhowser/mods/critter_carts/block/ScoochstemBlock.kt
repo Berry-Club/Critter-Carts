@@ -3,6 +3,7 @@ package dev.aaronhowser.mods.critter_carts.block
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isBlock
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isItem
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.roll
+import dev.aaronhowser.mods.critter_carts.datagen.tag.ModBlockTagsProvider
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
@@ -52,7 +53,9 @@ class ScoochstemBlock : RotatedPillarBlock(Properties.ofFullCopy(Blocks.OAK_LOG)
 		if (growthRemaining <= 0) return
 
 		val growthPosition = fromPosition.relative(direction)
-		if (!level.getBlockState(growthPosition).canBeReplaced()) return
+
+		val stateThere = level.getBlockState(growthPosition)
+		if (!stateThere.canBeReplaced() && !stateThere.isBlock(ModBlockTagsProvider.SCOOCHSTEM_REPLACEABLE)) return
 
 		val growthState = defaultBlockState()
 			.setValue(AXIS, direction.axis)
