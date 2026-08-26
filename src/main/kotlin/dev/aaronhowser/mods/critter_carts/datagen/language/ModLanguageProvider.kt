@@ -3,6 +3,7 @@ package dev.aaronhowser.mods.critter_carts.datagen.language
 import dev.aaronhowser.mods.critter_carts.CritterCarts
 import dev.aaronhowser.mods.critter_carts.registry.ModBlocks
 import dev.aaronhowser.mods.critter_carts.registry.ModEntityTypes
+import dev.aaronhowser.mods.critter_carts.registry.ModMobEffects
 import dev.aaronhowser.mods.critter_carts.registry.ModSoundEvents
 import net.minecraft.data.PackOutput
 import net.neoforged.neoforge.common.data.LanguageProvider
@@ -27,6 +28,14 @@ class ModLanguageProvider(
 		addBlock(ModBlocks.CYAN_SCOOCHSTEM, "Cyan Scoochstem")
 
 		addEntityType(ModEntityTypes.SCOOCHWORM, "Scoochworm")
+
+		addEffect(ModMobEffects.DYED_GREEN, "Dyed Green")
+		addEffect(ModMobEffects.DYED_BLUE, "Dyed Blue")
+		addEffect(ModMobEffects.DYED_RED, "Dyed Red")
+		addEffect(ModMobEffects.DYED_YELLOW, "Dyed Yellow")
+		addEffect(ModMobEffects.DYED_MAGENTA, "Dyed Magenta")
+		addEffect(ModMobEffects.DYED_CYAN, "Dyed Cyan")
+
 		add(ModSoundEvents.SCOOCHWORM_FOOTSTEP_SUBTITLE, "Scoochworm scooches")
 	}
 }
