@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "berries=false": {
+      "model": "critter_carts:block/dyeberry_vines"
+    },
+    "berries=true": {
+      "model": "critter_carts:block/dyeberry_vines_lit"
+    }
+  }
+}

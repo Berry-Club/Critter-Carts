@@ -14,15 +14,12 @@ import net.minecraft.client.renderer.RenderType
 import net.minecraft.core.Direction
 import net.minecraft.data.PackOutput
 import net.minecraft.resources.ResourceLocation
-import net.minecraft.world.level.block.Block
 import net.minecraft.world.item.ItemDisplayContext
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.CaveVines
 import net.minecraft.world.level.block.HugeMushroomBlock
 import net.minecraft.world.level.block.RotatedPillarBlock
-import net.neoforged.neoforge.client.model.generators.BlockModelBuilder
-import net.neoforged.neoforge.client.model.generators.BlockStateProvider
-import net.neoforged.neoforge.client.model.generators.ConfiguredModel
-import net.neoforged.neoforge.client.model.generators.ModelBuilder
-import net.neoforged.neoforge.client.model.generators.ModelFile
+import net.neoforged.neoforge.client.model.generators.*
 import net.neoforged.neoforge.common.data.ExistingFileHelper
 
 class ModBlockStateProvider(
@@ -35,6 +32,46 @@ class ModBlockStateProvider(
 		appleSlice()
 		scoochstem()
 		coloredScoochstems()
+		dyeberryVines()
+	}
+
+	private fun dyeberryVines() {
+		val headModel = models()
+			.cross("dyeberry_vines", modLoc("block/dyeberry_vines/cave_vines"))
+			.renderType(RenderType.CUTOUT.name)
+		val headLitModel = models()
+			.cross("dyeberry_vines_lit", modLoc("block/dyeberry_vines/cave_vines_lit"))
+			.renderType(RenderType.CUTOUT.name)
+		val plantModel = models()
+			.cross("dyeberry_vines_plant", modLoc("block/dyeberry_vines/cave_vines_plant"))
+			.renderType(RenderType.CUTOUT.name)
+		val plantLitModel = models()
+			.cross("dyeberry_vines_plant_lit", modLoc("block/dyeberry_vines/cave_vines_plant_lit"))
+			.renderType(RenderType.CUTOUT.name)
+
+		getVariantBuilder(ModBlocks.DYEBERRY_VINES.get())
+			.partialState()
+			.with(CaveVines.BERRIES, false)
+			.modelForState()
+			.modelFile(headModel)
+			.addModel()
+			.partialState()
+			.with(CaveVines.BERRIES, true)
+			.modelForState()
+			.modelFile(headLitModel)
+			.addModel()
+
+		getVariantBuilder(ModBlocks.DYEBERRY_VINES_PLANT.get())
+			.partialState()
+			.with(CaveVines.BERRIES, false)
+			.modelForState()
+			.modelFile(plantModel)
+			.addModel()
+			.partialState()
+			.with(CaveVines.BERRIES, true)
+			.modelForState()
+			.modelFile(plantLitModel)
+			.addModel()
 	}
 
 	private fun critterCage() {
@@ -106,9 +143,11 @@ class ModBlockStateProvider(
 			when (down) {
 				Direction.DOWN -> configuredModel
 					.rotationY(horizontalRotation(forward))
+
 				Direction.UP -> configuredModel
 					.rotationX(180)
 					.rotationY((horizontalRotation(forward) + 180) % 360)
+
 				Direction.NORTH -> configuredModel.rotationX(90)
 				Direction.EAST -> configuredModel.rotationX(90).rotationY(90)
 				Direction.SOUTH -> configuredModel.rotationX(90).rotationY(180)
