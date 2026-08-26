@@ -4,7 +4,6 @@ import com.mojang.blaze3d.vertex.PoseStack
 import dev.aaronhowser.mods.critter_carts.block.CritterCageBlock
 import dev.aaronhowser.mods.critter_carts.block.CritterCageBlockEntity
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity
-import dev.aaronhowser.mods.critter_carts.registry.ModEntityTypes
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer
@@ -25,10 +24,7 @@ class CritterCageBlockRenderer(
 		val down = blockEntity.blockState.getValue(CritterCageBlock.DOWN)
 		val forward = blockEntity.blockState.getValue(CritterCageBlock.FORWARD)
 
-		val data = blockEntity.entityData ?: return
-		val level = blockEntity.level ?: return
-		val worm = ScoochwormEntity(ModEntityTypes.SCOOCHWORM.get(), level)
-		worm.load(data.copyTag())
+		val worm = blockEntity.getScoochworm() ?: return
 		worm.supportDirection = down
 		val yaw = ScoochwormEntity.getMovementYaw(forward, down)
 		worm.yRot = yaw

@@ -1,15 +1,18 @@
 package dev.aaronhowser.mods.critter_carts.block
 
 import dev.aaronhowser.mods.aaron.block_entity.SyncingBlockEntity
+import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity
 import dev.aaronhowser.mods.critter_carts.item.CritterCageItem
 import dev.aaronhowser.mods.critter_carts.registry.ModBlockEntityTypes
 import dev.aaronhowser.mods.critter_carts.registry.ModDataComponents
+import dev.aaronhowser.mods.critter_carts.registry.ModEntityTypes
 import net.minecraft.core.BlockPos
 import net.minecraft.core.HolderLookup
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.component.CustomData
+import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.BlockState
 
 class CritterCageBlockEntity(
@@ -18,10 +21,16 @@ class CritterCageBlockEntity(
 ) : SyncingBlockEntity(ModBlockEntityTypes.CRITTER_CAGE.get(), pos, state) {
 
 	override val syncImmediately: Boolean = true
+	private var cachedEntityData: CustomData? = null
+	private var cachedEntityLevel: Level? = null
+	private var cachedScoochworm: ScoochwormEntity? = null
 
 	var entityData: CustomData? = null
 		set(value) {
 			field = value
+			cachedEntityData = null
+			cachedEntityLevel = null
+			cachedScoochworm = null
 			setChanged()
 			level?.sendBlockUpdated(blockPos, blockState, blockState, 3)
 		}
@@ -29,11 +38,30 @@ class CritterCageBlockEntity(
 	val hasEntity: Boolean
 		get() = entityData != null
 
+	fun getScoochworm(): ScoochwormEntity? {
+		val data = entityData ?: return null
+		val level = level ?: return null
+
+		if (data == cachedEntityData && level === cachedEntityLevel) {
+			return cachedScoochworm
+		}
+
+		val scoochworm = ScoochwormEntity(ModEntityTypes.SCOOCHWORM.get(), level)
+		scoochworm.load(data.copyTag())
+
+		cachedEntityData = data
+		cachedEntityLevel = level
+		cachedScoochworm = scoochworm
+
+		return scoochworm
+	}
+
 	fun tryRelease(player: Player?): Boolean {
 		val level = level ?: return false
 		val data = entityData ?: return false
 		val forward = blockState.getValue(CritterCageBlock.FORWARD)
 		val spawnPos = blockPos.relative(forward)
+
 		val stack = ItemStack(blockState.block)
 		stack.set(ModDataComponents.ENTITY_DATA, data)
 
