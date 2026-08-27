@@ -23,7 +23,8 @@ abstract class ScoochwormPartAttachmentLayer(
 	protected open fun prepareModel(
 		animatable: ScoochwormPartEntity,
 		partialTick: Float
-	) {}
+	) {
+	}
 
 	override fun render(
 		poseStack: PoseStack,

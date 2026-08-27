@@ -1,7 +1,7 @@
 package dev.aaronhowser.mods.critter_carts.item
 
-import dev.aaronhowser.mods.critter_carts.entity.data.WormColor
 import dev.aaronhowser.mods.critter_carts.block.DyeberryVinesBlock
+import dev.aaronhowser.mods.critter_carts.entity.data.WormColor
 import dev.aaronhowser.mods.critter_carts.registry.ModDataComponents
 import dev.aaronhowser.mods.critter_carts.registry.ModMobEffects
 import net.minecraft.world.effect.MobEffectInstance

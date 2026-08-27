@@ -2,8 +2,8 @@ package dev.aaronhowser.mods.critter_carts.client.render.entity
 
 import com.mojang.blaze3d.vertex.PoseStack
 import dev.aaronhowser.mods.critter_carts.client.model.entity.ScoochwormPartModel
-import dev.aaronhowser.mods.critter_carts.client.render.entity.layer.ScoochwormSaddleLayer
 import dev.aaronhowser.mods.critter_carts.client.render.entity.layer.ScoochwormLockboxLayer
+import dev.aaronhowser.mods.critter_carts.client.render.entity.layer.ScoochwormSaddleLayer
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormPartEntity
 import net.minecraft.client.renderer.entity.EntityRendererProvider
