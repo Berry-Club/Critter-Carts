@@ -1,4 +1,4 @@
-package dev.aaronhowser.mods.critter_carts.entity.data.attachment
+package dev.aaronhowser.mods.critter_carts.entity.attachment
 
 import net.minecraft.world.item.ItemStack
 

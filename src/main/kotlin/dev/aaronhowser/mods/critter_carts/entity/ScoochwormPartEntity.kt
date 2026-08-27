@@ -3,8 +3,9 @@ package dev.aaronhowser.mods.critter_carts.entity
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isClientSide
 import dev.aaronhowser.mods.critter_carts.entity.data.ScoochwormSegment
 import dev.aaronhowser.mods.critter_carts.entity.data.WormColor
-import dev.aaronhowser.mods.critter_carts.entity.data.attachment.ScoochwormAttachment
-import dev.aaronhowser.mods.critter_carts.entity.data.attachment.ScoochwormAttachmentType
+import dev.aaronhowser.mods.critter_carts.entity.attachment.ScoochwormAttachment
+import dev.aaronhowser.mods.critter_carts.entity.attachment.data.NoAttachmentData
+import dev.aaronhowser.mods.critter_carts.entity.attachment.data.SynchedAttachmentData
 import dev.aaronhowser.mods.critter_carts.registry.ModEntityDataSerializers
 import net.minecraft.core.Direction
 import net.minecraft.nbt.CompoundTag
@@ -54,13 +55,9 @@ class ScoochwormPartEntity(
 		get() = entityData.get(DATA_PART_INDEX)
 		set(value) = entityData.set(DATA_PART_INDEX, value)
 
-	var attachmentType: ScoochwormAttachmentType
-		get() = entityData.get(DATA_ATTACHMENT_TYPE)
-		set(value) = entityData.set(DATA_ATTACHMENT_TYPE, value)
-
-	var isLockboxOpen: Boolean
-		get() = entityData.get(DATA_LOCKBOX_OPEN)
-		set(value) = entityData.set(DATA_LOCKBOX_OPEN, value)
+	var attachmentData: SynchedAttachmentData
+		get() = entityData.get(DATA_ATTACHMENT_DATA)
+		set(value) = entityData.set(DATA_ATTACHMENT_DATA, value)
 
 	var color: WormColor
 		get() = WormColor.fromOrdinal(entityData.get(DATA_COLOR))
@@ -103,12 +100,12 @@ class ScoochwormPartEntity(
 	fun attachTo(
 		parentEntity: ScoochwormEntity,
 		partIndex: Int,
-		attachmentType: ScoochwormAttachmentType,
+		attachmentData: SynchedAttachmentData,
 		ownerSegment: ScoochwormSegment
 	) {
 		this.parentId = parentEntity.id
 		this.partIndex = partIndex
-		this.attachmentType = attachmentType
+		this.attachmentData = attachmentData
 		this.ownerSegment = ownerSegment
 		color = parentEntity.color
 	}
@@ -230,7 +227,7 @@ class ScoochwormPartEntity(
 
 	override fun interact(player: Player, hand: InteractionHand): InteractionResult {
 		val scoochworm = getScoochworm() ?: return InteractionResult.PASS
-		return scoochworm.interactWithPart(player, hand, partIndex, attachmentType)
+		return scoochworm.interactWithPart(player, hand, partIndex, attachmentData)
 	}
 
 	override fun canCollideWith(entity: Entity): Boolean {
@@ -249,10 +246,9 @@ class ScoochwormPartEntity(
 	override fun defineSynchedData(builder: SynchedEntityData.Builder) {
 		builder.define(DATA_PARENT_ID, NO_PARENT)
 		builder.define(DATA_PART_INDEX, 0)
-		builder.define(DATA_ATTACHMENT_TYPE, ScoochwormAttachmentType.NONE)
+		builder.define(DATA_ATTACHMENT_DATA, NoAttachmentData)
 		builder.define(DATA_BOTTOM_DIRECTION, Direction.DOWN)
 		builder.define(DATA_COLOR, WormColor.GREEN.ordinal)
-		builder.define(DATA_LOCKBOX_OPEN, false)
 	}
 
 	override fun readAdditionalSaveData(tag: CompoundTag) {}
@@ -276,10 +272,10 @@ class ScoochwormPartEntity(
 		private val DATA_PART_INDEX: EntityDataAccessor<Int> =
 			SynchedEntityData.defineId(ScoochwormPartEntity::class.java, EntityDataSerializers.INT)
 
-		private val DATA_ATTACHMENT_TYPE: EntityDataAccessor<ScoochwormAttachmentType> =
+		private val DATA_ATTACHMENT_DATA: EntityDataAccessor<SynchedAttachmentData> =
 			SynchedEntityData.defineId(
 				ScoochwormPartEntity::class.java,
-				ModEntityDataSerializers.SCOOCHWORM_ATTACHMENT_TYPE.get()
+				ModEntityDataSerializers.SCOOCHWORM_ATTACHMENT_DATA.get()
 			)
 
 		private val DATA_BOTTOM_DIRECTION: EntityDataAccessor<Direction> =
@@ -294,11 +290,6 @@ class ScoochwormPartEntity(
 				EntityDataSerializers.INT
 			)
 
-		private val DATA_LOCKBOX_OPEN: EntityDataAccessor<Boolean> =
-			SynchedEntityData.defineId(
-				ScoochwormPartEntity::class.java,
-				EntityDataSerializers.BOOLEAN
-			)
 	}
 
 }

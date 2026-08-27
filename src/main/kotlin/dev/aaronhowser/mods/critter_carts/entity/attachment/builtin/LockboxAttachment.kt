@@ -1,7 +1,11 @@
-package dev.aaronhowser.mods.critter_carts.entity.data.attachment
+package dev.aaronhowser.mods.critter_carts.entity.attachment.builtin
 
 import dev.aaronhowser.mods.critter_carts.config.ServerConfig
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormPartEntity
+import dev.aaronhowser.mods.critter_carts.entity.attachment.AttachmentInteractionResult
+import dev.aaronhowser.mods.critter_carts.entity.attachment.ScoochwormAttachment
+import dev.aaronhowser.mods.critter_carts.entity.attachment.data.LockboxAttachmentData
+import dev.aaronhowser.mods.critter_carts.entity.attachment.data.SynchedAttachmentData
 import net.minecraft.core.Direction
 import net.minecraft.core.component.DataComponents
 import net.minecraft.sounds.SoundEvent
@@ -22,13 +26,15 @@ class LockboxAttachment(
 	lockbox: ItemStack
 ) : ScoochwormAttachment(lockbox) {
 
-	override val type = ScoochwormAttachmentType.LOCKBOX
+	override val synchedData: SynchedAttachmentData
+		get() = LockboxAttachmentData(openers > 0)
 	override val equipSound: SoundEvent = SoundEvents.DONKEY_CHEST
 
 	private var bodyPart: ScoochwormPartEntity? = null
 	private var openers = 0
 	private var upsideDownTicks = 0
 	private var previousShouldOpen: Boolean? = null
+	private var isOpen = false
 
 	var previousOpenProgress = 0f
 		private set
@@ -94,7 +100,7 @@ class LockboxAttachment(
 	override fun clientTick(bodyPart: ScoochwormPartEntity) {
 		previousOpenProgress = openProgress
 
-		val shouldOpen = bodyPart.isLockboxOpen
+		val shouldOpen = isOpen
 			|| bodyPart.supportDirection == Direction.UP
 
 		val wasOpen = previousShouldOpen
@@ -105,6 +111,11 @@ class LockboxAttachment(
 
 		val change = if (shouldOpen) OPEN_SPEED else -OPEN_SPEED
 		openProgress = (openProgress + change).coerceIn(0f, 1f)
+	}
+
+	override fun applySynchedData(data: SynchedAttachmentData) {
+		val lockboxData = data as? LockboxAttachmentData ?: return
+		isOpen = lockboxData.isOpen
 	}
 
 	override fun serverTick(bodyPart: ScoochwormPartEntity) {
@@ -134,7 +145,7 @@ class LockboxAttachment(
 	}
 
 	private fun updateOpenState() {
-		bodyPart?.isLockboxOpen = openers > 0
+		bodyPart?.attachmentData = synchedData
 	}
 
 	private fun playOpenSound(bodyPart: ScoochwormPartEntity, isOpening: Boolean) {

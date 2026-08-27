@@ -1,7 +1,7 @@
 package dev.aaronhowser.mods.critter_carts.registry
 
 import dev.aaronhowser.mods.critter_carts.CritterCarts
-import dev.aaronhowser.mods.critter_carts.entity.data.attachment.ScoochwormAttachmentType
+import dev.aaronhowser.mods.critter_carts.entity.attachment.data.SynchedAttachmentData
 import net.minecraft.network.syncher.EntityDataSerializer
 import net.neoforged.neoforge.registries.DeferredHolder
 import net.neoforged.neoforge.registries.DeferredRegister
@@ -16,11 +16,11 @@ object ModEntityDataSerializers {
 			CritterCarts.MOD_ID
 		)
 
-	val SCOOCHWORM_ATTACHMENT_TYPE: DeferredHolder<EntityDataSerializer<*>, EntityDataSerializer<ScoochwormAttachmentType>> =
+	val SCOOCHWORM_ATTACHMENT_DATA: DeferredHolder<EntityDataSerializer<*>, EntityDataSerializer<SynchedAttachmentData>> =
 		register(
-			"scoochworm_attachment_type",
+			"scoochworm_attachment_data",
 			EntityDataSerializer.forValueType(
-				ScoochwormAttachmentType.STREAM_CODEC
+				SynchedAttachmentData.STREAM_CODEC
 			)
 		)
 

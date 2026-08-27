@@ -2,7 +2,7 @@ package dev.aaronhowser.mods.critter_carts.client.model.entity
 
 import dev.aaronhowser.mods.critter_carts.CritterCarts
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormPartEntity
-import dev.aaronhowser.mods.critter_carts.entity.data.attachment.LockboxAttachment
+import dev.aaronhowser.mods.critter_carts.entity.attachment.builtin.LockboxAttachment
 import net.minecraft.util.Mth
 import software.bernie.geckolib.model.DefaultedEntityGeoModel
 

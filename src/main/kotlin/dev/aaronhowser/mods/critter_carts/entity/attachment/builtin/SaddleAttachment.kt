@@ -1,6 +1,10 @@
-package dev.aaronhowser.mods.critter_carts.entity.data.attachment
+package dev.aaronhowser.mods.critter_carts.entity.attachment.builtin
 
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormPartEntity
+import dev.aaronhowser.mods.critter_carts.entity.attachment.AttachmentInteractionResult
+import dev.aaronhowser.mods.critter_carts.entity.attachment.ScoochwormAttachment
+import dev.aaronhowser.mods.critter_carts.entity.attachment.data.SaddleAttachmentData
+import dev.aaronhowser.mods.critter_carts.entity.attachment.data.SynchedAttachmentData
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.world.entity.player.Player
@@ -10,7 +14,7 @@ class SaddleAttachment(
 	saddle: ItemStack
 ) : ScoochwormAttachment(saddle) {
 
-	override val type = ScoochwormAttachmentType.SADDLE
+	override val synchedData: SynchedAttachmentData = SaddleAttachmentData
 	override val equipSound: SoundEvent = SoundEvents.HORSE_SADDLE
 
 	override fun interact(

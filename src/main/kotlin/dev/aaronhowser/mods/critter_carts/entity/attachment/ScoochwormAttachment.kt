@@ -1,10 +1,10 @@
-package dev.aaronhowser.mods.critter_carts.entity.data.attachment
+package dev.aaronhowser.mods.critter_carts.entity.attachment
 
 import com.mojang.serialization.Codec
-import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isItem
-import dev.aaronhowser.mods.critter_carts.datagen.tag.ModItemTagsProvider
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormPartEntity
-import dev.aaronhowser.mods.critter_carts.registry.ModItems
+import dev.aaronhowser.mods.critter_carts.entity.attachment.builtin.NoAttachment
+import dev.aaronhowser.mods.critter_carts.entity.attachment.data.SynchedAttachmentData
+import dev.aaronhowser.mods.critter_carts.registry.ModScoochwormAttachmentTypes
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtOps
 import net.minecraft.sounds.SoundEvent
@@ -13,13 +13,13 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.neoforged.neoforge.items.IItemHandler
 
-sealed class ScoochwormAttachment(
+abstract class ScoochwormAttachment(
 	itemStack: ItemStack
 ) {
 
 	protected val itemStack: ItemStack = itemStack.copy()
 
-	abstract val type: ScoochwormAttachmentType
+	abstract val synchedData: SynchedAttachmentData
 	abstract val equipSound: SoundEvent?
 	open val itemHandler: IItemHandler? = null
 
@@ -32,6 +32,8 @@ sealed class ScoochwormAttachment(
 	open fun clientTick(bodyPart: ScoochwormPartEntity) {}
 
 	open fun serverTick(bodyPart: ScoochwormPartEntity) {}
+
+	open fun applySynchedData(data: SynchedAttachmentData) {}
 
 	protected open fun synchronizeItemStack() {}
 
@@ -62,24 +64,26 @@ sealed class ScoochwormAttachment(
 		fun fromItemStack(
 			itemStack: ItemStack
 		): ScoochwormAttachment {
-			return when {
-				itemStack.isItem(ModItems.LOCKBOX) -> LockboxAttachment(itemStack)
-				itemStack.isItem(ModItemTagsProvider.SCOOCHWORM_SADDLES) -> SaddleAttachment(itemStack)
-				else -> NoAttachment()
+			for (type in ModScoochwormAttachmentTypes.REGISTRY) {
+				val attachment = type.createAttachment(itemStack)
+				if (attachment != null) return attachment
 			}
+
+			return NoAttachment()
 		}
 
 		fun canAttach(itemStack: ItemStack): Boolean {
-			return itemStack.isItem(ModItems.LOCKBOX) ||
-				itemStack.isItem(ModItemTagsProvider.SCOOCHWORM_SADDLES)
+			for (type in ModScoochwormAttachmentTypes.REGISTRY) {
+				if (type.accepts(itemStack)) return true
+			}
+
+			return false
 		}
 
-		fun createClient(type: ScoochwormAttachmentType): ScoochwormAttachment {
-			return when (type) {
-				ScoochwormAttachmentType.LOCKBOX -> LockboxAttachment(ItemStack.EMPTY)
-				ScoochwormAttachmentType.SADDLE -> SaddleAttachment(ItemStack.EMPTY)
-				ScoochwormAttachmentType.NONE -> NoAttachment()
-			}
+		fun createClient(data: SynchedAttachmentData): ScoochwormAttachment {
+			val attachment = data.type.createClientAttachment()
+			attachment.applySynchedData(data)
+			return attachment
 		}
 
 		fun load(tag: CompoundTag): ScoochwormAttachment {
@@ -94,19 +98,13 @@ sealed class ScoochwormAttachment(
 		fun predictInteraction(
 			player: Player,
 			heldStack: ItemStack,
-			attachmentType: ScoochwormAttachmentType
+			attachmentData: SynchedAttachmentData
 		): InteractionResult {
-			return when (attachmentType) {
-				ScoochwormAttachmentType.NONE -> {
-					if (canAttach(heldStack)) InteractionResult.SUCCESS else InteractionResult.PASS
-				}
-
-				ScoochwormAttachmentType.SADDLE -> {
-					if (player.isShiftKeyDown) InteractionResult.PASS else InteractionResult.SUCCESS
-				}
-
-				ScoochwormAttachmentType.LOCKBOX -> InteractionResult.SUCCESS
-			}
+			return attachmentData.type.predictInteraction(
+				attachmentData,
+				player,
+				heldStack
+			)
 		}
 	}
 }

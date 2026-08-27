@@ -3,15 +3,15 @@ package dev.aaronhowser.mods.critter_carts.client.render.entity.layer
 import dev.aaronhowser.mods.critter_carts.client.model.entity.ScoochwormLockboxModel
 import dev.aaronhowser.mods.critter_carts.client.render.entity.ScoochwormPartRenderer
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormPartEntity
-import dev.aaronhowser.mods.critter_carts.entity.data.attachment.LockboxAttachment
-import dev.aaronhowser.mods.critter_carts.entity.data.attachment.ScoochwormAttachmentType
+import dev.aaronhowser.mods.critter_carts.entity.attachment.builtin.LockboxAttachment
+import dev.aaronhowser.mods.critter_carts.registry.ModScoochwormAttachmentTypes
 
 class ScoochwormLockboxLayer private constructor(
 	renderer: ScoochwormPartRenderer,
 	private val lockboxModel: ScoochwormLockboxModel
 ) : ScoochwormPartAttachmentLayer(
 	renderer,
-	ScoochwormAttachmentType.LOCKBOX,
+	ModScoochwormAttachmentTypes.LOCKBOX.get(),
 	lockboxModel
 ) {
 

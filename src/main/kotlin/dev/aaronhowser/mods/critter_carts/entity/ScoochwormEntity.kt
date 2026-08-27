@@ -10,7 +10,7 @@ import dev.aaronhowser.mods.critter_carts.block.ScoochwormTravelBlock
 import dev.aaronhowser.mods.critter_carts.datagen.tag.ModBlockTagsProvider
 import dev.aaronhowser.mods.critter_carts.entity.control.ScoochwormStemMoveControl
 import dev.aaronhowser.mods.critter_carts.entity.data.*
-import dev.aaronhowser.mods.critter_carts.entity.data.attachment.ScoochwormAttachmentType
+import dev.aaronhowser.mods.critter_carts.entity.attachment.data.SynchedAttachmentData
 import dev.aaronhowser.mods.critter_carts.entity.goal.ScoochwormLookAtFoodGoal
 import dev.aaronhowser.mods.critter_carts.entity.goal.ScoochwormTravelGoal
 import dev.aaronhowser.mods.critter_carts.entity.goal.ScoochwormWanderGoal
@@ -218,7 +218,7 @@ class ScoochwormEntity(
 		player: Player,
 		hand: InteractionHand,
 		partIndex: Int?,
-		attachmentType: ScoochwormAttachmentType?
+		attachmentData: SynchedAttachmentData?
 	): InteractionResult {
 		val heldStack = player.getItemInHand(hand)
 
@@ -243,13 +243,13 @@ class ScoochwormEntity(
 			}
 		}
 
-		if (partIndex == null || attachmentType == null) return InteractionResult.PASS
+		if (partIndex == null || attachmentData == null) return InteractionResult.PASS
 
 		return bodySegments.interact(
 			player,
 			hand,
 			partIndex,
-			attachmentType
+			attachmentData
 		)
 	}
 

@@ -5,7 +5,12 @@ import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isItem
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.nextRange
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormPartEntity
-import dev.aaronhowser.mods.critter_carts.entity.data.attachment.*
+import dev.aaronhowser.mods.critter_carts.entity.attachment.AttachmentInteractionResult
+import dev.aaronhowser.mods.critter_carts.entity.attachment.ScoochwormAttachment
+import dev.aaronhowser.mods.critter_carts.entity.attachment.builtin.LockboxAttachment
+import dev.aaronhowser.mods.critter_carts.entity.attachment.builtin.NoAttachment
+import dev.aaronhowser.mods.critter_carts.entity.attachment.data.NoAttachmentData
+import dev.aaronhowser.mods.critter_carts.entity.attachment.data.SynchedAttachmentData
 import dev.aaronhowser.mods.critter_carts.registry.ModEntityTypes
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.sounds.SoundEvents
@@ -52,12 +57,14 @@ class ScoochwormSegment {
 
 	fun bindClientBodyPart(
 		bodyPart: ScoochwormPartEntity,
-		attachmentType: ScoochwormAttachmentType
+		attachmentData: SynchedAttachmentData
 	) {
 		this.bodyPart = bodyPart
 
-		if (attachment.type != attachmentType) {
-			attachment = ScoochwormAttachment.createClient(attachmentType)
+		if (attachment.synchedData.type != attachmentData.type) {
+			attachment = ScoochwormAttachment.createClient(attachmentData)
+		} else {
+			attachment.applySynchedData(attachmentData)
 		}
 	}
 
@@ -68,7 +75,7 @@ class ScoochwormSegment {
 	}
 
 	fun reparentBodyPart(scoochworm: ScoochwormEntity, partIndex: Int) {
-		bodyPart?.attachTo(scoochworm, partIndex, attachment.type, this)
+		bodyPart?.attachTo(scoochworm, partIndex, attachment.synchedData, this)
 	}
 
 	private fun installAttachment(
@@ -77,7 +84,7 @@ class ScoochwormSegment {
 		bodyPart: ScoochwormPartEntity
 	) {
 		attachment = ScoochwormAttachment.fromItemStack(itemStack)
-		bodyPart.attachmentType = attachment.type
+		bodyPart.attachmentData = attachment.synchedData
 
 		val equipSound = attachment.equipSound ?: return
 		bodyPart.playSound(
@@ -91,7 +98,7 @@ class ScoochwormSegment {
 	private fun removeAttachment(): ItemStack {
 		val removedItem = attachment.remove()
 		attachment = NoAttachment()
-		bodyPart?.attachmentType = attachment.type
+		bodyPart?.attachmentData = attachment.synchedData
 		return removedItem
 	}
 
@@ -114,7 +121,7 @@ class ScoochwormSegment {
 		}
 
 		if (
-			attachment.type != ScoochwormAttachmentType.NONE
+			attachment !is NoAttachment
 			&& player.isShiftKeyDown
 			&& heldStack.isEmpty
 		) {
@@ -190,7 +197,7 @@ class ScoochwormSegment {
 		bodyPart.attachTo(
 			scoochworm,
 			partIndex,
-			attachment.type,
+			attachment.synchedData,
 			this
 		)
 
@@ -214,12 +221,12 @@ class ScoochwormSegment {
 		fun predictInteraction(
 			player: Player,
 			heldStack: ItemStack,
-			attachmentType: ScoochwormAttachmentType
+			attachmentData: SynchedAttachmentData
 		): InteractionResult {
 			if (heldStack.isItem(Items.SHEARS)) return InteractionResult.SUCCESS
 
 			if (
-				attachmentType != ScoochwormAttachmentType.NONE
+				attachmentData !is NoAttachmentData
 				&& player.isShiftKeyDown
 				&& heldStack.isEmpty
 			) {
@@ -229,7 +236,7 @@ class ScoochwormSegment {
 			return ScoochwormAttachment.predictInteraction(
 				player,
 				heldStack,
-				attachmentType
+				attachmentData
 			)
 		}
 
