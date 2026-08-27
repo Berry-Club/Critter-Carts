@@ -21,7 +21,23 @@ class LockboxAttachment(
 	override val type = ScoochwormAttachmentType.LOCKBOX
 	override val equipSound: SoundEvent = SoundEvents.DONKEY_CHEST
 
-	private val container = SimpleContainer(CONTAINER_SIZE)
+	private var bodyPart: ScoochwormPartEntity? = null
+	private var openers = 0
+
+	private val container = object : SimpleContainer(CONTAINER_SIZE) {
+		override fun startOpen(player: Player) {
+			super.startOpen(player)
+			openers++
+			updateOpenState()
+		}
+
+		override fun stopOpen(player: Player) {
+			super.stopOpen(player)
+			if (openers > 0) openers--
+			updateOpenState()
+		}
+	}
+
 	override val itemHandler: IItemHandler = InvWrapper(container)
 
 	init {
@@ -41,6 +57,8 @@ class LockboxAttachment(
 		heldStack: ItemStack,
 		bodyPart: ScoochwormPartEntity
 	): AttachmentInteractionResult {
+		this.bodyPart = bodyPart
+
 		val menuProvider = SimpleMenuProvider(
 			{ containerId, playerInventory, _ ->
 				ChestMenu(
@@ -62,6 +80,11 @@ class LockboxAttachment(
 		updateItemContents()
 	}
 
+	override fun serverTick(bodyPart: ScoochwormPartEntity) {
+		this.bodyPart = bodyPart
+		updateOpenState()
+	}
+
 	fun insert(itemStack: ItemStack): ItemStack {
 		return container.addItem(itemStack)
 	}
@@ -69,6 +92,10 @@ class LockboxAttachment(
 	private fun updateItemContents() {
 		val contents = ItemContainerContents.fromItems(container.items)
 		itemStack.set(DataComponents.CONTAINER, contents)
+	}
+
+	private fun updateOpenState() {
+		bodyPart?.isLockboxOpen = openers > 0
 	}
 
 	companion object {

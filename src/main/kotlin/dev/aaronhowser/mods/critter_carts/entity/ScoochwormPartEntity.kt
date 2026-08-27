@@ -39,6 +39,11 @@ class ScoochwormPartEntity(
 	private var lerpZ = 0.0
 	private var ownerSegment: ScoochwormSegment? = null
 
+	var previousLockboxOpenProgress = 0f
+		private set
+	var lockboxOpenProgress = 0f
+		private set
+
 	init {
 		noPhysics = true
 	}
@@ -56,6 +61,10 @@ class ScoochwormPartEntity(
 	var attachmentType: ScoochwormAttachmentType
 		get() = entityData.get(DATA_ATTACHMENT_TYPE)
 		set(value) = entityData.set(DATA_ATTACHMENT_TYPE, value)
+
+	var isLockboxOpen: Boolean
+		get() = entityData.get(DATA_LOCKBOX_OPEN)
+		set(value) = entityData.set(DATA_LOCKBOX_OPEN, value)
 
 	var color: WormColor
 		get() = WormColor.fromOrdinal(entityData.get(DATA_COLOR))
@@ -154,6 +163,7 @@ class ScoochwormPartEntity(
 		super.tick()
 
 		if (isClientSide) {
+			tickLockboxLid()
 			tickInterpolation()
 			return
 		}
@@ -168,6 +178,14 @@ class ScoochwormPartEntity(
 		if (missingParentTicks > MAX_MISSING_PARENT_TICKS) {
 			discard()
 		}
+	}
+
+	private fun tickLockboxLid() {
+		previousLockboxOpenProgress = lockboxOpenProgress
+
+		val shouldOpen = isLockboxOpen || supportDirection == Direction.UP
+		val change = if (shouldOpen) LOCKBOX_OPEN_SPEED else -LOCKBOX_OPEN_SPEED
+		lockboxOpenProgress = (lockboxOpenProgress + change).coerceIn(0f, 1f)
 	}
 
 	// Interpolation
@@ -237,6 +255,7 @@ class ScoochwormPartEntity(
 		builder.define(DATA_ATTACHMENT_TYPE, ScoochwormAttachmentType.NONE)
 		builder.define(DATA_BOTTOM_DIRECTION, Direction.DOWN)
 		builder.define(DATA_COLOR, WormColor.GREEN.ordinal)
+		builder.define(DATA_LOCKBOX_OPEN, false)
 	}
 
 	override fun readAdditionalSaveData(tag: CompoundTag) {}
@@ -254,6 +273,7 @@ class ScoochwormPartEntity(
 		private const val NO_PARENT = -1
 		private const val MAX_MISSING_PARENT_TICKS = 20
 		private const val MINIMUM_MOVEMENT_DISTANCE_SQUARED = 0.000001
+		private const val LOCKBOX_OPEN_SPEED = 0.1f
 		private val DATA_PARENT_ID: EntityDataAccessor<Int> =
 			SynchedEntityData.defineId(ScoochwormPartEntity::class.java, EntityDataSerializers.INT)
 
@@ -276,6 +296,12 @@ class ScoochwormPartEntity(
 			SynchedEntityData.defineId(
 				ScoochwormPartEntity::class.java,
 				EntityDataSerializers.INT
+			)
+
+		private val DATA_LOCKBOX_OPEN: EntityDataAccessor<Boolean> =
+			SynchedEntityData.defineId(
+				ScoochwormPartEntity::class.java,
+				EntityDataSerializers.BOOLEAN
 			)
 	}
 

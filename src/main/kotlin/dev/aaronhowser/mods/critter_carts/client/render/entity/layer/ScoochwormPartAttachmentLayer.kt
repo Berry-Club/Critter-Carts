@@ -20,6 +20,11 @@ abstract class ScoochwormPartAttachmentLayer(
 
 	override fun getGeoModel(): GeoModel<ScoochwormPartEntity> = attachmentModel
 
+	protected open fun prepareModel(
+		animatable: ScoochwormPartEntity,
+		partialTick: Float
+	) {}
+
 	override fun render(
 		poseStack: PoseStack,
 		animatable: ScoochwormPartEntity,
@@ -40,10 +45,12 @@ abstract class ScoochwormPartAttachmentLayer(
 			bufferSource,
 			partialTick
 		) ?: return
+		val attachmentBakedModel = getDefaultBakedModel(animatable)
+		prepareModel(animatable, partialTick)
 
 		poseStack.withPose {
 			renderer.reRender(
-				getDefaultBakedModel(animatable),
+				attachmentBakedModel,
 				poseStack,
 				bufferSource,
 				animatable,
