@@ -14,18 +14,18 @@ import net.minecraft.world.item.component.ItemContainerContents
 import net.neoforged.neoforge.items.IItemHandler
 import net.neoforged.neoforge.items.wrapper.InvWrapper
 
-class SaddlebagAttachment(
-	saddlebag: ItemStack
-) : ScoochwormAttachment(saddlebag) {
+class LockboxAttachment(
+	lockbox: ItemStack
+) : ScoochwormAttachment(lockbox) {
 
-	override val type = ScoochwormAttachmentType.SADDLEBAGS
+	override val type = ScoochwormAttachmentType.LOCKBOX
 	override val equipSound: SoundEvent = SoundEvents.DONKEY_CHEST
 
 	private val container = SimpleContainer(CONTAINER_SIZE)
 	override val itemHandler: IItemHandler = InvWrapper(container)
 
 	init {
-		val contents = saddlebag.getOrDefault(
+		val contents = lockbox.getOrDefault(
 			DataComponents.CONTAINER,
 			ItemContainerContents.EMPTY
 		)
@@ -44,7 +44,7 @@ class SaddlebagAttachment(
 		val menuProvider = SimpleMenuProvider(
 			{ containerId, playerInventory, _ ->
 				ChestMenu(
-					MenuType.GENERIC_9x1,
+					MenuType.GENERIC_9x3,
 					containerId,
 					playerInventory,
 					container,
@@ -62,13 +62,17 @@ class SaddlebagAttachment(
 		updateItemContents()
 	}
 
+	fun insert(itemStack: ItemStack): ItemStack {
+		return container.addItem(itemStack)
+	}
+
 	private fun updateItemContents() {
 		val contents = ItemContainerContents.fromItems(container.items)
 		itemStack.set(DataComponents.CONTAINER, contents)
 	}
 
 	companion object {
-		private const val CONTAINER_ROWS = 1
-		private const val CONTAINER_SIZE = 9
+		private const val CONTAINER_ROWS = 3
+		private const val CONTAINER_SIZE = 27
 	}
 }

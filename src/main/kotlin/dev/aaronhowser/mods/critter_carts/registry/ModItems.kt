@@ -15,11 +15,8 @@ object ModItems : AaronItemRegistry() {
 	val ITEM_REGISTRY: DeferredRegister.Items = DeferredRegister.createItems(CritterCarts.MOD_ID)
 	override fun getItemRegistry(): DeferredRegister.Items = ITEM_REGISTRY
 
-	val SADDLEBAG: DeferredItem<StorageAttachmentItem> =
-		register("saddlebag", StorageAttachmentItem::saddleBag, StorageAttachmentItem.DEFAULT_PROPERTIES)
-
-	val WICKER_BASKET: DeferredItem<StorageAttachmentItem> =
-		register("wicker_basket", StorageAttachmentItem::wickerBasket, StorageAttachmentItem.DEFAULT_PROPERTIES)
+	val LOCKBOX: DeferredItem<StorageAttachmentItem> =
+		register("lockbox", ::StorageAttachmentItem, StorageAttachmentItem.DEFAULT_PROPERTIES)
 
 	val CRITTER_CAGE: DeferredItem<CritterCageItem> =
 		register(

@@ -11,8 +11,7 @@ import net.minecraft.world.item.TooltipFlag
 import net.minecraft.world.item.component.ItemContainerContents
 
 class StorageAttachmentItem(
-	properties: Properties,
-	private val additionalTooltip: Component?
+	properties: Properties
 ) : Item(properties) {
 
 	override fun appendHoverText(
@@ -35,10 +34,6 @@ class StorageAttachmentItem(
 		}
 
 		tooltipComponents += contentsText.withStyle(ChatFormatting.GRAY)
-
-		if (additionalTooltip != null) {
-			tooltipComponents += additionalTooltip
-		}
 	}
 
 	companion object {
@@ -47,14 +42,5 @@ class StorageAttachmentItem(
 				.stacksTo(1)
 				.component(DataComponents.CONTAINER, ItemContainerContents.EMPTY)
 		}
-
-		fun saddleBag(properties: Properties): StorageAttachmentItem {
-			return StorageAttachmentItem(properties, ModMenuLang.SADDLE_NOT_INCLUDED.toGrayComponent())
-		}
-
-		fun wickerBasket(properties: Properties): StorageAttachmentItem {
-			return StorageAttachmentItem(properties, null)
-		}
-
 	}
 }

@@ -117,11 +117,11 @@ class ScoochwormSegments(
 		}
 	}
 
-	fun insertIntoWickerBaskets(itemStack: ItemStack): ItemStack {
+	fun insertIntoLockboxes(itemStack: ItemStack): ItemStack {
 		var remainder = itemStack
 
 		for (segment in segments) {
-			remainder = segment.insertIntoWickerBasket(remainder)
+			remainder = segment.insertIntoLockbox(remainder)
 			if (remainder.isEmpty) break
 		}
 

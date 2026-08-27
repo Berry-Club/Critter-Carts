@@ -63,16 +63,14 @@ sealed class ScoochwormAttachment(
 			itemStack: ItemStack
 		): ScoochwormAttachment {
 			return when {
-				itemStack.isItem(ModItems.SADDLEBAG) -> SaddlebagAttachment(itemStack)
-				itemStack.isItem(ModItems.WICKER_BASKET) -> WickerBasketAttachment(itemStack)
+				itemStack.isItem(ModItems.LOCKBOX) -> LockboxAttachment(itemStack)
 				itemStack.isItem(ModItemTagsProvider.SCOOCHWORM_SADDLES) -> SaddleAttachment(itemStack)
 				else -> NoAttachment()
 			}
 		}
 
 		fun canAttach(itemStack: ItemStack): Boolean {
-			return itemStack.isItem(ModItems.SADDLEBAG) ||
-				itemStack.isItem(ModItems.WICKER_BASKET) ||
+			return itemStack.isItem(ModItems.LOCKBOX) ||
 				itemStack.isItem(ModItemTagsProvider.SCOOCHWORM_SADDLES)
 		}
 
@@ -99,8 +97,7 @@ sealed class ScoochwormAttachment(
 					if (player.isShiftKeyDown) InteractionResult.PASS else InteractionResult.SUCCESS
 				}
 
-				ScoochwormAttachmentType.SADDLEBAGS -> InteractionResult.SUCCESS
-				ScoochwormAttachmentType.WICKER_BASKET -> InteractionResult.PASS
+				ScoochwormAttachmentType.LOCKBOX -> InteractionResult.SUCCESS
 			}
 		}
 	}

@@ -14,8 +14,7 @@ class ModItemModelProvider(
 ) : ItemModelProvider(output, CritterCarts.MOD_ID, existingFileHelper) {
 
 	override fun registerModels() {
-		basicItem(ModItems.SADDLEBAG.get())
-		basicItem(ModItems.WICKER_BASKET.get())
+		basicItem(ModItems.LOCKBOX.get())
 		dyeberryItem(ModItems.GREEN_DYEBERRY.get(), "green")
 		dyeberryItem(ModItems.BLUE_DYEBERRY.get(), "blue")
 		dyeberryItem(ModItems.RED_DYEBERRY.get(), "red")

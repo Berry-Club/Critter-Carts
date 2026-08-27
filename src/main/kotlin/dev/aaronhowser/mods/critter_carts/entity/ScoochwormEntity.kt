@@ -136,7 +136,7 @@ class ScoochwormEntity(
 			if (itemEntity.hasPickUpDelay()) continue
 
 			val itemStack = itemEntity.item
-			val remainder = bodySegments.insertIntoWickerBaskets(itemStack)
+			val remainder = bodySegments.insertIntoLockboxes(itemStack)
 			if (remainder.count == itemStack.count) continue
 
 			if (remainder.isEmpty) {

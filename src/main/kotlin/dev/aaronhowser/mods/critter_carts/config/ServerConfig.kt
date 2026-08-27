@@ -7,8 +7,6 @@ class ServerConfig(
 	private val builder: ModConfigSpec.Builder
 ) {
 
-	lateinit var wickerBasketDropIntervalTicks: ModConfigSpec.IntValue
-	lateinit var wickerBasketDropAmount: ModConfigSpec.IntValue
 	lateinit var dyeberryVineReplacementChance: ModConfigSpec.DoubleValue
 
 	init {
@@ -16,14 +14,6 @@ class ServerConfig(
 	}
 
 	private fun general() {
-		wickerBasketDropIntervalTicks = builder
-			.comment("How often an upside-down Wicker Basket drops an item, in ticks.")
-			.defineInRange("wickerBasketDropIntervalTicks", 2, 1, Int.MAX_VALUE)
-
-		wickerBasketDropAmount = builder
-			.comment("The number of items an upside-down Wicker Basket attempts to drop each interval.")
-			.defineInRange("wickerBasketDropAmount", 1, 1, Int.MAX_VALUE)
-
 		dyeberryVineReplacementChance = builder
 			.comment("The chance that a berry-bearing cave vine is replaced with a dyeberry vine.")
 			.defineInRange("dyeberryVineReplacementChance", 0.05, 0.0, 1.0)

@@ -7,8 +7,7 @@ object ModItemLang {
 
 	fun add(provider: ModLanguageProvider) {
 		provider.apply {
-			addItem(ModItems.SADDLEBAG, "Saddlebag")
-			addItem(ModItems.WICKER_BASKET, "Wicker Basket")
+			addItem(ModItems.LOCKBOX, "Lockbox")
 			addItem(ModItems.GREEN_DYEBERRY, "Green Dyeberry")
 			addItem(ModItems.BLUE_DYEBERRY, "Blue Dyeberry")
 			addItem(ModItems.RED_DYEBERRY, "Red Dyeberry")

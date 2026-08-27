@@ -20,11 +20,10 @@
   "item.critter_carts.blue_dyeberry": "Blue Dyeberry",
   "item.critter_carts.cyan_dyeberry": "Cyan Dyeberry",
   "item.critter_carts.green_dyeberry": "Green Dyeberry",
+  "item.critter_carts.lockbox": "Lockbox",
   "item.critter_carts.magenta_dyeberry": "Magenta Dyeberry",
   "item.critter_carts.red_dyeberry": "Red Dyeberry",
-  "item.critter_carts.saddlebag": "Saddlebag",
   "item.critter_carts.scoochworm_spawn_egg": "Scoochworm Spawn Egg",
-  "item.critter_carts.wicker_basket": "Wicker Basket",
   "item.critter_carts.yellow_dyeberry": "Yellow Dyeberry",
   "item.minecraft.lingering_potion.effect.critter_carts.dyed_blue": "Lingering Potion of Blue Dyeing",
   "item.minecraft.lingering_potion.effect.critter_carts.dyed_cyan": "Lingering Potion of Cyan Dyeing",
@@ -54,6 +53,5 @@
   "subtitles.critter_carts.scoochworm_footstep": "Scoochworm scooches",
   "tooltip.critter_carts.container.empty": "Empty",
   "tooltip.critter_carts.container.stack": "Contains %s stack",
-  "tooltip.critter_carts.container.stacks": "Contains %s stacks",
-  "tooltip.critter_carts.saddle_not_included": "Saddle not included"
+  "tooltip.critter_carts.container.stacks": "Contains %s stacks"
 }

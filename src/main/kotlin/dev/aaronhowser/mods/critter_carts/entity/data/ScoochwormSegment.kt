@@ -137,13 +137,13 @@ class ScoochwormSegment {
 		dropSource.spawnAtLocation(attachmentItem)
 	}
 
-	fun insertIntoWickerBasket(itemStack: ItemStack): ItemStack {
-		val wickerBasket = attachment as? WickerBasketAttachment ?: return itemStack
-		return wickerBasket.insert(itemStack)
-	}
-
 	fun getItemHandler(): IItemHandler? {
 		return attachment.itemHandler
+	}
+
+	fun insertIntoLockbox(itemStack: ItemStack): ItemStack {
+		val lockbox = attachment as? LockboxAttachment ?: return itemStack
+		return lockbox.insert(itemStack)
 	}
 
 	fun clientTick() {
