@@ -11,6 +11,8 @@ import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.component.ItemContainerContents
+import net.neoforged.neoforge.items.IItemHandler
+import net.neoforged.neoforge.items.wrapper.InvWrapper
 
 class WickerBasketAttachment(
 	wickerBasket: ItemStack
@@ -20,6 +22,7 @@ class WickerBasketAttachment(
 	override val equipSound: SoundEvent = SoundEvents.DONKEY_CHEST
 
 	private val container = SimpleContainer(CONTAINER_SIZE)
+	override val itemHandler: IItemHandler = InvWrapper(container)
 	private var upsideDownTicks = 0
 
 	init {

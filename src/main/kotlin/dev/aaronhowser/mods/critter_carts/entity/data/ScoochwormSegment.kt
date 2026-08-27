@@ -143,8 +143,7 @@ class ScoochwormSegment {
 	}
 
 	fun getItemHandler(): IItemHandler? {
-		val itemStorage = attachment as? ItemStorageAttachment ?: return null
-		return itemStorage.itemHandler
+		return attachment.itemHandler
 	}
 
 	fun clientTick() {

@@ -11,6 +11,7 @@ import net.minecraft.sounds.SoundEvent
 import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
+import net.neoforged.neoforge.items.IItemHandler
 
 sealed class ScoochwormAttachment(
 	itemStack: ItemStack
@@ -20,6 +21,7 @@ sealed class ScoochwormAttachment(
 
 	abstract val type: ScoochwormAttachmentType
 	abstract val equipSound: SoundEvent?
+	open val itemHandler: IItemHandler? = null
 
 	abstract fun interact(
 		player: Player,
@@ -61,7 +63,7 @@ sealed class ScoochwormAttachment(
 			itemStack: ItemStack
 		): ScoochwormAttachment {
 			return when {
-				itemStack.isItem(ModItems.SADDLEBAG) -> ItemStorageAttachment(itemStack)
+				itemStack.isItem(ModItems.SADDLEBAG) -> SaddlebagAttachment(itemStack)
 				itemStack.isItem(ModItems.WICKER_BASKET) -> WickerBasketAttachment(itemStack)
 				itemStack.isItem(ModItemTagsProvider.SCOOCHWORM_SADDLES) -> SaddleAttachment(itemStack)
 				else -> NoAttachment()

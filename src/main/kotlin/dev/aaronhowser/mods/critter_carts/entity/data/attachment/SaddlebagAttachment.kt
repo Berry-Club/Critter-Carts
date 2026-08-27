@@ -14,7 +14,7 @@ import net.minecraft.world.item.component.ItemContainerContents
 import net.neoforged.neoforge.items.IItemHandler
 import net.neoforged.neoforge.items.wrapper.InvWrapper
 
-class ItemStorageAttachment(
+class SaddlebagAttachment(
 	saddlebag: ItemStack
 ) : ScoochwormAttachment(saddlebag) {
 
@@ -22,7 +22,7 @@ class ItemStorageAttachment(
 	override val equipSound: SoundEvent = SoundEvents.DONKEY_CHEST
 
 	private val container = SimpleContainer(CONTAINER_SIZE)
-	val itemHandler: IItemHandler = InvWrapper(container)
+	override val itemHandler: IItemHandler = InvWrapper(container)
 
 	init {
 		val contents = saddlebag.getOrDefault(
