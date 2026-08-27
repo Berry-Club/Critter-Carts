@@ -50,8 +50,9 @@ class ScoochwormWanderGoal(
 	}
 
 	override fun canContinueToUse(): Boolean {
-		val currentSupport = this.currentSupport ?: return false
-		return scoochworm.isTryingToMove && !isStem(currentSupport)
+		return currentSupport != null
+			&& scoochworm.isTryingToMove
+			&& scoochworm.hasWanderingSupport()
 	}
 
 	override fun start() {

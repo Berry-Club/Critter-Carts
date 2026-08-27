@@ -41,6 +41,7 @@ import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.gameevent.GameEvent
 import net.minecraft.world.level.material.PushReaction
+import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
 import net.neoforged.neoforge.fluids.FluidType
 import software.bernie.geckolib.animatable.GeoEntity
@@ -152,9 +153,41 @@ class ScoochwormEntity(
 
 	fun hasValidSupport(): Boolean {
 		val currentSupportPosition = supportPosition ?: return false
+		if (!isCloseToSupport(currentSupportPosition)) return false
 
 		return supportsScoochwormTravel(this, level(), currentSupportPosition, supportDirection.opposite)
 			|| supportsFreeTravel(level(), currentSupportPosition, supportDirection.opposite)
+	}
+
+	fun hasStemTravelSupport(): Boolean {
+		val currentSupportPosition = supportPosition ?: return false
+		if (!isCloseToSupport(currentSupportPosition)) return false
+
+		return supportsScoochwormTravel(
+			this,
+			level(),
+			currentSupportPosition,
+			supportDirection.opposite
+		)
+	}
+
+	fun hasWanderingSupport(): Boolean {
+		val currentSupportPosition = supportPosition ?: return false
+		if (!isCloseToSupport(currentSupportPosition)) return false
+
+		return supportsFreeTravel(
+			level(),
+			currentSupportPosition,
+			supportDirection.opposite
+		)
+	}
+
+	private fun isCloseToSupport(position: BlockPos): Boolean {
+		if (isTurningAroundCorner) return true
+
+		return boundingBox
+			.inflate(SUPPORT_CONTACT_TOLERANCE)
+			.intersects(AABB(position))
 	}
 
 	fun attachToSupport(position: BlockPos, direction: Direction) {
@@ -360,6 +393,7 @@ class ScoochwormEntity(
 		private const val FOOTSTEP_INTERVAL_TICKS = 3
 		private const val FOOTSTEP_CYCLE_PAUSE_TICKS = 40
 		private const val SUPPORT_PROBE_DISTANCE = 0.05
+		private const val SUPPORT_CONTACT_TOLERANCE = 0.1
 
 		private const val SEGMENTS_TAG = "Segments"
 		const val PATH_TAG = "Path"
