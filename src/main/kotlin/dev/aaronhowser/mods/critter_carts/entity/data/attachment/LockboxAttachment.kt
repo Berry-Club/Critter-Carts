@@ -1,11 +1,14 @@
 package dev.aaronhowser.mods.critter_carts.entity.data.attachment
 
+import dev.aaronhowser.mods.critter_carts.config.ServerConfig
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormPartEntity
+import net.minecraft.core.Direction
 import net.minecraft.core.component.DataComponents
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.world.SimpleContainer
 import net.minecraft.world.SimpleMenuProvider
+import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.inventory.ChestMenu
 import net.minecraft.world.inventory.MenuType
@@ -23,6 +26,7 @@ class LockboxAttachment(
 
 	private var bodyPart: ScoochwormPartEntity? = null
 	private var openers = 0
+	private var upsideDownTicks = 0
 
 	private val container = object : SimpleContainer(CONTAINER_SIZE) {
 		override fun startOpen(player: Player) {
@@ -83,6 +87,18 @@ class LockboxAttachment(
 	override fun serverTick(bodyPart: ScoochwormPartEntity) {
 		this.bodyPart = bodyPart
 		updateOpenState()
+
+		if (bodyPart.supportDirection != Direction.UP) {
+			upsideDownTicks = 0
+			return
+		}
+
+		upsideDownTicks++
+		val dropInterval = ServerConfig.CONFIG.lockboxDropIntervalTicks.get()
+		if (upsideDownTicks < dropInterval) return
+
+		upsideDownTicks = 0
+		dropNextStack(bodyPart)
 	}
 
 	fun insert(itemStack: ItemStack): ItemStack {
@@ -96,6 +112,34 @@ class LockboxAttachment(
 
 	private fun updateOpenState() {
 		bodyPart?.isLockboxOpen = openers > 0
+	}
+
+	private fun dropNextStack(bodyPart: ScoochwormPartEntity) {
+		val maximumDropAmount = ServerConfig.CONFIG.lockboxDropAmount.get()
+
+		for (slot in 0 until container.containerSize) {
+			val itemStack = container.getItem(slot)
+			if (itemStack.isEmpty) continue
+
+			val amount = minOf(maximumDropAmount, itemStack.count)
+			val droppedItem = container.removeItem(slot, amount)
+			spawnDroppedItem(bodyPart, droppedItem)
+			return
+		}
+	}
+
+	private fun spawnDroppedItem(bodyPart: ScoochwormPartEntity, itemStack: ItemStack) {
+		val itemEntity = ItemEntity(
+			bodyPart.level(),
+			bodyPart.x,
+			bodyPart.y,
+			bodyPart.z,
+			itemStack
+		)
+
+		itemEntity.setDeltaMovement(0.0, 0.0, 0.0)
+		itemEntity.setDefaultPickUpDelay()
+		bodyPart.level().addFreshEntity(itemEntity)
 	}
 
 	companion object {

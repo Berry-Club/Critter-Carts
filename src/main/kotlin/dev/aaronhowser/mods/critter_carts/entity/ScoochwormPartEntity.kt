@@ -10,6 +10,8 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData
+import net.minecraft.sounds.SoundEvents
+import net.minecraft.sounds.SoundSource
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
 import net.minecraft.world.damagesource.DamageSource
@@ -38,6 +40,7 @@ class ScoochwormPartEntity(
 	private var lerpY = 0.0
 	private var lerpZ = 0.0
 	private var ownerSegment: ScoochwormSegment? = null
+	private var previousLockboxShouldOpen: Boolean? = null
 
 	var previousLockboxOpenProgress = 0f
 		private set
@@ -183,9 +186,33 @@ class ScoochwormPartEntity(
 	private fun tickLockboxLid() {
 		previousLockboxOpenProgress = lockboxOpenProgress
 
-		val shouldOpen = isLockboxOpen || supportDirection == Direction.UP
+		val shouldOpen = attachmentType == ScoochwormAttachmentType.LOCKBOX
+			&& (isLockboxOpen || supportDirection == Direction.UP)
+
+		val previousShouldOpen = previousLockboxShouldOpen
+		if (previousShouldOpen != null && previousShouldOpen != shouldOpen) {
+			playLockboxSound(shouldOpen)
+		}
+		previousLockboxShouldOpen = shouldOpen
+
 		val change = if (shouldOpen) LOCKBOX_OPEN_SPEED else -LOCKBOX_OPEN_SPEED
 		lockboxOpenProgress = (lockboxOpenProgress + change).coerceIn(0f, 1f)
+	}
+
+	private fun playLockboxSound(isOpening: Boolean) {
+		val sound = if (isOpening) SoundEvents.CHEST_OPEN else SoundEvents.CHEST_CLOSE
+		val pitch = random.nextFloat() * 0.1f + 0.9f
+
+		level().playLocalSound(
+			x,
+			y,
+			z,
+			sound,
+			SoundSource.BLOCKS,
+			0.5f,
+			pitch,
+			false
+		)
 	}
 
 	// Interpolation
