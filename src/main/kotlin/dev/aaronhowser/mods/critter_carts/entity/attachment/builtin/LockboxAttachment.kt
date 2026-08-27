@@ -5,7 +5,7 @@ import dev.aaronhowser.mods.critter_carts.entity.ScoochwormPartEntity
 import dev.aaronhowser.mods.critter_carts.entity.attachment.AttachmentInteractionResult
 import dev.aaronhowser.mods.critter_carts.entity.attachment.ScoochwormAttachment
 import dev.aaronhowser.mods.critter_carts.entity.attachment.data.LockboxAttachmentData
-import dev.aaronhowser.mods.critter_carts.entity.attachment.data.SynchedAttachmentData
+import dev.aaronhowser.mods.critter_carts.entity.attachment.data.SyncedAttachmentData
 import net.minecraft.core.Direction
 import net.minecraft.core.component.DataComponents
 import net.minecraft.sounds.SoundEvent
@@ -26,7 +26,7 @@ class LockboxAttachment(
 	lockbox: ItemStack
 ) : ScoochwormAttachment(lockbox) {
 
-	override val synchedData: SynchedAttachmentData
+	override val syncedData: SyncedAttachmentData
 		get() = LockboxAttachmentData(openers > 0)
 	override val equipSound: SoundEvent = SoundEvents.DONKEY_CHEST
 
@@ -113,7 +113,7 @@ class LockboxAttachment(
 		openProgress = (openProgress + change).coerceIn(0f, 1f)
 	}
 
-	override fun applySynchedData(data: SynchedAttachmentData) {
+	override fun applySyncedData(data: SyncedAttachmentData) {
 		val lockboxData = data as? LockboxAttachmentData ?: return
 		isOpen = lockboxData.isOpen
 	}
@@ -145,7 +145,7 @@ class LockboxAttachment(
 	}
 
 	private fun updateOpenState() {
-		bodyPart?.attachmentData = synchedData
+		bodyPart?.attachmentData = syncedData
 	}
 
 	private fun playOpenSound(bodyPart: ScoochwormPartEntity, isOpening: Boolean) {

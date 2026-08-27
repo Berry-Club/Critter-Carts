@@ -6,13 +6,13 @@ import io.netty.buffer.ByteBuf
 import net.minecraft.network.codec.StreamCodec
 import net.minecraft.resources.ResourceLocation
 
-interface SynchedAttachmentData {
+interface SyncedAttachmentData {
 
-	val type: ScoochwormAttachmentType<out SynchedAttachmentData>
+	val type: ScoochwormAttachmentType<out SyncedAttachmentData>
 
 	companion object {
-		val STREAM_CODEC: StreamCodec<ByteBuf, SynchedAttachmentData> = object : StreamCodec<ByteBuf, SynchedAttachmentData> {
-			override fun decode(buffer: ByteBuf): SynchedAttachmentData {
+		val STREAM_CODEC: StreamCodec<ByteBuf, SyncedAttachmentData> = object : StreamCodec<ByteBuf, SyncedAttachmentData> {
+			override fun decode(buffer: ByteBuf): SyncedAttachmentData {
 				val typeId = ResourceLocation.STREAM_CODEC.decode(buffer)
 				val type = ModScoochwormAttachmentTypes.REGISTRY.get(typeId)
 					?: error("Unknown attachment data type: $typeId")
@@ -20,7 +20,7 @@ interface SynchedAttachmentData {
 				return type.decode(buffer)
 			}
 
-			override fun encode(buffer: ByteBuf, data: SynchedAttachmentData) {
+			override fun encode(buffer: ByteBuf, data: SyncedAttachmentData) {
 				val typeId = ModScoochwormAttachmentTypes.REGISTRY.getKey(data.type)
 					?: error("Unregistered attachment data type: ${data.type}")
 

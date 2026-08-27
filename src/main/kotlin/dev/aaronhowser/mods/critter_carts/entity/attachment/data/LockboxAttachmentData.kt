@@ -8,7 +8,7 @@ import net.minecraft.network.codec.StreamCodec
 
 data class LockboxAttachmentData(
 	val isOpen: Boolean
-) : SynchedAttachmentData {
+) : SyncedAttachmentData {
 	override val type: ScoochwormAttachmentType<LockboxAttachmentData>
 		get() = ModScoochwormAttachmentTypes.LOCKBOX.get()
 

@@ -5,7 +5,7 @@ import dev.aaronhowser.mods.critter_carts.registry.ModScoochwormAttachmentTypes
 import io.netty.buffer.ByteBuf
 import net.minecraft.network.codec.StreamCodec
 
-data object NoAttachmentData : SynchedAttachmentData {
+data object NoAttachmentData : SyncedAttachmentData {
 	override val type: ScoochwormAttachmentType<NoAttachmentData>
 		get() = ModScoochwormAttachmentTypes.NONE.get()
 

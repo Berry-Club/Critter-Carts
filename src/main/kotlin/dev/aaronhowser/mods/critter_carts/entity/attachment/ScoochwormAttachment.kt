@@ -3,7 +3,7 @@ package dev.aaronhowser.mods.critter_carts.entity.attachment
 import com.mojang.serialization.Codec
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormPartEntity
 import dev.aaronhowser.mods.critter_carts.entity.attachment.builtin.NoAttachment
-import dev.aaronhowser.mods.critter_carts.entity.attachment.data.SynchedAttachmentData
+import dev.aaronhowser.mods.critter_carts.entity.attachment.data.SyncedAttachmentData
 import dev.aaronhowser.mods.critter_carts.registry.ModScoochwormAttachmentTypes
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtOps
@@ -19,7 +19,7 @@ abstract class ScoochwormAttachment(
 
 	protected val itemStack: ItemStack = itemStack.copy()
 
-	abstract val synchedData: SynchedAttachmentData
+	abstract val syncedData: SyncedAttachmentData
 	abstract val equipSound: SoundEvent?
 	open val itemHandler: IItemHandler? = null
 
@@ -33,7 +33,7 @@ abstract class ScoochwormAttachment(
 
 	open fun serverTick(bodyPart: ScoochwormPartEntity) {}
 
-	open fun applySynchedData(data: SynchedAttachmentData) {}
+	open fun applySyncedData(data: SyncedAttachmentData) {}
 
 	protected open fun synchronizeItemStack() {}
 
@@ -80,9 +80,9 @@ abstract class ScoochwormAttachment(
 			return false
 		}
 
-		fun createClient(data: SynchedAttachmentData): ScoochwormAttachment {
+		fun createClient(data: SyncedAttachmentData): ScoochwormAttachment {
 			val attachment = data.type.createClientAttachment()
-			attachment.applySynchedData(data)
+			attachment.applySyncedData(data)
 			return attachment
 		}
 
@@ -98,7 +98,7 @@ abstract class ScoochwormAttachment(
 		fun predictInteraction(
 			player: Player,
 			heldStack: ItemStack,
-			attachmentData: SynchedAttachmentData
+			attachmentData: SyncedAttachmentData
 		): InteractionResult {
 			return attachmentData.type.predictInteraction(
 				attachmentData,

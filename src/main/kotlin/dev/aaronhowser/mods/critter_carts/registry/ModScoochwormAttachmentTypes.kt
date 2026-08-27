@@ -11,7 +11,7 @@ import dev.aaronhowser.mods.critter_carts.entity.attachment.builtin.SaddleAttach
 import dev.aaronhowser.mods.critter_carts.entity.attachment.data.LockboxAttachmentData
 import dev.aaronhowser.mods.critter_carts.entity.attachment.data.NoAttachmentData
 import dev.aaronhowser.mods.critter_carts.entity.attachment.data.SaddleAttachmentData
-import dev.aaronhowser.mods.critter_carts.entity.attachment.data.SynchedAttachmentData
+import dev.aaronhowser.mods.critter_carts.entity.attachment.data.SyncedAttachmentData
 import net.minecraft.core.Registry
 import net.minecraft.resources.ResourceKey
 import net.minecraft.world.InteractionResult
@@ -76,7 +76,7 @@ object ModScoochwormAttachmentTypes {
 			)
 		}
 
-	private fun <T : SynchedAttachmentData> register(
+	private fun <T : SyncedAttachmentData> register(
 		name: String,
 		supplier: Supplier<ScoochwormAttachmentType<T>>
 	): DeferredHolder<ScoochwormAttachmentType<*>, ScoochwormAttachmentType<T>> {

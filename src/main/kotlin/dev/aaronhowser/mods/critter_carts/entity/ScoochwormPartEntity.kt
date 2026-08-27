@@ -5,7 +5,7 @@ import dev.aaronhowser.mods.critter_carts.entity.data.ScoochwormSegment
 import dev.aaronhowser.mods.critter_carts.entity.data.WormColor
 import dev.aaronhowser.mods.critter_carts.entity.attachment.ScoochwormAttachment
 import dev.aaronhowser.mods.critter_carts.entity.attachment.data.NoAttachmentData
-import dev.aaronhowser.mods.critter_carts.entity.attachment.data.SynchedAttachmentData
+import dev.aaronhowser.mods.critter_carts.entity.attachment.data.SyncedAttachmentData
 import dev.aaronhowser.mods.critter_carts.registry.ModEntityDataSerializers
 import net.minecraft.core.Direction
 import net.minecraft.nbt.CompoundTag
@@ -55,7 +55,7 @@ class ScoochwormPartEntity(
 		get() = entityData.get(DATA_PART_INDEX)
 		set(value) = entityData.set(DATA_PART_INDEX, value)
 
-	var attachmentData: SynchedAttachmentData
+	var attachmentData: SyncedAttachmentData
 		get() = entityData.get(DATA_ATTACHMENT_DATA)
 		set(value) = entityData.set(DATA_ATTACHMENT_DATA, value)
 
@@ -100,7 +100,7 @@ class ScoochwormPartEntity(
 	fun attachTo(
 		parentEntity: ScoochwormEntity,
 		partIndex: Int,
-		attachmentData: SynchedAttachmentData,
+		attachmentData: SyncedAttachmentData,
 		ownerSegment: ScoochwormSegment
 	) {
 		this.parentId = parentEntity.id
@@ -272,7 +272,7 @@ class ScoochwormPartEntity(
 		private val DATA_PART_INDEX: EntityDataAccessor<Int> =
 			SynchedEntityData.defineId(ScoochwormPartEntity::class.java, EntityDataSerializers.INT)
 
-		private val DATA_ATTACHMENT_DATA: EntityDataAccessor<SynchedAttachmentData> =
+		private val DATA_ATTACHMENT_DATA: EntityDataAccessor<SyncedAttachmentData> =
 			SynchedEntityData.defineId(
 				ScoochwormPartEntity::class.java,
 				ModEntityDataSerializers.SCOOCHWORM_ATTACHMENT_DATA.get()

@@ -1,6 +1,6 @@
 package dev.aaronhowser.mods.critter_carts.entity.attachment
 
-import dev.aaronhowser.mods.critter_carts.entity.attachment.data.SynchedAttachmentData
+import dev.aaronhowser.mods.critter_carts.entity.attachment.data.SyncedAttachmentData
 
 import io.netty.buffer.ByteBuf
 import net.minecraft.network.codec.StreamCodec
@@ -8,7 +8,7 @@ import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 
-class ScoochwormAttachmentType<T : SynchedAttachmentData>(
+class ScoochwormAttachmentType<T : SyncedAttachmentData>(
 	private val streamCodec: StreamCodec<ByteBuf, T>,
 	private val itemPredicate: (ItemStack) -> Boolean,
 	private val attachmentFactory: (ItemStack) -> ScoochwormAttachment,
@@ -30,7 +30,7 @@ class ScoochwormAttachmentType<T : SynchedAttachmentData>(
 
 	@Suppress("UNCHECKED_CAST")
 	fun predictInteraction(
-		data: SynchedAttachmentData,
+		data: SyncedAttachmentData,
 		player: Player,
 		heldStack: ItemStack
 	): InteractionResult {
@@ -42,7 +42,7 @@ class ScoochwormAttachmentType<T : SynchedAttachmentData>(
 	}
 
 	@Suppress("UNCHECKED_CAST")
-	internal fun encode(buffer: ByteBuf, data: SynchedAttachmentData) {
+	internal fun encode(buffer: ByteBuf, data: SyncedAttachmentData) {
 		streamCodec.encode(buffer, data as T)
 	}
 }

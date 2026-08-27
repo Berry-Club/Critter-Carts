@@ -5,7 +5,7 @@ import dev.aaronhowser.mods.critter_carts.registry.ModScoochwormAttachmentTypes
 import io.netty.buffer.ByteBuf
 import net.minecraft.network.codec.StreamCodec
 
-data object SaddleAttachmentData : SynchedAttachmentData {
+data object SaddleAttachmentData : SyncedAttachmentData {
 	override val type: ScoochwormAttachmentType<SaddleAttachmentData>
 		get() = ModScoochwormAttachmentTypes.SADDLE.get()
 
