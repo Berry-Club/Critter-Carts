@@ -11,6 +11,8 @@ import net.minecraft.world.inventory.ChestMenu
 import net.minecraft.world.inventory.MenuType
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.component.ItemContainerContents
+import net.neoforged.neoforge.items.IItemHandler
+import net.neoforged.neoforge.items.wrapper.InvWrapper
 
 class ItemStorageAttachment(
 	saddlebag: ItemStack
@@ -20,6 +22,7 @@ class ItemStorageAttachment(
 	override val equipSound: SoundEvent = SoundEvents.DONKEY_CHEST
 
 	private val container = SimpleContainer(CONTAINER_SIZE)
+	val itemHandler: IItemHandler = InvWrapper(container)
 
 	init {
 		val contents = saddlebag.getOrDefault(

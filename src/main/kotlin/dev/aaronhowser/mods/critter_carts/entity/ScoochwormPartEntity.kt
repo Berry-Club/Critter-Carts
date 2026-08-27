@@ -19,6 +19,7 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.material.PushReaction
 import net.minecraft.world.phys.Vec3
+import net.neoforged.neoforge.items.IItemHandler
 import software.bernie.geckolib.animatable.GeoEntity
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache
 import software.bernie.geckolib.animatable.instance.SingletonAnimatableInstanceCache
@@ -64,6 +65,11 @@ class ScoochwormPartEntity(
 
 	private fun getScoochworm(): ScoochwormEntity? {
 		return level().getEntity(parentId) as? ScoochwormEntity
+	}
+
+	fun getItemHandler(): IItemHandler? {
+		val scoochworm = getScoochworm() ?: return null
+		return scoochworm.getItemHandler(partIndex)
 	}
 
 	fun getPartInFront(): Entity? {

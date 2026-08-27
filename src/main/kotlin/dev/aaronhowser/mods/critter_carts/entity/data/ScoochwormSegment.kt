@@ -17,6 +17,7 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.gameevent.GameEvent
 import net.minecraft.world.phys.Vec3
+import net.neoforged.neoforge.items.IItemHandler
 
 // The segment is the actual thing that gets saved to the head entity
 // It holds the attachment etc
@@ -139,6 +140,11 @@ class ScoochwormSegment {
 	fun insertIntoWickerBasket(itemStack: ItemStack): ItemStack {
 		val wickerBasket = attachment as? WickerBasketAttachment ?: return itemStack
 		return wickerBasket.insert(itemStack)
+	}
+
+	fun getItemHandler(): IItemHandler? {
+		val itemStorage = attachment as? ItemStorageAttachment ?: return null
+		return itemStorage.itemHandler
 	}
 
 	fun clientTick() {
