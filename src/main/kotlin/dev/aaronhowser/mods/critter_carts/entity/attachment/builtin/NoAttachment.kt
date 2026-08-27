@@ -6,6 +6,7 @@ import dev.aaronhowser.mods.critter_carts.entity.attachment.ScoochwormAttachment
 import dev.aaronhowser.mods.critter_carts.entity.attachment.data.NoAttachmentData
 import dev.aaronhowser.mods.critter_carts.entity.attachment.data.SyncedAttachmentData
 import net.minecraft.sounds.SoundEvent
+import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 
@@ -26,5 +27,9 @@ class NoAttachment : ScoochwormAttachment(ItemStack.EMPTY) {
 		val attachmentItem = heldStack.copy()
 		attachmentItem.count = 1
 		return AttachmentInteractionResult.Install(attachmentItem)
+	}
+
+	override fun predictInteraction(player: Player, heldStack: ItemStack): InteractionResult {
+		return if (canAttach(heldStack)) InteractionResult.SUCCESS else InteractionResult.PASS
 	}
 }

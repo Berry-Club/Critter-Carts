@@ -13,6 +13,7 @@ import net.minecraft.sounds.SoundEvents
 import net.minecraft.sounds.SoundSource
 import net.minecraft.world.SimpleContainer
 import net.minecraft.world.SimpleMenuProvider
+import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.inventory.ChestMenu
@@ -91,6 +92,10 @@ class LockboxAttachment(
 
 		player.openMenu(menuProvider)
 		return AttachmentInteractionResult.Consume
+	}
+
+	override fun predictInteraction(player: Player, heldStack: ItemStack): InteractionResult {
+		return InteractionResult.SUCCESS
 	}
 
 	override fun synchronizeItemStack() {

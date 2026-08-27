@@ -4,16 +4,12 @@ import dev.aaronhowser.mods.critter_carts.entity.attachment.data.SyncedAttachmen
 
 import io.netty.buffer.ByteBuf
 import net.minecraft.network.codec.StreamCodec
-import net.minecraft.world.InteractionResult
-import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 
 class ScoochwormAttachmentType<T : SyncedAttachmentData>(
 	private val streamCodec: StreamCodec<ByteBuf, T>,
 	private val itemPredicate: (ItemStack) -> Boolean,
-	private val attachmentFactory: (ItemStack) -> ScoochwormAttachment,
-	private val clientAttachmentFactory: () -> ScoochwormAttachment,
-	private val interactionPredictor: (T, Player, ItemStack) -> InteractionResult
+	private val attachmentFactory: (ItemStack) -> ScoochwormAttachment
 ) {
 	fun createAttachment(itemStack: ItemStack): ScoochwormAttachment? {
 		if (!itemPredicate(itemStack)) return null
@@ -24,17 +20,11 @@ class ScoochwormAttachmentType<T : SyncedAttachmentData>(
 		return itemPredicate(itemStack)
 	}
 
-	fun createClientAttachment(): ScoochwormAttachment {
-		return clientAttachmentFactory()
-	}
-
 	@Suppress("UNCHECKED_CAST")
-	fun predictInteraction(
-		data: SyncedAttachmentData,
-		player: Player,
-		heldStack: ItemStack
-	): InteractionResult {
-		return interactionPredictor(data as T, player, heldStack)
+	fun createClientAttachment(data: SyncedAttachmentData): ScoochwormAttachment {
+		val attachment = attachmentFactory(ItemStack.EMPTY)
+		attachment.applySyncedData(data as T)
+		return attachment
 	}
 
 	internal fun decode(buffer: ByteBuf): T {

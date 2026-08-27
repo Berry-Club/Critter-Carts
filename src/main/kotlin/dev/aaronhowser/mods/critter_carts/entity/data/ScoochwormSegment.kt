@@ -9,7 +9,6 @@ import dev.aaronhowser.mods.critter_carts.entity.attachment.AttachmentInteractio
 import dev.aaronhowser.mods.critter_carts.entity.attachment.ScoochwormAttachment
 import dev.aaronhowser.mods.critter_carts.entity.attachment.builtin.LockboxAttachment
 import dev.aaronhowser.mods.critter_carts.entity.attachment.builtin.NoAttachment
-import dev.aaronhowser.mods.critter_carts.entity.attachment.data.NoAttachmentData
 import dev.aaronhowser.mods.critter_carts.entity.attachment.data.SyncedAttachmentData
 import dev.aaronhowser.mods.critter_carts.registry.ModEntityTypes
 import net.minecraft.nbt.CompoundTag
@@ -61,7 +60,7 @@ class ScoochwormSegment {
 	) {
 		this.bodyPart = bodyPart
 
-		if (attachment.syncedData.type != attachmentData.type) {
+		if (attachment.syncedData.typeId != attachmentData.typeId) {
 			attachment = ScoochwormAttachment.createClient(attachmentData)
 		} else {
 			attachment.applySyncedData(attachmentData)
@@ -217,29 +216,21 @@ class ScoochwormSegment {
 		return attachment.save()
 	}
 
-	companion object {
-		fun predictInteraction(
-			player: Player,
-			heldStack: ItemStack,
-			attachmentData: SyncedAttachmentData
-		): InteractionResult {
+	fun predictInteraction(player: Player, heldStack: ItemStack): InteractionResult {
 			if (heldStack.isItem(Items.SHEARS)) return InteractionResult.SUCCESS
 
 			if (
-				attachmentData !is NoAttachmentData
+				attachment !is NoAttachment
 				&& player.isShiftKeyDown
 				&& heldStack.isEmpty
 			) {
 				return InteractionResult.SUCCESS
 			}
 
-			return ScoochwormAttachment.predictInteraction(
-				player,
-				heldStack,
-				attachmentData
-			)
-		}
+			return attachment.predictInteraction(player, heldStack)
+	}
 
+	companion object {
 		fun load(tag: CompoundTag): ScoochwormSegment {
 			val segment = ScoochwormSegment()
 			segment.attachment = ScoochwormAttachment.load(tag)

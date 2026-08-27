@@ -37,7 +37,7 @@ abstract class ScoochwormPartAttachmentLayer(
 		packedLight: Int,
 		packedOverlay: Int
 	) {
-		if (animatable.attachmentData.type != attachmentType) return
+		if (animatable.attachmentData.getType() != attachmentType) return
 
 		val texture = attachmentModel.getTextureResource(animatable, renderer)
 		val attachmentRenderType = renderer.getRenderType(

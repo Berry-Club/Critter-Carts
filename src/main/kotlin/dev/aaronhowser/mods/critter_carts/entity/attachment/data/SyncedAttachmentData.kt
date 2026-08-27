@@ -8,24 +8,26 @@ import net.minecraft.resources.ResourceLocation
 
 interface SyncedAttachmentData {
 
-	val type: ScoochwormAttachmentType<out SyncedAttachmentData>
+	val typeId: ResourceLocation
+
+	fun getType(): ScoochwormAttachmentType<*> {
+		return ModScoochwormAttachmentTypes.REGISTRY.get(typeId)
+			?: error("Unknown attachment data type: $typeId")
+	}
 
 	companion object {
 		val STREAM_CODEC: StreamCodec<ByteBuf, SyncedAttachmentData> = object : StreamCodec<ByteBuf, SyncedAttachmentData> {
 			override fun decode(buffer: ByteBuf): SyncedAttachmentData {
 				val typeId = ResourceLocation.STREAM_CODEC.decode(buffer)
-				val type = ModScoochwormAttachmentTypes.REGISTRY.get(typeId)
+				val attachmentType = ModScoochwormAttachmentTypes.REGISTRY.get(typeId)
 					?: error("Unknown attachment data type: $typeId")
 
-				return type.decode(buffer)
+				return attachmentType.decode(buffer)
 			}
 
 			override fun encode(buffer: ByteBuf, data: SyncedAttachmentData) {
-				val typeId = ModScoochwormAttachmentTypes.REGISTRY.getKey(data.type)
-					?: error("Unregistered attachment data type: ${data.type}")
-
-				ResourceLocation.STREAM_CODEC.encode(buffer, typeId)
-				data.type.encode(buffer, data)
+				ResourceLocation.STREAM_CODEC.encode(buffer, data.typeId)
+				data.getType().encode(buffer, data)
 			}
 		}
 	}

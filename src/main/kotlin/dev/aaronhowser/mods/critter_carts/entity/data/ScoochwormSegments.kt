@@ -95,11 +95,8 @@ class ScoochwormSegments(
 		val heldStack = player.getItemInHand(hand)
 
 		if (scoochworm.isClientSide) {
-			return ScoochwormSegment.predictInteraction(
-				player,
-				heldStack,
-				attachmentData
-			)
+			val segment = getSegment(partIndex) ?: return InteractionResult.PASS
+			return segment.predictInteraction(player, heldStack)
 		}
 
 		val segment = getSegment(partIndex) ?: return InteractionResult.PASS

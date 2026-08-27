@@ -7,6 +7,7 @@ import dev.aaronhowser.mods.critter_carts.entity.attachment.data.SaddleAttachmen
 import dev.aaronhowser.mods.critter_carts.entity.attachment.data.SyncedAttachmentData
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundEvents
+import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 
@@ -25,5 +26,9 @@ class SaddleAttachment(
 		if (player.isShiftKeyDown) return AttachmentInteractionResult.Pass
 		if (!player.startRiding(bodyPart)) return AttachmentInteractionResult.Pass
 		return AttachmentInteractionResult.Consume
+	}
+
+	override fun predictInteraction(player: Player, heldStack: ItemStack): InteractionResult {
+		return if (player.isShiftKeyDown) InteractionResult.PASS else InteractionResult.SUCCESS
 	}
 }

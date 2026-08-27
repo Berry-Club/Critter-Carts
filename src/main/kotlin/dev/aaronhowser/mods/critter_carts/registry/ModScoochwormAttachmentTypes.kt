@@ -3,7 +3,6 @@ package dev.aaronhowser.mods.critter_carts.registry
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isItem
 import dev.aaronhowser.mods.critter_carts.CritterCarts
 import dev.aaronhowser.mods.critter_carts.datagen.tag.ModItemTagsProvider
-import dev.aaronhowser.mods.critter_carts.entity.attachment.ScoochwormAttachment
 import dev.aaronhowser.mods.critter_carts.entity.attachment.ScoochwormAttachmentType
 import dev.aaronhowser.mods.critter_carts.entity.attachment.builtin.LockboxAttachment
 import dev.aaronhowser.mods.critter_carts.entity.attachment.builtin.NoAttachment
@@ -14,8 +13,6 @@ import dev.aaronhowser.mods.critter_carts.entity.attachment.data.SaddleAttachmen
 import dev.aaronhowser.mods.critter_carts.entity.attachment.data.SyncedAttachmentData
 import net.minecraft.core.Registry
 import net.minecraft.resources.ResourceKey
-import net.minecraft.world.InteractionResult
-import net.minecraft.world.item.ItemStack
 import net.neoforged.neoforge.registries.DeferredHolder
 import net.neoforged.neoforge.registries.DeferredRegister
 import java.util.function.Supplier
@@ -38,15 +35,7 @@ object ModScoochwormAttachmentTypes {
 			ScoochwormAttachmentType(
 				streamCodec = NoAttachmentData.STREAM_CODEC,
 				itemPredicate = { false },
-				attachmentFactory = { NoAttachment() },
-				clientAttachmentFactory = ::NoAttachment,
-				interactionPredictor = { _, _, heldStack ->
-					if (ScoochwormAttachment.canAttach(heldStack)) {
-						InteractionResult.SUCCESS
-					} else {
-						InteractionResult.PASS
-					}
-				}
+				attachmentFactory = { NoAttachment() }
 			)
 		}
 
@@ -55,9 +44,7 @@ object ModScoochwormAttachmentTypes {
 			ScoochwormAttachmentType(
 				streamCodec = LockboxAttachmentData.STREAM_CODEC,
 				itemPredicate = { itemStack -> itemStack.isItem(ModItems.LOCKBOX) },
-				attachmentFactory = ::LockboxAttachment,
-				clientAttachmentFactory = { LockboxAttachment(ItemStack.EMPTY) },
-				interactionPredictor = { _, _, _ -> InteractionResult.SUCCESS }
+				attachmentFactory = ::LockboxAttachment
 			)
 		}
 
@@ -68,11 +55,7 @@ object ModScoochwormAttachmentTypes {
 				itemPredicate = { itemStack ->
 					itemStack.isItem(ModItemTagsProvider.SCOOCHWORM_SADDLES)
 				},
-				attachmentFactory = ::SaddleAttachment,
-				clientAttachmentFactory = { SaddleAttachment(ItemStack.EMPTY) },
-				interactionPredictor = { _, player, _ ->
-					if (player.isShiftKeyDown) InteractionResult.PASS else InteractionResult.SUCCESS
-				}
+				attachmentFactory = ::SaddleAttachment
 			)
 		}
 
