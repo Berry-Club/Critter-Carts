@@ -6,6 +6,7 @@ import net.minecraft.core.Direction
 import net.minecraft.core.component.DataComponents
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundEvents
+import net.minecraft.sounds.SoundSource
 import net.minecraft.world.SimpleContainer
 import net.minecraft.world.SimpleMenuProvider
 import net.minecraft.world.entity.item.ItemEntity
@@ -27,6 +28,12 @@ class LockboxAttachment(
 	private var bodyPart: ScoochwormPartEntity? = null
 	private var openers = 0
 	private var upsideDownTicks = 0
+	private var previousShouldOpen: Boolean? = null
+
+	var previousOpenProgress = 0f
+		private set
+	var openProgress = 0f
+		private set
 
 	private val container = object : SimpleContainer(CONTAINER_SIZE) {
 		override fun startOpen(player: Player) {
@@ -84,6 +91,22 @@ class LockboxAttachment(
 		updateItemContents()
 	}
 
+	override fun clientTick(bodyPart: ScoochwormPartEntity) {
+		previousOpenProgress = openProgress
+
+		val shouldOpen = bodyPart.isLockboxOpen
+			|| bodyPart.supportDirection == Direction.UP
+
+		val wasOpen = previousShouldOpen
+		if (wasOpen != null && wasOpen != shouldOpen) {
+			playOpenSound(bodyPart, shouldOpen)
+		}
+		previousShouldOpen = shouldOpen
+
+		val change = if (shouldOpen) OPEN_SPEED else -OPEN_SPEED
+		openProgress = (openProgress + change).coerceIn(0f, 1f)
+	}
+
 	override fun serverTick(bodyPart: ScoochwormPartEntity) {
 		this.bodyPart = bodyPart
 		updateOpenState()
@@ -112,6 +135,22 @@ class LockboxAttachment(
 
 	private fun updateOpenState() {
 		bodyPart?.isLockboxOpen = openers > 0
+	}
+
+	private fun playOpenSound(bodyPart: ScoochwormPartEntity, isOpening: Boolean) {
+		val sound = if (isOpening) SoundEvents.CHEST_OPEN else SoundEvents.CHEST_CLOSE
+		val pitch = bodyPart.random.nextFloat() * 0.1f + 0.9f
+
+		bodyPart.level().playLocalSound(
+			bodyPart.x,
+			bodyPart.y,
+			bodyPart.z,
+			sound,
+			SoundSource.BLOCKS,
+			0.5f,
+			pitch,
+			false
+		)
 	}
 
 	private fun dropNextStack(bodyPart: ScoochwormPartEntity) {
@@ -145,5 +184,6 @@ class LockboxAttachment(
 	companion object {
 		private const val CONTAINER_ROWS = 3
 		private const val CONTAINER_SIZE = 27
+		private const val OPEN_SPEED = 0.1f
 	}
 }

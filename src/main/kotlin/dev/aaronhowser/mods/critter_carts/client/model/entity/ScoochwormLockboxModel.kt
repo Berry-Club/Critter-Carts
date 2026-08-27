@@ -2,6 +2,7 @@ package dev.aaronhowser.mods.critter_carts.client.model.entity
 
 import dev.aaronhowser.mods.critter_carts.CritterCarts
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormPartEntity
+import dev.aaronhowser.mods.critter_carts.entity.data.attachment.LockboxAttachment
 import net.minecraft.util.Mth
 import software.bernie.geckolib.model.DefaultedEntityGeoModel
 
@@ -10,13 +11,13 @@ class ScoochwormLockboxModel : DefaultedEntityGeoModel<ScoochwormPartEntity>(
 ) {
 
 	fun updateLid(
-		animatable: ScoochwormPartEntity,
+		lockbox: LockboxAttachment?,
 		partialTick: Float
 	) {
 		val progress = Mth.lerp(
 			partialTick,
-			animatable.previousLockboxOpenProgress,
-			animatable.lockboxOpenProgress
+			lockbox?.previousOpenProgress ?: 0f,
+			lockbox?.openProgress ?: 0f
 		)
 
 		val easedProgress = 1f - (1f - progress) * (1f - progress) * (1f - progress)

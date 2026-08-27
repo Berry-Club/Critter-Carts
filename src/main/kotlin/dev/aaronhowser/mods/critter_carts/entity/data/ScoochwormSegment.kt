@@ -50,6 +50,23 @@ class ScoochwormSegment {
 		bodyPart = null
 	}
 
+	fun bindClientBodyPart(
+		bodyPart: ScoochwormPartEntity,
+		attachmentType: ScoochwormAttachmentType
+	) {
+		this.bodyPart = bodyPart
+
+		if (attachment.type != attachmentType) {
+			attachment = ScoochwormAttachment.createClient(attachmentType)
+		}
+	}
+
+	fun unbindClientBodyPart(bodyPart: ScoochwormPartEntity) {
+		if (this.bodyPart === bodyPart) {
+			this.bodyPart = null
+		}
+	}
+
 	fun reparentBodyPart(scoochworm: ScoochwormEntity, partIndex: Int) {
 		bodyPart?.attachTo(scoochworm, partIndex, attachment.type, this)
 	}
@@ -141,19 +158,23 @@ class ScoochwormSegment {
 		return attachment.itemHandler
 	}
 
+	fun getAttachment(): ScoochwormAttachment {
+		return attachment
+	}
+
 	fun insertIntoLockbox(itemStack: ItemStack): ItemStack {
 		val lockbox = attachment as? LockboxAttachment ?: return itemStack
 		return lockbox.insert(itemStack)
 	}
 
-	fun clientTick() {
-		val bodyPart = bodyPart ?: return
-		attachment.clientTick(bodyPart)
-	}
-
 	fun serverTick() {
 		val bodyPart = bodyPart ?: return
 		attachment.serverTick(bodyPart)
+	}
+
+	fun clientTick() {
+		val bodyPart = bodyPart ?: return
+		attachment.clientTick(bodyPart)
 	}
 
 	private fun createBodyPart(

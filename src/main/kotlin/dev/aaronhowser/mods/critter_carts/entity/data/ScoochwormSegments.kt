@@ -129,12 +129,10 @@ class ScoochwormSegments(
 	}
 
 	fun tick() {
+		if (scoochworm.isClientSide) return
+
 		for (segment in segments) {
-			if (scoochworm.isClientSide) {
-				segment.clientTick()
-			} else {
-				segment.serverTick()
-			}
+			segment.serverTick()
 		}
 	}
 
@@ -144,6 +142,24 @@ class ScoochwormSegments(
 
 	fun getBodyPart(partIndex: Int): ScoochwormPartEntity? {
 		return getSegment(partIndex)?.bodyPart
+	}
+
+	fun bindClientBodyPart(bodyPart: ScoochwormPartEntity): ScoochwormSegment? {
+		val partIndex = bodyPart.partIndex
+		if (partIndex !in 0 until MAX_COUNT) return null
+
+		while (segments.size <= partIndex) {
+			segments.add(ScoochwormSegment())
+		}
+
+		val targetSegment = segments[partIndex]
+		for (segment in segments) {
+			if (segment === targetSegment) continue
+			segment.unbindClientBodyPart(bodyPart)
+		}
+
+		targetSegment.bindClientBodyPart(bodyPart, bodyPart.attachmentType)
+		return targetSegment
 	}
 
 	fun updateColor(color: WormColor) {

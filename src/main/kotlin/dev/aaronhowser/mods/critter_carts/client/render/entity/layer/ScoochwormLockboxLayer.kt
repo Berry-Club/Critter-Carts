@@ -3,6 +3,7 @@ package dev.aaronhowser.mods.critter_carts.client.render.entity.layer
 import dev.aaronhowser.mods.critter_carts.client.model.entity.ScoochwormLockboxModel
 import dev.aaronhowser.mods.critter_carts.client.render.entity.ScoochwormPartRenderer
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormPartEntity
+import dev.aaronhowser.mods.critter_carts.entity.data.attachment.LockboxAttachment
 import dev.aaronhowser.mods.critter_carts.entity.data.attachment.ScoochwormAttachmentType
 
 class ScoochwormLockboxLayer private constructor(
@@ -23,6 +24,7 @@ class ScoochwormLockboxLayer private constructor(
 		animatable: ScoochwormPartEntity,
 		partialTick: Float
 	) {
-		lockboxModel.updateLid(animatable, partialTick)
+		val lockbox = animatable.getAttachment() as? LockboxAttachment
+		lockboxModel.updateLid(lockbox, partialTick)
 	}
 }

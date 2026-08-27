@@ -3,6 +3,7 @@ package dev.aaronhowser.mods.critter_carts.entity
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isClientSide
 import dev.aaronhowser.mods.critter_carts.entity.data.ScoochwormSegment
 import dev.aaronhowser.mods.critter_carts.entity.data.WormColor
+import dev.aaronhowser.mods.critter_carts.entity.data.attachment.ScoochwormAttachment
 import dev.aaronhowser.mods.critter_carts.entity.data.attachment.ScoochwormAttachmentType
 import dev.aaronhowser.mods.critter_carts.registry.ModEntityDataSerializers
 import net.minecraft.core.Direction
@@ -10,8 +11,6 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData
-import net.minecraft.sounds.SoundEvents
-import net.minecraft.sounds.SoundSource
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
 import net.minecraft.world.damagesource.DamageSource
@@ -40,12 +39,6 @@ class ScoochwormPartEntity(
 	private var lerpY = 0.0
 	private var lerpZ = 0.0
 	private var ownerSegment: ScoochwormSegment? = null
-	private var previousLockboxShouldOpen: Boolean? = null
-
-	var previousLockboxOpenProgress = 0f
-		private set
-	var lockboxOpenProgress = 0f
-		private set
 
 	init {
 		noPhysics = true
@@ -83,6 +76,10 @@ class ScoochwormPartEntity(
 
 	fun getItemHandler(): IItemHandler? {
 		return ownerSegment?.getItemHandler()
+	}
+
+	fun getAttachment(): ScoochwormAttachment? {
+		return ownerSegment?.getAttachment()
 	}
 
 	fun getPartInFront(): Entity? {
@@ -166,7 +163,12 @@ class ScoochwormPartEntity(
 		super.tick()
 
 		if (isClientSide) {
-			tickLockboxLid()
+			val scoochworm = getScoochworm()
+			if (scoochworm != null) {
+				ownerSegment = scoochworm.bindClientBodyPart(this)
+			}
+
+			ownerSegment?.clientTick()
 			tickInterpolation()
 			return
 		}
@@ -181,38 +183,6 @@ class ScoochwormPartEntity(
 		if (missingParentTicks > MAX_MISSING_PARENT_TICKS) {
 			discard()
 		}
-	}
-
-	private fun tickLockboxLid() {
-		previousLockboxOpenProgress = lockboxOpenProgress
-
-		val shouldOpen = attachmentType == ScoochwormAttachmentType.LOCKBOX
-			&& (isLockboxOpen || supportDirection == Direction.UP)
-
-		val previousShouldOpen = previousLockboxShouldOpen
-		if (previousShouldOpen != null && previousShouldOpen != shouldOpen) {
-			playLockboxSound(shouldOpen)
-		}
-		previousLockboxShouldOpen = shouldOpen
-
-		val change = if (shouldOpen) LOCKBOX_OPEN_SPEED else -LOCKBOX_OPEN_SPEED
-		lockboxOpenProgress = (lockboxOpenProgress + change).coerceIn(0f, 1f)
-	}
-
-	private fun playLockboxSound(isOpening: Boolean) {
-		val sound = if (isOpening) SoundEvents.CHEST_OPEN else SoundEvents.CHEST_CLOSE
-		val pitch = random.nextFloat() * 0.1f + 0.9f
-
-		level().playLocalSound(
-			x,
-			y,
-			z,
-			sound,
-			SoundSource.BLOCKS,
-			0.5f,
-			pitch,
-			false
-		)
 	}
 
 	// Interpolation
@@ -300,7 +270,6 @@ class ScoochwormPartEntity(
 		private const val NO_PARENT = -1
 		private const val MAX_MISSING_PARENT_TICKS = 20
 		private const val MINIMUM_MOVEMENT_DISTANCE_SQUARED = 0.000001
-		private const val LOCKBOX_OPEN_SPEED = 0.1f
 		private val DATA_PARENT_ID: EntityDataAccessor<Int> =
 			SynchedEntityData.defineId(ScoochwormPartEntity::class.java, EntityDataSerializers.INT)
 

@@ -74,6 +74,14 @@ sealed class ScoochwormAttachment(
 				itemStack.isItem(ModItemTagsProvider.SCOOCHWORM_SADDLES)
 		}
 
+		fun createClient(type: ScoochwormAttachmentType): ScoochwormAttachment {
+			return when (type) {
+				ScoochwormAttachmentType.LOCKBOX -> LockboxAttachment(ItemStack.EMPTY)
+				ScoochwormAttachmentType.SADDLE -> SaddleAttachment(ItemStack.EMPTY)
+				ScoochwormAttachmentType.NONE -> NoAttachment()
+			}
+		}
+
 		fun load(tag: CompoundTag): ScoochwormAttachment {
 			val itemStack = CODEC
 				.parse(NbtOps.INSTANCE, tag)

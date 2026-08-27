@@ -253,6 +253,10 @@ class ScoochwormEntity(
 		)
 	}
 
+	fun bindClientBodyPart(bodyPart: ScoochwormPartEntity): ScoochwormSegment? {
+		return bodySegments.bindClientBodyPart(bodyPart)
+	}
+
 	private fun tryGrow(player: Player, heldStack: ItemStack): InteractionResult? {
 		if (!heldStack.isItem(Items.MELON) || !bodySegments.canGrow) return null
 
