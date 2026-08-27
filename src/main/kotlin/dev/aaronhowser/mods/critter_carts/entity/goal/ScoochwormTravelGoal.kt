@@ -37,9 +37,7 @@ class ScoochwormTravelGoal(
 	}
 
 	override fun canContinueToUse(): Boolean {
-		return scoochworm.isTryingToMove
-			&& nextSupport != null
-			&& scoochworm.hasStemTravelSupport()
+		return scoochworm.isTryingToMove && nextSupport != null
 	}
 
 	override fun start() {
@@ -72,7 +70,6 @@ class ScoochwormTravelGoal(
 	private fun arriveAtSupport(destination: ScoochwormSupport, direction: Direction) {
 		scoochworm.setPos(getPositionOnSupport(destination))
 		scoochworm.attachToSupport(destination.supportPosition, destination.supportDirection)
-		scoochworm.isTurningAroundCorner = false
 		currentSupport = destination
 
 		val followingSupport = chooseNextSupport(destination, direction)
@@ -101,7 +98,6 @@ class ScoochwormTravelGoal(
 		nextSupport = to
 
 		if (from.supportDirection == to.supportDirection) {
-			scoochworm.isTurningAroundCorner = false
 			cornerTarget = null
 			cornerExitDirection = null
 			movementDirection = getDirectionToSupport(from, to, approachDirection)
@@ -123,7 +119,6 @@ class ScoochwormTravelGoal(
 		cornerTarget = corner
 		cornerExitDirection = getDirectionBetween(corner, toPosition)
 		movementDirection = approachDirection
-		scoochworm.isTurningAroundCorner = true
 	}
 
 	override fun stop() {
@@ -133,7 +128,6 @@ class ScoochwormTravelGoal(
 		cornerTarget = null
 		cornerExitDirection = null
 		scoochworm.noPhysics = false
-		scoochworm.isTurningAroundCorner = false
 	}
 
 	private fun chooseNextSupport(support: ScoochwormSupport, forward: Direction): ScoochwormSupport? {
