@@ -1,6 +1,7 @@
 package dev.aaronhowser.mods.critter_carts.entity
 
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isClientSide
+import dev.aaronhowser.mods.critter_carts.entity.data.ScoochwormSegment
 import dev.aaronhowser.mods.critter_carts.entity.data.WormColor
 import dev.aaronhowser.mods.critter_carts.entity.data.attachment.ScoochwormAttachmentType
 import dev.aaronhowser.mods.critter_carts.registry.ModEntityDataSerializers
@@ -36,6 +37,7 @@ class ScoochwormPartEntity(
 	private var lerpX = 0.0
 	private var lerpY = 0.0
 	private var lerpZ = 0.0
+	private var ownerSegment: ScoochwormSegment? = null
 
 	init {
 		noPhysics = true
@@ -68,8 +70,7 @@ class ScoochwormPartEntity(
 	}
 
 	fun getItemHandler(): IItemHandler? {
-		val scoochworm = getScoochworm() ?: return null
-		return scoochworm.getItemHandler(partIndex)
+		return ownerSegment?.getItemHandler()
 	}
 
 	fun getPartInFront(): Entity? {
@@ -93,11 +94,13 @@ class ScoochwormPartEntity(
 	fun attachTo(
 		parentEntity: ScoochwormEntity,
 		partIndex: Int,
-		attachmentType: ScoochwormAttachmentType
+		attachmentType: ScoochwormAttachmentType,
+		ownerSegment: ScoochwormSegment
 	) {
 		this.parentId = parentEntity.id
 		this.partIndex = partIndex
 		this.attachmentType = attachmentType
+		this.ownerSegment = ownerSegment
 		color = parentEntity.color
 	}
 

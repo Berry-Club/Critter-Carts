@@ -43,7 +43,6 @@ import net.minecraft.world.level.gameevent.GameEvent
 import net.minecraft.world.level.material.PushReaction
 import net.minecraft.world.phys.Vec3
 import net.neoforged.neoforge.fluids.FluidType
-import net.neoforged.neoforge.items.IItemHandler
 import software.bernie.geckolib.animatable.GeoEntity
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache
 import software.bernie.geckolib.animatable.instance.SingletonAnimatableInstanceCache
@@ -252,11 +251,6 @@ class ScoochwormEntity(
 			partIndex,
 			attachmentType
 		)
-	}
-
-	fun getItemHandler(partIndex: Int): IItemHandler? {
-		val segment = bodySegments.getSegment(partIndex) ?: return null
-		return segment.getItemHandler()
 	}
 
 	private fun tryGrow(player: Player, heldStack: ItemStack): InteractionResult? {

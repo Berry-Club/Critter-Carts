@@ -51,7 +51,7 @@ class ScoochwormSegment {
 	}
 
 	fun reparentBodyPart(scoochworm: ScoochwormEntity, partIndex: Int) {
-		bodyPart?.attachTo(scoochworm, partIndex, attachment.type)
+		bodyPart?.attachTo(scoochworm, partIndex, attachment.type, this)
 	}
 
 	private fun installAttachment(
@@ -170,7 +170,8 @@ class ScoochwormSegment {
 		bodyPart.attachTo(
 			scoochworm,
 			partIndex,
-			attachment.type
+			attachment.type,
+			this
 		)
 
 		bodyPart.moveTo(
