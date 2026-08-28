@@ -1,6 +1,8 @@
 package dev.aaronhowser.mods.critter_carts.entity.goal
 
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.toVec3
+import dev.aaronhowser.mods.critter_carts.block.CritterCageBlock
+import dev.aaronhowser.mods.critter_carts.block.CritterCageBlockEntity
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
@@ -29,7 +31,11 @@ class ScoochwormTravelGoal(
 		scoochworm.attachToSupport(support.supportPosition, support.supportDirection)
 
 		val direction = getMovementDirection(support.supportDirection)
-		val destination = chooseNextSupport(support, direction) ?: return false
+		val destination = chooseNextSupport(support, direction)
+		if (destination == null) {
+			tryEnterCage(support, direction)
+			return false
+		}
 
 		currentSupport = support
 		startMovingTo(support, destination, direction)
@@ -76,6 +82,7 @@ class ScoochwormTravelGoal(
 		if (followingSupport == null) {
 			nextSupport = null
 			scoochworm.deltaMovement = Vec3.ZERO
+			tryEnterCage(destination, direction)
 			return
 		}
 
@@ -135,6 +142,20 @@ class ScoochwormTravelGoal(
 			?: tryTurnAlongSurface(support, forward)
 			?: tryTurnUpwards(support, forward)
 			?: tryTurnDownwards(support, forward)
+	}
+
+	private fun tryEnterCage(support: ScoochwormSupport, forward: Direction): Boolean {
+		val cagePosition = support.supportPosition.relative(forward)
+		val level = scoochworm.level()
+		val cageState = level.getBlockState(cagePosition)
+		if (cageState.block !is CritterCageBlock) return false
+		if (cageState.getValue(CritterCageBlock.FORWARD) != forward.opposite) return false
+		if (!cageState.getValue(CritterCageBlock.OPEN)) return false
+
+		val cage = level.getBlockEntity(cagePosition)
+		if (cage !is CritterCageBlockEntity || cage.hasEntity) return false
+
+		return cage.tryCapture(scoochworm)
 	}
 
 	private fun tryMoveForward(
