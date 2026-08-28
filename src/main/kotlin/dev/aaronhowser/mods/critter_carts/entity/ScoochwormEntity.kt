@@ -272,7 +272,7 @@ class ScoochwormEntity(
 					color = newColor
 					heldStack.consume(1, player)
 
-					ModAdvancements.award(player, ModAdvancements.DYE_SCOOCHWORM)
+					ModAdvancements.trigger(player, ModAdvancements.DYE_SCOOCHWORM)
 				}
 
 				return InteractionResult.sidedSuccess(isClientSide)
@@ -359,7 +359,7 @@ class ScoochwormEntity(
 		for (player in level().players()) {
 			if (player.distanceToSqr(this) > COLLISION_WITNESS_DISTANCE_SQUARED) continue
 
-			ModAdvancements.award(player, ModAdvancements.WITNESS_HEAD_ON_COLLISION)
+			ModAdvancements.trigger(player, ModAdvancements.WITNESS_HEAD_ON_COLLISION)
 		}
 	}
 

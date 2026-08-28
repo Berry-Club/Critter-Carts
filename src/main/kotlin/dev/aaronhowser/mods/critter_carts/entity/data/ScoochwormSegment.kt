@@ -91,7 +91,7 @@ class ScoochwormSegment {
 		attachment = newAttachment
 		bodyPart.attachmentData = attachment.syncedData
 
-		ModAdvancements.award(player, ModAdvancements.ATTACH_TO_SCOOCHWORM)
+		ModAdvancements.trigger(player, ModAdvancements.ATTACH_TO_SCOOCHWORM)
 
 		val equipSound = attachment.equipSound
 		if (equipSound != null) {
@@ -126,7 +126,7 @@ class ScoochwormSegment {
 			bodyPart.gameEvent(GameEvent.SHEAR, player)
 			onSheared()
 
-			ModAdvancements.award(player, ModAdvancements.SPLIT_SCOOCHWORM)
+			ModAdvancements.trigger(player, ModAdvancements.SPLIT_SCOOCHWORM)
 
 			val equipmentSlot = hand.getEquipmentSlot()
 			heldStack.hurtAndBreak(1, player, equipmentSlot)

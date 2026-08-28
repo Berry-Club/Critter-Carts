@@ -1,8 +1,11 @@
 {
   "parent": "critter_carts:guide/interact_with_scoochworm",
   "criteria": {
-    "impossible": {
-      "trigger": "minecraft:impossible"
+    "attach_to_scoochworm": {
+      "conditions": {
+        "action": "critter_carts:guide/attach_to_scoochworm"
+      },
+      "trigger": "aaron:player_action"
     }
   },
   "display": {
@@ -20,7 +23,7 @@
   },
   "requirements": [
     [
-      "impossible"
+      "attach_to_scoochworm"
     ]
   ],
   "sends_telemetry_event": true

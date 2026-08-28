@@ -1,5 +1,6 @@
 package dev.aaronhowser.mods.critter_carts.advancement
 
+import dev.aaronhowser.mods.aaron.registry.actual.AaronCriterionTriggers
 import dev.aaronhowser.mods.critter_carts.CritterCarts
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerPlayer
@@ -17,17 +18,10 @@ object ModAdvancements {
 	val EAT_DYEBERRY = guide("eat_dyeberry")
 	val EAT_AARONBERRY = guide("eat_aaronberry")
 
-	fun award(player: Player, advancementId: ResourceLocation) {
+	fun trigger(player: Player, action: ResourceLocation) {
 		if (player !is ServerPlayer) return
 
-		val advancement = player.server.advancements.get(advancementId) ?: return
-		val progress = player.advancements.getOrStartProgress(advancement)
-		if (progress.isDone) return
-
-		val remainingCriteria = progress.remainingCriteria.iterator()
-		while (remainingCriteria.hasNext()) {
-			player.advancements.award(advancement, remainingCriteria.next())
-		}
+		AaronCriterionTriggers.PLAYER_ACTION.get().trigger(player, action)
 	}
 
 	private fun guide(path: String): ResourceLocation {

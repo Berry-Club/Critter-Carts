@@ -1,8 +1,13 @@
 {
   "parent": "critter_carts:guide/root",
   "criteria": {
-    "impossible": {
-      "trigger": "minecraft:impossible"
+    "break_apple_slice": {
+      "conditions": {
+        "block": {
+          "blocks": "critter_carts:apple_slice"
+        }
+      },
+      "trigger": "aaron:block_broken"
     }
   },
   "display": {
@@ -19,7 +24,7 @@
   },
   "requirements": [
     [
-      "impossible"
+      "break_apple_slice"
     ]
   ],
   "sends_telemetry_event": true

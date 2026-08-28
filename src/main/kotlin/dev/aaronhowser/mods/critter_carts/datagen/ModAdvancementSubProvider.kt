@@ -1,5 +1,6 @@
 package dev.aaronhowser.mods.critter_carts.datagen
 
+import dev.aaronhowser.mods.aaron.advancement.BlockBrokenTrigger
 import dev.aaronhowser.mods.aaron.datagen.AaronAdvancementSubProvider
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.toComponent
 import dev.aaronhowser.mods.critter_carts.CritterCarts
@@ -27,7 +28,6 @@ import java.util.concurrent.CompletableFuture
 import java.util.function.Consumer
 import java.util.Optional
 
-@Suppress("UnusedVariable")
 class ModAdvancementSubProvider(
 	lookupProvider: CompletableFuture<HolderLookup.Provider>
 ) : AaronAdvancementSubProvider(CritterCarts.MOD_ID, lookupProvider) {
@@ -60,7 +60,10 @@ class ModAdvancementSubProvider(
 				ModAdvancementLang.BREAK_APPLE_SLICE_TITLE.toComponent(),
 				ModAdvancementLang.BREAK_APPLE_SLICE_DESC.toComponent()
 			)
-			.addImpossibleCriterion()
+			.addCriterion(
+				"break_apple_slice",
+				BlockBrokenTrigger.TriggerInstance.block(ModBlocks.APPLE_SLICE.get())
+			)
 			.save(ModAdvancements.BREAK_APPLE_SLICE)
 
 		val interactWithScoochworm = advancement()
@@ -83,7 +86,10 @@ class ModAdvancementSubProvider(
 				ModAdvancementLang.ATTACH_TO_SCOOCHWORM_DESC.toComponent(),
 				type = AdvancementType.GOAL
 			)
-			.addImpossibleCriterion()
+			.addCriterion(
+				"attach_to_scoochworm",
+				playerAction(ModAdvancements.ATTACH_TO_SCOOCHWORM)
+			)
 			.save(ModAdvancements.ATTACH_TO_SCOOCHWORM)
 
 		advancement()
@@ -94,7 +100,10 @@ class ModAdvancementSubProvider(
 				ModAdvancementLang.SPLIT_SCOOCHWORM_DESC.toComponent(),
 				type = AdvancementType.GOAL
 			)
-			.addImpossibleCriterion()
+			.addCriterion(
+				"split_scoochworm",
+				playerAction(ModAdvancements.SPLIT_SCOOCHWORM)
+			)
 			.save(ModAdvancements.SPLIT_SCOOCHWORM)
 
 		advancement()
@@ -105,7 +114,10 @@ class ModAdvancementSubProvider(
 				ModAdvancementLang.WITNESS_HEAD_ON_COLLISION_DESC.toComponent(),
 				type = AdvancementType.CHALLENGE
 			)
-			.addImpossibleCriterion()
+			.addCriterion(
+				"witness_head_on_collision",
+				playerAction(ModAdvancements.WITNESS_HEAD_ON_COLLISION)
+			)
 			.save(ModAdvancements.WITNESS_HEAD_ON_COLLISION)
 
 		advancement()
@@ -115,7 +127,10 @@ class ModAdvancementSubProvider(
 				ModAdvancementLang.DYE_SCOOCHWORM_TITLE.toComponent(),
 				ModAdvancementLang.DYE_SCOOCHWORM_DESC.toComponent()
 			)
-			.addImpossibleCriterion()
+			.addCriterion(
+				"dye_scoochworm",
+				playerAction(ModAdvancements.DYE_SCOOCHWORM)
+			)
 			.save(ModAdvancements.DYE_SCOOCHWORM)
 
 		val eatDyeberry = advancement()
