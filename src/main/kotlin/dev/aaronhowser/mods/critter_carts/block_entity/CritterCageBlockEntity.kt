@@ -1,7 +1,8 @@
-package dev.aaronhowser.mods.critter_carts.block
+package dev.aaronhowser.mods.critter_carts.block_entity
 
 import dev.aaronhowser.mods.aaron.block_entity.SyncingBlockEntity
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.getMinimalTag
+import dev.aaronhowser.mods.critter_carts.block.CritterCageBlock
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity
 import dev.aaronhowser.mods.critter_carts.item.CritterCageItem
 import dev.aaronhowser.mods.critter_carts.registry.ModBlockEntityTypes

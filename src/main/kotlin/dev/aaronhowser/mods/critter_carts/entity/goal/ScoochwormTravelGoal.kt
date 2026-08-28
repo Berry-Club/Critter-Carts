@@ -2,7 +2,7 @@ package dev.aaronhowser.mods.critter_carts.entity.goal
 
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.toVec3
 import dev.aaronhowser.mods.critter_carts.block.CritterCageBlock
-import dev.aaronhowser.mods.critter_carts.block.CritterCageBlockEntity
+import dev.aaronhowser.mods.critter_carts.block_entity.CritterCageBlockEntity
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction

@@ -1,6 +1,7 @@
 package dev.aaronhowser.mods.critter_carts.block
 
 import com.mojang.serialization.MapCodec
+import dev.aaronhowser.mods.critter_carts.block_entity.CritterCageBlockEntity
 import dev.aaronhowser.mods.critter_carts.registry.ModDataComponents
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
