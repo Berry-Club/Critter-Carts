@@ -1,6 +1,8 @@
 package dev.aaronhowser.mods.critter_carts.datagen.loot
 
+import dev.aaronhowser.mods.aaron.datagen.AaronLootTableDsl
 import dev.aaronhowser.mods.critter_carts.registry.ModBlocks
+import dev.aaronhowser.mods.critter_carts.registry.ModDataComponents
 import net.minecraft.core.HolderLookup
 import net.minecraft.core.registries.Registries
 import net.minecraft.data.loot.BlockLootSubProvider
@@ -10,6 +12,7 @@ import net.minecraft.world.item.enchantment.Enchantments
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.storage.loot.entries.LootItem
 import net.minecraft.world.level.storage.loot.functions.ApplyBonusCount
+import net.minecraft.world.level.storage.loot.functions.CopyComponentsFunction
 import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction
 import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator
 import net.neoforged.neoforge.registries.DeferredHolder
@@ -19,7 +22,7 @@ class ModBlockLootTablesSubProvider(
 ) : BlockLootSubProvider(setOf(), FeatureFlags.REGISTRY.allFlags(), provider) {
 
 	override fun generate() {
-		add(ModBlocks.CRITTER_CAGE.get(), noDrop())
+		critterCage()
 		dropSelf(ModBlocks.SCOOCHSTEM.get())
 		dropSelf(ModBlocks.SCOOCHSTEM_WOOD.get())
 		appleSlice()
@@ -36,6 +39,25 @@ class ModBlockLootTablesSubProvider(
 				add(block.get(), noDrop())
 			}
 		}
+	}
+
+	private fun critterCage() {
+		add(
+			ModBlocks.CRITTER_CAGE.get(),
+			AaronLootTableDsl.table {
+				pool {
+					rolls(1f)
+					item(ModBlocks.CRITTER_CAGE.get()) {
+						apply(
+							CopyComponentsFunction.copyComponents(
+								CopyComponentsFunction.Source.BLOCK_ENTITY
+							)
+								.include(ModDataComponents.ENTITY_DATA.get())
+						)
+					}
+				}
+			}
+		)
 	}
 
 	private fun appleSlice() {

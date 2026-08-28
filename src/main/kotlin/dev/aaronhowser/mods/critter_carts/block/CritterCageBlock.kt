@@ -21,7 +21,6 @@ import net.minecraft.world.level.block.state.StateDefinition
 import net.minecraft.world.level.block.state.properties.BlockStateProperties
 import net.minecraft.world.level.block.state.properties.BooleanProperty
 import net.minecraft.world.level.block.state.properties.DirectionProperty
-import net.minecraft.world.level.storage.loot.LootParams
 import net.minecraft.world.phys.BlockHitResult
 
 class CritterCageBlock : BaseEntityBlock(
@@ -109,16 +108,6 @@ class CritterCageBlock : BaseEntityBlock(
 		if (blockEntity is CritterCageBlockEntity) {
 			blockEntity.tryRelease(null)
 		}
-	}
-
-	override fun getDrops(state: BlockState, builder: LootParams.Builder): List<ItemStack> {
-		val stack = ItemStack(asItem())
-		val blockEntity = builder.getOptionalParameter(net.minecraft.world.level.storage.loot.parameters.LootContextParams.BLOCK_ENTITY)
-		if (blockEntity is CritterCageBlockEntity) {
-			blockEntity.copyEntityDataTo(stack)
-		}
-
-		return listOf(stack)
 	}
 
 	override fun getRenderShape(state: BlockState): RenderShape = RenderShape.MODEL

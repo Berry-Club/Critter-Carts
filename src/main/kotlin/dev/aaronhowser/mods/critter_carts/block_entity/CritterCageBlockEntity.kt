@@ -10,6 +10,7 @@ import dev.aaronhowser.mods.critter_carts.registry.ModDataComponents
 import dev.aaronhowser.mods.critter_carts.registry.ModEntityTypes
 import net.minecraft.core.BlockPos
 import net.minecraft.core.HolderLookup
+import net.minecraft.core.component.DataComponentMap
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
@@ -108,9 +109,17 @@ class CritterCageBlockEntity(
 		return true
 	}
 
-	fun copyEntityDataTo(stack: ItemStack) {
-		val data = entityData ?: return
-		stack.set(ModDataComponents.ENTITY_DATA, data)
+	override fun collectImplicitComponents(components: DataComponentMap.Builder) {
+		super.collectImplicitComponents(components)
+
+		val data = entityData
+		if (data != null) {
+			components.set(ModDataComponents.ENTITY_DATA, data)
+		}
+	}
+
+	override fun applyImplicitComponents(componentInput: DataComponentInput) {
+		entityData = componentInput.get(ModDataComponents.ENTITY_DATA)
 	}
 
 	override fun saveAdditional(tag: CompoundTag, registries: HolderLookup.Provider) {

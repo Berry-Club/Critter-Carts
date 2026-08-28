@@ -1,7 +1,7 @@
-// 1.21.1	2026-08-26T17:14:18.7135363	Loot Tables
+// 1.21.1	2026-08-27T23:10:03.905134	Loot Tables
 9a4e68b50b9f4c41c7abcfad2f34e75069e526e7 data/critter_carts/loot_table/blocks/apple_slice.json
 76c082bd763a27ce9b96008fca4dab982993b987 data/critter_carts/loot_table/blocks/blue_scoochstem.json
-19485d411d9c36f87b2ce7b3856fa954132262c6 data/critter_carts/loot_table/blocks/critter_cage.json
+b64715791bf1b5efb35f106674388da4b579ddab data/critter_carts/loot_table/blocks/critter_cage.json
 6911e2dafad4cdb13a1f5c22baa23a92b409ca14 data/critter_carts/loot_table/blocks/cyan_scoochstem.json
 a23754e58e8448938235cc7ff53b3fce34eafcf5 data/critter_carts/loot_table/blocks/dyeberry_vines.json
 85c8446371211c498015ee15ffeebf95077aed5a data/critter_carts/loot_table/blocks/dyeberry_vines_plant.json
