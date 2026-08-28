@@ -63,7 +63,7 @@ class CritterCageBlock : Block(
 		super.setPlacedBy(level, pos, state, placer, stack)
 		val blockEntity = level.getBlockEntity(pos)
 		if (blockEntity is CritterCageBlockEntity) {
-			blockEntity.entityData = stack.get(ModDataComponents.ENTITY_DATA)
+			blockEntity.storedEntityData = stack.get(ModDataComponents.ENTITY_DATA)
 			level.setBlock(pos, state.setValue(OPEN, !blockEntity.hasEntity), UPDATE_CLIENTS)
 		}
 	}

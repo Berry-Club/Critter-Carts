@@ -28,7 +28,7 @@ class CritterCageBlockEntity(
 	private var cachedEntityLevel: Level? = null
 	private var cachedScoochworm: ScoochwormEntity? = null
 
-	var entityData: CustomData? = null
+	var storedEntityData: CustomData? = null
 		set(value) {
 			field = value
 			cachedEntityData = null
@@ -39,10 +39,10 @@ class CritterCageBlockEntity(
 		}
 
 	val hasEntity: Boolean
-		get() = entityData != null
+		get() = storedEntityData != null
 
 	fun getScoochworm(): ScoochwormEntity? {
-		val data = entityData ?: return null
+		val data = storedEntityData ?: return null
 		val level = level ?: return null
 
 		if (data == cachedEntityData && level === cachedEntityLevel) {
@@ -63,7 +63,7 @@ class CritterCageBlockEntity(
 		val level = level ?: return false
 		if (level.isClientSide || hasEntity || !blockState.getValue(CritterCageBlock.OPEN)) return false
 
-		entityData = CritterCageItem.createEntityData(scoochworm)
+		storedEntityData = CritterCageItem.createEntityData(scoochworm)
 		level.setBlock(
 			blockPos,
 			blockState.setValue(CritterCageBlock.OPEN, false),
@@ -76,7 +76,7 @@ class CritterCageBlockEntity(
 
 	fun tryRelease(player: Player?): Boolean {
 		val level = level ?: return false
-		val data = entityData ?: return false
+		val data = storedEntityData ?: return false
 		val forward = blockState.getValue(CritterCageBlock.FORWARD)
 		val spawnPos = blockPos.relative(forward)
 
@@ -97,7 +97,7 @@ class CritterCageBlockEntity(
 			return false
 		}
 
-		entityData = null
+		storedEntityData = null
 		level.setBlock(
 			blockPos,
 			blockState.setValue(CritterCageBlock.OPEN, true),
@@ -109,25 +109,25 @@ class CritterCageBlockEntity(
 	override fun collectImplicitComponents(components: DataComponentMap.Builder) {
 		super.collectImplicitComponents(components)
 
-		val data = entityData
+		val data = storedEntityData
 		if (data != null) {
 			components.set(ModDataComponents.ENTITY_DATA, data)
 		}
 	}
 
 	override fun applyImplicitComponents(componentInput: DataComponentInput) {
-		entityData = componentInput.get(ModDataComponents.ENTITY_DATA)
+		storedEntityData = componentInput.get(ModDataComponents.ENTITY_DATA)
 	}
 
 	override fun saveAdditional(tag: CompoundTag, registries: HolderLookup.Provider) {
 		super.saveAdditional(tag, registries)
-		val data = entityData ?: return
+		val data = storedEntityData ?: return
 		tag.put(ENTITY_DATA_TAG, data.copyTag())
 	}
 
 	override fun loadAdditional(tag: CompoundTag, registries: HolderLookup.Provider) {
 		super.loadAdditional(tag, registries)
-		entityData = if (tag.contains(ENTITY_DATA_TAG)) {
+		storedEntityData = if (tag.contains(ENTITY_DATA_TAG)) {
 			CustomData.of(tag.getCompound(ENTITY_DATA_TAG))
 		} else {
 			null
