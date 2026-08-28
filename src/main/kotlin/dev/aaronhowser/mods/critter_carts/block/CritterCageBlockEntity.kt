@@ -1,6 +1,7 @@
 package dev.aaronhowser.mods.critter_carts.block
 
 import dev.aaronhowser.mods.aaron.block_entity.SyncingBlockEntity
+import dev.aaronhowser.mods.aaron.misc.AaronExtensions.getMinimalTag
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity
 import dev.aaronhowser.mods.critter_carts.item.CritterCageItem
 import dev.aaronhowser.mods.critter_carts.registry.ModBlockEntityTypes
@@ -13,6 +14,7 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.component.CustomData
 import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.state.BlockState
 
 class CritterCageBlockEntity(
@@ -56,6 +58,23 @@ class CritterCageBlockEntity(
 		return scoochworm
 	}
 
+	fun tryCapture(scoochworm: ScoochwormEntity): Boolean {
+		val level = level ?: return false
+		if (level.isClientSide || hasEntity || !blockState.getValue(CritterCageBlock.OPEN)) return false
+
+		val wormTag = scoochworm.getMinimalTag(stripUniqueness = false)
+		wormTag.remove(ScoochwormEntity.PATH_TAG)
+		entityData = CustomData.of(wormTag)
+		level.setBlock(
+			blockPos,
+			blockState.setValue(CritterCageBlock.OPEN, false),
+			Block.UPDATE_CLIENTS
+		)
+		scoochworm.discard()
+
+		return true
+	}
+
 	fun tryRelease(player: Player?): Boolean {
 		val level = level ?: return false
 		val data = entityData ?: return false
@@ -80,6 +99,11 @@ class CritterCageBlockEntity(
 		}
 
 		entityData = null
+		level.setBlock(
+			blockPos,
+			blockState.setValue(CritterCageBlock.OPEN, true),
+			Block.UPDATE_CLIENTS
+		)
 		return true
 	}
 
