@@ -28,6 +28,7 @@ import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.Mob
+import net.minecraft.world.entity.MoverType
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal
@@ -47,6 +48,7 @@ import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache
 import software.bernie.geckolib.animatable.instance.SingletonAnimatableInstanceCache
 import software.bernie.geckolib.animation.AnimatableManager
 import java.util.*
+import kotlin.math.abs
 
 class ScoochwormEntity(
 	entityType: EntityType<ScoochwormEntity>,
@@ -106,6 +108,7 @@ class ScoochwormEntity(
 		val positionBefore = position()
 
 		super.aiStep()
+		pressAgainstSupport()
 		bodySegments.tick()
 
 		if (isServerSide) {
@@ -123,6 +126,30 @@ class ScoochwormEntity(
 		if (moved) {
 			playNextFootstep()
 		}
+	}
+
+	private fun pressAgainstSupport() {
+		val currentSupportPosition = supportPosition ?: return
+		val collisionShape = level()
+			.getBlockState(currentSupportPosition)
+			.getCollisionShape(level(), currentSupportPosition)
+			.move(
+				currentSupportPosition.x.toDouble(),
+				currentSupportPosition.y.toDouble(),
+				currentSupportPosition.z.toDouble()
+			)
+
+		val maximumMovement = supportDirection.axisDirection.step.toDouble()
+		val movementDistance = collisionShape.collide(
+			supportDirection.axis,
+			boundingBox,
+			maximumMovement
+		)
+
+		val movement = supportDirection.normal.toVec3()
+			.scale(abs(movementDistance))
+
+		move(MoverType.SELF, movement)
 	}
 
 	private fun eatTouchingItems() {
