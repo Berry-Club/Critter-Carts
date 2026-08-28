@@ -1,5 +1,6 @@
 package dev.aaronhowser.mods.critter_carts.entity.attachment.builtin
 
+import dev.aaronhowser.mods.aaron.misc.AaronExtensions.nextRange
 import dev.aaronhowser.mods.critter_carts.config.ServerConfig
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormPartEntity
 import dev.aaronhowser.mods.critter_carts.entity.attachment.ScoochwormAttachment
@@ -100,7 +101,7 @@ class LockboxAttachment(
 
 		val wasOpen = previousShouldOpen
 		if (wasOpen != null && wasOpen != shouldOpen) {
-			playOpenSound(bodyPart, shouldOpen)
+			playSound(bodyPart, shouldOpen)
 		}
 		previousShouldOpen = shouldOpen
 
@@ -138,9 +139,9 @@ class LockboxAttachment(
 		itemStack.set(DataComponents.CONTAINER, contents)
 	}
 
-	private fun playOpenSound(bodyPart: ScoochwormPartEntity, isOpening: Boolean) {
+	private fun playSound(bodyPart: ScoochwormPartEntity, isOpening: Boolean) {
 		val sound = if (isOpening) SoundEvents.CHEST_OPEN else SoundEvents.CHEST_CLOSE
-		val pitch = bodyPart.random.nextFloat() * 0.1f + 0.9f
+		val pitch = bodyPart.random.nextRange(1.2f, 1.3f)
 
 		bodyPart.level().playLocalSound(
 			bodyPart.x,
@@ -148,7 +149,7 @@ class LockboxAttachment(
 			bodyPart.z,
 			sound,
 			SoundSource.BLOCKS,
-			0.5f,
+			0.75f,
 			pitch,
 			false
 		)
