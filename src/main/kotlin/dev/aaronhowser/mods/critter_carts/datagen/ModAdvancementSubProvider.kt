@@ -44,7 +44,7 @@ class ModAdvancementSubProvider(
 				ModItems.SCOOCHWORM_SPAWN_EGG,
 				ModAdvancementLang.ROOT_TITLE.toComponent(),
 				ModAdvancementLang.ROOT_DESC.toComponent(),
-				ResourceLocation.withDefaultNamespace("textures/gui/advancements/backgrounds/stone.png"),
+				CritterCarts.modResource("textures/block/scoochstem/side.png"),
 				AdvancementType.TASK,
 				false,
 				false,

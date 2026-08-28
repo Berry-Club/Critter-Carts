@@ -6,7 +6,7 @@
   },
   "display": {
     "announce_to_chat": false,
-    "background": "minecraft:textures/gui/advancements/backgrounds/stone.png",
+    "background": "critter_carts:textures/block/scoochstem/side.png",
     "description": {
       "translate": "advancements.critter_carts.root.desc"
     },
