@@ -1,6 +1,5 @@
 package dev.aaronhowser.mods.critter_carts.block
 
-import com.mojang.serialization.MapCodec
 import dev.aaronhowser.mods.critter_carts.block_entity.CritterCageBlockEntity
 import dev.aaronhowser.mods.critter_carts.registry.ModDataComponents
 import net.minecraft.core.BlockPos
@@ -11,9 +10,9 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.context.BlockPlaceContext
 import net.minecraft.world.level.Level
-import net.minecraft.world.level.block.BaseEntityBlock
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.EntityBlock
 import net.minecraft.world.level.block.RenderShape
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.BlockState
@@ -23,9 +22,9 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty
 import net.minecraft.world.level.block.state.properties.DirectionProperty
 import net.minecraft.world.phys.BlockHitResult
 
-class CritterCageBlock : BaseEntityBlock(
+class CritterCageBlock : Block(
 	Properties.ofFullCopy(Blocks.IRON_BARS).noOcclusion()
-) {
+), EntityBlock {
 
 	init {
 		registerDefaultState(
@@ -36,8 +35,6 @@ class CritterCageBlock : BaseEntityBlock(
 				.setValue(POWERED, false)
 		)
 	}
-
-	override fun codec(): MapCodec<out BaseEntityBlock> = CODEC
 
 	override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block, BlockState>) {
 		builder.add(DOWN, FORWARD, OPEN, POWERED)
@@ -117,7 +114,6 @@ class CritterCageBlock : BaseEntityBlock(
 	}
 
 	companion object {
-		val CODEC: MapCodec<CritterCageBlock> = simpleCodec { CritterCageBlock() }
 		val DOWN: DirectionProperty = DirectionProperty.create("down")
 		val FORWARD: DirectionProperty = DirectionProperty.create("forward")
 		val OPEN: BooleanProperty = BlockStateProperties.OPEN
