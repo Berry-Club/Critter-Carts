@@ -13,6 +13,7 @@ class ModLanguageProvider(
 ) : LanguageProvider(output, CritterCarts.MOD_ID, "en_us") {
 
 	override fun addTranslations() {
+		ModAdvancementLang.add(this)
 		ModItemLang.add(this)
 		ModMenuLang.add(this)
 

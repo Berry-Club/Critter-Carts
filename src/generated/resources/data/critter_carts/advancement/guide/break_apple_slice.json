@@ -1,0 +1,26 @@
+{
+  "parent": "critter_carts:guide/root",
+  "criteria": {
+    "impossible": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.critter_carts.break_apple_slice.desc"
+    },
+    "icon": {
+      "count": 1,
+      "id": "critter_carts:apple_slice"
+    },
+    "title": {
+      "translate": "advancements.critter_carts.break_apple_slice.title"
+    }
+  },
+  "requirements": [
+    [
+      "impossible"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

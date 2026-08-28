@@ -1,0 +1,32 @@
+{
+  "parent": "critter_carts:guide/eat_dyeberry",
+  "criteria": {
+    "eat_aaronberry": {
+      "conditions": {
+        "item": {
+          "items": "critter_carts:aaronberry"
+        }
+      },
+      "trigger": "minecraft:consume_item"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.critter_carts.eat_aaronberry.desc"
+    },
+    "frame": "challenge",
+    "icon": {
+      "count": 1,
+      "id": "critter_carts:aaronberry"
+    },
+    "title": {
+      "translate": "advancements.critter_carts.eat_aaronberry.title"
+    }
+  },
+  "requirements": [
+    [
+      "eat_aaronberry"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

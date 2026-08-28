@@ -6,6 +6,7 @@ import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isItem
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isServerSide
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.nextRange
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.toVec3
+import dev.aaronhowser.mods.critter_carts.advancement.ModAdvancements
 import dev.aaronhowser.mods.critter_carts.block.ScoochwormTravelBlock
 import dev.aaronhowser.mods.critter_carts.datagen.tag.ModBlockTagsProvider
 import dev.aaronhowser.mods.critter_carts.entity.control.ScoochwormStemMoveControl
@@ -270,6 +271,8 @@ class ScoochwormEntity(
 				if (isServerSide) {
 					color = newColor
 					heldStack.consume(1, player)
+
+					ModAdvancements.award(player, ModAdvancements.DYE_SCOOCHWORM)
 				}
 
 				return InteractionResult.sidedSuccess(isClientSide)
@@ -334,7 +337,30 @@ class ScoochwormEntity(
 	override fun push(entity: Entity) {}
 	override fun doPush(entity: Entity) {
 		if (entity is ItemEntity) return
+
+		if (entity is ScoochwormEntity) {
+			awardHeadOnCollisionAdvancement(entity)
+		}
+
 		super.doPush(entity)
+	}
+
+	private fun awardHeadOnCollisionAdvancement(other: ScoochwormEntity) {
+		if (isClientSide) return
+
+		val movement = rememberedMovementDirection ?: return
+		val otherMovement = other.rememberedMovementDirection ?: return
+		if (movement.normalize().dot(otherMovement.normalize()) > HEAD_ON_DIRECTION_DOT) return
+
+		val directionToOther = position().vectorTo(other.position()).normalize()
+		if (movement.normalize().dot(directionToOther) < HEAD_ON_ALIGNMENT_DOT) return
+		if (otherMovement.normalize().dot(directionToOther.reverse()) < HEAD_ON_ALIGNMENT_DOT) return
+
+		for (player in level().players()) {
+			if (player.distanceToSqr(this) > COLLISION_WITNESS_DISTANCE_SQUARED) continue
+
+			ModAdvancements.award(player, ModAdvancements.WITNESS_HEAD_ON_COLLISION)
+		}
 	}
 
 	// Entity data
@@ -389,6 +415,9 @@ class ScoochwormEntity(
 	override fun getAnimatableInstanceCache(): AnimatableInstanceCache = animatableInstanceCache
 
 	companion object {
+		private const val HEAD_ON_DIRECTION_DOT = -0.8
+		private const val HEAD_ON_ALIGNMENT_DOT = 0.8
+		private const val COLLISION_WITNESS_DISTANCE_SQUARED = 16.0 * 16.0
 		const val SIZE = 14f / 16f
 		const val PART_SPACING = SIZE * 1.2
 

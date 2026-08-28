@@ -1,0 +1,163 @@
+package dev.aaronhowser.mods.critter_carts.datagen
+
+import dev.aaronhowser.mods.aaron.datagen.AaronAdvancementSubProvider
+import dev.aaronhowser.mods.aaron.misc.AaronExtensions.toComponent
+import dev.aaronhowser.mods.critter_carts.CritterCarts
+import dev.aaronhowser.mods.critter_carts.advancement.ModAdvancements
+import dev.aaronhowser.mods.critter_carts.datagen.language.ModAdvancementLang
+import dev.aaronhowser.mods.critter_carts.registry.ModBlocks
+import dev.aaronhowser.mods.critter_carts.registry.ModEntityTypes
+import dev.aaronhowser.mods.critter_carts.registry.ModItems
+import net.minecraft.advancements.Advancement
+import net.minecraft.advancements.AdvancementHolder
+import net.minecraft.advancements.AdvancementType
+import net.minecraft.advancements.critereon.ConsumeItemTrigger
+import net.minecraft.advancements.critereon.EntityPredicate
+import net.minecraft.advancements.critereon.EntityTypePredicate
+import net.minecraft.advancements.critereon.ItemPredicate
+import net.minecraft.advancements.critereon.PlayerInteractTrigger
+import net.minecraft.advancements.critereon.PlayerTrigger
+import net.minecraft.core.HolderLookup
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.entity.EntityType
+import net.minecraft.world.item.Items
+import net.minecraft.world.level.ItemLike
+import net.neoforged.neoforge.common.data.ExistingFileHelper
+import java.util.concurrent.CompletableFuture
+import java.util.function.Consumer
+import java.util.Optional
+
+@Suppress("UnusedVariable")
+class ModAdvancementSubProvider(
+	lookupProvider: CompletableFuture<HolderLookup.Provider>
+) : AaronAdvancementSubProvider(CritterCarts.MOD_ID, lookupProvider) {
+
+	override fun generate(
+		registries: HolderLookup.Provider,
+		saver: Consumer<AdvancementHolder>,
+		existingFileHelper: ExistingFileHelper
+	) {
+		fun Advancement.Builder.save(id: ResourceLocation) = save(saver, id, existingFileHelper)
+
+		val root = advancement()
+			.display(
+				ModItems.SCOOCHWORM_SPAWN_EGG,
+				ModAdvancementLang.ROOT_TITLE.toComponent(),
+				ModAdvancementLang.ROOT_DESC.toComponent(),
+				ResourceLocation.withDefaultNamespace("textures/gui/advancements/backgrounds/stone.png"),
+				AdvancementType.TASK,
+				false,
+				false,
+				false
+			)
+			.addCriterion("tick", PlayerTrigger.TriggerInstance.tick())
+			.save(ModAdvancements.ROOT)
+
+		val breakAppleSlice = advancement()
+			.parent(root)
+			.display(
+				ModBlocks.APPLE_SLICE,
+				ModAdvancementLang.BREAK_APPLE_SLICE_TITLE.toComponent(),
+				ModAdvancementLang.BREAK_APPLE_SLICE_DESC.toComponent()
+			)
+			.addImpossibleCriterion()
+			.save(ModAdvancements.BREAK_APPLE_SLICE)
+
+		val interactWithScoochworm = advancement()
+			.parent(breakAppleSlice)
+			.display(
+				ModItems.SCOOCHWORM_SPAWN_EGG,
+				ModAdvancementLang.INTERACT_WITH_SCOOCHWORM_TITLE.toComponent(),
+				ModAdvancementLang.INTERACT_WITH_SCOOCHWORM_DESC.toComponent()
+			)
+			.addCriterion("scoochworm", interactedWith(ModEntityTypes.SCOOCHWORM.get()))
+			.addCriterion("scoochworm_segment", interactedWith(ModEntityTypes.SCOOCHWORM_PART.get()))
+			.anyRequirements()
+			.save(ModAdvancements.INTERACT_WITH_SCOOCHWORM)
+
+		advancement()
+			.parent(interactWithScoochworm)
+			.display(
+				Items.SADDLE,
+				ModAdvancementLang.ATTACH_TO_SCOOCHWORM_TITLE.toComponent(),
+				ModAdvancementLang.ATTACH_TO_SCOOCHWORM_DESC.toComponent(),
+				type = AdvancementType.GOAL
+			)
+			.addImpossibleCriterion()
+			.save(ModAdvancements.ATTACH_TO_SCOOCHWORM)
+
+		advancement()
+			.parent(interactWithScoochworm)
+			.display(
+				Items.SHEARS,
+				ModAdvancementLang.SPLIT_SCOOCHWORM_TITLE.toComponent(),
+				ModAdvancementLang.SPLIT_SCOOCHWORM_DESC.toComponent(),
+				type = AdvancementType.GOAL
+			)
+			.addImpossibleCriterion()
+			.save(ModAdvancements.SPLIT_SCOOCHWORM)
+
+		advancement()
+			.parent(interactWithScoochworm)
+			.display(
+				Items.POPPY,
+				ModAdvancementLang.WITNESS_HEAD_ON_COLLISION_TITLE.toComponent(),
+				ModAdvancementLang.WITNESS_HEAD_ON_COLLISION_DESC.toComponent(),
+				type = AdvancementType.CHALLENGE
+			)
+			.addImpossibleCriterion()
+			.save(ModAdvancements.WITNESS_HEAD_ON_COLLISION)
+
+		advancement()
+			.parent(interactWithScoochworm)
+			.display(
+				ModItems.GREEN_DYEBERRY,
+				ModAdvancementLang.DYE_SCOOCHWORM_TITLE.toComponent(),
+				ModAdvancementLang.DYE_SCOOCHWORM_DESC.toComponent()
+			)
+			.addImpossibleCriterion()
+			.save(ModAdvancements.DYE_SCOOCHWORM)
+
+		val eatDyeberry = advancement()
+			.parent(root)
+			.display(
+				ModItems.GREEN_DYEBERRY,
+				ModAdvancementLang.EAT_DYEBERRY_TITLE.toComponent(),
+				ModAdvancementLang.EAT_DYEBERRY_DESC.toComponent()
+			)
+			.addCriterion("green", consumed(ModItems.GREEN_DYEBERRY.get()))
+			.addCriterion("blue", consumed(ModItems.BLUE_DYEBERRY.get()))
+			.addCriterion("red", consumed(ModItems.RED_DYEBERRY.get()))
+			.addCriterion("yellow", consumed(ModItems.YELLOW_DYEBERRY.get()))
+			.addCriterion("magenta", consumed(ModItems.MAGENTA_DYEBERRY.get()))
+			.addCriterion("cyan", consumed(ModItems.CYAN_DYEBERRY.get()))
+			.anyRequirements()
+			.save(ModAdvancements.EAT_DYEBERRY)
+
+		advancement()
+			.parent(eatDyeberry)
+			.display(
+				ModItems.AARONBERRY,
+				ModAdvancementLang.EAT_AARONBERRY_TITLE.toComponent(),
+				ModAdvancementLang.EAT_AARONBERRY_DESC.toComponent(),
+				type = AdvancementType.CHALLENGE
+			)
+			.addCriterion("eat_aaronberry", consumed(ModItems.AARONBERRY.get()))
+			.save(ModAdvancements.EAT_AARONBERRY)
+	}
+
+	private fun interactedWith(entityType: EntityType<*>) =
+		PlayerInteractTrigger.TriggerInstance.itemUsedOnEntity(
+			ItemPredicate.Builder.item(),
+			Optional.of(EntityPredicate.wrap(
+				EntityPredicate.Builder.entity()
+					.entityType(EntityTypePredicate.of(entityType))
+			))
+		)
+
+	private fun consumed(item: ItemLike) =
+		ConsumeItemTrigger.TriggerInstance.usedItem(
+			ItemPredicate.Builder.item()
+				.of(item)
+		)
+}

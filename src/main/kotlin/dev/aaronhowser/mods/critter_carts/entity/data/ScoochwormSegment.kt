@@ -3,6 +3,7 @@ package dev.aaronhowser.mods.critter_carts.entity.data
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.getEquipmentSlot
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isItem
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.nextRange
+import dev.aaronhowser.mods.critter_carts.advancement.ModAdvancements
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormPartEntity
 import dev.aaronhowser.mods.critter_carts.entity.attachment.ScoochwormAttachment
@@ -90,6 +91,8 @@ class ScoochwormSegment {
 		attachment = newAttachment
 		bodyPart.attachmentData = attachment.syncedData
 
+		ModAdvancements.award(player, ModAdvancements.ATTACH_TO_SCOOCHWORM)
+
 		val equipSound = attachment.equipSound
 		if (equipSound != null) {
 			bodyPart.playSound(
@@ -122,6 +125,8 @@ class ScoochwormSegment {
 			bodyPart.playSound(SoundEvents.SHEEP_SHEAR, 1f, 1f)
 			bodyPart.gameEvent(GameEvent.SHEAR, player)
 			onSheared()
+
+			ModAdvancements.award(player, ModAdvancements.SPLIT_SCOOCHWORM)
 
 			val equipmentSlot = hand.getEquipmentSlot()
 			heldStack.hurtAndBreak(1, player, equipmentSlot)

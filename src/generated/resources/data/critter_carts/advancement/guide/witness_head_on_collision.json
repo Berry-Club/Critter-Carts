@@ -1,0 +1,27 @@
+{
+  "parent": "critter_carts:guide/interact_with_scoochworm",
+  "criteria": {
+    "impossible": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.critter_carts.witness_head_on_collision.desc"
+    },
+    "frame": "challenge",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:poppy"
+    },
+    "title": {
+      "translate": "advancements.critter_carts.witness_head_on_collision.title"
+    }
+  },
+  "requirements": [
+    [
+      "impossible"
+    ]
+  ],
+  "sends_telemetry_event": true
+}
