@@ -1,5 +1,6 @@
 package dev.aaronhowser.mods.critter_carts.block
 
+import dev.aaronhowser.mods.aaron.misc.AaronExtensions.roll
 import dev.aaronhowser.mods.critter_carts.entity.data.WormColor
 import dev.aaronhowser.mods.critter_carts.registry.ModBlocks
 import dev.aaronhowser.mods.critter_carts.world.DyeberryVineReplacement
@@ -69,7 +70,7 @@ class DyeberryVinesBlock : CaveVinesBlock(Properties.ofFullCopy(Blocks.CAVE_VINE
 		val vanillaState = Blocks.CAVE_VINES
 			.defaultBlockState()
 			.setValue(AGE, state.getValue(AGE) + 1)
-			.setValue(BERRIES, random.nextFloat() < BERRY_GROWTH_CHANCE)
+			.setValue(BERRIES, random.roll(BERRY_GROWTH_CHANCE))
 
 		return DyeberryVineReplacement.replace(vanillaState, random)
 	}
