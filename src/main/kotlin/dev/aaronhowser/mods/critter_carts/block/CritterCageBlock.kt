@@ -32,6 +32,7 @@ class CritterCageBlock : BaseEntityBlock(
 			stateDefinition.any()
 				.setValue(DOWN, Direction.DOWN)
 				.setValue(FORWARD, Direction.NORTH)
+				.setValue(OPEN, true)
 				.setValue(POWERED, false)
 		)
 	}
@@ -39,7 +40,7 @@ class CritterCageBlock : BaseEntityBlock(
 	override fun codec(): MapCodec<out BaseEntityBlock> = CODEC
 
 	override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block, BlockState>) {
-		builder.add(DOWN, FORWARD, POWERED)
+		builder.add(DOWN, FORWARD, OPEN, POWERED)
 	}
 
 	override fun getStateForPlacement(context: BlockPlaceContext): BlockState {
@@ -51,6 +52,7 @@ class CritterCageBlock : BaseEntityBlock(
 		return defaultBlockState()
 			.setValue(DOWN, down)
 			.setValue(FORWARD, forward)
+			.setValue(OPEN, true)
 			.setValue(POWERED, context.level.hasNeighborSignal(context.clickedPos))
 	}
 
@@ -65,6 +67,7 @@ class CritterCageBlock : BaseEntityBlock(
 		val blockEntity = level.getBlockEntity(pos)
 		if (blockEntity is CritterCageBlockEntity) {
 			blockEntity.entityData = stack.get(ModDataComponents.ENTITY_DATA)
+			level.setBlock(pos, state.setValue(OPEN, !blockEntity.hasEntity), UPDATE_CLIENTS)
 		}
 	}
 
@@ -127,6 +130,7 @@ class CritterCageBlock : BaseEntityBlock(
 		val CODEC: MapCodec<CritterCageBlock> = simpleCodec { CritterCageBlock() }
 		val DOWN: DirectionProperty = DirectionProperty.create("down")
 		val FORWARD: DirectionProperty = DirectionProperty.create("forward")
+		val OPEN: BooleanProperty = BlockStateProperties.OPEN
 		val POWERED: BooleanProperty = BlockStateProperties.POWERED
 	}
 }
