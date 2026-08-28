@@ -59,7 +59,7 @@ class ScoochwormEntity(
 	private val animatableInstanceCache = SingletonAnimatableInstanceCache(this)
 	val stemMoveControl = ScoochwormStemMoveControl(this)
 	private val movementPath = ScoochwormPath()
-	private val bodySegments = ScoochwormSegments(this)
+	private val bodySegments = ScoochwormBody(this)
 
 	private var footstepPartIndex = HEAD_FOOTSTEP_INDEX
 	private var nextFootstepTick = random.nextInt(FOOTSTEP_CYCLE_PAUSE_TICKS + 1)

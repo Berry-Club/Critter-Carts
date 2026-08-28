@@ -9,7 +9,7 @@ import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 
-class ScoochwormSegments(
+class ScoochwormBody(
 	private val scoochworm: ScoochwormEntity
 ) {
 
