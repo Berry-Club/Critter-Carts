@@ -76,10 +76,10 @@ neoForge {
 			gameDirectory = file 'runs/server'
 		}
 
-		gameTestServer {
-			type = 'gameTestServer'
-			systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
-		}
+//		gameTestServer {
+//			type = 'gameTestServer'
+//			systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+//		}
 
 		data {
 			data()
