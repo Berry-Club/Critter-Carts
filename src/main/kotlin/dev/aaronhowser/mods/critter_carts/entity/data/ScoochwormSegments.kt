@@ -3,7 +3,6 @@ package dev.aaronhowser.mods.critter_carts.entity.data
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isClientSide
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormPartEntity
-import dev.aaronhowser.mods.critter_carts.entity.attachment.data.SyncedAttachmentData
 import net.minecraft.nbt.ListTag
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
@@ -89,8 +88,7 @@ class ScoochwormSegments(
 	fun interact(
 		player: Player,
 		hand: InteractionHand,
-		partIndex: Int,
-		attachmentData: SyncedAttachmentData
+		partIndex: Int
 	): InteractionResult {
 		val heldStack = player.getItemInHand(hand)
 

@@ -227,7 +227,7 @@ class ScoochwormPartEntity(
 
 	override fun interact(player: Player, hand: InteractionHand): InteractionResult {
 		val scoochworm = getScoochworm() ?: return InteractionResult.PASS
-		return scoochworm.interactWithPart(player, hand, partIndex, attachmentData)
+		return scoochworm.interactWithPart(player, hand, partIndex)
 	}
 
 	override fun canCollideWith(entity: Entity): Boolean {
