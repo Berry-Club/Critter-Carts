@@ -429,9 +429,9 @@ class ScoochwormEntity(
 
 		private const val SEGMENTS_TAG = "Segments"
 		const val PATH_TAG = "Path"
-		private const val TRYING_TO_MOVE_TAG = "Moving"
-		private const val SUPPORT_DIRECTION_TAG = "AttachmentBottom"
-		private const val SUPPORT_POSITION_TAG = "AttachmentPosition"
+		const val TRYING_TO_MOVE_TAG = "Moving"
+		const val SUPPORT_DIRECTION_TAG = "AttachmentBottom"
+		const val SUPPORT_POSITION_TAG = "AttachmentPosition"
 		private const val COLOR_TAG = "Color"
 
 		private val DATA_SUPPORT_DIRECTION: EntityDataAccessor<Direction> =

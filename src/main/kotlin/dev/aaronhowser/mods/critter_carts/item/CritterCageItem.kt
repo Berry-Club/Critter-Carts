@@ -29,11 +29,8 @@ class CritterCageItem(block: Block, properties: Properties) : BlockItem(block, p
 		if (interactionTarget !is ScoochwormEntity || stack.has(ModDataComponents.ENTITY_DATA)) return InteractionResult.PASS
 
 		if (player.isServerSide) {
-			val wormNbt = interactionTarget.getMinimalTag(stripUniqueness = false)
-			wormNbt.remove(ScoochwormEntity.PATH_TAG)
-
 			val filledCage = stack.copy()    // So it works in creative mode
-			filledCage.set(ModDataComponents.ENTITY_DATA, CustomData.of(wormNbt))
+			filledCage.set(ModDataComponents.ENTITY_DATA, createEntityData(interactionTarget))
 			player.setItemInHand(usedHand, filledCage)
 
 			interactionTarget.discard()
@@ -45,6 +42,27 @@ class CritterCageItem(block: Block, properties: Properties) : BlockItem(block, p
 	override fun isFoil(stack: ItemStack): Boolean = stack.has(ModDataComponents.ENTITY_DATA)
 
 	companion object {
+		fun createEntityData(scoochworm: ScoochwormEntity): CustomData {
+			val wormTag = scoochworm.getMinimalTag(stripUniqueness = true)
+
+			val removeTags = listOf(
+				"UUID",
+				"Pos",
+				"Motion",
+				"Rotation",
+				ScoochwormEntity.PATH_TAG,
+				ScoochwormEntity.TRYING_TO_MOVE_TAG,
+				ScoochwormEntity.SUPPORT_DIRECTION_TAG,
+				ScoochwormEntity.SUPPORT_POSITION_TAG
+			)
+
+			for (tagName in removeTags) {
+				wormTag.remove(tagName)
+			}
+
+			return CustomData.of(wormTag)
+		}
+
 		fun placeScoochworm(
 			stack: ItemStack,
 			level: Level,

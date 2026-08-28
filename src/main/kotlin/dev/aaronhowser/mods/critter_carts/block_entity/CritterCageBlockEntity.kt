@@ -1,7 +1,6 @@
 package dev.aaronhowser.mods.critter_carts.block_entity
 
 import dev.aaronhowser.mods.aaron.block_entity.SyncingBlockEntity
-import dev.aaronhowser.mods.aaron.misc.AaronExtensions.getMinimalTag
 import dev.aaronhowser.mods.critter_carts.block.CritterCageBlock
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity
 import dev.aaronhowser.mods.critter_carts.item.CritterCageItem
@@ -64,9 +63,7 @@ class CritterCageBlockEntity(
 		val level = level ?: return false
 		if (level.isClientSide || hasEntity || !blockState.getValue(CritterCageBlock.OPEN)) return false
 
-		val wormTag = scoochworm.getMinimalTag(stripUniqueness = false)
-		wormTag.remove(ScoochwormEntity.PATH_TAG)
-		entityData = CustomData.of(wormTag)
+		entityData = CritterCageItem.createEntityData(scoochworm)
 		level.setBlock(
 			blockPos,
 			blockState.setValue(CritterCageBlock.OPEN, false),
