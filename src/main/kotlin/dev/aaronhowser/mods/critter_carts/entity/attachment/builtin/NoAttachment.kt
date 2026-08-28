@@ -29,7 +29,11 @@ class NoAttachment : ScoochwormAttachment(ItemStack.EMPTY) {
 		return AttachmentInteractionResult.Install(attachmentItem)
 	}
 
-	override fun predictInteraction(player: Player, heldStack: ItemStack): InteractionResult {
+	override fun predictInteraction(
+		player: Player,
+		heldStack: ItemStack,
+		bodyPart: ScoochwormPartEntity
+	): InteractionResult {
 		return if (canAttach(heldStack)) InteractionResult.SUCCESS else InteractionResult.PASS
 	}
 }

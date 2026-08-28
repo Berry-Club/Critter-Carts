@@ -34,8 +34,8 @@ object ModScoochwormAttachmentTypes {
 		register("none") {
 			ScoochwormAttachmentType(
 				streamCodec = NoAttachmentData.STREAM_CODEC,
-				itemPredicate = { false },
-				attachmentFactory = { NoAttachment() }
+				matchesItem = { false },
+				createFromItem = { NoAttachment() }
 			)
 		}
 
@@ -43,8 +43,8 @@ object ModScoochwormAttachmentTypes {
 		register("lockbox") {
 			ScoochwormAttachmentType(
 				streamCodec = LockboxAttachmentData.STREAM_CODEC,
-				itemPredicate = { itemStack -> itemStack.isItem(ModItems.LOCKBOX) },
-				attachmentFactory = ::LockboxAttachment
+				matchesItem = { itemStack -> itemStack.isItem(ModItems.LOCKBOX) },
+				createFromItem = ::LockboxAttachment
 			)
 		}
 
@@ -52,10 +52,10 @@ object ModScoochwormAttachmentTypes {
 		register("saddle") {
 			ScoochwormAttachmentType(
 				streamCodec = SaddleAttachmentData.STREAM_CODEC,
-				itemPredicate = { itemStack ->
+				matchesItem = { itemStack ->
 					itemStack.isItem(ModItemTagsProvider.SCOOCHWORM_SADDLES)
 				},
-				attachmentFactory = ::SaddleAttachment
+				createFromItem = ::SaddleAttachment
 			)
 		}
 

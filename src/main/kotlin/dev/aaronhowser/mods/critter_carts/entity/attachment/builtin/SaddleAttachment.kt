@@ -28,7 +28,11 @@ class SaddleAttachment(
 		return AttachmentInteractionResult.Consume
 	}
 
-	override fun predictInteraction(player: Player, heldStack: ItemStack): InteractionResult {
+	override fun predictInteraction(
+		player: Player,
+		heldStack: ItemStack,
+		bodyPart: ScoochwormPartEntity
+	): InteractionResult {
 		return if (player.isShiftKeyDown) InteractionResult.PASS else InteractionResult.SUCCESS
 	}
 }

@@ -29,10 +29,11 @@ abstract class ScoochwormAttachment(
 		bodyPart: ScoochwormPartEntity
 	): AttachmentInteractionResult
 
-	abstract fun predictInteraction(
+	open fun predictInteraction(
 		player: Player,
-		heldStack: ItemStack
-	): InteractionResult
+		heldStack: ItemStack,
+		bodyPart: ScoochwormPartEntity
+	): InteractionResult = InteractionResult.SUCCESS
 
 	open fun clientTick(bodyPart: ScoochwormPartEntity) {}
 
@@ -70,7 +71,7 @@ abstract class ScoochwormAttachment(
 			itemStack: ItemStack
 		): ScoochwormAttachment {
 			for (type in ModScoochwormAttachmentTypes.REGISTRY) {
-				val attachment = type.createAttachment(itemStack)
+				val attachment = type.create(itemStack)
 				if (attachment != null) return attachment
 			}
 
@@ -79,14 +80,14 @@ abstract class ScoochwormAttachment(
 
 		fun canAttach(itemStack: ItemStack): Boolean {
 			for (type in ModScoochwormAttachmentTypes.REGISTRY) {
-				if (type.accepts(itemStack)) return true
+				if (type.matches(itemStack)) return true
 			}
 
 			return false
 		}
 
 		fun createClient(data: SyncedAttachmentData): ScoochwormAttachment {
-			return data.getType().createClientAttachment(data)
+			return data.resolveType().createClientAttachment(data)
 		}
 
 		fun load(tag: CompoundTag): ScoochwormAttachment {
@@ -97,6 +98,5 @@ abstract class ScoochwormAttachment(
 
 			return fromItemStack(itemStack)
 		}
-
 	}
 }

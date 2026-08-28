@@ -217,17 +217,18 @@ class ScoochwormSegment {
 	}
 
 	fun predictInteraction(player: Player, heldStack: ItemStack): InteractionResult {
-			if (heldStack.isItem(Items.SHEARS)) return InteractionResult.SUCCESS
+		if (heldStack.isItem(Items.SHEARS)) return InteractionResult.SUCCESS
 
-			if (
-				attachment !is NoAttachment
-				&& player.isShiftKeyDown
-				&& heldStack.isEmpty
-			) {
-				return InteractionResult.SUCCESS
-			}
+		if (
+			attachment !is NoAttachment
+			&& player.isShiftKeyDown
+			&& heldStack.isEmpty
+		) {
+			return InteractionResult.SUCCESS
+		}
 
-			return attachment.predictInteraction(player, heldStack)
+		val bodyPart = bodyPart ?: return InteractionResult.PASS
+		return attachment.predictInteraction(player, heldStack, bodyPart)
 	}
 
 	companion object {

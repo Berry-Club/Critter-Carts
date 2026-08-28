@@ -10,7 +10,7 @@ interface SyncedAttachmentData {
 
 	val typeId: ResourceLocation
 
-	fun getType(): ScoochwormAttachmentType<*> {
+	fun resolveType(): ScoochwormAttachmentType<*> {
 		return ModScoochwormAttachmentTypes.REGISTRY.get(typeId)
 			?: error("Unknown attachment data type: $typeId")
 	}
@@ -27,7 +27,7 @@ interface SyncedAttachmentData {
 
 			override fun encode(buffer: ByteBuf, data: SyncedAttachmentData) {
 				ResourceLocation.STREAM_CODEC.encode(buffer, data.typeId)
-				data.getType().encode(buffer, data)
+				data.resolveType().encode(buffer, data)
 			}
 		}
 	}

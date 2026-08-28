@@ -8,21 +8,21 @@ import net.minecraft.world.item.ItemStack
 
 class ScoochwormAttachmentType<T : SyncedAttachmentData>(
 	private val streamCodec: StreamCodec<ByteBuf, T>,
-	private val itemPredicate: (ItemStack) -> Boolean,
-	private val attachmentFactory: (ItemStack) -> ScoochwormAttachment
+	private val matchesItem: (ItemStack) -> Boolean,
+	private val createFromItem: (ItemStack) -> ScoochwormAttachment
 ) {
-	fun createAttachment(itemStack: ItemStack): ScoochwormAttachment? {
-		if (!itemPredicate(itemStack)) return null
-		return attachmentFactory(itemStack)
+	fun create(itemStack: ItemStack): ScoochwormAttachment? {
+		if (!matches(itemStack)) return null
+		return createFromItem(itemStack)
 	}
 
-	fun accepts(itemStack: ItemStack): Boolean {
-		return itemPredicate(itemStack)
+	fun matches(itemStack: ItemStack): Boolean {
+		return matchesItem(itemStack)
 	}
 
 	@Suppress("UNCHECKED_CAST")
 	fun createClientAttachment(data: SyncedAttachmentData): ScoochwormAttachment {
-		val attachment = attachmentFactory(ItemStack.EMPTY)
+		val attachment = createFromItem(ItemStack.EMPTY)
 		attachment.applySyncedData(data as T)
 		return attachment
 	}
