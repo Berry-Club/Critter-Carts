@@ -81,7 +81,7 @@ class CritterCageBlock : Block(
 		}
 
 		if (!level.isClientSide) {
-			blockEntity.tryRelease(player)
+			blockEntity.tryRelease()
 		}
 
 		return InteractionResult.sidedSuccess(level.isClientSide)
@@ -103,7 +103,7 @@ class CritterCageBlock : Block(
 
 		val blockEntity = level.getBlockEntity(pos)
 		if (blockEntity is CritterCageBlockEntity) {
-			blockEntity.tryRelease(null)
+			blockEntity.tryRelease()
 		}
 	}
 

@@ -11,7 +11,6 @@ import net.minecraft.core.BlockPos
 import net.minecraft.core.HolderLookup
 import net.minecraft.core.component.DataComponentMap
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.component.CustomData
 import net.minecraft.world.level.Level
@@ -24,6 +23,7 @@ class CritterCageBlockEntity(
 ) : SyncingBlockEntity(ModBlockEntityTypes.CRITTER_CAGE.get(), pos, state) {
 
 	override val syncImmediately: Boolean = true
+
 	private var cachedEntityData: CustomData? = null
 	private var cachedEntityLevel: Level? = null
 	private var cachedScoochworm: ScoochwormEntity? = null
@@ -74,7 +74,7 @@ class CritterCageBlockEntity(
 		return true
 	}
 
-	fun tryRelease(player: Player?): Boolean {
+	fun tryRelease(): Boolean {
 		val level = level ?: return false
 		val data = storedEntityData ?: return false
 		val forward = blockState.getValue(CritterCageBlock.FORWARD)
@@ -87,9 +87,7 @@ class CritterCageBlockEntity(
 			stack,
 			level,
 			spawnPos,
-			blockPos,
-			forward,
-			player
+			forward
 		) ?: return false
 
 		if (!level.noCollision(worm)) {
@@ -97,12 +95,16 @@ class CritterCageBlockEntity(
 			return false
 		}
 
+		worm.isTryingToMove = true
+
 		storedEntityData = null
+
 		level.setBlock(
 			blockPos,
 			blockState.setValue(CritterCageBlock.OPEN, true),
 			Block.UPDATE_CLIENTS
 		)
+
 		return true
 	}
 

@@ -67,9 +67,7 @@ class CritterCageItem(block: Block, properties: Properties) : BlockItem(block, p
 			stack: ItemStack,
 			level: Level,
 			spawnPos: BlockPos,
-			clickedPos: BlockPos,
-			clickedFace: Direction,
-			player: Player?
+			facingDirection: Direction
 		): ScoochwormEntity? {
 			val entityData = stack.get(ModDataComponents.ENTITY_DATA) ?: return null
 			val entity = ScoochwormEntity(ModEntityTypes.SCOOCHWORM.get(), level)
@@ -78,9 +76,8 @@ class CritterCageItem(block: Block, properties: Properties) : BlockItem(block, p
 			ScoochwormEntity.finishPlacement(
 				entity,
 				level,
-				clickedPos,
-				clickedFace,
-				player
+				spawnPos,
+				facingDirection
 			)
 			level.addFreshEntity(entity)
 			return entity

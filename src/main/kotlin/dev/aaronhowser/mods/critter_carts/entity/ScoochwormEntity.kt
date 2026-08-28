@@ -553,6 +553,28 @@ class ScoochwormEntity(
 			worm.yHeadRot = rotation
 		}
 
+		fun finishPlacement(
+			worm: ScoochwormEntity,
+			level: Level,
+			spawnPosition: BlockPos,
+			facingDirection: Direction
+		) {
+			for (supportDirection in Direction.entries) {
+				val supportPosition = spawnPosition.relative(supportDirection)
+				val attachmentFace = supportDirection.opposite
+				if (!canAttachTo(worm, level, supportPosition, attachmentFace)) continue
+
+				worm.attachToSupport(supportPosition, supportDirection)
+				break
+			}
+
+			val rotation = getMovementYaw(facingDirection, worm.supportDirection)
+			worm.yRot = rotation
+			worm.yRotO = rotation
+			worm.yBodyRot = rotation
+			worm.yHeadRot = rotation
+		}
+
 		private fun canAttachTo(
 			worm: ScoochwormEntity,
 			level: Level,
