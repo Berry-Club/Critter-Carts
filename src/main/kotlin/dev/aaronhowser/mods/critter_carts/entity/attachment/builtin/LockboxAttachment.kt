@@ -2,7 +2,6 @@ package dev.aaronhowser.mods.critter_carts.entity.attachment.builtin
 
 import dev.aaronhowser.mods.critter_carts.config.ServerConfig
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormPartEntity
-import dev.aaronhowser.mods.critter_carts.entity.attachment.AttachmentInteractionResult
 import dev.aaronhowser.mods.critter_carts.entity.attachment.ScoochwormAttachment
 import dev.aaronhowser.mods.critter_carts.entity.attachment.data.LockboxAttachmentData
 import dev.aaronhowser.mods.critter_carts.entity.attachment.data.SyncedAttachmentData
@@ -13,6 +12,7 @@ import net.minecraft.sounds.SoundEvents
 import net.minecraft.sounds.SoundSource
 import net.minecraft.world.SimpleContainer
 import net.minecraft.world.SimpleMenuProvider
+import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.inventory.ChestMenu
@@ -30,7 +30,6 @@ class LockboxAttachment(
 		get() = LockboxAttachmentData(openers > 0)
 	override val equipSound: SoundEvent = SoundEvents.DONKEY_CHEST
 
-	private var bodyPart: ScoochwormPartEntity? = null
 	private var openers = 0
 	private var upsideDownTicks = 0
 	private var previousShouldOpen: Boolean? = null
@@ -45,13 +44,11 @@ class LockboxAttachment(
 		override fun startOpen(player: Player) {
 			super.startOpen(player)
 			openers++
-			updateOpenState()
 		}
 
 		override fun stopOpen(player: Player) {
 			super.stopOpen(player)
 			if (openers > 0) openers--
-			updateOpenState()
 		}
 	}
 
@@ -73,9 +70,7 @@ class LockboxAttachment(
 		player: Player,
 		heldStack: ItemStack,
 		bodyPart: ScoochwormPartEntity
-	): AttachmentInteractionResult {
-		this.bodyPart = bodyPart
-
+	): InteractionResult {
 		val menuProvider = SimpleMenuProvider(
 			{ containerId, playerInventory, _ ->
 				ChestMenu(
@@ -90,7 +85,7 @@ class LockboxAttachment(
 		)
 
 		player.openMenu(menuProvider)
-		return AttachmentInteractionResult.Consume
+		return InteractionResult.CONSUME
 	}
 
 	override fun synchronizeItemStack() {
@@ -119,8 +114,7 @@ class LockboxAttachment(
 	}
 
 	override fun serverTick(bodyPart: ScoochwormPartEntity) {
-		this.bodyPart = bodyPart
-		updateOpenState()
+		bodyPart.attachmentData = syncedData
 
 		if (bodyPart.supportDirection != Direction.UP) {
 			upsideDownTicks = 0
@@ -142,10 +136,6 @@ class LockboxAttachment(
 	private fun updateItemContents() {
 		val contents = ItemContainerContents.fromItems(container.items)
 		itemStack.set(DataComponents.CONTAINER, contents)
-	}
-
-	private fun updateOpenState() {
-		bodyPart?.attachmentData = syncedData
 	}
 
 	private fun playOpenSound(bodyPart: ScoochwormPartEntity, isOpening: Boolean) {

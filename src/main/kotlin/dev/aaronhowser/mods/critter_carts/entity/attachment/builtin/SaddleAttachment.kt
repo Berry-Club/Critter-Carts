@@ -1,7 +1,6 @@
 package dev.aaronhowser.mods.critter_carts.entity.attachment.builtin
 
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormPartEntity
-import dev.aaronhowser.mods.critter_carts.entity.attachment.AttachmentInteractionResult
 import dev.aaronhowser.mods.critter_carts.entity.attachment.ScoochwormAttachment
 import dev.aaronhowser.mods.critter_carts.entity.attachment.data.SaddleAttachmentData
 import dev.aaronhowser.mods.critter_carts.entity.attachment.data.SyncedAttachmentData
@@ -22,10 +21,10 @@ class SaddleAttachment(
 		player: Player,
 		heldStack: ItemStack,
 		bodyPart: ScoochwormPartEntity
-	): AttachmentInteractionResult {
-		if (player.isShiftKeyDown) return AttachmentInteractionResult.Pass
-		if (!player.startRiding(bodyPart)) return AttachmentInteractionResult.Pass
-		return AttachmentInteractionResult.Consume
+	): InteractionResult {
+		if (player.isShiftKeyDown) return InteractionResult.PASS
+		if (!player.startRiding(bodyPart)) return InteractionResult.PASS
+		return InteractionResult.CONSUME
 	}
 
 	override fun predictInteraction(

@@ -23,11 +23,11 @@ abstract class ScoochwormAttachment(
 	abstract val equipSound: SoundEvent?
 	open val itemHandler: IItemHandler? = null
 
-	abstract fun interact(
+	open fun interact(
 		player: Player,
 		heldStack: ItemStack,
 		bodyPart: ScoochwormPartEntity
-	): AttachmentInteractionResult
+	): InteractionResult = InteractionResult.PASS
 
 	open fun predictInteraction(
 		player: Player,

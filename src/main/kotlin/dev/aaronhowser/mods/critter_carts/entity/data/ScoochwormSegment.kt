@@ -5,7 +5,6 @@ import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isItem
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.nextRange
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormEntity
 import dev.aaronhowser.mods.critter_carts.entity.ScoochwormPartEntity
-import dev.aaronhowser.mods.critter_carts.entity.attachment.AttachmentInteractionResult
 import dev.aaronhowser.mods.critter_carts.entity.attachment.ScoochwormAttachment
 import dev.aaronhowser.mods.critter_carts.entity.attachment.builtin.LockboxAttachment
 import dev.aaronhowser.mods.critter_carts.entity.attachment.builtin.NoAttachment
@@ -81,17 +80,27 @@ class ScoochwormSegment {
 		itemStack: ItemStack,
 		player: Player,
 		bodyPart: ScoochwormPartEntity
-	) {
-		attachment = ScoochwormAttachment.fromItemStack(itemStack)
+	): Boolean {
+		val attachmentItem = itemStack.copy()
+		attachmentItem.count = 1
+
+		val newAttachment = ScoochwormAttachment.fromItemStack(attachmentItem)
+		if (newAttachment is NoAttachment) return false
+
+		attachment = newAttachment
 		bodyPart.attachmentData = attachment.syncedData
 
-		val equipSound = attachment.equipSound ?: return
-		bodyPart.playSound(
-			equipSound,
-			1f,
-			bodyPart.random.nextRange(0.8f, 1.2f)
-		)
+		val equipSound = attachment.equipSound
+		if (equipSound != null) {
+			bodyPart.playSound(
+				equipSound,
+				1f,
+				bodyPart.random.nextRange(0.8f, 1.2f)
+			)
+		}
 		bodyPart.gameEvent(GameEvent.EQUIP, player)
+
+		return true
 	}
 
 	private fun removeAttachment(): ItemStack {
@@ -139,17 +148,14 @@ class ScoochwormSegment {
 			return InteractionResult.CONSUME
 		}
 
-		return when (val result = attachment.interact(player, heldStack, bodyPart)) {
-			AttachmentInteractionResult.Pass -> InteractionResult.PASS
-			AttachmentInteractionResult.Consume -> InteractionResult.CONSUME
+		if (attachment is NoAttachment) {
+			if (!installAttachment(heldStack, player, bodyPart)) return InteractionResult.PASS
 
-			is AttachmentInteractionResult.Install -> {
-				// Store a single-item copy in the attachment before consuming the held stack.
-				installAttachment(result.itemStack, player, bodyPart)
-				heldStack.consume(1, player)
-				InteractionResult.CONSUME
-			}
+			heldStack.consume(1, player)
+			return InteractionResult.CONSUME
 		}
+
+		return attachment.interact(player, heldStack, bodyPart)
 	}
 
 	fun dropAttachmentItem(entity: Entity) {
@@ -218,10 +224,16 @@ class ScoochwormSegment {
 
 	fun predictInteraction(player: Player, heldStack: ItemStack): InteractionResult {
 		if (heldStack.isItem(Items.SHEARS)) return InteractionResult.SUCCESS
+		if (attachment is NoAttachment) {
+			return if (ScoochwormAttachment.canAttach(heldStack)) {
+				InteractionResult.SUCCESS
+			} else {
+				InteractionResult.PASS
+			}
+		}
 
 		if (
-			attachment !is NoAttachment
-			&& player.isShiftKeyDown
+			player.isShiftKeyDown
 			&& heldStack.isEmpty
 		) {
 			return InteractionResult.SUCCESS
