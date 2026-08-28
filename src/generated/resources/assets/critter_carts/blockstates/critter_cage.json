@@ -21,12 +21,10 @@
       "y": 90
     },
     "down=down,forward=east,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
-      "y": 90
+      "model": "critter_carts:block/critter_cage_open_down_east"
     },
     "down=down,forward=east,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
-      "y": 90
+      "model": "critter_carts:block/critter_cage_open_down_east"
     },
     "down=down,forward=north,open=false,powered=false": {
       "model": "critter_carts:block/critter_cage_block"
@@ -35,10 +33,10 @@
       "model": "critter_carts:block/critter_cage_block"
     },
     "down=down,forward=north,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block"
+      "model": "critter_carts:block/critter_cage_open_down_north"
     },
     "down=down,forward=north,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block"
+      "model": "critter_carts:block/critter_cage_open_down_north"
     },
     "down=down,forward=south,open=false,powered=false": {
       "model": "critter_carts:block/critter_cage_block",
@@ -49,12 +47,10 @@
       "y": 180
     },
     "down=down,forward=south,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
-      "y": 180
+      "model": "critter_carts:block/critter_cage_open_down_south"
     },
     "down=down,forward=south,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
-      "y": 180
+      "model": "critter_carts:block/critter_cage_open_down_south"
     },
     "down=down,forward=up,open=false,powered=false": {
       "model": "critter_carts:block/critter_cage_block"
@@ -77,12 +73,10 @@
       "y": 270
     },
     "down=down,forward=west,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
-      "y": 270
+      "model": "critter_carts:block/critter_cage_open_down_west"
     },
     "down=down,forward=west,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
-      "y": 270
+      "model": "critter_carts:block/critter_cage_open_down_west"
     },
     "down=east,forward=down,open=false,powered=false": {
       "model": "critter_carts:block/critter_cage_block",
@@ -95,14 +89,10 @@
       "y": 90
     },
     "down=east,forward=down,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
-      "x": 90,
-      "y": 90
+      "model": "critter_carts:block/critter_cage_open_east_down"
     },
     "down=east,forward=down,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
-      "x": 90,
-      "y": 90
+      "model": "critter_carts:block/critter_cage_open_east_down"
     },
     "down=east,forward=east,open=false,powered=false": {
       "model": "critter_carts:block/critter_cage_block",
@@ -135,14 +125,10 @@
       "y": 90
     },
     "down=east,forward=north,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
-      "x": 90,
-      "y": 90
+      "model": "critter_carts:block/critter_cage_open_east_north"
     },
     "down=east,forward=north,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
-      "x": 90,
-      "y": 90
+      "model": "critter_carts:block/critter_cage_open_east_north"
     },
     "down=east,forward=south,open=false,powered=false": {
       "model": "critter_carts:block/critter_cage_block",
@@ -155,14 +141,10 @@
       "y": 90
     },
     "down=east,forward=south,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
-      "x": 90,
-      "y": 90
+      "model": "critter_carts:block/critter_cage_open_east_south"
     },
     "down=east,forward=south,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
-      "x": 90,
-      "y": 90
+      "model": "critter_carts:block/critter_cage_open_east_south"
     },
     "down=east,forward=up,open=false,powered=false": {
       "model": "critter_carts:block/critter_cage_block",
@@ -175,14 +157,10 @@
       "y": 90
     },
     "down=east,forward=up,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
-      "x": 90,
-      "y": 90
+      "model": "critter_carts:block/critter_cage_open_east_up"
     },
     "down=east,forward=up,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
-      "x": 90,
-      "y": 90
+      "model": "critter_carts:block/critter_cage_open_east_up"
     },
     "down=east,forward=west,open=false,powered=false": {
       "model": "critter_carts:block/critter_cage_block",
@@ -213,12 +191,10 @@
       "x": 90
     },
     "down=north,forward=down,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
-      "x": 90
+      "model": "critter_carts:block/critter_cage_open_north_down"
     },
     "down=north,forward=down,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
-      "x": 90
+      "model": "critter_carts:block/critter_cage_open_north_down"
     },
     "down=north,forward=east,open=false,powered=false": {
       "model": "critter_carts:block/critter_cage_block",
@@ -229,12 +205,10 @@
       "x": 90
     },
     "down=north,forward=east,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
-      "x": 90
+      "model": "critter_carts:block/critter_cage_open_north_east"
     },
     "down=north,forward=east,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
-      "x": 90
+      "model": "critter_carts:block/critter_cage_open_north_east"
     },
     "down=north,forward=north,open=false,powered=false": {
       "model": "critter_carts:block/critter_cage_block",
@@ -277,12 +251,10 @@
       "x": 90
     },
     "down=north,forward=up,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
-      "x": 90
+      "model": "critter_carts:block/critter_cage_open_north_up"
     },
     "down=north,forward=up,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
-      "x": 90
+      "model": "critter_carts:block/critter_cage_open_north_up"
     },
     "down=north,forward=west,open=false,powered=false": {
       "model": "critter_carts:block/critter_cage_block",
@@ -293,12 +265,10 @@
       "x": 90
     },
     "down=north,forward=west,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
-      "x": 90
+      "model": "critter_carts:block/critter_cage_open_north_west"
     },
     "down=north,forward=west,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
-      "x": 90
+      "model": "critter_carts:block/critter_cage_open_north_west"
     },
     "down=south,forward=down,open=false,powered=false": {
       "model": "critter_carts:block/critter_cage_block",
@@ -311,14 +281,10 @@
       "y": 180
     },
     "down=south,forward=down,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
-      "x": 90,
-      "y": 180
+      "model": "critter_carts:block/critter_cage_open_south_down"
     },
     "down=south,forward=down,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
-      "x": 90,
-      "y": 180
+      "model": "critter_carts:block/critter_cage_open_south_down"
     },
     "down=south,forward=east,open=false,powered=false": {
       "model": "critter_carts:block/critter_cage_block",
@@ -331,14 +297,10 @@
       "y": 180
     },
     "down=south,forward=east,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
-      "x": 90,
-      "y": 180
+      "model": "critter_carts:block/critter_cage_open_south_east"
     },
     "down=south,forward=east,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
-      "x": 90,
-      "y": 180
+      "model": "critter_carts:block/critter_cage_open_south_east"
     },
     "down=south,forward=north,open=false,powered=false": {
       "model": "critter_carts:block/critter_cage_block",
@@ -391,14 +353,10 @@
       "y": 180
     },
     "down=south,forward=up,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
-      "x": 90,
-      "y": 180
+      "model": "critter_carts:block/critter_cage_open_south_up"
     },
     "down=south,forward=up,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
-      "x": 90,
-      "y": 180
+      "model": "critter_carts:block/critter_cage_open_south_up"
     },
     "down=south,forward=west,open=false,powered=false": {
       "model": "critter_carts:block/critter_cage_block",
@@ -411,14 +369,10 @@
       "y": 180
     },
     "down=south,forward=west,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
-      "x": 90,
-      "y": 180
+      "model": "critter_carts:block/critter_cage_open_south_west"
     },
     "down=south,forward=west,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
-      "x": 90,
-      "y": 180
+      "model": "critter_carts:block/critter_cage_open_south_west"
     },
     "down=up,forward=down,open=false,powered=false": {
       "model": "critter_carts:block/critter_cage_block",
@@ -451,14 +405,10 @@
       "y": 270
     },
     "down=up,forward=east,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
-      "x": 180,
-      "y": 270
+      "model": "critter_carts:block/critter_cage_open_up_east"
     },
     "down=up,forward=east,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
-      "x": 180,
-      "y": 270
+      "model": "critter_carts:block/critter_cage_open_up_east"
     },
     "down=up,forward=north,open=false,powered=false": {
       "model": "critter_carts:block/critter_cage_block",
@@ -471,14 +421,10 @@
       "y": 180
     },
     "down=up,forward=north,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
-      "x": 180,
-      "y": 180
+      "model": "critter_carts:block/critter_cage_open_up_north"
     },
     "down=up,forward=north,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
-      "x": 180,
-      "y": 180
+      "model": "critter_carts:block/critter_cage_open_up_north"
     },
     "down=up,forward=south,open=false,powered=false": {
       "model": "critter_carts:block/critter_cage_block",
@@ -489,12 +435,10 @@
       "x": 180
     },
     "down=up,forward=south,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
-      "x": 180
+      "model": "critter_carts:block/critter_cage_open_up_south"
     },
     "down=up,forward=south,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
-      "x": 180
+      "model": "critter_carts:block/critter_cage_open_up_south"
     },
     "down=up,forward=up,open=false,powered=false": {
       "model": "critter_carts:block/critter_cage_block",
@@ -527,14 +471,10 @@
       "y": 90
     },
     "down=up,forward=west,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
-      "x": 180,
-      "y": 90
+      "model": "critter_carts:block/critter_cage_open_up_west"
     },
     "down=up,forward=west,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
-      "x": 180,
-      "y": 90
+      "model": "critter_carts:block/critter_cage_open_up_west"
     },
     "down=west,forward=down,open=false,powered=false": {
       "model": "critter_carts:block/critter_cage_block",
@@ -547,14 +487,10 @@
       "y": 270
     },
     "down=west,forward=down,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
-      "x": 90,
-      "y": 270
+      "model": "critter_carts:block/critter_cage_open_west_down"
     },
     "down=west,forward=down,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
-      "x": 90,
-      "y": 270
+      "model": "critter_carts:block/critter_cage_open_west_down"
     },
     "down=west,forward=east,open=false,powered=false": {
       "model": "critter_carts:block/critter_cage_block",
@@ -587,14 +523,10 @@
       "y": 270
     },
     "down=west,forward=north,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
-      "x": 90,
-      "y": 270
+      "model": "critter_carts:block/critter_cage_open_west_north"
     },
     "down=west,forward=north,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
-      "x": 90,
-      "y": 270
+      "model": "critter_carts:block/critter_cage_open_west_north"
     },
     "down=west,forward=south,open=false,powered=false": {
       "model": "critter_carts:block/critter_cage_block",
@@ -607,14 +539,10 @@
       "y": 270
     },
     "down=west,forward=south,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
-      "x": 90,
-      "y": 270
+      "model": "critter_carts:block/critter_cage_open_west_south"
     },
     "down=west,forward=south,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
-      "x": 90,
-      "y": 270
+      "model": "critter_carts:block/critter_cage_open_west_south"
     },
     "down=west,forward=up,open=false,powered=false": {
       "model": "critter_carts:block/critter_cage_block",
@@ -627,14 +555,10 @@
       "y": 270
     },
     "down=west,forward=up,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
-      "x": 90,
-      "y": 270
+      "model": "critter_carts:block/critter_cage_open_west_up"
     },
     "down=west,forward=up,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
-      "x": 90,
-      "y": 270
+      "model": "critter_carts:block/critter_cage_open_west_up"
     },
     "down=west,forward=west,open=false,powered=false": {
       "model": "critter_carts:block/critter_cage_block",
