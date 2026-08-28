@@ -33,7 +33,7 @@ class ScoochwormTravelGoal(
 		val direction = getMovementDirection(support.supportDirection)
 		val destination = chooseNextSupport(support, direction)
 		if (destination == null) {
-			tryEnterCage(support, direction)
+			tryEnterCage(direction)
 			return false
 		}
 
@@ -82,7 +82,7 @@ class ScoochwormTravelGoal(
 		if (followingSupport == null) {
 			nextSupport = null
 			scoochworm.deltaMovement = Vec3.ZERO
-			tryEnterCage(destination, direction)
+			tryEnterCage(direction)
 			return
 		}
 
@@ -144,8 +144,9 @@ class ScoochwormTravelGoal(
 			?: tryTurnDownwards(support, forward)
 	}
 
-	private fun tryEnterCage(support: ScoochwormSupport, forward: Direction): Boolean {
-		val cagePosition = support.supportPosition.relative(forward)
+	private fun tryEnterCage(forward: Direction): Boolean {
+		val wormCenter = scoochworm.position().add(0.0, ScoochwormEntity.SIZE / 2.0, 0.0)
+		val cagePosition = BlockPos.containing(wormCenter).relative(forward)
 		val level = scoochworm.level()
 		val cageState = level.getBlockState(cagePosition)
 		if (cageState.block !is CritterCageBlock) return false
