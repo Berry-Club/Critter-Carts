@@ -35,7 +35,6 @@ class CritterCageBlockEntity(
 			cachedEntityLevel = null
 			cachedScoochworm = null
 			setChanged()
-			level?.sendBlockUpdated(blockPos, blockState, blockState, 3)
 		}
 
 	val hasEntity: Boolean
@@ -123,6 +122,8 @@ class CritterCageBlockEntity(
 
 	override fun saveAdditional(tag: CompoundTag, registries: HolderLookup.Provider) {
 		super.saveAdditional(tag, registries)
+		tag.putBoolean(HAS_ENTITY_TAG, hasEntity)
+
 		val data = storedEntityData ?: return
 		tag.put(ENTITY_DATA_TAG, data.copyTag())
 	}
@@ -137,6 +138,7 @@ class CritterCageBlockEntity(
 	}
 
 	companion object {
+		private const val HAS_ENTITY_TAG = "HasEntity"
 		private const val ENTITY_DATA_TAG = "EntityData"
 	}
 }
