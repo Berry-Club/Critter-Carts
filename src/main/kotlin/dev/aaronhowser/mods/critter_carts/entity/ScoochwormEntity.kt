@@ -204,6 +204,9 @@ class ScoochwormEntity(
 		val growResult = tryGrow(player, heldStack)
 		if (growResult != null) return growResult
 
+		val dyeResult = tryDye(player, heldStack)
+		if (dyeResult != null) return dyeResult
+
 		if (!player.isSecondaryUseActive) {
 			isTryingToMove = !isTryingToMove
 			if (!isTryingToMove) deltaMovement = Vec3.ZERO
@@ -224,23 +227,12 @@ class ScoochwormEntity(
 		val growResult = tryGrow(player, heldStack)
 		if (growResult != null) return growResult
 
+		val dyeResult = tryDye(player, heldStack)
+		if (dyeResult != null) return dyeResult
+
 		if (heldStack.isItem(Items.SHEARS)) {
 			if (partIndex == null || !bodySegments.canSplitAt(partIndex)) {
 				return InteractionResult.PASS
-			}
-		}
-
-		if (heldStack.has(ModDataComponents.WORM_COLOR)) {
-			val newColor = heldStack.getOrDefault(ModDataComponents.WORM_COLOR, WormColor.GREEN)
-			if (newColor != color) {
-				if (isServerSide) {
-					color = newColor
-					heldStack.consume(1, player)
-
-					ModAdvancements.trigger(player, ModAdvancements.DYE_SCOOCHWORM)
-				}
-
-				return InteractionResult.sidedSuccess(isClientSide)
 			}
 		}
 
@@ -266,6 +258,22 @@ class ScoochwormEntity(
 
 			playSound(SoundEvents.GENERIC_EAT, 1f, 1f)
 			gameEvent(GameEvent.EAT, player)
+		}
+
+		return InteractionResult.sidedSuccess(isClientSide)
+	}
+
+	private fun tryDye(player: Player, heldStack: ItemStack): InteractionResult? {
+		if (!heldStack.has(ModDataComponents.WORM_COLOR)) return null
+
+		val newColor = heldStack.getOrDefault(ModDataComponents.WORM_COLOR, WormColor.GREEN)
+		if (newColor == color) return InteractionResult.PASS
+
+		if (isServerSide) {
+			color = newColor
+			heldStack.consume(1, player)
+
+			ModAdvancements.trigger(player, ModAdvancements.DYE_SCOOCHWORM)
 		}
 
 		return InteractionResult.sidedSuccess(isClientSide)
