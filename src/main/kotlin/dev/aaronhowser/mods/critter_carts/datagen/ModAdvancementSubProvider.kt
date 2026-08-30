@@ -112,7 +112,7 @@ class ModAdvancementSubProvider(
 				Items.POPPY,
 				ModAdvancementLang.WITNESS_HEAD_ON_COLLISION_TITLE.toComponent(),
 				ModAdvancementLang.WITNESS_HEAD_ON_COLLISION_DESC.toComponent(),
-				type = AdvancementType.GOAL
+				type = AdvancementType.CHALLENGE
 			)
 			.addCriterion(
 				"witness_head_on_collision",
