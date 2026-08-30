@@ -312,13 +312,13 @@ class ScoochwormEntity(
 		if (entity is ItemEntity) return
 
 		if (entity is ScoochwormEntity) {
-			awardHeadOnCollisionAdvancement(entity)
+			kiss(entity)
 		}
 
 		super.doPush(entity)
 	}
 
-	private fun awardHeadOnCollisionAdvancement(other: ScoochwormEntity) {
+	private fun kiss(other: ScoochwormEntity) {
 		if (isClientSide) return
 
 		val movement = rememberedMovementDirection ?: return
@@ -328,6 +328,10 @@ class ScoochwormEntity(
 		val directionToOther = position().vectorTo(other.position()).normalize()
 		if (movement.normalize().dot(directionToOther) < HEAD_ON_ALIGNMENT_DOT) return
 		if (otherMovement.normalize().dot(directionToOther.reverse()) < HEAD_ON_ALIGNMENT_DOT) return
+
+		if (uuid < other.uuid) {
+			playSound(ModSoundEvents.SCOOCHWORM_KISS.get(), 1f, 1f)
+		}
 
 		for (player in level().players()) {
 			if (player.distanceToSqr(this) > COLLISION_WITNESS_DISTANCE_SQUARED) continue

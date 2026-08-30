@@ -69,6 +69,7 @@
   "item.minecraft.tipped_arrow.effect.critter_carts.dyed_yellow": "Arrow of Yellow Dyeing",
   "itemGroup.critter_carts": "Critter Carts",
   "subtitles.critter_carts.scoochworm_footstep": "Scoochworm scooches",
+  "subtitles.critter_carts.scoochworm_kiss": "Scoochworm smooches",
   "tooltip.critter_carts.container.empty": "Empty",
   "tooltip.critter_carts.container.stack": "Contains %s stack",
   "tooltip.critter_carts.container.stacks": "Contains %s stacks"

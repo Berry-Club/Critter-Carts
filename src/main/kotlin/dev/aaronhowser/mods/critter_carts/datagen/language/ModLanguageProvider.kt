@@ -46,6 +46,7 @@ class ModLanguageProvider(
 		addPotion("dyed_cyan", "Cyan")
 
 		add(ModSoundEvents.SCOOCHWORM_FOOTSTEP_SUBTITLE, "Scoochworm scooches")
+		add(ModSoundEvents.SCOOCHWORM_KISS_SUBTITLE, "Scoochworm smooches")
 	}
 
 	private fun addPotion(potionName: String, colorName: String) {

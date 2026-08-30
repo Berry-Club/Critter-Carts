@@ -5,5 +5,13 @@
       "critter_carts:entity/scoochworm/footstep_2"
     ],
     "subtitle": "subtitles.critter_carts.scoochworm_footstep"
+  },
+  "scoochworm_kiss": {
+    "sounds": [
+      "critter_carts:entity/kiss_1",
+      "critter_carts:entity/kiss_2",
+      "critter_carts:entity/kiss_3"
+    ],
+    "subtitle": "subtitles.critter_carts.scoochworm_kiss"
   }
 }

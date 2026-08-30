@@ -12,7 +12,7 @@ class ModSoundDefinitionsProvider(
 ) : SoundDefinitionsProvider(output, CritterCarts.MOD_ID, existingFileHelper) {
 
 	override fun registerSounds() {
-		val definition = definition()
+		val footstepDefinition = definition()
 			.subtitle(ModSoundEvents.SCOOCHWORM_FOOTSTEP_SUBTITLE)
 			.with(
 				sound(CritterCarts.modResource("entity/scoochworm/footstep_1"))
@@ -21,7 +21,21 @@ class ModSoundDefinitionsProvider(
 				sound(CritterCarts.modResource("entity/scoochworm/footstep_2"))
 			)
 
-		add(ModSoundEvents.SCOOCHWORM_FOOTSTEP, definition)
+		add(ModSoundEvents.SCOOCHWORM_FOOTSTEP, footstepDefinition)
+
+		val kissDefinition = definition()
+			.subtitle(ModSoundEvents.SCOOCHWORM_KISS_SUBTITLE)
+			.with(
+				sound(CritterCarts.modResource("entity/kiss_1"))
+			)
+			.with(
+				sound(CritterCarts.modResource("entity/kiss_2"))
+			)
+			.with(
+				sound(CritterCarts.modResource("entity/kiss_3"))
+			)
+
+		add(ModSoundEvents.SCOOCHWORM_KISS, kissDefinition)
 	}
 
 }
