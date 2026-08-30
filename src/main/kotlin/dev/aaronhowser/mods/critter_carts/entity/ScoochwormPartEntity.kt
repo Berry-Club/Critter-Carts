@@ -34,7 +34,6 @@ class ScoochwormPartEntity(
 ) : Entity(entityType, level), GeoEntity {
 
 	private val animatableInstanceCache = SingletonAnimatableInstanceCache(this)
-	private var missingParentTicks = 0
 	private var lerpSteps = 0
 	private var lerpX = 0.0
 	private var lerpY = 0.0
@@ -171,13 +170,7 @@ class ScoochwormPartEntity(
 		}
 
 		val scoochworm = getScoochworm()
-		if (scoochworm != null && !scoochworm.isRemoved) {
-			missingParentTicks = 0
-			return
-		}
-
-		missingParentTicks++
-		if (missingParentTicks > MAX_MISSING_PARENT_TICKS) {
+		if (scoochworm == null || scoochworm.isRemoved) {
 			discard()
 		}
 	}
@@ -264,7 +257,6 @@ class ScoochwormPartEntity(
 
 	companion object {
 		private const val NO_PARENT = -1
-		private const val MAX_MISSING_PARENT_TICKS = 20
 		private const val MINIMUM_MOVEMENT_DISTANCE_SQUARED = 0.000001
 		private val DATA_PARENT_ID: EntityDataAccessor<Int> =
 			SynchedEntityData.defineId(ScoochwormPartEntity::class.java, EntityDataSerializers.INT)
