@@ -333,9 +333,13 @@ class ScoochwormEntity(
 		if (isClientSide) return
 		if (tickCount < nextKissTick || other.tickCount < other.nextKissTick) return
 
-		val movement = direction.normal.toVec3()
-		val otherMovement = other.direction.normal.toVec3()
-		if (movement.normalize().dot(otherMovement.normalize()) > HEAD_ON_DIRECTION_DOT) return
+		val movementDirection = stemMoveControl.movementDirection ?: direction
+		val otherMovementDirection = other.stemMoveControl.movementDirection ?: other.direction
+		if (movementDirection.opposite != otherMovementDirection) return
+		if (!sharesMovementLane(other, movementDirection.axis)) return
+
+		val movement = movementDirection.normal.toVec3()
+		val otherMovement = otherMovementDirection.normal.toVec3()
 
 		val directionToOther = position().vectorTo(other.position()).normalize()
 		if (movement.normalize().dot(directionToOther) < HEAD_ON_ALIGNMENT_DOT) return
@@ -349,6 +353,20 @@ class ScoochwormEntity(
 		for (player in level().players()) {
 			if (!player.closerThan(this, COLLISION_WITNESS_DISTANCE_SQUARED)) continue
 			ModAdvancements.trigger(player, ModAdvancements.WITNESS_HEAD_ON_COLLISION)
+		}
+	}
+
+	private fun sharesMovementLane(
+		other: ScoochwormEntity,
+		movementAxis: Direction.Axis
+	): Boolean {
+		val position = blockPosition()
+		val otherPosition = other.blockPosition()
+
+		return when (movementAxis) {
+			Direction.Axis.X -> position.y == otherPosition.y && position.z == otherPosition.z
+			Direction.Axis.Y -> position.x == otherPosition.x && position.z == otherPosition.z
+			Direction.Axis.Z -> position.x == otherPosition.x && position.y == otherPosition.y
 		}
 	}
 
@@ -404,7 +422,6 @@ class ScoochwormEntity(
 	override fun getAnimatableInstanceCache(): AnimatableInstanceCache = animatableInstanceCache
 
 	companion object {
-		private const val HEAD_ON_DIRECTION_DOT = -0.8
 		private const val HEAD_ON_ALIGNMENT_DOT = 0.8
 		private const val KISS_PROXIMITY = 0.3
 		private const val KISS_COOLDOWN_TICKS = 20 * 10
