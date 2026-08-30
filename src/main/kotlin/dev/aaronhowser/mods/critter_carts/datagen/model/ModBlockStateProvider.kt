@@ -92,11 +92,17 @@ class ModBlockStateProvider(
 	}
 
 	private fun critterCage() {
-		val model = ModelFile.UncheckedModelFile(modLoc("block/critter_cage_block"))
+		val closedModel = ModelFile.UncheckedModelFile(modLoc("block/critter_cage"))
+		val openModel = ModelFile.UncheckedModelFile(modLoc("block/critter_cage_open"))
 
 		getVariantBuilder(ModBlocks.CRITTER_CAGE.get()).forAllStates { state ->
 			val down = state.getValue(CritterCageBlock.DOWN)
 			val forward = state.getValue(CritterCageBlock.FORWARD)
+			val model = if (state.getValue(CritterCageBlock.OPEN)) {
+				openModel
+			} else {
+				closedModel
+			}
 			val configuredModel = ConfiguredModel.builder().modelFile(model)
 
 			when (down) {

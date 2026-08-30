@@ -1,658 +1,658 @@
 {
   "variants": {
     "down=down,forward=down,open=false,powered=false": {
-      "model": "critter_carts:block/critter_cage_block"
+      "model": "critter_carts:block/critter_cage"
     },
     "down=down,forward=down,open=false,powered=true": {
-      "model": "critter_carts:block/critter_cage_block"
+      "model": "critter_carts:block/critter_cage"
     },
     "down=down,forward=down,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block"
+      "model": "critter_carts:block/critter_cage_open"
     },
     "down=down,forward=down,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block"
+      "model": "critter_carts:block/critter_cage_open"
     },
     "down=down,forward=east,open=false,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "y": 90
     },
     "down=down,forward=east,open=false,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "y": 90
     },
     "down=down,forward=east,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "y": 90
     },
     "down=down,forward=east,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "y": 90
     },
     "down=down,forward=north,open=false,powered=false": {
-      "model": "critter_carts:block/critter_cage_block"
+      "model": "critter_carts:block/critter_cage"
     },
     "down=down,forward=north,open=false,powered=true": {
-      "model": "critter_carts:block/critter_cage_block"
+      "model": "critter_carts:block/critter_cage"
     },
     "down=down,forward=north,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block"
+      "model": "critter_carts:block/critter_cage_open"
     },
     "down=down,forward=north,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block"
+      "model": "critter_carts:block/critter_cage_open"
     },
     "down=down,forward=south,open=false,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "y": 180
     },
     "down=down,forward=south,open=false,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "y": 180
     },
     "down=down,forward=south,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "y": 180
     },
     "down=down,forward=south,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "y": 180
     },
     "down=down,forward=up,open=false,powered=false": {
-      "model": "critter_carts:block/critter_cage_block"
+      "model": "critter_carts:block/critter_cage"
     },
     "down=down,forward=up,open=false,powered=true": {
-      "model": "critter_carts:block/critter_cage_block"
+      "model": "critter_carts:block/critter_cage"
     },
     "down=down,forward=up,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block"
+      "model": "critter_carts:block/critter_cage_open"
     },
     "down=down,forward=up,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block"
+      "model": "critter_carts:block/critter_cage_open"
     },
     "down=down,forward=west,open=false,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "y": 270
     },
     "down=down,forward=west,open=false,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "y": 270
     },
     "down=down,forward=west,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "y": 270
     },
     "down=down,forward=west,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "y": 270
     },
     "down=east,forward=down,open=false,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 90,
       "y": 90
     },
     "down=east,forward=down,open=false,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 90,
       "y": 90
     },
     "down=east,forward=down,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 90,
       "y": 90
     },
     "down=east,forward=down,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 90,
       "y": 90
     },
     "down=east,forward=east,open=false,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 90,
       "y": 90
     },
     "down=east,forward=east,open=false,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 90,
       "y": 90
     },
     "down=east,forward=east,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 90,
       "y": 90
     },
     "down=east,forward=east,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 90,
       "y": 90
     },
     "down=east,forward=north,open=false,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 90,
       "y": 90
     },
     "down=east,forward=north,open=false,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 90,
       "y": 90
     },
     "down=east,forward=north,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 90,
       "y": 90
     },
     "down=east,forward=north,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 90,
       "y": 90
     },
     "down=east,forward=south,open=false,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 90,
       "y": 90
     },
     "down=east,forward=south,open=false,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 90,
       "y": 90
     },
     "down=east,forward=south,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 90,
       "y": 90
     },
     "down=east,forward=south,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 90,
       "y": 90
     },
     "down=east,forward=up,open=false,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 90,
       "y": 90
     },
     "down=east,forward=up,open=false,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 90,
       "y": 90
     },
     "down=east,forward=up,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 90,
       "y": 90
     },
     "down=east,forward=up,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 90,
       "y": 90
     },
     "down=east,forward=west,open=false,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 90,
       "y": 90
     },
     "down=east,forward=west,open=false,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 90,
       "y": 90
     },
     "down=east,forward=west,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 90,
       "y": 90
     },
     "down=east,forward=west,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 90,
       "y": 90
     },
     "down=north,forward=down,open=false,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 90
     },
     "down=north,forward=down,open=false,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 90
     },
     "down=north,forward=down,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 90
     },
     "down=north,forward=down,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 90
     },
     "down=north,forward=east,open=false,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 90
     },
     "down=north,forward=east,open=false,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 90
     },
     "down=north,forward=east,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 90
     },
     "down=north,forward=east,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 90
     },
     "down=north,forward=north,open=false,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 90
     },
     "down=north,forward=north,open=false,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 90
     },
     "down=north,forward=north,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 90
     },
     "down=north,forward=north,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 90
     },
     "down=north,forward=south,open=false,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 90
     },
     "down=north,forward=south,open=false,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 90
     },
     "down=north,forward=south,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 90
     },
     "down=north,forward=south,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 90
     },
     "down=north,forward=up,open=false,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 90
     },
     "down=north,forward=up,open=false,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 90
     },
     "down=north,forward=up,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 90
     },
     "down=north,forward=up,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 90
     },
     "down=north,forward=west,open=false,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 90
     },
     "down=north,forward=west,open=false,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 90
     },
     "down=north,forward=west,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 90
     },
     "down=north,forward=west,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 90
     },
     "down=south,forward=down,open=false,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 90,
       "y": 180
     },
     "down=south,forward=down,open=false,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 90,
       "y": 180
     },
     "down=south,forward=down,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 90,
       "y": 180
     },
     "down=south,forward=down,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 90,
       "y": 180
     },
     "down=south,forward=east,open=false,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 90,
       "y": 180
     },
     "down=south,forward=east,open=false,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 90,
       "y": 180
     },
     "down=south,forward=east,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 90,
       "y": 180
     },
     "down=south,forward=east,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 90,
       "y": 180
     },
     "down=south,forward=north,open=false,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 90,
       "y": 180
     },
     "down=south,forward=north,open=false,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 90,
       "y": 180
     },
     "down=south,forward=north,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 90,
       "y": 180
     },
     "down=south,forward=north,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 90,
       "y": 180
     },
     "down=south,forward=south,open=false,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 90,
       "y": 180
     },
     "down=south,forward=south,open=false,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 90,
       "y": 180
     },
     "down=south,forward=south,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 90,
       "y": 180
     },
     "down=south,forward=south,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 90,
       "y": 180
     },
     "down=south,forward=up,open=false,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 90,
       "y": 180
     },
     "down=south,forward=up,open=false,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 90,
       "y": 180
     },
     "down=south,forward=up,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 90,
       "y": 180
     },
     "down=south,forward=up,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 90,
       "y": 180
     },
     "down=south,forward=west,open=false,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 90,
       "y": 180
     },
     "down=south,forward=west,open=false,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 90,
       "y": 180
     },
     "down=south,forward=west,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 90,
       "y": 180
     },
     "down=south,forward=west,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 90,
       "y": 180
     },
     "down=up,forward=down,open=false,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 180,
       "y": 180
     },
     "down=up,forward=down,open=false,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 180,
       "y": 180
     },
     "down=up,forward=down,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 180,
       "y": 180
     },
     "down=up,forward=down,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 180,
       "y": 180
     },
     "down=up,forward=east,open=false,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 180,
       "y": 270
     },
     "down=up,forward=east,open=false,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 180,
       "y": 270
     },
     "down=up,forward=east,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 180,
       "y": 270
     },
     "down=up,forward=east,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 180,
       "y": 270
     },
     "down=up,forward=north,open=false,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 180,
       "y": 180
     },
     "down=up,forward=north,open=false,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 180,
       "y": 180
     },
     "down=up,forward=north,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 180,
       "y": 180
     },
     "down=up,forward=north,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 180,
       "y": 180
     },
     "down=up,forward=south,open=false,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 180
     },
     "down=up,forward=south,open=false,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 180
     },
     "down=up,forward=south,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 180
     },
     "down=up,forward=south,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 180
     },
     "down=up,forward=up,open=false,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 180,
       "y": 180
     },
     "down=up,forward=up,open=false,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 180,
       "y": 180
     },
     "down=up,forward=up,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 180,
       "y": 180
     },
     "down=up,forward=up,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 180,
       "y": 180
     },
     "down=up,forward=west,open=false,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 180,
       "y": 90
     },
     "down=up,forward=west,open=false,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 180,
       "y": 90
     },
     "down=up,forward=west,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 180,
       "y": 90
     },
     "down=up,forward=west,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 180,
       "y": 90
     },
     "down=west,forward=down,open=false,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 90,
       "y": 270
     },
     "down=west,forward=down,open=false,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 90,
       "y": 270
     },
     "down=west,forward=down,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 90,
       "y": 270
     },
     "down=west,forward=down,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 90,
       "y": 270
     },
     "down=west,forward=east,open=false,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 90,
       "y": 270
     },
     "down=west,forward=east,open=false,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 90,
       "y": 270
     },
     "down=west,forward=east,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 90,
       "y": 270
     },
     "down=west,forward=east,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 90,
       "y": 270
     },
     "down=west,forward=north,open=false,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 90,
       "y": 270
     },
     "down=west,forward=north,open=false,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 90,
       "y": 270
     },
     "down=west,forward=north,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 90,
       "y": 270
     },
     "down=west,forward=north,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 90,
       "y": 270
     },
     "down=west,forward=south,open=false,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 90,
       "y": 270
     },
     "down=west,forward=south,open=false,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 90,
       "y": 270
     },
     "down=west,forward=south,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 90,
       "y": 270
     },
     "down=west,forward=south,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 90,
       "y": 270
     },
     "down=west,forward=up,open=false,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 90,
       "y": 270
     },
     "down=west,forward=up,open=false,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 90,
       "y": 270
     },
     "down=west,forward=up,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 90,
       "y": 270
     },
     "down=west,forward=up,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 90,
       "y": 270
     },
     "down=west,forward=west,open=false,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 90,
       "y": 270
     },
     "down=west,forward=west,open=false,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage",
       "x": 90,
       "y": 270
     },
     "down=west,forward=west,open=true,powered=false": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 90,
       "y": 270
     },
     "down=west,forward=west,open=true,powered=true": {
-      "model": "critter_carts:block/critter_cage_block",
+      "model": "critter_carts:block/critter_cage_open",
       "x": 90,
       "y": 270
     }
