@@ -11,7 +11,8 @@ class ScoochwormStemMoveControl(
 	private val scoochworm: ScoochwormEntity
 ) : MoveControl(scoochworm) {
 
-	private var movementDirection: Direction? = null
+	var movementDirection: Direction? = null
+		private set
 
 	fun setWantedPosition(
 		x: Double,
