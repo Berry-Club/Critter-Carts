@@ -61,6 +61,8 @@ class ScoochwormEntity(
 
 	private var footstepPartIndex = HEAD_FOOTSTEP_INDEX
 	private var nextFootstepTick = random.nextInt(FOOTSTEP_CYCLE_PAUSE_TICKS + 1)
+	private var nextKissTick = 0
+
 	var rememberedMovementDirection: Vec3? = null
 	var isTurningAroundCorner = false
 
@@ -111,6 +113,7 @@ class ScoochwormEntity(
 
 		if (isServerSide) {
 			eatTouchingItems()
+			kissNearbyWorms()
 		}
 
 		if (isClientSide || !isTryingToMove) return
@@ -147,6 +150,18 @@ class ScoochwormEntity(
 
 			playSound(SoundEvents.GENERIC_EAT, 1f, 1f)
 			gameEvent(GameEvent.EAT)
+		}
+	}
+
+	private fun kissNearbyWorms() {
+		val nearbyWorms = level().getEntitiesOfClass(
+			ScoochwormEntity::class.java,
+			boundingBox.inflate(1.0)
+		)
+
+		for (other in nearbyWorms) {
+			if (other === this) continue
+			kiss(other)
 		}
 	}
 
@@ -311,31 +326,28 @@ class ScoochwormEntity(
 	override fun doPush(entity: Entity) {
 		if (entity is ItemEntity) return
 
-		if (entity is ScoochwormEntity) {
-			kiss(entity)
-		}
-
 		super.doPush(entity)
 	}
 
-	private fun kiss(other: ScoochwormEntity) {
+	fun kiss(other: ScoochwormEntity) {
 		if (isClientSide) return
+		if (tickCount < nextKissTick || other.tickCount < other.nextKissTick) return
 
-		val movement = rememberedMovementDirection ?: return
-		val otherMovement = other.rememberedMovementDirection ?: return
+		val movement = direction.normal.toVec3()
+		val otherMovement = other.direction.normal.toVec3()
 		if (movement.normalize().dot(otherMovement.normalize()) > HEAD_ON_DIRECTION_DOT) return
 
 		val directionToOther = position().vectorTo(other.position()).normalize()
 		if (movement.normalize().dot(directionToOther) < HEAD_ON_ALIGNMENT_DOT) return
 		if (otherMovement.normalize().dot(directionToOther.reverse()) < HEAD_ON_ALIGNMENT_DOT) return
 
-		if (uuid < other.uuid) {
-			playSound(ModSoundEvents.SCOOCHWORM_KISS.get(), 1f, 1f)
-		}
+		nextKissTick = tickCount + KISS_COOLDOWN_TICKS
+		other.nextKissTick = other.tickCount + KISS_COOLDOWN_TICKS
+
+		playSound(ModSoundEvents.SCOOCHWORM_KISS.get(), 1f, 1f)
 
 		for (player in level().players()) {
-			if (player.distanceToSqr(this) > COLLISION_WITNESS_DISTANCE_SQUARED) continue
-
+			if (!player.closerThan(this, COLLISION_WITNESS_DISTANCE_SQUARED)) continue
 			ModAdvancements.trigger(player, ModAdvancements.WITNESS_HEAD_ON_COLLISION)
 		}
 	}
@@ -394,6 +406,8 @@ class ScoochwormEntity(
 	companion object {
 		private const val HEAD_ON_DIRECTION_DOT = -0.8
 		private const val HEAD_ON_ALIGNMENT_DOT = 0.8
+		private const val KISS_PROXIMITY = 0.3
+		private const val KISS_COOLDOWN_TICKS = 20 * 10
 		private const val COLLISION_WITNESS_DISTANCE_SQUARED = 16.0 * 16.0
 		const val SIZE = 14f / 16f
 		const val PART_SPACING = SIZE * 1.2
