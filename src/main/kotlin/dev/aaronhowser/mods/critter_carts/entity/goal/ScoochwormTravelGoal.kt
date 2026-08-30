@@ -15,6 +15,7 @@ class ScoochwormTravelGoal(
 ) : Goal() {
 
 	private var currentSupport: ScoochwormSupport? = null
+	private var previousSupport: ScoochwormSupport? = null
 	private var movementDirection: Direction? = null
 	private var nextSupport: ScoochwormSupport? = null
 	private var cornerTarget: Vec3? = null
@@ -31,6 +32,9 @@ class ScoochwormTravelGoal(
 		scoochworm.attachToSupport(support.supportPosition, support.supportDirection)
 
 		val direction = getMovementDirection(support.supportDirection)
+		scoochworm.rememberedMovementDirection = direction.normal.toVec3()
+		if (kissWormAhead(direction)) return false
+
 		val destination = chooseNextSupport(support, direction)
 		if (destination == null) {
 			tryEnterCage(direction)
@@ -53,6 +57,11 @@ class ScoochwormTravelGoal(
 	override fun tick() {
 		val destination = nextSupport ?: return
 		val direction = movementDirection ?: return
+		if (kissWormAhead(direction)) {
+			nextSupport = null
+			scoochworm.deltaMovement = Vec3.ZERO
+			return
+		}
 
 		val targetPosition = cornerTarget ?: getPositionOnSupport(destination)
 		val displacement = scoochworm.position().vectorTo(targetPosition)
@@ -76,6 +85,7 @@ class ScoochwormTravelGoal(
 	private fun arriveAtSupport(destination: ScoochwormSupport, direction: Direction) {
 		scoochworm.setPos(getPositionOnSupport(destination))
 		scoochworm.attachToSupport(destination.supportPosition, destination.supportDirection)
+		previousSupport = currentSupport
 		currentSupport = destination
 
 		val followingSupport = chooseNextSupport(destination, direction)
@@ -138,10 +148,87 @@ class ScoochwormTravelGoal(
 	}
 
 	private fun chooseNextSupport(support: ScoochwormSupport, forward: Direction): ScoochwormSupport? {
-		return tryMoveForward(support, forward)
-			?: tryTurnAlongSurface(support, forward)
-			?: tryTurnUpwards(support, forward)
-			?: tryTurnDownwards(support, forward)
+		val forwardSupport = tryMoveForward(support, forward)
+		if (canApproach(support, forwardSupport, forward)) return forwardSupport
+		if (kissWormAhead(forward)) return null
+
+		val surfaceTurn = tryTurnAlongSurface(support, forward)
+		if (canApproach(support, surfaceTurn, forward)) return surfaceTurn
+
+		val upwardTurn = tryTurnUpwards(support, forward)
+		if (canApproach(support, upwardTurn, forward)) return upwardTurn
+
+		val downwardTurn = tryTurnDownwards(support, forward)
+		if (canApproach(support, downwardTurn, forward)) return downwardTurn
+
+		return null
+	}
+
+	private fun canApproach(
+		from: ScoochwormSupport,
+		destination: ScoochwormSupport?,
+		incomingDirection: Direction
+	): Boolean {
+		if (destination == null) return false
+		if (destination == previousSupport) return false
+
+		val fromPosition = getPositionOnSupport(from)
+		val destinationPosition = getPositionOnSupport(destination)
+		val incomingMovement = incomingDirection.normal.toVec3()
+
+		if (from.supportDirection == destination.supportDirection) {
+			val movement = fromPosition.vectorTo(destinationPosition)
+			return isAllowedTurn(incomingMovement, movement)
+		}
+
+		val corner = when (incomingDirection.axis) {
+			Direction.Axis.X -> Vec3(destinationPosition.x, fromPosition.y, fromPosition.z)
+			Direction.Axis.Y -> Vec3(fromPosition.x, destinationPosition.y, fromPosition.z)
+			Direction.Axis.Z -> Vec3(fromPosition.x, fromPosition.y, destinationPosition.z)
+		}
+
+		val movementToCorner = fromPosition.vectorTo(corner)
+		val movementFromCorner = corner.vectorTo(destinationPosition)
+		if (!isAllowedTurn(incomingMovement, movementToCorner)) return false
+
+		val cornerApproach = if (movementToCorner.lengthSqr() == 0.0) {
+			incomingMovement
+		} else {
+			movementToCorner
+		}
+
+		return isAllowedTurn(cornerApproach, movementFromCorner)
+	}
+
+	private fun isAllowedTurn(incomingMovement: Vec3, nextMovement: Vec3): Boolean {
+		if (nextMovement.lengthSqr() == 0.0) return true
+
+		return incomingMovement.normalize()
+			.dot(nextMovement.normalize()) >= MAX_TURN_DOT
+	}
+
+	private fun kissWormAhead(forward: Direction): Boolean {
+		val forwardMovement = forward.normal.toVec3()
+		val searchBounds = scoochworm.boundingBox
+			.expandTowards(forwardMovement.scale(KISS_SEARCH_DISTANCE))
+			.inflate(0.05)
+
+		val nearbyWorms = scoochworm.level().getEntitiesOfClass(
+			ScoochwormEntity::class.java,
+			searchBounds
+		) { other -> other != scoochworm }
+
+		for (nearbyWorm in nearbyWorms) {
+			val directionToWorm = scoochworm.position()
+				.vectorTo(nearbyWorm.position())
+				.normalize()
+			if (forwardMovement.dot(directionToWorm) < HEAD_ON_ALIGNMENT_DOT) continue
+
+			scoochworm.kiss(nearbyWorm)
+			return true
+		}
+
+		return false
 	}
 
 	private fun tryEnterCage(forward: Direction): Boolean {
@@ -374,6 +461,12 @@ class ScoochwormTravelGoal(
 			first.z * second.x - first.x * second.z,
 			first.x * second.y - first.y * second.x
 		) ?: direction
+	}
+
+	companion object {
+		private const val HEAD_ON_ALIGNMENT_DOT = 0.8
+		private const val KISS_SEARCH_DISTANCE = 0.15
+		private const val MAX_TURN_DOT = -0.8191520442889918
 	}
 
 }
