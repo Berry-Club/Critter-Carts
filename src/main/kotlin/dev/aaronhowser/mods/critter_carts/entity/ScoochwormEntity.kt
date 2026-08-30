@@ -131,26 +131,15 @@ class ScoochwormEntity(
 
 	private fun pressAgainstSupport() {
 		val currentSupportPosition = supportPosition ?: return
-		val movementDistance = if (noPhysics) {
-			getDistanceToSupportCollision(currentSupportPosition)
-		} else {
-			SURFACE_PRESS_DISTANCE
-		}
-		val movement = supportDirection.normal.toVec3()
-			.scale(movementDistance)
-
-		move(MoverType.SELF, movement)
-	}
-
-	private fun getDistanceToSupportCollision(supportPosition: BlockPos): Double {
 		val collisionShape = level()
-			.getBlockState(supportPosition)
-			.getCollisionShape(level(), supportPosition)
+			.getBlockState(currentSupportPosition)
+			.getCollisionShape(level(), currentSupportPosition)
 			.move(
-				supportPosition.x.toDouble(),
-				supportPosition.y.toDouble(),
-				supportPosition.z.toDouble()
+				currentSupportPosition.x.toDouble(),
+				currentSupportPosition.y.toDouble(),
+				currentSupportPosition.z.toDouble()
 			)
+
 		val maximumMovement = supportDirection.axisDirection.step.toDouble()
 		val movementDistance = collisionShape.collide(
 			supportDirection.axis,
@@ -158,7 +147,10 @@ class ScoochwormEntity(
 			maximumMovement
 		)
 
-		return abs(movementDistance)
+		val movement = supportDirection.normal.toVec3()
+			.scale(abs(movementDistance))
+
+		move(MoverType.SELF, movement)
 	}
 
 	private fun eatTouchingItems() {
@@ -425,7 +417,6 @@ class ScoochwormEntity(
 		private const val FOOTSTEP_INTERVAL_TICKS = 3
 		private const val FOOTSTEP_CYCLE_PAUSE_TICKS = 40
 		private const val SUPPORT_PROBE_DISTANCE = 0.05
-		private const val SURFACE_PRESS_DISTANCE = 1.0
 
 		private const val SEGMENTS_TAG = "Segments"
 		const val PATH_TAG = "Path"
