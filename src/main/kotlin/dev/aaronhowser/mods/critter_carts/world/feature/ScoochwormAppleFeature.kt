@@ -28,7 +28,7 @@ class ScoochwormAppleFeature : Feature<NoneFeatureConfiguration>(NoneFeatureConf
 
 		placeApple(level, center)
 		spawnScoochworm(level, center.below(APPLE_RADIUS))
-		sendTeleportMessage(level, center)
+//		sendTeleportMessage(level, center)
 
 		return true
 	}
