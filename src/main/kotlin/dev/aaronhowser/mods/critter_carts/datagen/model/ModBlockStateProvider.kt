@@ -92,79 +92,11 @@ class ModBlockStateProvider(
 	}
 
 	private fun critterCage() {
-		val bottomTexture = modLoc("block/critter_cage/critter_cage_bottom")
-		val sideTexture = modLoc("block/critter_cage/critter_cage_side")
-		val topTexture = modLoc("block/critter_cage/critter_cage_top")
-		val model = models()
-			.withExistingParent("critter_cage_block", mcLoc("block/block"))
-			.renderType(RenderType.CUTOUT.name)
-			.texture("bottom", bottomTexture)
-			.texture("side", sideTexture)
-			.texture("top", topTexture)
-			.particle(sideTexture)
-
-		for (direction in Direction.entries) {
-			val texture = when (direction) {
-				Direction.DOWN -> "#bottom"
-				Direction.UP -> "#top"
-				else -> "#side"
-			}
-
-			model.element {
-				when (direction) {
-					Direction.DOWN -> {
-						from(0f, 0f, 0f)
-						to(16f, 0f, 16f)
-					}
-
-					Direction.UP -> {
-						from(0f, 16f, 0f)
-						to(16f, 16f, 16f)
-					}
-
-					Direction.NORTH -> {
-						from(0f, 0f, 0f)
-						to(16f, 16f, 0f)
-					}
-
-					Direction.SOUTH -> {
-						from(0f, 0f, 16f)
-						to(16f, 16f, 16f)
-					}
-
-					Direction.WEST -> {
-						from(0f, 0f, 0f)
-						to(0f, 16f, 16f)
-					}
-
-					Direction.EAST -> {
-						from(16f, 0f, 0f)
-						to(16f, 16f, 16f)
-					}
-				}
-
-				face(direction) {
-					texture(texture)
-				}
-				face(direction.opposite) {
-					texture(texture)
-				}
-			}
-		}
+		val model = ModelFile.UncheckedModelFile(modLoc("block/critter_cage_block"))
 
 		getVariantBuilder(ModBlocks.CRITTER_CAGE.get()).forAllStates { state ->
 			val down = state.getValue(CritterCageBlock.DOWN)
 			val forward = state.getValue(CritterCageBlock.FORWARD)
-			if (
-				state.getValue(CritterCageBlock.OPEN)
-				&& forward.axis != down.axis
-			) {
-				val openModel = critterCageOpenModel(down, forward)
-				return@forAllStates ConfiguredModel.builder()
-					.modelFile(openModel)
-					.build()
-			}
-
 			val configuredModel = ConfiguredModel.builder().modelFile(model)
 
 			when (down) {
@@ -224,51 +156,6 @@ class ModBlockStateProvider(
 					scale(0.4f)
 				}
 			}
-	}
-
-	private fun critterCageOpenModel(
-		down: Direction,
-		forward: Direction
-	): BlockModelBuilder {
-		val modelName = "critter_cage_open_${down.serializedName}_${forward.serializedName}"
-		val sideTexture = modLoc("block/critter_cage/critter_cage_side")
-		val model = models()
-			.withExistingParent(modelName, mcLoc("block/block"))
-			.renderType(RenderType.CUTOUT.name)
-			.texture("bottom", modLoc("block/critter_cage/critter_cage_bottom"))
-			.texture("side", sideTexture)
-			.texture("top", modLoc("block/critter_cage/critter_cage_top"))
-			.particle(sideTexture)
-
-		for (direction in Direction.entries) {
-			if (direction == forward) continue
-
-			val texture = when (direction) {
-				down -> "#bottom"
-				down.opposite -> "#top"
-				else -> "#side"
-			}
-
-			model.element {
-				when (direction) {
-					Direction.DOWN -> from(0f, 0f, 0f).to(16f, 0f, 16f)
-					Direction.UP -> from(0f, 16f, 0f).to(16f, 16f, 16f)
-					Direction.NORTH -> from(0f, 0f, 0f).to(16f, 16f, 0f)
-					Direction.SOUTH -> from(0f, 0f, 16f).to(16f, 16f, 16f)
-					Direction.WEST -> from(0f, 0f, 0f).to(0f, 16f, 16f)
-					Direction.EAST -> from(16f, 0f, 0f).to(16f, 16f, 16f)
-				}
-
-				face(direction) {
-					texture(texture)
-				}
-				face(direction.opposite) {
-					texture(texture)
-				}
-			}
-		}
-
-		return model
 	}
 
 	private fun horizontalRotation(direction: Direction): Int {
