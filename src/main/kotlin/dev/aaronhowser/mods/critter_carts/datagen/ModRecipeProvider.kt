@@ -2,6 +2,8 @@ package dev.aaronhowser.mods.critter_carts.datagen
 
 import dev.aaronhowser.mods.aaron.datagen.AaronRecipeProvider
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.asIngredient
+import dev.aaronhowser.mods.aaron.misc.AaronExtensions.getDefaultInstance
+import dev.aaronhowser.mods.aaron.misc.AaronExtensions.withCount
 import dev.aaronhowser.mods.critter_carts.CritterCarts
 import dev.aaronhowser.mods.critter_carts.registry.ModBlocks
 import dev.aaronhowser.mods.critter_carts.registry.ModItems
@@ -93,6 +95,11 @@ class ModRecipeProvider(
 			listOf(ModItems.AARONBERRY.asIngredient())
 		).save(recipeOutput, modLoc("rotten_flesh_from_aaronberry"))
 
+		shapelessRecipe(
+			Items.APPLE,
+			9,
+			listOf(ModBlocks.APPLE_SLICE.asIngredient())
+		).save(recipeOutput, modLoc("apples_from_apple_slice"))
 	}
 
 }

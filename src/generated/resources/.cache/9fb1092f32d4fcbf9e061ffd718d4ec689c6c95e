@@ -1,4 +1,5 @@
-// 1.21.1	2026-08-30T21:36:14.6671613	Recipes
+// 1.21.1	2026-08-30T21:40:50.846595	Recipes
+38b1273376e060cced505dc34b6a41f10806d486 data/critter_carts/advancement/recipes/misc/apples_from_apple_slice.json
 5f77a73fd79a8b7f18db085b09e9042de4937e4c data/critter_carts/advancement/recipes/misc/blue_dye_from_dyeberry.json
 c80a869cbdc4d75abb665919499ac6b88748ef1e data/critter_carts/advancement/recipes/misc/blue_scoochstem.json
 938c3d0b73f6fcf516aac3e259b1ccfc1b5989e2 data/critter_carts/advancement/recipes/misc/cyan_dye_from_dyeberry.json
@@ -13,6 +14,7 @@ a1c2add7e18c6016775bcd1694d20928a28a993e data/critter_carts/advancement/recipes/
 8b1eeede4168a7d7492e91edf2f18e2f10678d3a data/critter_carts/advancement/recipes/misc/scoochstem_wood.json
 9ef03e72effbc202850375475f10dd33a09c6cb4 data/critter_carts/advancement/recipes/misc/yellow_dye_from_dyeberry.json
 094dfd219c1d6577a602ccdaca264ea5e67bdf17 data/critter_carts/advancement/recipes/misc/yellow_scoochstem.json
+e8df4abc0025fc46c4bf563689e4ebd9197567ab data/critter_carts/recipe/apples_from_apple_slice.json
 68b18b11a4fa256fa8b1a55d3385408bb944eb3c data/critter_carts/recipe/blue_dye_from_dyeberry.json
 61b60bdc6282331e96117e4bdada39e6bf8d1d1d data/critter_carts/recipe/blue_scoochstem.json
 a9386256d2938dbea3700665b4aeabb3eb1c36c7 data/critter_carts/recipe/cyan_dye_from_dyeberry.json
