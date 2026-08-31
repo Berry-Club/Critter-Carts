@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "critter_carts:blue_dyeberry"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "minecraft:blue_dye"
+  }
+}

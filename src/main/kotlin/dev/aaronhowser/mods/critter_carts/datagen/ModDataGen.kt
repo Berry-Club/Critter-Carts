@@ -30,11 +30,14 @@ object ModDataGen {
 		val generator = event.generator
 		val output = generator.packOutput
 
+		val lookupProvider = event.lookupProvider
+		val existingFileHelper = event.existingFileHelper
+
 		generator.addProvider(
 			event.includeServer(),
 			DatapackBuiltinEntriesProvider(
 				output,
-				event.lookupProvider,
+				lookupProvider,
 				RegistrySetBuilder()
 					.add(Registries.CONFIGURED_FEATURE, ModConfiguredFeatures::bootstrap)
 					.add(Registries.PLACED_FEATURE, ModPlacedFeatures::bootstrap)
@@ -44,13 +47,18 @@ object ModDataGen {
 		)
 
 		generator.addProvider(
-			event.includeClient(),
-			ModBlockStateProvider(output, event.existingFileHelper)
+			event.includeServer(),
+			ModRecipeProvider(output, lookupProvider)
 		)
 
 		generator.addProvider(
 			event.includeClient(),
-			ModItemModelProvider(output, event.existingFileHelper)
+			ModBlockStateProvider(output, existingFileHelper)
+		)
+
+		generator.addProvider(
+			event.includeClient(),
+			ModItemModelProvider(output, existingFileHelper)
 		)
 
 		generator.addProvider(
@@ -60,54 +68,42 @@ object ModDataGen {
 
 		generator.addProvider(
 			event.includeClient(),
-			ModSoundDefinitionsProvider(output, event.existingFileHelper)
+			ModSoundDefinitionsProvider(output, existingFileHelper)
 		)
 
 		generator.addProvider(
 			event.includeServer(),
-			ModLootTableProvider(output, event.lookupProvider)
+			ModLootTableProvider(output, lookupProvider)
 		)
 
 		generator.addProvider(
 			event.includeServer(),
 			AdvancementProvider(
 				output,
-				event.lookupProvider,
-				event.existingFileHelper,
-				listOf(ModAdvancementSubProvider(event.lookupProvider))
+				lookupProvider,
+				existingFileHelper,
+				listOf(ModAdvancementSubProvider(lookupProvider))
 			)
 		)
 
 		val blockTagProvider = generator.addProvider(
 			event.includeServer(),
-			ModBlockTagsProvider(output, event.lookupProvider, event.existingFileHelper)
+			ModBlockTagsProvider(output, lookupProvider, existingFileHelper)
 		)
 
 		generator.addProvider(
 			event.includeServer(),
-			ModItemTagsProvider(
-				output,
-				event.lookupProvider,
-				blockTagProvider.contentsGetter(),
-				event.existingFileHelper
-			)
+			ModItemTagsProvider(output, lookupProvider, blockTagProvider.contentsGetter(), existingFileHelper)
 		)
 
 		generator.addProvider(
 			event.includeServer(),
-			ModEntityTypeTagsProvider(
-				output,
-				event.lookupProvider
-			)
+			ModEntityTypeTagsProvider(output, lookupProvider)
 		)
 
 		generator.addProvider(
 			event.includeServer(),
-			ModMobEffectTagsProvider(
-				output,
-				event.lookupProvider,
-				event.existingFileHelper
-			)
+			ModMobEffectTagsProvider(output, lookupProvider, existingFileHelper)
 		)
 	}
 }
