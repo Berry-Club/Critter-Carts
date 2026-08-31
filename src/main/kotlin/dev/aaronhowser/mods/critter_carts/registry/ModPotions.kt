@@ -30,6 +30,8 @@ object ModPotions {
 		register("dyed_magenta") { createEffect(ModMobEffects.DYED_MAGENTA) }
 	val DYED_CYAN: DeferredHolder<Potion, Potion> =
 		register("dyed_cyan") { createEffect(ModMobEffects.DYED_CYAN) }
+	val AARON: DeferredHolder<Potion, Potion> =
+		register("aaron") { createEffect(ModMobEffects.AARON) }
 
 	private fun createEffect(effect: Holder<MobEffect>): MobEffectInstance {
 		return MobEffectInstance(
@@ -60,5 +62,6 @@ object ModPotions {
 		builder.addMix(Potions.AWKWARD, ModItems.YELLOW_DYEBERRY.get(), DYED_YELLOW)
 		builder.addMix(Potions.AWKWARD, ModItems.MAGENTA_DYEBERRY.get(), DYED_MAGENTA)
 		builder.addMix(Potions.AWKWARD, ModItems.CYAN_DYEBERRY.get(), DYED_CYAN)
+		builder.addMix(Potions.AWKWARD, ModItems.AARONBERRY.get(), AARON)
 	}
 }
