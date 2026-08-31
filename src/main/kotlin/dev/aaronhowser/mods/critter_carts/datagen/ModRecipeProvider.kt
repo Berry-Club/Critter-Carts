@@ -3,11 +3,16 @@ package dev.aaronhowser.mods.critter_carts.datagen
 import dev.aaronhowser.mods.aaron.datagen.AaronRecipeProvider
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.asIngredient
 import dev.aaronhowser.mods.critter_carts.CritterCarts
+import dev.aaronhowser.mods.critter_carts.registry.ModBlocks
 import dev.aaronhowser.mods.critter_carts.registry.ModItems
 import net.minecraft.core.HolderLookup
 import net.minecraft.data.PackOutput
 import net.minecraft.data.recipes.RecipeOutput
+import net.minecraft.world.item.Item
 import net.minecraft.world.item.Items
+import net.minecraft.world.level.block.Block
+import net.neoforged.neoforge.registries.DeferredBlock
+import net.neoforged.neoforge.registries.DeferredItem
 import java.util.concurrent.CompletableFuture
 
 class ModRecipeProvider(
@@ -18,7 +23,38 @@ class ModRecipeProvider(
 	private fun modLoc(name: String) = CritterCarts.modResource(name)
 
 	override fun buildRecipes(recipeOutput: RecipeOutput, holderLookup: HolderLookup.Provider) {
+		buildShapedRecipes(recipeOutput, holderLookup)
+		buildShapelessRecipes(recipeOutput, holderLookup)
 		buildNamedRecipes(recipeOutput, holderLookup)
+	}
+
+	private fun buildShapelessRecipes(recipeOutput: RecipeOutput, holderLookup: HolderLookup.Provider) {
+		fun coloredScoochstem(dyeBerry: DeferredItem<out Item>, output: DeferredBlock<out Block>) {
+			shapelessRecipe(
+				output,
+				listOf(
+					dyeBerry.asIngredient(),
+					ModBlocks.SCOOCHSTEM.asIngredient()
+				)
+			).save(recipeOutput)
+		}
+
+		coloredScoochstem(ModItems.RED_DYEBERRY, ModBlocks.RED_SCOOCHSTEM)
+		coloredScoochstem(ModItems.BLUE_DYEBERRY, ModBlocks.BLUE_SCOOCHSTEM)
+		coloredScoochstem(ModItems.CYAN_DYEBERRY, ModBlocks.CYAN_SCOOCHSTEM)
+		coloredScoochstem(ModItems.YELLOW_DYEBERRY, ModBlocks.YELLOW_SCOOCHSTEM)
+		coloredScoochstem(ModItems.GREEN_DYEBERRY, ModBlocks.GREEN_SCOOCHSTEM)
+		coloredScoochstem(ModItems.MAGENTA_DYEBERRY, ModBlocks.MAGENTA_SCOOCHSTEM)
+	}
+
+	private fun buildShapedRecipes(recipeOutput: RecipeOutput, holderLookup: HolderLookup.Provider) {
+		shapedRecipe(
+			ModBlocks.SCOOCHSTEM_WOOD.toStack(4),
+			"WW,WW",
+			mapOf(
+				'W' to ModBlocks.SCOOCHSTEM.asIngredient()
+			)
+		).save(recipeOutput)
 	}
 
 	private fun buildNamedRecipes(recipeOutput: RecipeOutput, holderLookup: HolderLookup.Provider) {
