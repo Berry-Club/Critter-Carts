@@ -37,7 +37,7 @@ object ModPotions {
 			DyeberryItem.POTION_DURATION,
 			0,
 			false,
-			false,
+			true,
 			true
 		)
 	}
