@@ -78,11 +78,11 @@ object WebLineInteractionHandler {
 		if (firstNode == null) {
 			storeFirstNode(player, itemStack, selectedNode)
 		} else {
-			tryCreateLine(level, player, itemStack, firstNode, selectedNode)
+			createLine(level, player, itemStack, firstNode, selectedNode)
 		}
 	}
 
-	private fun tryCreateLine(
+	private fun createLine(
 		level: ServerLevel,
 		player: Player,
 		itemStack: ItemStack,
@@ -122,7 +122,10 @@ object WebLineInteractionHandler {
 			return
 		}
 
-		createLine(level, player, itemStack, firstNode, selectedNode)
+		val webLine = WebLine(UUID.randomUUID(), firstNode, selectedNode)
+		WebSavedData.get(level).addLine(level, webLine)
+		itemStack.remove(ModDataComponents.WEB_NODE)
+		player.status(ModMessageLang.LINE_CREATED_MESSAGE.toComponent())
 	}
 
 	private fun shearLine(
@@ -154,19 +157,6 @@ object WebLineInteractionHandler {
 	private fun storeFirstNode(player: Player, itemStack: ItemStack, selectedNode: WebNode) {
 		itemStack.set(ModDataComponents.WEB_NODE, WebNodeDataComponent(selectedNode))
 		player.status(ModMessageLang.FIRST_NODE_MESSAGE.toComponent())
-	}
-
-	private fun createLine(
-		level: ServerLevel,
-		player: Player,
-		itemStack: ItemStack,
-		firstNode: WebNode,
-		secondNode: WebNode
-	) {
-		val webLine = WebLine(UUID.randomUUID(), firstNode, secondNode)
-		WebSavedData.get(level).addLine(level, webLine)
-		itemStack.remove(ModDataComponents.WEB_NODE)
-		player.status(ModMessageLang.LINE_CREATED_MESSAGE.toComponent())
 	}
 
 	fun getTargetedLineAnchor(
