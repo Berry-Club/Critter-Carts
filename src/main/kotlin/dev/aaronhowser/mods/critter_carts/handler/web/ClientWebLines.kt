@@ -6,7 +6,7 @@ import dev.aaronhowser.mods.critter_carts.handler.web.node.LineAnchor
 import dev.aaronhowser.mods.critter_carts.packet.client_to_server.WebLineInteractPacket
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.player.Player
-import java.util.UUID
+import java.util.*
 
 object ClientWebLines {
 
@@ -36,21 +36,21 @@ object ClientWebLines {
 		val itemStack = player.getItemInHand(hand)
 		if (!itemStack.isItem(ModItemTagsProvider.WEB_LINE_INTERACTABLE)) return false
 
-		val lineAnchor = getLookedAtAnchor(player) ?: return false
+		val lineAnchor = getLookedAtAnchor(player, 1f) ?: return false
 		WebLineInteractPacket(lineAnchor.lineUuid, lineAnchor.position, hand).messageServer()
 		return true
 	}
 
-	fun getHoveredAnchor(player: Player): LineAnchor? {
+	fun getHoveredAnchor(player: Player, delta: Float): LineAnchor? {
 		if (!player.mainHandItem.isItem(ModItemTagsProvider.WEB_LINE_INTERACTABLE)
 			&& !player.offhandItem.isItem(ModItemTagsProvider.WEB_LINE_INTERACTABLE)
 		) return null
 
-		return getLookedAtAnchor(player)
+		return getLookedAtAnchor(player, delta)
 	}
 
-	private fun getLookedAtAnchor(player: Player): LineAnchor? {
-		val eyePosition = player.eyePosition
+	private fun getLookedAtAnchor(player: Player, delta: Float): LineAnchor? {
+		val eyePosition = player.getEyePosition(delta)
 		val interactionRange = player.blockInteractionRange()
 		val lookOffset = player.lookAngle.scale(interactionRange)
 		val lookEnd = eyePosition.add(lookOffset)

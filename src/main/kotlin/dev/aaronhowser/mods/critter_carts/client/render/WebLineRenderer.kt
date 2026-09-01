@@ -30,6 +30,7 @@ object WebLineRenderer {
 		if (event.stage != RenderLevelStageEvent.Stage.AFTER_WEATHER) return
 
 		val cameraPosition = event.camera.position
+		val delta = event.partialTick.getGameTimeDeltaPartialTick(false)
 		val poseStack = event.poseStack
 
 		poseStack.withPose {
@@ -44,17 +45,19 @@ object WebLineRenderer {
 				)
 			}
 
-			renderPlacementPreview(poseStack)
-			renderLineAnchorPreview(poseStack)
+			renderPlacementPreview(poseStack, delta)
+			renderLineAnchorPreview(poseStack, delta)
 		}
 	}
 
-	private fun renderPlacementPreview(poseStack: PoseStack) {
+	private fun renderPlacementPreview(poseStack: PoseStack, delta: Float) {
 		val minecraft = Minecraft.getInstance()
 		val player = minecraft.player ?: return
 		val itemStack = getHeldWebFluid(player.mainHandItem, player.offhandItem) ?: return
+
 		val firstNode = itemStack.get(ModDataComponents.WEB_NODE)?.node ?: return
-		val secondNode = getTargetedNode(minecraft) ?: return
+		val secondNode = getTargetedNode(minecraft, delta) ?: return
+
 		val isValid = WebLineInteractionHandler.canCreateLine(
 			player.level(),
 			player,
@@ -78,9 +81,9 @@ object WebLineRenderer {
 		return null
 	}
 
-	private fun getTargetedNode(minecraft: Minecraft): WebNode? {
+	private fun getTargetedNode(minecraft: Minecraft, delta: Float): WebNode? {
 		val player = minecraft.player ?: return null
-		val lineAnchor = ClientWebLines.getHoveredAnchor(player)
+		val lineAnchor = ClientWebLines.getHoveredAnchor(player, delta)
 		if (lineAnchor != null) return lineAnchor
 
 		val hitResult = minecraft.hitResult
@@ -94,10 +97,11 @@ object WebLineRenderer {
 		)
 	}
 
-	private fun renderLineAnchorPreview(poseStack: PoseStack) {
+	private fun renderLineAnchorPreview(poseStack: PoseStack, delta: Float) {
 		val minecraft = Minecraft.getInstance()
 		val player = minecraft.player ?: return
-		val lineAnchor = ClientWebLines.getHoveredAnchor(player) ?: return
+		val lineAnchor = ClientWebLines.getHoveredAnchor(player, delta) ?: return
+
 		val cubeRadius = 0.05
 		val anchorColor = 0xA0FFFFFF.toInt()
 		val position = lineAnchor.position
