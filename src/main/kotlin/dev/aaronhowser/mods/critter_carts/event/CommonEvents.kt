@@ -14,6 +14,7 @@ import net.neoforged.neoforge.event.brewing.RegisterBrewingRecipesEvent
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent
 import net.neoforged.neoforge.event.level.ChunkWatchEvent
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent
+import net.neoforged.neoforge.event.tick.ServerTickEvent
 
 @EventBusSubscriber(modid = CritterCarts.MOD_ID)
 object CommonEvents {
@@ -25,6 +26,14 @@ object CommonEvents {
 	@SubscribeEvent
 	fun onChunkWatch(event: ChunkWatchEvent.Watch) {
 		WebSavedData.get(event.player.serverLevel()).syncChunk(event.player, event.pos)
+	}
+
+	@SubscribeEvent
+	fun onServerTick(event: ServerTickEvent.Post) {
+		if (event.server.tickCount % WEB_VALIDATION_INTERVAL != 0) return
+
+		val level = event.server.overworld()
+		WebSavedData.get(level).removeInvalidLines(level)
 	}
 
 	@SubscribeEvent
@@ -49,4 +58,6 @@ object CommonEvents {
 	fun registerBrewingRecipes(event: RegisterBrewingRecipesEvent) {
 		ModPotions.registerRecipes(event)
 	}
+
+	private const val WEB_VALIDATION_INTERVAL = 20
 }
