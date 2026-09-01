@@ -3,7 +3,6 @@ package dev.aaronhowser.mods.critter_carts.handler.web
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isItem
 import dev.aaronhowser.mods.critter_carts.datagen.tag.ModItemTagsProvider
 import dev.aaronhowser.mods.critter_carts.handler.web.node.LineAnchor
-import dev.aaronhowser.mods.critter_carts.item.WebFluidItem
 import dev.aaronhowser.mods.critter_carts.packet.client_to_server.WebLineInteractPacket
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.player.Player
@@ -50,7 +49,7 @@ object ClientWebLines {
 
 	private fun getLookedAtAnchor(player: Player): LineAnchor? {
 		val lookEnd = player.eyePosition.add(player.lookAngle.scale(player.blockInteractionRange()))
-		return WebFluidItem.findLineAnchor(player, lookEnd)
+		return WebLineInteractionHandler.findLineAnchor(lines.values, player.eyePosition, lookEnd)
 	}
 
 }

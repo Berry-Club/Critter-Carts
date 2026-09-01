@@ -3,7 +3,7 @@ package dev.aaronhowser.mods.critter_carts.packet.client_to_server
 import dev.aaronhowser.mods.aaron.packet.AaronPacket
 import dev.aaronhowser.mods.aaron.serialization.AaronExtraStreamCodecs
 import dev.aaronhowser.mods.critter_carts.CritterCarts
-import dev.aaronhowser.mods.critter_carts.item.WebFluidItem
+import dev.aaronhowser.mods.critter_carts.handler.web.WebLineInteractionHandler
 import io.netty.buffer.ByteBuf
 import net.minecraft.core.UUIDUtil
 import net.minecraft.network.codec.ByteBufCodecs
@@ -23,7 +23,7 @@ class WebLineInteractPacket(
 
 	override fun handleOnServer(context: IPayloadContext) {
 		val player = context.player() as? ServerPlayer ?: return
-		WebFluidItem.selectLine(player, lineUuid, position, hand)
+		WebLineInteractionHandler.interact(player, lineUuid, position, hand)
 	}
 
 	override fun type(): CustomPacketPayload.Type<WebLineInteractPacket> = TYPE
