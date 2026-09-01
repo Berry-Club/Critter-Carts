@@ -27,7 +27,12 @@ class WebFluidItem(properties: Properties) : Item(properties) {
 
 		val player = context.player ?: return InteractionResult.PASS
 		val itemStack = context.itemInHand
-		val selectedNode = WebNode.BlockAnchor(context.clickedPos, context.clickedFace)
+		val faceOffset = Vec3.atLowerCornerOf(context.clickedFace.normal).scale(SURFACE_OFFSET)
+		val selectedNode = WebNode.BlockAnchor(
+			context.clickedPos,
+			context.clickedFace,
+			context.clickLocation.add(faceOffset)
+		)
 		val storedNode = itemStack.get(ModDataComponents.WEB_NODE)?.node
 
 		if (storedNode == null) {
@@ -46,9 +51,7 @@ class WebFluidItem(properties: Properties) : Item(properties) {
 			return InteractionResult.CONSUME
 		}
 
-		val firstCenter = getFaceCenter(storedNode)
-		val secondCenter = getFaceCenter(selectedNode)
-		if (firstCenter.distanceToSqr(secondCenter) >= MAX_LENGTH_SQUARED) {
+		if (storedNode.position.distanceToSqr(selectedNode.position) >= MAX_LENGTH_SQUARED) {
 			player.status(ModMessageLang.TOO_LONG_MESSAGE.toComponent())
 			return InteractionResult.CONSUME
 		}
@@ -72,28 +75,15 @@ class WebFluidItem(properties: Properties) : Item(properties) {
 		firstNode: WebNode.BlockAnchor,
 		secondNode: WebNode.BlockAnchor
 	): Boolean {
-		val firstCenter = offsetFromFace(getFaceCenter(firstNode), firstNode)
-		val secondCenter = offsetFromFace(getFaceCenter(secondNode), secondNode)
 		val clipContext = ClipContext(
-			firstCenter,
-			secondCenter,
+			firstNode.position,
+			secondNode.position,
 			ClipContext.Block.COLLIDER,
 			ClipContext.Fluid.NONE,
 			player
 		)
 		val result = level.clip(clipContext)
 		return result.type == HitResult.Type.MISS
-	}
-
-	private fun getFaceCenter(node: WebNode.BlockAnchor): Vec3 {
-		val blockCenter = Vec3.atCenterOf(node.blockPos)
-		val faceOffset = Vec3.atLowerCornerOf(node.face.normal).scale(0.5)
-		return blockCenter.add(faceOffset)
-	}
-
-	private fun offsetFromFace(center: Vec3, node: WebNode.BlockAnchor): Vec3 {
-		val faceOffset = Vec3.atLowerCornerOf(node.face.normal).scale(SURFACE_OFFSET)
-		return center.add(faceOffset)
 	}
 
 	companion object {

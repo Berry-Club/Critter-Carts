@@ -12,6 +12,9 @@ data class WebLine(
 	val firstNode: WebNode,
 	val secondNode: WebNode
 ) {
+	val length: Double
+		get() = firstNode.position.distanceTo(secondNode.position)
+
 	companion object {
 		val CODEC: Codec<WebLine> = RecordCodecBuilder.create { instance ->
 			instance.group(

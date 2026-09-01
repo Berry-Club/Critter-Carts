@@ -9,13 +9,24 @@ import net.minecraft.core.Direction
 import net.minecraft.core.UUIDUtil
 import net.minecraft.network.codec.ByteBufCodecs
 import net.minecraft.network.codec.StreamCodec
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.world.phys.Vec3
 import java.util.UUID
 
 sealed interface WebNode {
+	val position: Vec3
+
+	fun isValid(level: ServerLevel, lineExists: (UUID) -> Boolean): Boolean
+
 	data class BlockAnchor(
 		val blockPos: BlockPos,
-		val face: Direction
+		val face: Direction,
+		override val position: Vec3
 	) : WebNode {
+		override fun isValid(level: ServerLevel, lineExists: (UUID) -> Boolean): Boolean {
+			return level.getBlockState(blockPos).isFaceSturdy(level, blockPos, face)
+		}
+
 		companion object {
 			const val TYPE = "block"
 			const val TYPE_ID = 0
@@ -28,13 +39,17 @@ sealed interface WebNode {
 							.forGetter(BlockAnchor::blockPos),
 						Direction.CODEC
 							.fieldOf("face")
-							.forGetter(BlockAnchor::face)
+							.forGetter(BlockAnchor::face),
+						Vec3.CODEC
+							.fieldOf("position")
+							.forGetter(BlockAnchor::position)
 					).apply(instance, ::BlockAnchor)
 				}
 
 			val STREAM_CODEC: StreamCodec<ByteBuf, BlockAnchor> = StreamCodec.composite(
 				BlockPos.STREAM_CODEC, BlockAnchor::blockPos,
 				Direction.STREAM_CODEC, BlockAnchor::face,
+				POSITION_STREAM_CODEC, BlockAnchor::position,
 				::BlockAnchor
 			)
 		}
@@ -42,8 +57,12 @@ sealed interface WebNode {
 
 	data class LineAnchor(
 		val lineUuid: UUID,
-		val percentAlong: Double
+		override val position: Vec3
 	) : WebNode {
+		override fun isValid(level: ServerLevel, lineExists: (UUID) -> Boolean): Boolean {
+			return lineExists(lineUuid)
+		}
+
 		companion object {
 			const val TYPE = "line"
 			const val TYPE_ID = 1
@@ -54,21 +73,28 @@ sealed interface WebNode {
 						UUIDUtil.CODEC
 							.fieldOf("line_uuid")
 							.forGetter(LineAnchor::lineUuid),
-						Codec.doubleRange(0.0, 1.0)
-							.fieldOf("percent_along")
-							.forGetter(LineAnchor::percentAlong)
+						Vec3.CODEC
+							.fieldOf("position")
+							.forGetter(LineAnchor::position)
 					).apply(instance, ::LineAnchor)
 				}
 
 			val STREAM_CODEC: StreamCodec<ByteBuf, LineAnchor> = StreamCodec.composite(
 				UUIDUtil.STREAM_CODEC, LineAnchor::lineUuid,
-				ByteBufCodecs.DOUBLE, LineAnchor::percentAlong,
+				POSITION_STREAM_CODEC, LineAnchor::position,
 				::LineAnchor
 			)
 		}
 	}
 
 	companion object {
+		private val POSITION_STREAM_CODEC: StreamCodec<ByteBuf, Vec3> = StreamCodec.composite(
+			ByteBufCodecs.DOUBLE, { position -> position.x },
+			ByteBufCodecs.DOUBLE, { position -> position.y },
+			ByteBufCodecs.DOUBLE, { position -> position.z },
+			::Vec3
+		)
+
 		val CODEC: Codec<WebNode> =
 			Codec.STRING.dispatch(
 				"type",

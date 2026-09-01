@@ -9,10 +9,6 @@ object ClientWebLines {
 		return lines.values
 	}
 
-	fun getLine(uuid: UUID): WebLine? {
-		return lines[uuid]
-	}
-
 	fun addLines(newLines: Collection<WebLine>) {
 		for (line in newLines) {
 			lines[line.uuid] = line

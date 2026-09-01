@@ -85,19 +85,15 @@ class WebSavedData : SavedData() {
 		if (cachedValidity != null) return cachedValidity
 		if (!visitedLines.add(line.uuid)) return false
 
-		val dependenciesValid = isNodeDependencyValid(level, line.firstNode, visitedLines, validityCache)
-			&& isNodeDependencyValid(level, line.secondNode, visitedLines, validityCache)
+		val dependenciesValid = isNodeValid(level, line.firstNode, visitedLines, validityCache)
+			&& isNodeValid(level, line.secondNode, visitedLines, validityCache)
 		if (!dependenciesValid) {
 			visitedLines.remove(line.uuid)
 			validityCache[line.uuid] = false
 			return false
 		}
 
-		val firstPosition = getNodePosition(level, line.firstNode, mutableSetOf())
-		val secondPosition = getNodePosition(level, line.secondNode, mutableSetOf())
-		val lineValid = firstPosition != null
-			&& secondPosition != null
-			&& hasLineOfSight(level, firstPosition, secondPosition)
+		val lineValid = hasLineOfSight(level, line.firstNode.position, line.secondNode.position)
 
 		visitedLines.remove(line.uuid)
 		validityCache[line.uuid] = lineValid
@@ -116,39 +112,17 @@ class WebSavedData : SavedData() {
 		return level.clip(clipContext).type == HitResult.Type.MISS
 	}
 
-	private fun isNodeDependencyValid(
+	private fun isNodeValid(
 		level: ServerLevel,
 		node: WebNode,
 		visitedLines: MutableSet<UUID>,
 		validityCache: MutableMap<UUID, Boolean>
 	): Boolean {
+		if (!node.isValid(level, lines::containsKey)) return false
 		if (node !is WebNode.LineAnchor) return true
 
 		val anchoredLine = lines[node.lineUuid] ?: return false
 		return isValid(level, anchoredLine, visitedLines, validityCache)
-	}
-
-	private fun getNodePosition(level: ServerLevel, node: WebNode, visitedLines: MutableSet<UUID>): Vec3? {
-		return when (node) {
-			is WebNode.BlockAnchor -> {
-				val blockState = level.getBlockState(node.blockPos)
-				if (!blockState.isFaceSturdy(level, node.blockPos, node.face)) return null
-
-				val blockCenter = Vec3.atCenterOf(node.blockPos)
-				val faceOffset = Vec3.atLowerCornerOf(node.face.normal)
-					.scale(0.5 + SURFACE_OFFSET)
-				blockCenter.add(faceOffset)
-			}
-
-			is WebNode.LineAnchor -> {
-				if (!visitedLines.add(node.lineUuid)) return null
-
-				val anchoredLine = lines[node.lineUuid] ?: return null
-				val firstPosition = getNodePosition(level, anchoredLine.firstNode, visitedLines) ?: return null
-				val secondPosition = getNodePosition(level, anchoredLine.secondNode, visitedLines) ?: return null
-				firstPosition.lerp(secondPosition, node.percentAlong)
-			}
-		}
 	}
 
 	private fun sendToNearbyPlayers(level: ServerLevel, line: WebLine, packet: AaronPacket) {
@@ -204,7 +178,6 @@ class WebSavedData : SavedData() {
 	companion object {
 		const val SAVED_DATA_NAME = "critter_carts_webs"
 		const val LINES_TAG = "Lines"
-		private const val SURFACE_OFFSET = 0.001
 
 		private fun load(tag: CompoundTag, registries: HolderLookup.Provider): WebSavedData {
 			val savedData = WebSavedData()
