@@ -4,11 +4,10 @@ import dev.aaronhowser.mods.aaron.misc.AaronExtensions.status
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.toComponent
 import dev.aaronhowser.mods.critter_carts.datagen.language.ModMessageLang
 import dev.aaronhowser.mods.critter_carts.handler.web.WebLine
-import dev.aaronhowser.mods.critter_carts.handler.web.WebNode
 import dev.aaronhowser.mods.critter_carts.handler.web.WebSavedData
+import dev.aaronhowser.mods.critter_carts.handler.web.node.BlockAnchor
 import dev.aaronhowser.mods.critter_carts.item.component.WebNodeDataComponent
 import dev.aaronhowser.mods.critter_carts.registry.ModDataComponents
-import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.player.Player
@@ -28,7 +27,7 @@ class WebFluidItem(properties: Properties) : Item(properties) {
 		val player = context.player ?: return InteractionResult.PASS
 		val itemStack = context.itemInHand
 		val faceOffset = Vec3.atLowerCornerOf(context.clickedFace.normal).scale(SURFACE_OFFSET)
-		val selectedNode = WebNode.BlockAnchor(
+		val selectedNode = BlockAnchor(
 			context.clickedPos,
 			context.clickedFace,
 			context.clickLocation.add(faceOffset)
@@ -41,7 +40,7 @@ class WebFluidItem(properties: Properties) : Item(properties) {
 			return InteractionResult.CONSUME
 		}
 
-		if (storedNode !is WebNode.BlockAnchor) {
+		if (storedNode !is BlockAnchor) {
 			itemStack.remove(ModDataComponents.WEB_NODE)
 			return InteractionResult.CONSUME
 		}
@@ -72,8 +71,8 @@ class WebFluidItem(properties: Properties) : Item(properties) {
 	private fun hasLineOfSight(
 		level: ServerLevel,
 		player: Player,
-		firstNode: WebNode.BlockAnchor,
-		secondNode: WebNode.BlockAnchor
+		firstNode: BlockAnchor,
+		secondNode: BlockAnchor
 	): Boolean {
 		val clipContext = ClipContext(
 			firstNode.position,

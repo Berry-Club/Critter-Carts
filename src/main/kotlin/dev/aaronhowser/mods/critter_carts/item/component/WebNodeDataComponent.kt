@@ -2,7 +2,7 @@ package dev.aaronhowser.mods.critter_carts.item.component
 
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import dev.aaronhowser.mods.critter_carts.handler.web.WebNode
+import dev.aaronhowser.mods.critter_carts.handler.web.node.WebNode
 import io.netty.buffer.ByteBuf
 import net.minecraft.network.codec.StreamCodec
 
