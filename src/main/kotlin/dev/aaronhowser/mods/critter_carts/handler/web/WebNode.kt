@@ -18,24 +18,24 @@ import java.util.UUID
 sealed interface WebNode {
 	val position: Vec3
 
-	fun isLoaded(level: ServerLevel, lines: Map<UUID, WebLine>, checkedLines: MutableSet<UUID>): Boolean
+	fun isLoaded(level: ServerLevel): Boolean
 
-	fun isValid(level: ServerLevel, lines: Map<UUID, WebLine>): Boolean
+	fun isValid(level: ServerLevel, lines: Map<UUID, WebLine>, checkedLines: MutableSet<UUID>): Boolean
 
 	data class BlockAnchor(
 		val blockPos: BlockPos,
 		val face: Direction,
 		override val position: Vec3
 	) : WebNode {
-		override fun isLoaded(
+		override fun isLoaded(level: ServerLevel): Boolean {
+			return isChunkLoaded(level, ChunkPos(blockPos))
+		}
+
+		override fun isValid(
 			level: ServerLevel,
 			lines: Map<UUID, WebLine>,
 			checkedLines: MutableSet<UUID>
 		): Boolean {
-			return isChunkLoaded(level, ChunkPos(blockPos))
-		}
-
-		override fun isValid(level: ServerLevel, lines: Map<UUID, WebLine>): Boolean {
 			return level.getBlockState(blockPos).isFaceSturdy(level, blockPos, face)
 		}
 
@@ -71,25 +71,20 @@ sealed interface WebNode {
 		val lineUuid: UUID,
 		override val position: Vec3
 	) : WebNode {
-		override fun isLoaded(
+		override fun isLoaded(level: ServerLevel): Boolean {
+			val chunkPos = ChunkPos(BlockPos.containing(position))
+			return isChunkLoaded(level, chunkPos)
+		}
+
+		override fun isValid(
 			level: ServerLevel,
 			lines: Map<UUID, WebLine>,
 			checkedLines: MutableSet<UUID>
 		): Boolean {
-			if (!checkedLines.add(lineUuid)) return true
+			val line = lines[lineUuid] ?: return false
+			if (!line.isLoaded(level)) return true
 
-			val line = lines[lineUuid]
-			if (line == null) {
-				val chunkPos = ChunkPos(BlockPos.containing(position))
-				return isChunkLoaded(level, chunkPos)
-			}
-
-			return line.firstNode.isLoaded(level, lines, checkedLines)
-				&& line.secondNode.isLoaded(level, lines, checkedLines)
-		}
-
-		override fun isValid(level: ServerLevel, lines: Map<UUID, WebLine>): Boolean {
-			return lines.containsKey(lineUuid)
+			return line.isValid(level, lines, checkedLines)
 		}
 
 		companion object {

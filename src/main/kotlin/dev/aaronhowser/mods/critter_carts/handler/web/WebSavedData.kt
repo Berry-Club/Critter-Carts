@@ -4,7 +4,6 @@ import com.mojang.serialization.DynamicOps
 import dev.aaronhowser.mods.aaron.packet.AaronPacket
 import dev.aaronhowser.mods.critter_carts.packet.server_to_client.AddWebLinesPacket
 import dev.aaronhowser.mods.critter_carts.packet.server_to_client.RemoveWebLinePacket
-import net.minecraft.core.BlockPos
 import net.minecraft.core.HolderLookup
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtOps
@@ -12,11 +11,7 @@ import net.minecraft.nbt.Tag
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.level.ChunkPos
-import net.minecraft.world.level.ClipContext
 import net.minecraft.world.level.saveddata.SavedData
-import net.minecraft.world.phys.shapes.CollisionContext
-import net.minecraft.world.phys.HitResult
-import net.minecraft.world.phys.Vec3
 import java.util.UUID
 
 class WebSavedData : SavedData() {
@@ -36,7 +31,7 @@ class WebSavedData : SavedData() {
 	}
 
 	fun syncChunk(player: ServerPlayer, chunkPos: ChunkPos) {
-		val nearbyLines = lines.values.filter { line -> chunkPos in getChunkPositions(line) }
+		val nearbyLines = lines.values.filter { line -> chunkPos in line.getChunkPositions() }
 		if (nearbyLines.isEmpty()) return
 
 		AddWebLinesPacket(nearbyLines).messagePlayer(player)
@@ -44,7 +39,7 @@ class WebSavedData : SavedData() {
 
 	fun removeInvalidLines(level: ServerLevel) {
 		val invalidLines = lines.values.filter { line ->
-			isLoaded(level, line) && !isValid(level, line, mutableSetOf())
+			line.isLoaded(level) && !line.isValid(level, lines)
 		}
 		if (invalidLines.isEmpty()) return
 
@@ -56,54 +51,10 @@ class WebSavedData : SavedData() {
 		setDirty()
 	}
 
-	private fun isLoaded(level: ServerLevel, line: WebLine): Boolean {
-		val checkedLines: MutableSet<UUID> = mutableSetOf()
-		return line.firstNode.isLoaded(level, lines, checkedLines)
-			&& line.secondNode.isLoaded(level, lines, checkedLines)
-	}
-
-	private fun isValid(
-		level: ServerLevel,
-		line: WebLine,
-		checkedLines: MutableSet<UUID>
-	): Boolean {
-		if (!checkedLines.add(line.uuid)) return false
-
-		if (!isValid(level, line.firstNode, checkedLines)) return false
-		if (!isValid(level, line.secondNode, checkedLines)) return false
-
-		checkedLines.remove(line.uuid)
-		return hasLineOfSight(level, line.firstNode.position, line.secondNode.position)
-	}
-
-	private fun hasLineOfSight(level: ServerLevel, firstPosition: Vec3, secondPosition: Vec3): Boolean {
-		val clipContext = ClipContext(
-			firstPosition,
-			secondPosition,
-			ClipContext.Block.COLLIDER,
-			ClipContext.Fluid.NONE,
-			CollisionContext.empty()
-		)
-
-		return level.clip(clipContext).type == HitResult.Type.MISS
-	}
-
-	private fun isValid(
-		level: ServerLevel,
-		node: WebNode,
-		checkedLines: MutableSet<UUID>
-	): Boolean {
-		if (!node.isValid(level, lines)) return false
-		if (node !is WebNode.LineAnchor) return true
-
-		val line = lines[node.lineUuid] ?: return false
-		return isValid(level, line, checkedLines)
-	}
-
 	private fun sendToNearbyPlayers(level: ServerLevel, line: WebLine, packet: AaronPacket) {
 		val nearbyPlayers: MutableSet<ServerPlayer> = mutableSetOf()
 
-		for (chunkPos in getChunkPositions(line)) {
+		for (chunkPos in line.getChunkPositions()) {
 			for (player in level.chunkSource.chunkMap.getPlayers(chunkPos, false)) {
 				nearbyPlayers.add(player)
 			}
@@ -112,13 +63,6 @@ class WebSavedData : SavedData() {
 		for (player in nearbyPlayers) {
 			packet.messagePlayer(player)
 		}
-	}
-
-	private fun getChunkPositions(line: WebLine): Set<ChunkPos> {
-		return setOf(
-			ChunkPos(BlockPos.containing(line.firstNode.position)),
-			ChunkPos(BlockPos.containing(line.secondNode.position))
-		)
 	}
 
 	override fun save(tag: CompoundTag, registries: HolderLookup.Provider): CompoundTag {
