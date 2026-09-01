@@ -29,6 +29,11 @@ object CommonEvents {
 	}
 
 	@SubscribeEvent
+	fun onChunkUnwatch(event: ChunkWatchEvent.UnWatch) {
+		WebSavedData.get(event.player.serverLevel()).forgetChunk(event.player, event.pos)
+	}
+
+	@SubscribeEvent
 	fun onServerTick(event: ServerTickEvent.Post) {
 		if (event.server.tickCount % WEB_VALIDATION_INTERVAL != 0) return
 

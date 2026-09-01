@@ -37,6 +37,30 @@ class WebSavedData : SavedData() {
 		AddWebLinesPacket(nearbyLines).messagePlayer(player)
 	}
 
+	fun forgetChunk(player: ServerPlayer, chunkPos: ChunkPos) {
+		val level = player.serverLevel()
+
+		for (line in lines.values) {
+			val lineChunks = line.getChunkPositions()
+			if (chunkPos !in lineChunks) continue
+
+			var stillTrackingLine = false
+			for (lineChunk in lineChunks) {
+				if (lineChunk == chunkPos) continue
+
+				val trackingPlayers = level.chunkSource.chunkMap.getPlayers(lineChunk, false)
+				if (player !in trackingPlayers) continue
+
+				stillTrackingLine = true
+				break
+			}
+
+			if (!stillTrackingLine) {
+				RemoveWebLinePacket(line.uuid).messagePlayer(player)
+			}
+		}
+	}
+
 	fun removeInvalidLines(level: ServerLevel) {
 		val invalidLines = lines.values.filter { line ->
 			line.isLoaded(level) && !line.isValid(level, lines)
