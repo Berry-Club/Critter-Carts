@@ -17,5 +17,6 @@ class ModLanguageProvider(
 		ModMenuLang.add(this)
 		ModPotionLang.add(this)
 		ModSoundLang.add(this)
+		ModMessageLang.add(this)
 	}
 }

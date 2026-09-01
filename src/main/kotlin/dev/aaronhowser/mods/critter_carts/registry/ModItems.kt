@@ -7,6 +7,7 @@ import dev.aaronhowser.mods.critter_carts.item.CritterCageItem
 import dev.aaronhowser.mods.critter_carts.item.DyeberryItem
 import dev.aaronhowser.mods.critter_carts.item.ScoochwormSpawnEggItem
 import dev.aaronhowser.mods.critter_carts.item.StorageAttachmentItem
+import dev.aaronhowser.mods.critter_carts.item.WebFluidItem
 import net.neoforged.neoforge.registries.DeferredItem
 import net.neoforged.neoforge.registries.DeferredRegister
 
@@ -17,6 +18,9 @@ object ModItems : AaronItemRegistry() {
 
 	val LOCKBOX: DeferredItem<StorageAttachmentItem> =
 		register("lockbox", ::StorageAttachmentItem, StorageAttachmentItem.DEFAULT_PROPERTIES)
+
+	val WEB_FLUID: DeferredItem<WebFluidItem> =
+		register("web_fluid", ::WebFluidItem, PROPERTIES_SINGLE_STACK)
 
 	val CRITTER_CAGE: DeferredItem<CritterCageItem> =
 		register(

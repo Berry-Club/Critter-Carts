@@ -8,6 +8,7 @@ object ModItemLang {
 	fun add(provider: ModLanguageProvider) {
 		provider.apply {
 			addItem(ModItems.LOCKBOX, "Lockbox")
+			addItem(ModItems.WEB_FLUID, "Web Fluid")
 			addItem(ModItems.GREEN_DYEBERRY, "Green Dyeberry")
 			addItem(ModItems.BLUE_DYEBERRY, "Blue Dyeberry")
 			addItem(ModItems.RED_DYEBERRY, "Red Dyeberry")
