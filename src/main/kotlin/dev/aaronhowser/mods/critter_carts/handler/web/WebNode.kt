@@ -3,6 +3,7 @@ package dev.aaronhowser.mods.critter_carts.handler.web
 import com.mojang.serialization.Codec
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
+import dev.aaronhowser.mods.aaron.serialization.AaronExtraStreamCodecs
 import io.netty.buffer.ByteBuf
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
@@ -11,7 +12,7 @@ import net.minecraft.network.codec.ByteBufCodecs
 import net.minecraft.network.codec.StreamCodec
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.phys.Vec3
-import java.util.UUID
+import java.util.*
 
 sealed interface WebNode {
 	val position: Vec3
@@ -49,7 +50,7 @@ sealed interface WebNode {
 			val STREAM_CODEC: StreamCodec<ByteBuf, BlockAnchor> = StreamCodec.composite(
 				BlockPos.STREAM_CODEC, BlockAnchor::blockPos,
 				Direction.STREAM_CODEC, BlockAnchor::face,
-				POSITION_STREAM_CODEC, BlockAnchor::position,
+				AaronExtraStreamCodecs.VEC3, BlockAnchor::position,
 				::BlockAnchor
 			)
 		}
@@ -81,19 +82,13 @@ sealed interface WebNode {
 
 			val STREAM_CODEC: StreamCodec<ByteBuf, LineAnchor> = StreamCodec.composite(
 				UUIDUtil.STREAM_CODEC, LineAnchor::lineUuid,
-				POSITION_STREAM_CODEC, LineAnchor::position,
+				AaronExtraStreamCodecs.VEC3, LineAnchor::position,
 				::LineAnchor
 			)
 		}
 	}
 
 	companion object {
-		private val POSITION_STREAM_CODEC: StreamCodec<ByteBuf, Vec3> = StreamCodec.composite(
-			ByteBufCodecs.DOUBLE, { position -> position.x },
-			ByteBufCodecs.DOUBLE, { position -> position.y },
-			ByteBufCodecs.DOUBLE, { position -> position.z },
-			::Vec3
-		)
 
 		val CODEC: Codec<WebNode> =
 			Codec.STRING.dispatch(
