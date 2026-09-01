@@ -9,14 +9,13 @@ import dev.aaronhowser.mods.critter_carts.handler.web.ClientWebLines
 import dev.aaronhowser.mods.critter_carts.registry.ModBlockEntityTypes
 import dev.aaronhowser.mods.critter_carts.registry.ModEntityTypes
 import dev.aaronhowser.mods.critter_carts.registry.ModItems
-import net.minecraft.world.InteractionResult
 import net.neoforged.api.distmarker.Dist
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.neoforge.client.event.EntityRenderersEvent
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent
-import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent
+import net.neoforged.neoforge.client.event.InputEvent
 
 @EventBusSubscriber(
 	modid = CritterCarts.MOD_ID,
@@ -24,30 +23,8 @@ import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent
 )
 object ClientEvents {
 	@SubscribeEvent
-	fun interactWithWebLine(event: PlayerInteractEvent.RightClickBlock) {
-		if (event.isCanceled) return
-		if (!ClientWebLines.interact(event.entity, event.hand)) return
-
-		event.cancellationResult = InteractionResult.SUCCESS
-		event.isCanceled = true
-	}
-
-	@SubscribeEvent
-	fun interactWithWebLine(event: PlayerInteractEvent.RightClickItem) {
-		if (event.isCanceled) return
-		if (!ClientWebLines.interact(event.entity, event.hand)) return
-
-		event.cancellationResult = InteractionResult.SUCCESS
-		event.isCanceled = true
-	}
-
-	@SubscribeEvent
-	fun interactWithWebLine(event: PlayerInteractEvent.EntityInteract) {
-		if (event.isCanceled) return
-		if (!ClientWebLines.interact(event.entity, event.hand)) return
-
-		event.cancellationResult = InteractionResult.SUCCESS
-		event.isCanceled = true
+	fun interactWithWebLine(event: InputEvent.InteractionKeyMappingTriggered) {
+		ClientWebLines.handleInteractionEvent(event)
 	}
 
 	@SubscribeEvent

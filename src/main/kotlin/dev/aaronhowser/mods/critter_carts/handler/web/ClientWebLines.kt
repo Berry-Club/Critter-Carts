@@ -4,9 +4,11 @@ import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isItem
 import dev.aaronhowser.mods.critter_carts.datagen.tag.ModItemTagsProvider
 import dev.aaronhowser.mods.critter_carts.handler.web.node.LineAnchor
 import dev.aaronhowser.mods.critter_carts.packet.client_to_server.WebLineInteractPacket
+import net.minecraft.client.Minecraft
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.phys.Vec3
+import net.neoforged.neoforge.client.event.InputEvent
 import java.util.*
 
 object ClientWebLines {
@@ -31,19 +33,40 @@ object ClientWebLines {
 		lines.clear()
 	}
 
-	fun interact(player: Player, hand: InteractionHand): Boolean {
-		if (!player.level().isClientSide) return false
+	fun handleInteractionEvent(event: InputEvent.InteractionKeyMappingTriggered) {
+		if (event.isUseItem) {
+			rightClickLine(event)
+		}
+	}
 
-		val itemStack = player.getItemInHand(hand)
-		if (!itemStack.isItem(ModItemTagsProvider.WEB_LINE_INTERACTABLE)) return false
+	private fun rightClickLine(event: InputEvent.InteractionKeyMappingTriggered) {
+		val player = Minecraft.getInstance().player ?: return
+		val interactionHand = getInteractionHand(player) ?: return
 
 		val lineAnchor = getLookedAtAnchor(
 			player,
 			player.eyePosition,
 			player.lookAngle
-		) ?: return false
-		WebLineInteractPacket(lineAnchor.lineUuid, lineAnchor.position, hand).messageServer()
-		return true
+		) ?: return
+
+		val hand = event.hand
+		if (hand == interactionHand) {
+			WebLineInteractPacket(lineAnchor.lineUuid, lineAnchor.position, hand).messageServer()
+		}
+
+		event.isCanceled = true
+	}
+
+	private fun getInteractionHand(player: Player): InteractionHand? {
+		if (player.mainHandItem.isItem(ModItemTagsProvider.WEB_LINE_INTERACTABLE)) {
+			return InteractionHand.MAIN_HAND
+		}
+
+		if (player.offhandItem.isItem(ModItemTagsProvider.WEB_LINE_INTERACTABLE)) {
+			return InteractionHand.OFF_HAND
+		}
+
+		return null
 	}
 
 	fun getHoveredAnchor(
