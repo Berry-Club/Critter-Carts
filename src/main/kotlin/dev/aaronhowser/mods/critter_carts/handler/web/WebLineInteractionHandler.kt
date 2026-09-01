@@ -11,6 +11,7 @@ import dev.aaronhowser.mods.critter_carts.handler.web.node.LineAnchor
 import dev.aaronhowser.mods.critter_carts.handler.web.node.WebNode
 import dev.aaronhowser.mods.critter_carts.item.component.WebNodeDataComponent
 import dev.aaronhowser.mods.critter_carts.registry.ModDataComponents
+import dev.aaronhowser.mods.critter_carts.registry.ModItems
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.sounds.SoundEvents
@@ -25,7 +26,7 @@ import net.minecraft.world.phys.Vec3
 import net.neoforged.neoforge.common.Tags
 import org.joml.Intersectiond
 import org.joml.Vector3d
-import java.util.UUID
+import java.util.*
 
 object WebLineInteractionHandler {
 
@@ -57,12 +58,13 @@ object WebLineInteractionHandler {
 
 		if (selectedNode.position.distanceToSqr(requestedPosition) > positionToleranceSquared) return
 
-		if (itemStack.isItem(Tags.Items.TOOLS_SHEAR)) {
-			shearLine(level, player, itemStack, lineUuid, selectedNode, hand)
-			return
-		}
+		when {
+			itemStack.isItem(Tags.Items.TOOLS_SHEAR) ->
+				shearLine(level, player, itemStack, lineUuid, selectedNode, hand)
 
-		handleNodeSelection(level, player, itemStack, selectedNode)
+			itemStack.isItem(ModItems.WEB_FLUID) ->
+				handleNodeSelection(level, player, itemStack, selectedNode)
+		}
 	}
 
 	fun handleNodeSelection(
