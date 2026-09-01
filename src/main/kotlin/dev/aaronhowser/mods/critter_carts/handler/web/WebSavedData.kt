@@ -58,21 +58,19 @@ class WebSavedData : SavedData() {
 
 	private fun isLoaded(level: ServerLevel, line: WebLine): Boolean {
 		val visitedLines: MutableSet<UUID> = mutableSetOf()
-		return isNodeLoaded(level, line.firstNode, visitedLines)
-			&& isNodeLoaded(level, line.secondNode, visitedLines)
+		return isLoaded(level, line, visitedLines)
 	}
 
-	private fun isNodeLoaded(level: ServerLevel, node: WebNode, visitedLines: MutableSet<UUID>): Boolean {
-		return when (node) {
-			is WebNode.BlockAnchor -> level.hasChunk(node.blockPos.x shr 4, node.blockPos.z shr 4)
-			is WebNode.LineAnchor -> {
-				if (!visitedLines.add(node.lineUuid)) return true
+	private fun isLoaded(level: ServerLevel, line: WebLine, visitedLines: MutableSet<UUID>): Boolean {
+		if (!visitedLines.add(line.uuid)) return true
 
-				val anchoredLine = lines[node.lineUuid] ?: return true
-				isNodeLoaded(level, anchoredLine.firstNode, visitedLines)
-					&& isNodeLoaded(level, anchoredLine.secondNode, visitedLines)
-			}
+		val lineIsLoaded: (UUID) -> Boolean = { uuid ->
+			val anchoredLine = lines[uuid]
+			anchoredLine == null || isLoaded(level, anchoredLine, visitedLines)
 		}
+
+		return line.firstNode.isLoaded(level, lineIsLoaded)
+			&& line.secondNode.isLoaded(level, lineIsLoaded)
 	}
 
 	private fun isValid(

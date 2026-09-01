@@ -11,11 +11,14 @@ import net.minecraft.core.UUIDUtil
 import net.minecraft.network.codec.ByteBufCodecs
 import net.minecraft.network.codec.StreamCodec
 import net.minecraft.server.level.ServerLevel
+import net.minecraft.world.level.ChunkPos
 import net.minecraft.world.phys.Vec3
 import java.util.*
 
 sealed interface WebNode {
 	val position: Vec3
+
+	fun isLoaded(level: ServerLevel, lineIsLoaded: (UUID) -> Boolean): Boolean
 
 	fun isValid(level: ServerLevel, lineExists: (UUID) -> Boolean): Boolean
 
@@ -24,6 +27,11 @@ sealed interface WebNode {
 		val face: Direction,
 		override val position: Vec3
 	) : WebNode {
+		override fun isLoaded(level: ServerLevel, lineIsLoaded: (UUID) -> Boolean): Boolean {
+			val chunkPos = ChunkPos(blockPos)
+			return level.hasChunk(chunkPos.x, chunkPos.z)
+		}
+
 		override fun isValid(level: ServerLevel, lineExists: (UUID) -> Boolean): Boolean {
 			return level.getBlockState(blockPos).isFaceSturdy(level, blockPos, face)
 		}
@@ -60,6 +68,10 @@ sealed interface WebNode {
 		val lineUuid: UUID,
 		override val position: Vec3
 	) : WebNode {
+		override fun isLoaded(level: ServerLevel, lineIsLoaded: (UUID) -> Boolean): Boolean {
+			return lineIsLoaded(lineUuid)
+		}
+
 		override fun isValid(level: ServerLevel, lineExists: (UUID) -> Boolean): Boolean {
 			return lineExists(lineUuid)
 		}
