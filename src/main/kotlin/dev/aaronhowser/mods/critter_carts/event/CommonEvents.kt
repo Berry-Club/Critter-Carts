@@ -50,7 +50,7 @@ object CommonEvents {
 		val level = event.level
 		if (level !is ServerLevel) return
 
-		WebSavedData.get(level).markChunkForValidation(event.pos)
+		WebSavedData.get(level).markForValidation(event.pos)
 	}
 
 	@SubscribeEvent

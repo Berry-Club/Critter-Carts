@@ -30,9 +30,7 @@ class WebSavedData : SavedData() {
 
 		val previousLine = lines.put(line.uuid, line)
 		if (previousLine != null) {
-			removeFromChunkCache(previousLine)
-			removeNodeIfOrphaned(previousLine.firstNode.uuid)
-			removeNodeIfOrphaned(previousLine.secondNode.uuid)
+			removeLineReferences(previousLine)
 		}
 
 		addToChunkCache(line)
@@ -53,13 +51,10 @@ class WebSavedData : SavedData() {
 	}
 
 	fun removeLine(level: ServerLevel, uuid: UUID): WebLine? {
-		val removedLine = lines.remove(uuid) ?: return null
-		removeFromChunkCache(removedLine)
-		removeNodeIfOrphaned(removedLine.firstNode.uuid)
-		removeNodeIfOrphaned(removedLine.secondNode.uuid)
+		val removedLine = lines[uuid] ?: return null
+		removeStoredLine(level, removedLine)
 		chunksToValidate.addAll(removedLine.intersectedChunkPositions)
 		setDirty()
-		sendToNearbyPlayers(level, removedLine, RemoveWebLinePacket(uuid))
 		return removedLine
 	}
 
@@ -94,17 +89,22 @@ class WebSavedData : SavedData() {
 		}
 	}
 
-	fun markChunkForValidation(blockPos: BlockPos) {
+	fun markForValidation(blockPos: BlockPos) {
 		chunksToValidate.add(ChunkPos(blockPos))
-	}
-
-	fun markChunkForValidation(chunkPos: ChunkPos) {
-		chunksToValidate.add(chunkPos)
 	}
 
 	fun validateChangedChunks(level: ServerLevel) {
 		if (chunksToValidate.isEmpty()) return
 
+		val lineUuids = getLinesNearChangedChunks()
+		val invalidLines = getInvalidLines(level, lineUuids)
+		if (invalidLines.isEmpty()) return
+
+		removeInvalidLines(level, invalidLines)
+		setDirty()
+	}
+
+	private fun getLinesNearChangedChunks(): Set<UUID> {
 		val lineUuids: MutableSet<UUID> = mutableSetOf()
 		for (changedChunk in chunksToValidate) {
 			for (chunkX in changedChunk.x - 1..changedChunk.x + 1) {
@@ -117,21 +117,44 @@ class WebSavedData : SavedData() {
 		}
 
 		chunksToValidate.clear()
+		return lineUuids
+	}
 
-		val invalidLines = lineUuids.mapNotNull { uuid -> lines[uuid] }.filter { line ->
-			line.isLoaded(level) && !line.isValid(level, lines)
+	private fun getInvalidLines(
+		level: ServerLevel,
+		lineUuids: Set<UUID>
+	): Map<WebLine, WebLineInvalidation> {
+		val invalidLines: MutableMap<WebLine, WebLineInvalidation> = mutableMapOf()
+		for (lineUuid in lineUuids) {
+			val line = lines[lineUuid] ?: continue
+			if (!line.isLoaded(level)) continue
+
+			val invalidation = line.getInvalidation(level, lines) ?: continue
+			invalidLines[line] = invalidation
 		}
-		if (invalidLines.isEmpty()) return
 
-		for (line in invalidLines) {
-			lines.remove(line.uuid)
-			removeFromChunkCache(line)
-			removeNodeIfOrphaned(line.firstNode.uuid)
-			removeNodeIfOrphaned(line.secondNode.uuid)
-			sendToNearbyPlayers(level, line, RemoveWebLinePacket(line.uuid))
+		return invalidLines
+	}
+
+	private fun removeInvalidLines(
+		level: ServerLevel,
+		invalidLines: Map<WebLine, WebLineInvalidation>
+	) {
+		for (line in invalidLines.keys) {
+			removeStoredLine(level, line)
 		}
+	}
 
-		setDirty()
+	private fun removeStoredLine(level: ServerLevel, line: WebLine) {
+		lines.remove(line.uuid)
+		removeLineReferences(line)
+		sendToNearbyPlayers(level, line, RemoveWebLinePacket(line.uuid))
+	}
+
+	private fun removeLineReferences(line: WebLine) {
+		removeFromChunkCache(line)
+		removeNodeIfOrphaned(line.firstNode.uuid)
+		removeNodeIfOrphaned(line.secondNode.uuid)
 	}
 
 	private fun addToChunkCache(line: WebLine) {

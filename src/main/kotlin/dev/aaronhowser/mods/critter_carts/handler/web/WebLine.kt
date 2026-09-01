@@ -6,6 +6,7 @@ import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.level.ChunkPos
 import net.minecraft.world.level.ClipContext
 import net.minecraft.world.phys.AABB
+import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.shapes.CollisionContext
 import java.util.UUID
@@ -26,18 +27,27 @@ data class WebLine(
 		return firstNode.isLoaded(level) && secondNode.isLoaded(level)
 	}
 
-	fun isValid(level: ServerLevel, lines: Map<UUID, WebLine>): Boolean {
-		return isValid(level, lines, mutableSetOf())
+	fun getInvalidation(
+		level: ServerLevel,
+		lines: Map<UUID, WebLine>
+	): WebLineInvalidation? {
+		return getInvalidation(level, lines, mutableSetOf())
 	}
 
-	fun isValid(
+	fun getInvalidation(
 		level: ServerLevel,
 		lines: Map<UUID, WebLine>,
 		checkedLines: MutableSet<UUID>
-	): Boolean {
-		if (!checkedLines.add(uuid)) return false
-		if (!firstNode.isValid(level, lines, checkedLines)) return false
-		if (!secondNode.isValid(level, lines, checkedLines)) return false
+	): WebLineInvalidation? {
+		if (!checkedLines.add(uuid)) {
+			return WebLineInvalidation(WebLineInvalidationReason.CYCLIC_DEPENDENCY)
+		}
+
+		val firstInvalidation = firstNode.getInvalidation(level, lines, checkedLines)
+		if (firstInvalidation != null) return firstInvalidation
+
+		val secondInvalidation = secondNode.getInvalidation(level, lines, checkedLines)
+		if (secondInvalidation != null) return secondInvalidation
 
 		checkedLines.remove(uuid)
 
@@ -49,7 +59,11 @@ data class WebLine(
 			CollisionContext.empty()
 		)
 
-		return level.clip(clipContext).type == HitResult.Type.MISS
+		val hitResult = level.clip(clipContext)
+		if (hitResult.type == HitResult.Type.MISS) return null
+
+		val blockPos = (hitResult as BlockHitResult).blockPos
+		return WebLineInvalidation(WebLineInvalidationReason.OBSTRUCTED, blockPos)
 	}
 
 	fun getEndpointChunkPositions(): Set<ChunkPos> {

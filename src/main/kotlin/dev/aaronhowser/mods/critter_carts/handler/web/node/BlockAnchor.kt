@@ -4,6 +4,8 @@ import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import dev.aaronhowser.mods.aaron.serialization.AaronExtraStreamCodecs
 import dev.aaronhowser.mods.critter_carts.handler.web.WebLine
+import dev.aaronhowser.mods.critter_carts.handler.web.WebLineInvalidation
+import dev.aaronhowser.mods.critter_carts.handler.web.WebLineInvalidationReason
 import io.netty.buffer.ByteBuf
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
@@ -25,12 +27,14 @@ data class BlockAnchor(
 		return WebNode.isChunkLoaded(level, ChunkPos(blockPos))
 	}
 
-	override fun isValid(
+	override fun getInvalidation(
 		level: ServerLevel,
 		lines: Map<UUID, WebLine>,
 		checkedLines: MutableSet<UUID>
-	): Boolean {
-		return level.getBlockState(blockPos).isFaceSturdy(level, blockPos, face)
+	): WebLineInvalidation? {
+		if (level.getBlockState(blockPos).isFaceSturdy(level, blockPos, face)) return null
+
+		return WebLineInvalidation(WebLineInvalidationReason.INVALID_ANCHOR, blockPos)
 	}
 
 	companion object {

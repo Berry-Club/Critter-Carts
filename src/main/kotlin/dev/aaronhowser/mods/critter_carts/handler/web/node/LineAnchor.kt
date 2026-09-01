@@ -4,6 +4,8 @@ import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import dev.aaronhowser.mods.aaron.serialization.AaronExtraStreamCodecs
 import dev.aaronhowser.mods.critter_carts.handler.web.WebLine
+import dev.aaronhowser.mods.critter_carts.handler.web.WebLineInvalidation
+import dev.aaronhowser.mods.critter_carts.handler.web.WebLineInvalidationReason
 import io.netty.buffer.ByteBuf
 import net.minecraft.core.BlockPos
 import net.minecraft.core.UUIDUtil
@@ -24,15 +26,16 @@ data class LineAnchor(
 		return WebNode.isChunkLoaded(level, chunkPos)
 	}
 
-	override fun isValid(
+	override fun getInvalidation(
 		level: ServerLevel,
 		lines: Map<UUID, WebLine>,
 		checkedLines: MutableSet<UUID>
-	): Boolean {
-		val line = lines[lineUuid] ?: return false
-		if (!line.isLoaded(level)) return true
+	): WebLineInvalidation? {
+		val line = lines[lineUuid]
+			?: return WebLineInvalidation(WebLineInvalidationReason.MISSING_LINE)
+		if (!line.isLoaded(level)) return null
 
-		return line.isValid(level, lines, checkedLines)
+		return line.getInvalidation(level, lines, checkedLines)
 	}
 
 	companion object {

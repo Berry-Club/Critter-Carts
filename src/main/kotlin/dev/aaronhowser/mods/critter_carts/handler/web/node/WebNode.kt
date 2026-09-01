@@ -2,6 +2,7 @@ package dev.aaronhowser.mods.critter_carts.handler.web.node
 
 import com.mojang.serialization.Codec
 import dev.aaronhowser.mods.critter_carts.handler.web.WebLine
+import dev.aaronhowser.mods.critter_carts.handler.web.WebLineInvalidation
 import io.netty.buffer.ByteBuf
 import net.minecraft.network.codec.ByteBufCodecs
 import net.minecraft.network.codec.StreamCodec
@@ -16,7 +17,11 @@ sealed interface WebNode {
 	val position: Vec3
 
 	fun isLoaded(level: ServerLevel): Boolean
-	fun isValid(level: ServerLevel, lines: Map<UUID, WebLine>, checkedLines: MutableSet<UUID>): Boolean
+	fun getInvalidation(
+		level: ServerLevel,
+		lines: Map<UUID, WebLine>,
+		checkedLines: MutableSet<UUID>
+	): WebLineInvalidation?
 
 	companion object {
 		fun isChunkLoaded(level: ServerLevel, chunkPos: ChunkPos): Boolean {
