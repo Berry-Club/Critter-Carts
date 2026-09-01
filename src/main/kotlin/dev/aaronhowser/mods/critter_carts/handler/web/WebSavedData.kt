@@ -1,11 +1,16 @@
 package dev.aaronhowser.mods.critter_carts.handler.web
 
 import com.mojang.serialization.DynamicOps
+import dev.aaronhowser.mods.aaron.packet.AaronPacket
+import dev.aaronhowser.mods.critter_carts.packet.server_to_client.AddWebLinesPacket
+import dev.aaronhowser.mods.critter_carts.packet.server_to_client.RemoveWebLinePacket
 import net.minecraft.core.HolderLookup
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtOps
 import net.minecraft.nbt.Tag
 import net.minecraft.server.level.ServerLevel
+import net.minecraft.server.level.ServerPlayer
+import net.minecraft.world.level.ChunkPos
 import net.minecraft.world.level.saveddata.SavedData
 import java.util.UUID
 
@@ -20,15 +25,33 @@ class WebSavedData : SavedData() {
 		return lines[uuid]
 	}
 
-	fun addLine(line: WebLine) {
+	fun addLine(level: ServerLevel, line: WebLine) {
 		lines[line.uuid] = line
 		setDirty()
+		sendToNearbyPlayers(level, line, AddWebLinesPacket(listOf(line)))
 	}
 
-	fun removeLine(uuid: UUID): WebLine? {
+	fun removeLine(level: ServerLevel, uuid: UUID): WebLine? {
 		val removedLine = lines.remove(uuid) ?: return null
 		setDirty()
+		sendToNearbyPlayers(level, removedLine, RemoveWebLinePacket(uuid))
 		return removedLine
+	}
+
+	fun syncChunk(player: ServerPlayer, chunkPos: ChunkPos) {
+		val nearbyLines = lines.values.filter { line -> line.getChunkPositions().contains(chunkPos) }
+		if (nearbyLines.isEmpty()) return
+
+		AddWebLinesPacket(nearbyLines).messagePlayer(player)
+	}
+
+	private fun sendToNearbyPlayers(level: ServerLevel, line: WebLine, packet: AaronPacket) {
+		val chunkPositions = line.getChunkPositions()
+		for (player in level.players()) {
+			if (chunkPositions.any { chunkPos -> level.chunkSource.chunkMap.getPlayers(chunkPos, false).contains(player) }) {
+				packet.messagePlayer(player)
+			}
+		}
 	}
 
 	override fun save(tag: CompoundTag, registries: HolderLookup.Provider): CompoundTag {

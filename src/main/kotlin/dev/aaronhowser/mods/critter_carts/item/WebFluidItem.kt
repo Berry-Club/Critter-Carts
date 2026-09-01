@@ -59,7 +59,7 @@ class WebFluidItem(properties: Properties) : Item(properties) {
 		}
 
 		val line = WebLine(UUID.randomUUID(), storedNode, selectedNode)
-		WebSavedData.get(level).addLine(line)
+		WebSavedData.get(level).addLine(level, line)
 		itemStack.remove(ModDataComponents.WEB_NODE)
 		player.status(ModMessageLang.LINE_CREATED_MESSAGE.toComponent())
 

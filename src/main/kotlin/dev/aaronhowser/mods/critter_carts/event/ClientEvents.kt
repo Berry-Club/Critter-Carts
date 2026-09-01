@@ -8,17 +8,23 @@ import dev.aaronhowser.mods.critter_carts.client.render.entity.ScoochwormRendere
 import dev.aaronhowser.mods.critter_carts.registry.ModBlockEntityTypes
 import dev.aaronhowser.mods.critter_carts.registry.ModEntityTypes
 import dev.aaronhowser.mods.critter_carts.registry.ModItems
+import dev.aaronhowser.mods.critter_carts.handler.web.ClientWebLines
 import net.neoforged.api.distmarker.Dist
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.neoforge.client.event.EntityRenderersEvent
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent
+import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent
 
 @EventBusSubscriber(
 	modid = CritterCarts.MOD_ID,
 	value = [Dist.CLIENT]
 )
 object ClientEvents {
+	@SubscribeEvent
+	fun onLoggingOut(event: ClientPlayerNetworkEvent.LoggingOut) {
+		ClientWebLines.clear()
+	}
 
 	@SubscribeEvent
 	fun registerEntityRenderers(event: EntityRenderersEvent.RegisterRenderers) {

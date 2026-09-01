@@ -5,6 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder
 import io.netty.buffer.ByteBuf
 import net.minecraft.core.UUIDUtil
 import net.minecraft.network.codec.StreamCodec
+import net.minecraft.world.level.ChunkPos
 import java.util.UUID
 
 data class WebLine(
@@ -12,6 +13,12 @@ data class WebLine(
 	val firstNode: WebNode,
 	val secondNode: WebNode
 ) {
+	fun getChunkPositions(): Set<ChunkPos> {
+		return listOf(firstNode, secondNode)
+			.filterIsInstance<WebNode.BlockAnchor>()
+			.mapTo(mutableSetOf()) { node -> ChunkPos(node.blockPos) }
+	}
+
 	companion object {
 		val CODEC: Codec<WebLine> = RecordCodecBuilder.create { instance ->
 			instance.group(
