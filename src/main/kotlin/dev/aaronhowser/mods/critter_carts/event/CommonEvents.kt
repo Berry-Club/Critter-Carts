@@ -37,7 +37,41 @@ object CommonEvents {
 	}
 
 	@SubscribeEvent
-	fun onBlockUpdate(event: BlockEvent) {
+	fun onBlockBreak(event: BlockEvent.BreakEvent) {
+		markWebLinesForValidation(event)
+	}
+
+	@SubscribeEvent
+	fun onBlockPlace(event: BlockEvent.EntityPlaceEvent) {
+		markWebLinesForValidation(event)
+	}
+
+	@SubscribeEvent
+	fun onBlockToolModification(event: BlockEvent.BlockToolModificationEvent) {
+		markWebLinesForValidation(event)
+	}
+
+	@SubscribeEvent
+	fun onFarmlandTrample(event: BlockEvent.FarmlandTrampleEvent) {
+		markWebLinesForValidation(event)
+	}
+
+	@SubscribeEvent
+	fun onFluidPlaceBlock(event: BlockEvent.FluidPlaceBlockEvent) {
+		markWebLinesForValidation(event)
+	}
+
+	@SubscribeEvent
+	fun onNeighborNotify(event: BlockEvent.NeighborNotifyEvent) {
+		markWebLinesForValidation(event)
+	}
+
+	@SubscribeEvent
+	fun onPortalSpawn(event: BlockEvent.PortalSpawnEvent) {
+		markWebLinesForValidation(event)
+	}
+
+	private fun markWebLinesForValidation(event: BlockEvent) {
 		val level = event.level
 		if (level !is ServerLevel) return
 
