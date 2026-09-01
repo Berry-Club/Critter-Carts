@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack
 import dev.aaronhowser.mods.aaron.client.render.AaronRenderUtil
 import dev.aaronhowser.mods.aaron.misc.AaronDsls.withPose
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isItem
+import dev.aaronhowser.mods.aaron.misc.AaronExtensions.toVec3
 import dev.aaronhowser.mods.critter_carts.CritterCarts
 import dev.aaronhowser.mods.critter_carts.handler.web.ClientWebLines
 import dev.aaronhowser.mods.critter_carts.handler.web.WebLineInteractionHandler
@@ -14,6 +15,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.HitResult
+import net.minecraft.world.phys.Vec3
 import net.neoforged.api.distmarker.Dist
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
@@ -30,7 +32,7 @@ object WebLineRenderer {
 		if (event.stage != RenderLevelStageEvent.Stage.AFTER_WEATHER) return
 
 		val cameraPosition = event.camera.position
-		val delta = event.partialTick.getGameTimeDeltaPartialTick(false)
+		val viewVector = event.camera.lookVector.toVec3()
 		val poseStack = event.poseStack
 
 		poseStack.withPose {
@@ -45,18 +47,22 @@ object WebLineRenderer {
 				)
 			}
 
-			renderPlacementPreview(poseStack, delta)
-			renderLineAnchorPreview(poseStack, delta)
+			renderPlacementPreview(poseStack, cameraPosition, viewVector)
+			renderLineAnchorPreview(poseStack, cameraPosition, viewVector)
 		}
 	}
 
-	private fun renderPlacementPreview(poseStack: PoseStack, delta: Float) {
+	private fun renderPlacementPreview(
+		poseStack: PoseStack,
+		eyePosition: Vec3,
+		viewVector: Vec3
+	) {
 		val minecraft = Minecraft.getInstance()
 		val player = minecraft.player ?: return
 		val itemStack = getHeldWebFluid(player.mainHandItem, player.offhandItem) ?: return
 
 		val firstNode = itemStack.get(ModDataComponents.WEB_NODE)?.node ?: return
-		val secondNode = getTargetedNode(minecraft, delta) ?: return
+		val secondNode = getTargetedNode(minecraft, eyePosition, viewVector) ?: return
 
 		val isValid = WebLineInteractionHandler.canCreateLine(
 			player.level(),
@@ -81,9 +87,13 @@ object WebLineRenderer {
 		return null
 	}
 
-	private fun getTargetedNode(minecraft: Minecraft, delta: Float): WebNode? {
+	private fun getTargetedNode(
+		minecraft: Minecraft,
+		eyePosition: Vec3,
+		viewVector: Vec3
+	): WebNode? {
 		val player = minecraft.player ?: return null
-		val lineAnchor = ClientWebLines.getHoveredAnchor(player, delta)
+		val lineAnchor = ClientWebLines.getHoveredAnchor(player, eyePosition, viewVector)
 		if (lineAnchor != null) return lineAnchor
 
 		val hitResult = minecraft.hitResult
@@ -97,10 +107,18 @@ object WebLineRenderer {
 		)
 	}
 
-	private fun renderLineAnchorPreview(poseStack: PoseStack, delta: Float) {
+	private fun renderLineAnchorPreview(
+		poseStack: PoseStack,
+		eyePosition: Vec3,
+		viewVector: Vec3
+	) {
 		val minecraft = Minecraft.getInstance()
 		val player = minecraft.player ?: return
-		val lineAnchor = ClientWebLines.getHoveredAnchor(player, delta) ?: return
+		val lineAnchor = ClientWebLines.getHoveredAnchor(
+			player,
+			eyePosition,
+			viewVector
+		) ?: return
 
 		val cubeRadius = 0.05
 		val anchorColor = 0xA0FFFFFF.toInt()
