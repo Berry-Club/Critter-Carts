@@ -23,9 +23,14 @@ import net.minecraft.world.level.gameevent.GameEvent
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
 import net.neoforged.neoforge.common.Tags
+import org.joml.Intersectiond
+import org.joml.Vector3d
 import java.util.UUID
 
 object WebLineInteractionHandler {
+
+	private const val LINE_SELECTION_RADIUS = 0.3
+	private const val REQUESTED_POSITION_TOLERANCE = 0.1
 
 	fun interact(
 		player: ServerPlayer,
@@ -39,12 +44,19 @@ object WebLineInteractionHandler {
 		val level = player.serverLevel()
 		val line = WebSavedData.get(level).getLine(lineUuid) ?: return
 		val eyePosition = player.eyePosition
-		val lookEnd = eyePosition.add(player.lookAngle.scale(player.blockInteractionRange()))
-		val selectedNode = findLineAnchor(listOf(line), eyePosition, lookEnd) ?: return
-		val positionTolerance = 0.1
-		val positionToleranceSquared = positionTolerance * positionTolerance
+		val interactionRange = player.blockInteractionRange()
+		val lookOffset = player.lookAngle.scale(interactionRange)
+		val lookEnd = eyePosition.add(lookOffset)
+		val selectedNode = getTargetedLineAnchor(
+			listOf(line),
+			eyePosition,
+			lookEnd
+		) ?: return
+		val positionToleranceSquared =
+			REQUESTED_POSITION_TOLERANCE * REQUESTED_POSITION_TOLERANCE
 
 		if (selectedNode.position.distanceToSqr(requestedPosition) > positionToleranceSquared) return
+
 		if (itemStack.isItem(Tags.Items.TOOLS_SHEAR)) {
 			shearLine(level, player, itemStack, lineUuid, selectedNode, hand)
 			return
@@ -68,18 +80,22 @@ object WebLineInteractionHandler {
 			return
 		}
 
-		if (firstNode is LineAnchor
-			&& selectedNode is LineAnchor
-			&& firstNode.lineUuid == selectedNode.lineUuid
-		) {
+		val bothAnchorsAreOnSameLine =
+			firstNode is LineAnchor
+				&& selectedNode is LineAnchor
+				&& firstNode.lineUuid == selectedNode.lineUuid
+
+		if (bothAnchorsAreOnSameLine) {
 			player.status(ModMessageLang.SAME_LINE_MESSAGE.toComponent())
 			return
 		}
 
-		if (firstNode is BlockAnchor
-			&& selectedNode is BlockAnchor
-			&& firstNode.face == selectedNode.face
-		) {
+		val bothAnchorsFaceSameDirection =
+			firstNode is BlockAnchor
+				&& selectedNode is BlockAnchor
+				&& firstNode.face == selectedNode.face
+
+		if (bothAnchorsFaceSameDirection) {
 			player.status(ModMessageLang.SAME_DIRECTION_MESSAGE.toComponent())
 			return
 		}
@@ -141,27 +157,39 @@ object WebLineInteractionHandler {
 		player.status(ModMessageLang.LINE_CREATED_MESSAGE.toComponent())
 	}
 
-	fun findLineAnchor(
-		lines: Collection<WebLine>,
+	fun getTargetedLineAnchor(
+		lines: List<WebLine>,
 		lookStart: Vec3,
 		lookEnd: Vec3
 	): LineAnchor? {
-		val selectionRadius = 0.3
-		val selectionRadiusSquared = selectionRadius * selectionRadius
-		var closestAnchor: LineAnchor? = null
-		var closestDistanceSquared = selectionRadiusSquared
+		val selectionRadiusSquared = LINE_SELECTION_RADIUS * LINE_SELECTION_RADIUS
+		var targetedAnchor: LineAnchor? = null
+		var targetedDistanceSquared = selectionRadiusSquared
 
 		for (line in lines) {
-			val anchorPosition = getClosestPosition(line, lookStart, lookEnd)
-			val closestLookPosition = getClosestPosition(lookStart, lookEnd, anchorPosition)
-			val distanceSquared = anchorPosition.distanceToSqr(closestLookPosition)
-			if (distanceSquared > closestDistanceSquared) continue
+			val lineStart = line.firstNode.position
+			val lineEnd = line.secondNode.position
+			val anchorPosition = Vector3d()
+			val lookPosition = Vector3d()
+			val distanceFromLookSquared = Intersectiond.findClosestPointsLineSegments(
+				lineStart.x, lineStart.y, lineStart.z,
+				lineEnd.x, lineEnd.y, lineEnd.z,
+				lookStart.x, lookStart.y, lookStart.z,
+				lookEnd.x, lookEnd.y, lookEnd.z,
+				anchorPosition,
+				lookPosition
+			)
 
-			closestDistanceSquared = distanceSquared
-			closestAnchor = LineAnchor(line.uuid, anchorPosition)
+			if (distanceFromLookSquared > targetedDistanceSquared) continue
+
+			targetedDistanceSquared = distanceFromLookSquared
+			targetedAnchor = LineAnchor(
+				line.uuid,
+				Vec3(anchorPosition.x, anchorPosition.y, anchorPosition.z)
+			)
 		}
 
-		return closestAnchor
+		return targetedAnchor
 	}
 
 	private fun hasLineOfSight(
@@ -181,33 +209,4 @@ object WebLineInteractionHandler {
 		return result.type == HitResult.Type.MISS
 	}
 
-	private fun getClosestPosition(line: WebLine, lookStart: Vec3, lookEnd: Vec3): Vec3 {
-		val parallelTolerance = 1.0e-7
-		val lineStart = line.firstNode.position
-		val lineDirection = line.secondNode.position.subtract(lineStart)
-		val lookDirection = lookEnd.subtract(lookStart)
-		val offset = lineStart.subtract(lookStart)
-		val lineLengthSquared = lineDirection.lengthSqr()
-		val lookLengthSquared = lookDirection.lengthSqr()
-		val directionsDot = lineDirection.dot(lookDirection)
-		val denominator = lineLengthSquared * lookLengthSquared - directionsDot * directionsDot
-
-		if (denominator <= parallelTolerance) {
-			return getClosestPosition(lineStart, line.secondNode.position, lookStart)
-		}
-
-		val numerator = directionsDot * lookDirection.dot(offset) -
-			lookLengthSquared * lineDirection.dot(offset)
-		val lineParameter = numerator / denominator
-		return lineStart.add(lineDirection.scale(lineParameter.coerceIn(0.0, 1.0)))
-	}
-
-	private fun getClosestPosition(start: Vec3, end: Vec3, position: Vec3): Vec3 {
-		val direction = end.subtract(start)
-		val lengthSquared = direction.lengthSqr()
-		if (lengthSquared == 0.0) return start
-
-		val parameter = position.subtract(start).dot(direction) / lengthSquared
-		return start.add(direction.scale(parameter.coerceIn(0.0, 1.0)))
-	}
 }

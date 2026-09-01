@@ -12,11 +12,11 @@ object ClientWebLines {
 
 	private val lines: MutableMap<UUID, WebLine> = mutableMapOf()
 
-	fun getLines(): Collection<WebLine> {
-		return lines.values
+	fun getLines(): List<WebLine> {
+		return lines.values.toList()
 	}
 
-	fun addLines(newLines: Collection<WebLine>) {
+	fun addLines(newLines: List<WebLine>) {
 		for (line in newLines) {
 			lines[line.uuid] = line
 		}
@@ -50,8 +50,16 @@ object ClientWebLines {
 	}
 
 	private fun getLookedAtAnchor(player: Player): LineAnchor? {
-		val lookEnd = player.eyePosition.add(player.lookAngle.scale(player.blockInteractionRange()))
-		return WebLineInteractionHandler.findLineAnchor(lines.values, player.eyePosition, lookEnd)
+		val eyePosition = player.eyePosition
+		val interactionRange = player.blockInteractionRange()
+		val lookOffset = player.lookAngle.scale(interactionRange)
+		val lookEnd = eyePosition.add(lookOffset)
+
+		return WebLineInteractionHandler.getTargetedLineAnchor(
+			lines.values.toList(),
+			eyePosition,
+			lookEnd
+		)
 	}
 
 }
