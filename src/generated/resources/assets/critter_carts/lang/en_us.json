@@ -45,6 +45,7 @@
   "item.critter_carts.web_fluid": "Web Fluid",
   "item.critter_carts.web_fluid.first_node": "First web endpoint selected",
   "item.critter_carts.web_fluid.line_created": "Web line created",
+  "item.critter_carts.web_fluid.line_removed": "Web line removed",
   "item.critter_carts.web_fluid.obstructed": "The selected faces do not have line of sight",
   "item.critter_carts.web_fluid.same_direction": "The selected faces cannot point in the same direction",
   "item.critter_carts.web_fluid.too_long": "The web line must be shorter than 10 blocks",

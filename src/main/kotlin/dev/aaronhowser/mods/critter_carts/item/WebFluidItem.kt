@@ -1,5 +1,7 @@
 package dev.aaronhowser.mods.critter_carts.item
 
+import dev.aaronhowser.mods.aaron.misc.AaronExtensions.getEquipmentSlot
+import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isItem
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.status
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.toComponent
 import dev.aaronhowser.mods.critter_carts.datagen.language.ModMessageLang
@@ -10,11 +12,11 @@ import dev.aaronhowser.mods.critter_carts.handler.web.node.BlockAnchor
 import dev.aaronhowser.mods.critter_carts.handler.web.node.LineAnchor
 import dev.aaronhowser.mods.critter_carts.handler.web.node.WebNode
 import dev.aaronhowser.mods.critter_carts.item.component.WebNodeDataComponent
-import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isItem
 import dev.aaronhowser.mods.critter_carts.datagen.tag.ModItemTagsProvider
 import dev.aaronhowser.mods.critter_carts.registry.ModDataComponents
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
+import net.minecraft.sounds.SoundEvents
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.player.Player
@@ -22,8 +24,10 @@ import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.context.UseOnContext
 import net.minecraft.world.level.ClipContext
+import net.minecraft.world.level.gameevent.GameEvent
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
+import net.neoforged.neoforge.common.Tags
 import java.util.UUID
 
 class WebFluidItem(properties: Properties) : Item(properties) {
@@ -61,6 +65,14 @@ class WebFluidItem(properties: Properties) : Item(properties) {
 			val positionToleranceSquared = positionTolerance * positionTolerance
 
 			if (lineAnchor.position.distanceToSqr(requestedPosition) > positionToleranceSquared) return
+			if (itemStack.isItem(Tags.Items.TOOLS_SHEAR)) {
+				WebSavedData.get(level).removeLine(level, lineUuid)
+				player.playSound(SoundEvents.SHEEP_SHEAR, 1f, 1f)
+				level.gameEvent(player, GameEvent.SHEAR, lineAnchor.position)
+				itemStack.hurtAndBreak(1, player, hand.getEquipmentSlot())
+				player.status(ModMessageLang.LINE_REMOVED_MESSAGE.toComponent())
+				return
+			}
 
 			handleAnchor(level, player, itemStack, lineAnchor)
 		}

@@ -13,6 +13,7 @@ import net.minecraft.world.item.Item
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.block.Block
 import net.neoforged.neoforge.common.data.ExistingFileHelper
+import net.neoforged.neoforge.common.Tags
 import java.util.concurrent.CompletableFuture
 
 class ModItemTagsProvider(
@@ -42,6 +43,7 @@ class ModItemTagsProvider(
 
 		tag(WEB_LINE_INTERACTABLE)
 			.add(ModItems.WEB_FLUID)
+			.addTag(Tags.Items.TOOLS_SHEAR)
 
 		tag(ItemTags.LOGS)
 			.add(

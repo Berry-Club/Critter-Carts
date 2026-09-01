@@ -1,5 +1,6 @@
 {
   "values": [
-    "critter_carts:web_fluid"
+    "critter_carts:web_fluid",
+    "#c:tools/shear"
   ]
 }

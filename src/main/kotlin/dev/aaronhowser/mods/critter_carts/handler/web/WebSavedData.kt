@@ -36,6 +36,7 @@ class WebSavedData : SavedData() {
 	fun removeLine(level: ServerLevel, uuid: UUID): WebLine? {
 		val removedLine = lines.remove(uuid) ?: return null
 		removeFromChunkCache(removedLine)
+		chunksToValidate.addAll(removedLine.intersectedChunkPositions)
 		setDirty()
 		sendToNearbyPlayers(level, removedLine, RemoveWebLinePacket(uuid))
 		return removedLine

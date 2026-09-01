@@ -7,6 +7,7 @@ object ModMessageLang {
 	const val TOO_LONG_MESSAGE = "item.critter_carts.web_fluid.too_long"
 	const val OBSTRUCTED_MESSAGE = "item.critter_carts.web_fluid.obstructed"
 	const val LINE_CREATED_MESSAGE = "item.critter_carts.web_fluid.line_created"
+	const val LINE_REMOVED_MESSAGE = "item.critter_carts.web_fluid.line_removed"
 
 	fun add(provider: ModLanguageProvider) {
 		provider.apply {
@@ -15,6 +16,7 @@ object ModMessageLang {
 			add(TOO_LONG_MESSAGE, "The web line must be shorter than 10 blocks")
 			add(OBSTRUCTED_MESSAGE, "The selected faces do not have line of sight")
 			add(LINE_CREATED_MESSAGE, "Web line created")
+			add(LINE_REMOVED_MESSAGE, "Web line removed")
 		}
 	}
 
