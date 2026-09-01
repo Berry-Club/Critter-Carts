@@ -3,6 +3,7 @@ package dev.aaronhowser.mods.critter_carts.client.render
 import com.mojang.blaze3d.vertex.PoseStack
 import dev.aaronhowser.mods.aaron.client.render.AaronRenderUtil
 import dev.aaronhowser.mods.aaron.misc.AaronDsls.withPose
+import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isItem
 import dev.aaronhowser.mods.critter_carts.CritterCarts
 import dev.aaronhowser.mods.critter_carts.handler.web.ClientWebLines
 import dev.aaronhowser.mods.critter_carts.handler.web.WebLineInteractionHandler
@@ -71,8 +72,8 @@ object WebLineRenderer {
 	}
 
 	private fun getHeldWebFluid(mainHandItem: ItemStack, offhandItem: ItemStack): ItemStack? {
-		if (mainHandItem.`is`(ModItems.WEB_FLUID.get())) return mainHandItem
-		if (offhandItem.`is`(ModItems.WEB_FLUID.get())) return offhandItem
+		if (mainHandItem.isItem(ModItems.WEB_FLUID.get())) return mainHandItem
+		if (offhandItem.isItem(ModItems.WEB_FLUID.get())) return offhandItem
 
 		return null
 	}
