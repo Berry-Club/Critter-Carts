@@ -67,20 +67,30 @@ object WebLineInteractionHandler {
 		}
 	}
 
-	fun handleNodeSelection(
+	private fun handleNodeSelection(
 		level: ServerLevel,
 		player: Player,
 		itemStack: ItemStack,
 		selectedNode: WebNode
 	) {
-		val maxLength = 10.0
-		val maxLengthSquared = maxLength * maxLength
 		val firstNode = itemStack.get(ModDataComponents.WEB_NODE)?.node
 
 		if (firstNode == null) {
 			storeFirstNode(player, itemStack, selectedNode)
-			return
+		} else {
+			tryCreateLine(level, player, itemStack, firstNode, selectedNode)
 		}
+	}
+
+	private fun tryCreateLine(
+		level: ServerLevel,
+		player: Player,
+		itemStack: ItemStack,
+		firstNode: WebNode,
+		selectedNode: WebNode
+	) {
+		val maxLength = 10.0
+		val maxLengthSquared = maxLength * maxLength
 
 		val bothAnchorsAreOnSameLine =
 			firstNode is LineAnchor
