@@ -45,4 +45,8 @@ class WebFluidItem(properties: Properties) : Item(properties) {
 		return super.use(level, player, usedHand)
 	}
 
+	override fun isFoil(stack: ItemStack): Boolean {
+		return stack.has(ModDataComponents.WEB_NODE)
+	}
+
 }
