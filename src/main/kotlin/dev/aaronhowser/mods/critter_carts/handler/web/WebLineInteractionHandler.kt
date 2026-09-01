@@ -171,6 +171,7 @@ object WebLineInteractionHandler {
 			val lineEnd = line.secondNode.position
 			val anchorPosition = Vector3d()
 			val lookPosition = Vector3d()
+
 			val distanceFromLookSquared = Intersectiond.findClosestPointsLineSegments(
 				lineStart.x, lineStart.y, lineStart.z,
 				lineEnd.x, lineEnd.y, lineEnd.z,
