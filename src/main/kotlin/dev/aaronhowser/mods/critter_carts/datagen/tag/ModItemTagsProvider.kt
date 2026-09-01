@@ -40,6 +40,9 @@ class ModItemTagsProvider(
 		tag(SCOOCHWORM_SADDLES)
 			.add(Items.SADDLE)
 
+		tag(WEB_LINE_INTERACTABLE)
+			.add(ModItems.WEB_FLUID)
+
 		tag(ItemTags.LOGS)
 			.add(
 				ModBlocks.SCOOCHSTEM.asItem(),
@@ -57,6 +60,7 @@ class ModItemTagsProvider(
 		val DYEBERRIES = create("dyeberries")
 		val SCOOCHWORM_LOOK_AT = create("scoochworm_look_at")
 		val SCOOCHWORM_SADDLES = create("scoochworm_saddles")
+		val WEB_LINE_INTERACTABLE = create("web_line_interactable")
 
 		private fun create(id: String): TagKey<Item> = ItemTags.create(CritterCarts.modResource(id))
 	}

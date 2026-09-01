@@ -10,7 +10,8 @@ import dev.aaronhowser.mods.critter_carts.handler.web.node.BlockAnchor
 import dev.aaronhowser.mods.critter_carts.handler.web.node.LineAnchor
 import dev.aaronhowser.mods.critter_carts.handler.web.node.WebNode
 import dev.aaronhowser.mods.critter_carts.item.component.WebNodeDataComponent
-import dev.aaronhowser.mods.critter_carts.packet.client_to_server.SelectWebLinePacket
+import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isItem
+import dev.aaronhowser.mods.critter_carts.datagen.tag.ModItemTagsProvider
 import dev.aaronhowser.mods.critter_carts.registry.ModDataComponents
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
@@ -27,20 +28,6 @@ import java.util.UUID
 
 class WebFluidItem(properties: Properties) : Item(properties) {
 
-	override fun onItemUseFirst(stack: ItemStack, context: UseOnContext): InteractionResult {
-		if (!context.level.isClientSide) return InteractionResult.PASS
-
-		val player = context.player ?: return InteractionResult.PASS
-		val lineAnchor = findLineAnchor(
-			ClientWebLines.getLines(),
-			player.eyePosition,
-			context.clickLocation
-		) ?: return InteractionResult.PASS
-
-		SelectWebLinePacket(lineAnchor.lineUuid, lineAnchor.position, context.hand).messageServer()
-		return InteractionResult.SUCCESS
-	}
-
 	override fun useOn(context: UseOnContext): InteractionResult {
 		val level = context.level
 		if (level !is ServerLevel) return InteractionResult.SUCCESS
@@ -52,6 +39,10 @@ class WebFluidItem(properties: Properties) : Item(properties) {
 	}
 
 	companion object {
+		fun findLineAnchor(player: Player, lookEnd: Vec3): LineAnchor? {
+			return findLineAnchor(ClientWebLines.getLines(), player.eyePosition, lookEnd)
+		}
+
 		fun selectLine(
 			player: ServerPlayer,
 			lineUuid: UUID,
@@ -59,7 +50,7 @@ class WebFluidItem(properties: Properties) : Item(properties) {
 			hand: InteractionHand
 		) {
 			val itemStack = player.getItemInHand(hand)
-			if (itemStack.item !is WebFluidItem) return
+			if (!itemStack.isItem(ModItemTagsProvider.WEB_LINE_INTERACTABLE)) return
 
 			val level = player.serverLevel()
 			val line = WebSavedData.get(level).getLine(lineUuid) ?: return

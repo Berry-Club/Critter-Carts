@@ -6,8 +6,8 @@ import dev.aaronhowser.mods.critter_carts.CritterCarts
 import dev.aaronhowser.mods.critter_carts.item.WebFluidItem
 import io.netty.buffer.ByteBuf
 import net.minecraft.core.UUIDUtil
-import net.minecraft.network.codec.StreamCodec
 import net.minecraft.network.codec.ByteBufCodecs
+import net.minecraft.network.codec.StreamCodec
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.InteractionHand
@@ -15,7 +15,7 @@ import net.minecraft.world.phys.Vec3
 import net.neoforged.neoforge.network.handling.IPayloadContext
 import java.util.UUID
 
-class SelectWebLinePacket(
+class WebLineInteractPacket(
 	val lineUuid: UUID,
 	val position: Vec3,
 	val hand: InteractionHand
@@ -26,20 +26,20 @@ class SelectWebLinePacket(
 		WebFluidItem.selectLine(player, lineUuid, position, hand)
 	}
 
-	override fun type(): CustomPacketPayload.Type<SelectWebLinePacket> = TYPE
+	override fun type(): CustomPacketPayload.Type<WebLineInteractPacket> = TYPE
 
 	companion object {
-		val TYPE: CustomPacketPayload.Type<SelectWebLinePacket> =
-			makeType(CritterCarts.MOD_ID, "select_web_line")
+		val TYPE: CustomPacketPayload.Type<WebLineInteractPacket> =
+			makeType(CritterCarts.MOD_ID, "web_line_interact")
 
-		val STREAM_CODEC: StreamCodec<ByteBuf, SelectWebLinePacket> = StreamCodec.composite(
-			UUIDUtil.STREAM_CODEC, SelectWebLinePacket::lineUuid,
-			AaronExtraStreamCodecs.VEC3, SelectWebLinePacket::position,
+		val STREAM_CODEC: StreamCodec<ByteBuf, WebLineInteractPacket> = StreamCodec.composite(
+			UUIDUtil.STREAM_CODEC, WebLineInteractPacket::lineUuid,
+			AaronExtraStreamCodecs.VEC3, WebLineInteractPacket::position,
 			ByteBufCodecs.BOOL.map(
 				{ isMainHand -> if (isMainHand) InteractionHand.MAIN_HAND else InteractionHand.OFF_HAND },
 				{ hand -> hand == InteractionHand.MAIN_HAND }
-			), SelectWebLinePacket::hand,
-			::SelectWebLinePacket
+			), WebLineInteractPacket::hand,
+			::WebLineInteractPacket
 		)
 	}
 }
