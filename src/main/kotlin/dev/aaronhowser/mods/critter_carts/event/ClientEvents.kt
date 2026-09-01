@@ -28,7 +28,7 @@ object ClientEvents {
 		if (event.isCanceled) return
 		if (!ClientWebLines.interact(event.entity, event.hand)) return
 
-		event.cancellationResult = InteractionResult.FAIL
+		event.cancellationResult = InteractionResult.SUCCESS
 		event.isCanceled = true
 	}
 
@@ -37,7 +37,7 @@ object ClientEvents {
 		if (event.isCanceled) return
 		if (!ClientWebLines.interact(event.entity, event.hand)) return
 
-		event.cancellationResult = InteractionResult.FAIL
+		event.cancellationResult = InteractionResult.SUCCESS
 		event.isCanceled = true
 	}
 
@@ -46,7 +46,7 @@ object ClientEvents {
 		if (event.isCanceled) return
 		if (!ClientWebLines.interact(event.entity, event.hand)) return
 
-		event.cancellationResult = InteractionResult.FAIL
+		event.cancellationResult = InteractionResult.SUCCESS
 		event.isCanceled = true
 	}
 
