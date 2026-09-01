@@ -7,6 +7,7 @@ import dev.aaronhowser.mods.critter_carts.handler.web.WebLine
 import io.netty.buffer.ByteBuf
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
+import net.minecraft.core.UUIDUtil
 import net.minecraft.network.codec.StreamCodec
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.level.ChunkPos
@@ -14,6 +15,7 @@ import net.minecraft.world.phys.Vec3
 import java.util.UUID
 
 data class BlockAnchor(
+	override val uuid: UUID,
 	val blockPos: BlockPos,
 	val face: Direction,
 	override val position: Vec3
@@ -38,6 +40,9 @@ data class BlockAnchor(
 		val CODEC: MapCodec<BlockAnchor> =
 			RecordCodecBuilder.mapCodec { instance ->
 				instance.group(
+					UUIDUtil.CODEC
+						.fieldOf("uuid")
+						.forGetter(BlockAnchor::uuid),
 					BlockPos.CODEC
 						.fieldOf("block_pos")
 						.forGetter(BlockAnchor::blockPos),
@@ -51,6 +56,7 @@ data class BlockAnchor(
 			}
 
 		val STREAM_CODEC: StreamCodec<ByteBuf, BlockAnchor> = StreamCodec.composite(
+			UUIDUtil.STREAM_CODEC, BlockAnchor::uuid,
 			BlockPos.STREAM_CODEC, BlockAnchor::blockPos,
 			Direction.STREAM_CODEC, BlockAnchor::face,
 			AaronExtraStreamCodecs.VEC3, BlockAnchor::position,

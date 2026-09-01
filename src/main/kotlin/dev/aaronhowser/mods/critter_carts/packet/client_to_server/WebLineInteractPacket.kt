@@ -16,14 +16,15 @@ import net.neoforged.neoforge.network.handling.IPayloadContext
 import java.util.UUID
 
 class WebLineInteractPacket(
-	val lineUuid: UUID,
+	val targetUuid: UUID,
+	val targetsNode: Boolean,
 	val position: Vec3,
 	val hand: InteractionHand
 ) : AaronPacket() {
 
 	override fun handleOnServer(context: IPayloadContext) {
 		val player = context.player() as? ServerPlayer ?: return
-		WebLineInteractionHandler.interact(player, lineUuid, position, hand)
+		WebLineInteractionHandler.interact(player, targetUuid, targetsNode, position, hand)
 	}
 
 	override fun type(): CustomPacketPayload.Type<WebLineInteractPacket> = TYPE
@@ -33,7 +34,8 @@ class WebLineInteractPacket(
 			makeType(CritterCarts.MOD_ID, "web_line_interact")
 
 		val STREAM_CODEC: StreamCodec<ByteBuf, WebLineInteractPacket> = StreamCodec.composite(
-			UUIDUtil.STREAM_CODEC, WebLineInteractPacket::lineUuid,
+			UUIDUtil.STREAM_CODEC, WebLineInteractPacket::targetUuid,
+			ByteBufCodecs.BOOL, WebLineInteractPacket::targetsNode,
 			AaronExtraStreamCodecs.VEC3, WebLineInteractPacket::position,
 			ByteBufCodecs.BOOL.map(
 				{ isMainHand -> if (isMainHand) InteractionHand.MAIN_HAND else InteractionHand.OFF_HAND },

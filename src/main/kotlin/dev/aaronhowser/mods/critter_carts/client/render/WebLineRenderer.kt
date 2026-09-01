@@ -93,8 +93,8 @@ object WebLineRenderer {
 		viewVector: Vec3
 	): WebNode? {
 		val player = minecraft.player ?: return null
-		val lineAnchor = ClientWebLines.getHoveredAnchor(player, eyePosition, viewVector)
-		if (lineAnchor != null) return lineAnchor
+		val targetedNode = ClientWebLines.getHoveredAnchor(player, eyePosition, viewVector)
+		if (targetedNode != null) return targetedNode.node
 
 		val hitResult = minecraft.hitResult
 		if (hitResult !is BlockHitResult) return null
@@ -114,7 +114,7 @@ object WebLineRenderer {
 	) {
 		val minecraft = Minecraft.getInstance()
 		val player = minecraft.player ?: return
-		val lineAnchor = ClientWebLines.getHoveredAnchor(
+		val targetedNode = ClientWebLines.getHoveredAnchor(
 			player,
 			eyePosition,
 			viewVector
@@ -122,7 +122,7 @@ object WebLineRenderer {
 
 		val cubeRadius = 0.05
 		val anchorColor = 0xA0FFFFFF.toInt()
-		val position = lineAnchor.position
+		val position = targetedNode.node.position
 
 		AaronRenderUtil.renderCubeThroughWalls(
 			poseStack,

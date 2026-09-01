@@ -2,6 +2,7 @@ package dev.aaronhowser.mods.critter_carts.handler.web
 
 import com.mojang.serialization.DynamicOps
 import dev.aaronhowser.mods.aaron.packet.AaronPacket
+import dev.aaronhowser.mods.critter_carts.handler.web.node.WebNode
 import dev.aaronhowser.mods.critter_carts.packet.server_to_client.AddWebLinesPacket
 import dev.aaronhowser.mods.critter_carts.packet.server_to_client.RemoveWebLinePacket
 import net.minecraft.core.BlockPos
@@ -16,17 +17,35 @@ import net.minecraft.world.level.saveddata.SavedData
 import java.util.UUID
 
 class WebSavedData : SavedData() {
+
+	private val nodes: MutableMap<UUID, WebNode> = mutableMapOf()
 	private val lines: MutableMap<UUID, WebLine> = mutableMapOf()
+
 	private val lineUuidsByChunk: MutableMap<ChunkPos, MutableSet<UUID>> = mutableMapOf()
 	private val chunksToValidate: MutableSet<ChunkPos> = mutableSetOf()
 
 	fun addLine(level: ServerLevel, line: WebLine) {
+		nodes[line.firstNode.uuid] = line.firstNode
+		nodes[line.secondNode.uuid] = line.secondNode
+
 		val previousLine = lines.put(line.uuid, line)
-		if (previousLine != null) removeFromChunkCache(previousLine)
+		if (previousLine != null) {
+			removeFromChunkCache(previousLine)
+			removeNodeIfOrphaned(previousLine.firstNode.uuid)
+			removeNodeIfOrphaned(previousLine.secondNode.uuid)
+		}
 
 		addToChunkCache(line)
 		setDirty()
-		sendToNearbyPlayers(level, line, AddWebLinesPacket(listOf(line)))
+		sendToNearbyPlayers(level, line, AddWebLinesPacket.fromLines(listOf(line)))
+	}
+
+	fun getNode(uuid: UUID): WebNode? {
+		return nodes[uuid]
+	}
+
+	fun getCanonicalNode(node: WebNode): WebNode {
+		return nodes[node.uuid] ?: node
 	}
 
 	fun getLine(uuid: UUID): WebLine? {
@@ -36,6 +55,8 @@ class WebSavedData : SavedData() {
 	fun removeLine(level: ServerLevel, uuid: UUID): WebLine? {
 		val removedLine = lines.remove(uuid) ?: return null
 		removeFromChunkCache(removedLine)
+		removeNodeIfOrphaned(removedLine.firstNode.uuid)
+		removeNodeIfOrphaned(removedLine.secondNode.uuid)
 		chunksToValidate.addAll(removedLine.intersectedChunkPositions)
 		setDirty()
 		sendToNearbyPlayers(level, removedLine, RemoveWebLinePacket(uuid))
@@ -46,7 +67,7 @@ class WebSavedData : SavedData() {
 		val nearbyLines = lines.values.filter { line -> chunkPos in line.getEndpointChunkPositions() }
 		if (nearbyLines.isEmpty()) return
 
-		AddWebLinesPacket(nearbyLines).messagePlayer(player)
+		AddWebLinesPacket.fromLines(nearbyLines).messagePlayer(player)
 	}
 
 	fun forgetChunk(player: ServerPlayer, chunkPos: ChunkPos) {
@@ -105,6 +126,8 @@ class WebSavedData : SavedData() {
 		for (line in invalidLines) {
 			lines.remove(line.uuid)
 			removeFromChunkCache(line)
+			removeNodeIfOrphaned(line.firstNode.uuid)
+			removeNodeIfOrphaned(line.secondNode.uuid)
 			sendToNearbyPlayers(level, line, RemoveWebLinePacket(line.uuid))
 		}
 
@@ -134,6 +157,14 @@ class WebSavedData : SavedData() {
 		}
 	}
 
+	private fun removeNodeIfOrphaned(nodeUuid: UUID) {
+		for (line in lines.values) {
+			if (line.firstNode.uuid == nodeUuid || line.secondNode.uuid == nodeUuid) return
+		}
+
+		nodes.remove(nodeUuid)
+	}
+
 	private fun sendToNearbyPlayers(level: ServerLevel, line: WebLine, packet: AaronPacket) {
 		val nearbyPlayers: MutableSet<ServerPlayer> = mutableSetOf()
 
@@ -150,29 +181,49 @@ class WebSavedData : SavedData() {
 
 	override fun save(tag: CompoundTag, registries: HolderLookup.Provider): CompoundTag {
 		val ops = registries.createSerializationContext(NbtOps.INSTANCE)
-		val linesTag = WebLine.CODEC
+
+		val nodesTag = WebNode.CODEC
 			.listOf()
-			.encodeStart(ops, lines.values.toList())
+			.encodeStart(ops, nodes.values.toList())
 			.getOrThrow()
 
+		val linesTag = WebLineData.CODEC
+			.listOf()
+			.encodeStart(ops, lines.values.map(WebLine::data))
+			.getOrThrow()
+
+		tag.put(NODES_TAG, nodesTag)
 		tag.put(LINES_TAG, linesTag)
 		return tag
 	}
 
 	companion object {
 		private const val SAVED_DATA_NAME = "critter_carts_webs"
+		private const val NODES_TAG = "Nodes"
 		private const val LINES_TAG = "Lines"
 
 		private fun load(tag: CompoundTag, registries: HolderLookup.Provider): WebSavedData {
 			val savedData = WebSavedData()
+			val nodesTag = tag.get(NODES_TAG) ?: return savedData
 			val linesTag = tag.get(LINES_TAG) ?: return savedData
 			val ops: DynamicOps<Tag> = registries.createSerializationContext(NbtOps.INSTANCE)
-			val loadedLines = WebLine.CODEC
+			val loadedNodes = WebNode.CODEC
+				.listOf()
+				.parse(ops, nodesTag)
+				.getOrThrow()
+			val loadedLines = WebLineData.CODEC
 				.listOf()
 				.parse(ops, linesTag)
 				.getOrThrow()
 
-			for (line in loadedLines) {
+			for (node in loadedNodes) {
+				savedData.nodes[node.uuid] = node
+			}
+
+			for (lineData in loadedLines) {
+				val firstNode = savedData.nodes[lineData.firstNodeUuid] ?: continue
+				val secondNode = savedData.nodes[lineData.secondNodeUuid] ?: continue
+				val line = WebLine(lineData.uuid, firstNode, secondNode)
 				savedData.lines[line.uuid] = line
 				savedData.addToChunkCache(line)
 			}

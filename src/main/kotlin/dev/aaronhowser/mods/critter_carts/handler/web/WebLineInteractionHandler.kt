@@ -38,7 +38,8 @@ object WebLineInteractionHandler {
 
 	fun interact(
 		player: ServerPlayer,
-		lineUuid: UUID,
+		targetUuid: UUID,
+		targetsNode: Boolean,
 		requestedPosition: Vec3,
 		hand: InteractionHand
 	) {
@@ -46,24 +47,41 @@ object WebLineInteractionHandler {
 		if (!itemStack.isItem(ModItemTagsProvider.WEB_LINE_INTERACTABLE)) return
 
 		val level = player.serverLevel()
-		val line = WebSavedData.get(level).getLine(lineUuid) ?: return
+		val savedData = WebSavedData.get(level)
+		if (targetsNode) {
+			if (!itemStack.isItem(ModItems.WEB_FLUID)) return
+
+			val selectedNode = savedData.getNode(targetUuid) ?: return
+			if (!isTargetingNode(player, selectedNode)) return
+			val positionToleranceSquared =
+				REQUESTED_POSITION_TOLERANCE * REQUESTED_POSITION_TOLERANCE
+			if (selectedNode.position.distanceToSqr(requestedPosition) > positionToleranceSquared) return
+
+			handleNodeSelection(level, player, itemStack, selectedNode)
+			return
+		}
+
+		val line = savedData.getLine(targetUuid) ?: return
 		val eyePosition = player.eyePosition
 		val interactionRange = player.blockInteractionRange()
 		val lookOffset = player.lookAngle.scale(interactionRange)
 		val lookEnd = eyePosition.add(lookOffset)
-		val selectedNode = getTargetedLineAnchor(
+		val snapToExistingNode = itemStack.isItem(ModItems.WEB_FLUID)
+		val targetedNode = getTargetedNode(
 			listOf(line),
 			eyePosition,
-			lookEnd
+			lookEnd,
+			snapToExistingNode
 		) ?: return
+		val selectedNode = targetedNode.node
 		val positionToleranceSquared =
 			REQUESTED_POSITION_TOLERANCE * REQUESTED_POSITION_TOLERANCE
 
 		if (selectedNode.position.distanceToSqr(requestedPosition) > positionToleranceSquared) return
 
 		when {
-			itemStack.isItem(Tags.Items.TOOLS_SHEAR) ->
-				shearLine(level, player, itemStack, lineUuid, selectedNode, hand)
+			itemStack.isItem(Tags.Items.TOOLS_SHEAR) && selectedNode is LineAnchor ->
+				shearLine(level, player, itemStack, targetUuid, selectedNode, hand)
 
 			itemStack.isItem(ModItems.WEB_FLUID) ->
 				handleNodeSelection(level, player, itemStack, selectedNode)
@@ -92,14 +110,22 @@ object WebLineInteractionHandler {
 		firstNode: WebNode,
 		selectedNode: WebNode
 	) {
-		val invalidMessage = getInvalidMessage(level, player, firstNode, selectedNode)
+		val savedData = WebSavedData.get(level)
+		val canonicalFirstNode = savedData.getCanonicalNode(firstNode)
+		val canonicalSelectedNode = savedData.getCanonicalNode(selectedNode)
+		val invalidMessage = getInvalidMessage(
+			level,
+			player,
+			canonicalFirstNode,
+			canonicalSelectedNode
+		)
 		if (invalidMessage != null) {
 			player.status(invalidMessage.toComponent())
 			return
 		}
 
-		val webLine = WebLine(UUID.randomUUID(), firstNode, selectedNode)
-		WebSavedData.get(level).addLine(level, webLine)
+		val webLine = WebLine(UUID.randomUUID(), canonicalFirstNode, canonicalSelectedNode)
+		savedData.addLine(level, webLine)
 		itemStack.remove(ModDataComponents.WEB_NODE)
 		player.status(ModMessageLang.LINE_CREATED_MESSAGE.toComponent())
 	}
@@ -148,7 +174,12 @@ object WebLineInteractionHandler {
 		val surfaceOffset = 0.001
 		val faceNormal = Vec3.atLowerCornerOf(face.normal)
 
-		return BlockAnchor(blockPos, face, position.add(faceNormal.scale(surfaceOffset)))
+		return BlockAnchor(
+			UUID.randomUUID(),
+			blockPos,
+			face,
+			position.add(faceNormal.scale(surfaceOffset))
+		)
 	}
 
 	private fun getInvalidMessage(
@@ -157,6 +188,8 @@ object WebLineInteractionHandler {
 		firstNode: WebNode,
 		secondNode: WebNode
 	): String? {
+		if (firstNode.uuid == secondNode.uuid) return ModMessageLang.SAME_LINE_MESSAGE
+
 		if (firstNode is LineAnchor
 			&& secondNode is LineAnchor
 			&& firstNode.lineUuid == secondNode.lineUuid
@@ -179,13 +212,14 @@ object WebLineInteractionHandler {
 		return null
 	}
 
-	fun getTargetedLineAnchor(
+	fun getTargetedNode(
 		lines: List<WebLine>,
 		lookStart: Vec3,
-		lookEnd: Vec3
-	): LineAnchor? {
+		lookEnd: Vec3,
+		snapToExistingNode: Boolean
+	): TargetedWebNode? {
 		val selectionRadiusSquared = LINE_SELECTION_RADIUS * LINE_SELECTION_RADIUS
-		var targetedAnchor: LineAnchor? = null
+		var targetedNode: TargetedWebNode? = null
 		var targetedDistanceSquared = selectionRadiusSquared
 
 		for (line in lines) {
@@ -206,13 +240,37 @@ object WebLineInteractionHandler {
 			if (distanceFromLookSquared > targetedDistanceSquared) continue
 
 			targetedDistanceSquared = distanceFromLookSquared
-			targetedAnchor = LineAnchor(
-				line.uuid,
-				Vec3(anchorPosition.x, anchorPosition.y, anchorPosition.z)
-			)
+			val position = Vec3(anchorPosition.x, anchorPosition.y, anchorPosition.z)
+			val node = if (snapToExistingNode) {
+				getSnappedNode(line, position)
+			} else {
+				LineAnchor(UUID.randomUUID(), line.uuid, position)
+			}
+
+			val targetedLineUuid = if (node === line.firstNode || node === line.secondNode) {
+				null
+			} else {
+				line.uuid
+			}
+
+			targetedNode = TargetedWebNode(targetedLineUuid, node)
 		}
 
-		return targetedAnchor
+		return targetedNode
+	}
+
+	private fun getSnappedNode(line: WebLine, position: Vec3): WebNode {
+		val snapRadiusSquared = NODE_SNAP_RADIUS * NODE_SNAP_RADIUS
+		val firstDistanceSquared = line.firstNode.position.distanceToSqr(position)
+		val secondDistanceSquared = line.secondNode.position.distanceToSqr(position)
+
+		if (firstDistanceSquared <= snapRadiusSquared
+			&& firstDistanceSquared <= secondDistanceSquared
+		) return line.firstNode
+
+		if (secondDistanceSquared <= snapRadiusSquared) return line.secondNode
+
+		return LineAnchor(UUID.randomUUID(), line.uuid, position)
 	}
 
 	private fun hasLineOfSight(
@@ -231,5 +289,23 @@ object WebLineInteractionHandler {
 		val result = level.clip(clipContext)
 		return result.type == HitResult.Type.MISS
 	}
+
+	private fun isTargetingNode(player: Player, node: WebNode): Boolean {
+		val lookStart = player.eyePosition
+		val lookOffset = player.lookAngle.scale(player.blockInteractionRange())
+		val lookLengthSquared = lookOffset.lengthSqr()
+		if (lookLengthSquared == 0.0) return false
+
+		val nodeOffset = node.position.subtract(lookStart)
+		val progress = nodeOffset.dot(lookOffset)
+			.div(lookLengthSquared)
+			.coerceIn(0.0, 1.0)
+		val closestPosition = lookStart.add(lookOffset.scale(progress))
+		val selectionRadiusSquared = LINE_SELECTION_RADIUS * LINE_SELECTION_RADIUS
+
+		return closestPosition.distanceToSqr(node.position) <= selectionRadiusSquared
+	}
+
+	private const val NODE_SNAP_RADIUS = 0.3
 
 }

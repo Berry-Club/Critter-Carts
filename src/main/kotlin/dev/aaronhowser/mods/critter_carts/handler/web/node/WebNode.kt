@@ -12,6 +12,7 @@ import java.util.UUID
 
 sealed interface WebNode {
 
+	val uuid: UUID
 	val position: Vec3
 
 	fun isLoaded(level: ServerLevel): Boolean

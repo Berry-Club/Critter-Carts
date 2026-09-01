@@ -14,6 +14,7 @@ import net.minecraft.world.phys.Vec3
 import java.util.UUID
 
 data class LineAnchor(
+	override val uuid: UUID,
 	val lineUuid: UUID,
 	override val position: Vec3
 ) : WebNode {
@@ -42,6 +43,9 @@ data class LineAnchor(
 			RecordCodecBuilder.mapCodec { instance ->
 				instance.group(
 					UUIDUtil.CODEC
+						.fieldOf("uuid")
+						.forGetter(LineAnchor::uuid),
+					UUIDUtil.CODEC
 						.fieldOf("line_uuid")
 						.forGetter(LineAnchor::lineUuid),
 					Vec3.CODEC
@@ -51,6 +55,7 @@ data class LineAnchor(
 			}
 
 		val STREAM_CODEC: StreamCodec<ByteBuf, LineAnchor> = StreamCodec.composite(
+			UUIDUtil.STREAM_CODEC, LineAnchor::uuid,
 			UUIDUtil.STREAM_CODEC, LineAnchor::lineUuid,
 			AaronExtraStreamCodecs.VEC3, LineAnchor::position,
 			::LineAnchor
