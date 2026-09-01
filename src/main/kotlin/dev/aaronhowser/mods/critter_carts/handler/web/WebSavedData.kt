@@ -16,22 +16,28 @@ import java.util.UUID
 
 class WebSavedData : SavedData() {
 	private val lines: MutableMap<UUID, WebLine> = mutableMapOf()
+	private val lineUuidsByChunk: MutableMap<ChunkPos, MutableSet<UUID>> = mutableMapOf()
+	private val chunksToValidate: MutableSet<ChunkPos> = mutableSetOf()
 
 	fun addLine(level: ServerLevel, line: WebLine) {
-		lines[line.uuid] = line
+		val previousLine = lines.put(line.uuid, line)
+		if (previousLine != null) removeFromChunkCache(previousLine)
+
+		addToChunkCache(line)
 		setDirty()
 		sendToNearbyPlayers(level, line, AddWebLinesPacket(listOf(line)))
 	}
 
 	fun removeLine(level: ServerLevel, uuid: UUID): WebLine? {
 		val removedLine = lines.remove(uuid) ?: return null
+		removeFromChunkCache(removedLine)
 		setDirty()
 		sendToNearbyPlayers(level, removedLine, RemoveWebLinePacket(uuid))
 		return removedLine
 	}
 
 	fun syncChunk(player: ServerPlayer, chunkPos: ChunkPos) {
-		val nearbyLines = lines.values.filter { line -> chunkPos in line.getChunkPositions() }
+		val nearbyLines = lines.values.filter { line -> chunkPos in line.getEndpointChunkPositions() }
 		if (nearbyLines.isEmpty()) return
 
 		AddWebLinesPacket(nearbyLines).messagePlayer(player)
@@ -41,7 +47,7 @@ class WebSavedData : SavedData() {
 		val level = player.serverLevel()
 
 		for (line in lines.values) {
-			val lineChunks = line.getChunkPositions()
+			val lineChunks = line.getEndpointChunkPositions()
 			if (chunkPos !in lineChunks) continue
 
 			var stillTrackingLine = false
@@ -61,24 +67,67 @@ class WebSavedData : SavedData() {
 		}
 	}
 
-	fun removeInvalidLines(level: ServerLevel) {
-		val invalidLines = lines.values.filter { line ->
+	fun markChunkForValidation(chunkPos: ChunkPos) {
+		chunksToValidate.add(chunkPos)
+	}
+
+	fun validateChangedChunks(level: ServerLevel) {
+		if (chunksToValidate.isEmpty()) return
+
+		val lineUuids: MutableSet<UUID> = mutableSetOf()
+		for (changedChunk in chunksToValidate) {
+			for (chunkX in changedChunk.x - 1..changedChunk.x + 1) {
+				for (chunkZ in changedChunk.z - 1..changedChunk.z + 1) {
+					val chunkPos = ChunkPos(chunkX, chunkZ)
+					val cachedUuids = lineUuidsByChunk[chunkPos] ?: continue
+					lineUuids.addAll(cachedUuids)
+				}
+			}
+		}
+
+		chunksToValidate.clear()
+
+		val invalidLines = lineUuids.mapNotNull { uuid -> lines[uuid] }.filter { line ->
 			line.isLoaded(level) && !line.isValid(level, lines)
 		}
 		if (invalidLines.isEmpty()) return
 
 		for (line in invalidLines) {
 			lines.remove(line.uuid)
+			removeFromChunkCache(line)
 			sendToNearbyPlayers(level, line, RemoveWebLinePacket(line.uuid))
 		}
 
 		setDirty()
 	}
 
+	private fun addToChunkCache(line: WebLine) {
+		for (chunkPos in line.intersectedChunkPositions) {
+			var lineUuids = lineUuidsByChunk[chunkPos]
+			if (lineUuids == null) {
+				lineUuids = mutableSetOf()
+				lineUuidsByChunk[chunkPos] = lineUuids
+			}
+
+			lineUuids.add(line.uuid)
+		}
+	}
+
+	private fun removeFromChunkCache(line: WebLine) {
+		for (chunkPos in line.intersectedChunkPositions) {
+			val lineUuids = lineUuidsByChunk[chunkPos] ?: continue
+			lineUuids.remove(line.uuid)
+
+			if (lineUuids.isEmpty()) {
+				lineUuidsByChunk.remove(chunkPos)
+			}
+		}
+	}
+
 	private fun sendToNearbyPlayers(level: ServerLevel, line: WebLine, packet: AaronPacket) {
 		val nearbyPlayers: MutableSet<ServerPlayer> = mutableSetOf()
 
-		for (chunkPos in line.getChunkPositions()) {
+		for (chunkPos in line.getEndpointChunkPositions()) {
 			for (player in level.chunkSource.chunkMap.getPlayers(chunkPos, false)) {
 				nearbyPlayers.add(player)
 			}
@@ -115,6 +164,7 @@ class WebSavedData : SavedData() {
 
 			for (line in loadedLines) {
 				savedData.lines[line.uuid] = line
+				savedData.addToChunkCache(line)
 			}
 
 			return savedData

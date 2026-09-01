@@ -10,6 +10,7 @@ import net.minecraft.network.codec.StreamCodec
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.level.ChunkPos
 import net.minecraft.world.level.ClipContext
+import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.shapes.CollisionContext
 import java.util.UUID
@@ -21,6 +22,7 @@ data class WebLine(
 ) {
 	val length: Double
 		get() = firstNode.position.distanceTo(secondNode.position)
+	val intersectedChunkPositions: Set<ChunkPos> = calculateIntersectedChunkPositions()
 
 	fun isLoaded(level: ServerLevel): Boolean {
 		return firstNode.isLoaded(level) && secondNode.isLoaded(level)
@@ -52,11 +54,45 @@ data class WebLine(
 		return level.clip(clipContext).type == HitResult.Type.MISS
 	}
 
-	fun getChunkPositions(): Set<ChunkPos> {
+	fun getEndpointChunkPositions(): Set<ChunkPos> {
 		return setOf(
 			ChunkPos(BlockPos.containing(firstNode.position)),
 			ChunkPos(BlockPos.containing(secondNode.position))
 		)
+	}
+
+	private fun calculateIntersectedChunkPositions(): Set<ChunkPos> {
+		val firstChunk = ChunkPos(BlockPos.containing(firstNode.position))
+		val secondChunk = ChunkPos(BlockPos.containing(secondNode.position))
+		val minChunkX = minOf(firstChunk.x, secondChunk.x)
+		val maxChunkX = maxOf(firstChunk.x, secondChunk.x)
+		val minChunkZ = minOf(firstChunk.z, secondChunk.z)
+		val maxChunkZ = maxOf(firstChunk.z, secondChunk.z)
+		val minY = minOf(firstNode.position.y, secondNode.position.y) - 1.0
+		val maxY = maxOf(firstNode.position.y, secondNode.position.y) + 1.0
+		val chunkPositions: MutableSet<ChunkPos> = mutableSetOf()
+
+		for (chunkX in minChunkX..maxChunkX) {
+			for (chunkZ in minChunkZ..maxChunkZ) {
+				val chunkPos = ChunkPos(chunkX, chunkZ)
+				val bounds = AABB(
+					chunkPos.minBlockX.toDouble(),
+					minY,
+					chunkPos.minBlockZ.toDouble(),
+					(chunkPos.maxBlockX + 1).toDouble(),
+					maxY,
+					(chunkPos.maxBlockZ + 1).toDouble()
+				)
+
+				if (bounds.contains(firstNode.position)
+					|| bounds.clip(firstNode.position, secondNode.position).isPresent
+				) {
+					chunkPositions.add(chunkPos)
+				}
+			}
+		}
+
+		return chunkPositions
 	}
 
 	companion object {

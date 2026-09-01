@@ -6,6 +6,8 @@ import dev.aaronhowser.mods.critter_carts.registry.ModEntityTypes
 import dev.aaronhowser.mods.critter_carts.registry.ModPotions
 import dev.aaronhowser.mods.critter_carts.handler.web.WebSavedData
 import dev.aaronhowser.mods.critter_carts.packet.ModPacketHandler
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.world.level.ChunkPos
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.neoforge.capabilities.Capabilities
@@ -13,6 +15,7 @@ import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent
 import net.neoforged.neoforge.event.brewing.RegisterBrewingRecipesEvent
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent
 import net.neoforged.neoforge.event.level.ChunkWatchEvent
+import net.neoforged.neoforge.event.level.BlockEvent
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent
 import net.neoforged.neoforge.event.tick.ServerTickEvent
 
@@ -34,11 +37,17 @@ object CommonEvents {
 	}
 
 	@SubscribeEvent
-	fun onServerTick(event: ServerTickEvent.Post) {
-		if (event.server.tickCount % WEB_VALIDATION_INTERVAL != 0) return
+	fun onBlockUpdate(event: BlockEvent) {
+		val level = event.level
+		if (level !is ServerLevel) return
 
+		WebSavedData.get(level).markChunkForValidation(ChunkPos(event.pos))
+	}
+
+	@SubscribeEvent
+	fun onServerTick(event: ServerTickEvent.Post) {
 		val level = event.server.overworld()
-		WebSavedData.get(level).removeInvalidLines(level)
+		WebSavedData.get(level).validateChangedChunks(level)
 	}
 
 	@SubscribeEvent
@@ -64,5 +73,4 @@ object CommonEvents {
 		ModPotions.registerRecipes(event)
 	}
 
-	private const val WEB_VALIDATION_INTERVAL = 20
 }
