@@ -4,6 +4,7 @@ import com.mojang.serialization.DynamicOps
 import dev.aaronhowser.mods.aaron.packet.AaronPacket
 import dev.aaronhowser.mods.critter_carts.packet.server_to_client.AddWebLinesPacket
 import dev.aaronhowser.mods.critter_carts.packet.server_to_client.RemoveWebLinePacket
+import net.minecraft.core.BlockPos
 import net.minecraft.core.HolderLookup
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtOps
@@ -65,6 +66,10 @@ class WebSavedData : SavedData() {
 				RemoveWebLinePacket(line.uuid).messagePlayer(player)
 			}
 		}
+	}
+
+	fun markChunkForValidation(blockPos: BlockPos) {
+		chunksToValidate.add(ChunkPos(blockPos))
 	}
 
 	fun markChunkForValidation(chunkPos: ChunkPos) {
