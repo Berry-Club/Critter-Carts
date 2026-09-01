@@ -29,6 +29,10 @@ class WebSavedData : SavedData() {
 		sendToNearbyPlayers(level, line, AddWebLinesPacket(listOf(line)))
 	}
 
+	fun getLine(uuid: UUID): WebLine? {
+		return lines[uuid]
+	}
+
 	fun removeLine(level: ServerLevel, uuid: UUID): WebLine? {
 		val removedLine = lines.remove(uuid) ?: return null
 		removeFromChunkCache(removedLine)
