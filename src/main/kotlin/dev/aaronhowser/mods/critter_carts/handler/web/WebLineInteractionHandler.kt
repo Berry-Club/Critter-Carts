@@ -12,6 +12,8 @@ import dev.aaronhowser.mods.critter_carts.handler.web.node.WebNode
 import dev.aaronhowser.mods.critter_carts.item.component.WebNodeDataComponent
 import dev.aaronhowser.mods.critter_carts.registry.ModDataComponents
 import dev.aaronhowser.mods.critter_carts.registry.ModItems
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.sounds.SoundEvents
@@ -20,6 +22,7 @@ import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.ClipContext
+import net.minecraft.world.level.Level
 import net.minecraft.world.level.gameevent.GameEvent
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
@@ -67,7 +70,7 @@ object WebLineInteractionHandler {
 		}
 	}
 
-	private fun handleNodeSelection(
+	fun handleNodeSelection(
 		level: ServerLevel,
 		player: Player,
 		itemStack: ItemStack,
@@ -89,36 +92,9 @@ object WebLineInteractionHandler {
 		firstNode: WebNode,
 		selectedNode: WebNode
 	) {
-		val maxLength = 10.0
-		val maxLengthSquared = maxLength * maxLength
-
-		val bothAnchorsAreOnSameLine =
-			firstNode is LineAnchor
-				&& selectedNode is LineAnchor
-				&& firstNode.lineUuid == selectedNode.lineUuid
-
-		if (bothAnchorsAreOnSameLine) {
-			player.status(ModMessageLang.SAME_LINE_MESSAGE.toComponent())
-			return
-		}
-
-		val bothAnchorsFaceSameDirection =
-			firstNode is BlockAnchor
-				&& selectedNode is BlockAnchor
-				&& firstNode.face == selectedNode.face
-
-		if (bothAnchorsFaceSameDirection) {
-			player.status(ModMessageLang.SAME_DIRECTION_MESSAGE.toComponent())
-			return
-		}
-
-		if (firstNode.position.distanceToSqr(selectedNode.position) >= maxLengthSquared) {
-			player.status(ModMessageLang.TOO_LONG_MESSAGE.toComponent())
-			return
-		}
-
-		if (!hasLineOfSight(level, player, firstNode, selectedNode)) {
-			player.status(ModMessageLang.OBSTRUCTED_MESSAGE.toComponent())
+		val invalidMessage = getInvalidMessage(level, player, firstNode, selectedNode)
+		if (invalidMessage != null) {
+			player.status(invalidMessage.toComponent())
 			return
 		}
 
@@ -159,6 +135,50 @@ object WebLineInteractionHandler {
 		player.status(ModMessageLang.FIRST_NODE_MESSAGE.toComponent())
 	}
 
+	fun canCreateLine(
+		level: Level,
+		player: Player,
+		firstNode: WebNode,
+		secondNode: WebNode
+	): Boolean {
+		return getInvalidMessage(level, player, firstNode, secondNode) == null
+	}
+
+	fun createBlockAnchor(blockPos: BlockPos, face: Direction, position: Vec3): BlockAnchor {
+		val surfaceOffset = 0.001
+		val faceNormal = Vec3.atLowerCornerOf(face.normal)
+
+		return BlockAnchor(blockPos, face, position.add(faceNormal.scale(surfaceOffset)))
+	}
+
+	private fun getInvalidMessage(
+		level: Level,
+		player: Player,
+		firstNode: WebNode,
+		secondNode: WebNode
+	): String? {
+		if (firstNode is LineAnchor
+			&& secondNode is LineAnchor
+			&& firstNode.lineUuid == secondNode.lineUuid
+		) return ModMessageLang.SAME_LINE_MESSAGE
+
+		if (firstNode is BlockAnchor
+			&& secondNode is BlockAnchor
+			&& firstNode.face == secondNode.face
+		) return ModMessageLang.SAME_DIRECTION_MESSAGE
+
+		val maxLength = 10.0
+		if (firstNode.position.distanceToSqr(secondNode.position) >= maxLength * maxLength) {
+			return ModMessageLang.TOO_LONG_MESSAGE
+		}
+
+		if (!hasLineOfSight(level, player, firstNode, secondNode)) {
+			return ModMessageLang.OBSTRUCTED_MESSAGE
+		}
+
+		return null
+	}
+
 	fun getTargetedLineAnchor(
 		lines: List<WebLine>,
 		lookStart: Vec3,
@@ -196,7 +216,7 @@ object WebLineInteractionHandler {
 	}
 
 	private fun hasLineOfSight(
-		level: ServerLevel,
+		level: Level,
 		player: Player,
 		firstNode: WebNode,
 		secondNode: WebNode
