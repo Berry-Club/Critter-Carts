@@ -16,7 +16,7 @@ class WebFluidItem(properties: Properties) : Item(properties) {
 
 		val player = context.player ?: return InteractionResult.PASS
 		val blockAnchor = createBlockAnchor(context)
-		WebLineInteractionHandler.handleAnchor(level, player, context.itemInHand, blockAnchor)
+		WebLineInteractionHandler.handleNodeSelection(level, player, context.itemInHand, blockAnchor)
 		return InteractionResult.CONSUME
 	}
 

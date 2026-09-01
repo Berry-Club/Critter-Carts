@@ -39,67 +39,92 @@ object WebLineInteractionHandler {
 		val line = WebSavedData.get(level).getLine(lineUuid) ?: return
 		val eyePosition = player.eyePosition
 		val lookEnd = eyePosition.add(player.lookAngle.scale(player.blockInteractionRange()))
-		val lineAnchor = findLineAnchor(listOf(line), eyePosition, lookEnd) ?: return
+		val selectedNode = findLineAnchor(listOf(line), eyePosition, lookEnd) ?: return
 		val positionTolerance = 0.1
 		val positionToleranceSquared = positionTolerance * positionTolerance
 
-		if (lineAnchor.position.distanceToSqr(requestedPosition) > positionToleranceSquared) return
+		if (selectedNode.position.distanceToSqr(requestedPosition) > positionToleranceSquared) return
 		if (itemStack.isItem(Tags.Items.TOOLS_SHEAR)) {
-			WebSavedData.get(level).removeLine(level, lineUuid)
-			player.playSound(SoundEvents.SHEEP_SHEAR, 1f, 1f)
-			level.gameEvent(player, GameEvent.SHEAR, lineAnchor.position)
-			itemStack.hurtAndBreak(1, player, hand.getEquipmentSlot())
-			player.status(ModMessageLang.LINE_REMOVED_MESSAGE.toComponent())
+			shearLine(level, player, itemStack, lineUuid, selectedNode, hand)
 			return
 		}
 
-		handleAnchor(level, player, itemStack, lineAnchor)
+		handleNodeSelection(level, player, itemStack, selectedNode)
 	}
 
-	fun handleAnchor(
+	fun handleNodeSelection(
 		level: ServerLevel,
 		player: Player,
 		itemStack: ItemStack,
-		selectedAnchor: WebNode
+		selectedNode: WebNode
 	) {
 		val maxLength = 10.0
 		val maxLengthSquared = maxLength * maxLength
-		val storedAnchor = itemStack.get(ModDataComponents.WEB_NODE)?.node
+		val firstNode = itemStack.get(ModDataComponents.WEB_NODE)?.node
 
-		if (storedAnchor == null) {
-			itemStack.set(ModDataComponents.WEB_NODE, WebNodeDataComponent(selectedAnchor))
-			player.status(ModMessageLang.FIRST_NODE_MESSAGE.toComponent())
+		if (firstNode == null) {
+			storeFirstNode(player, itemStack, selectedNode)
 			return
 		}
 
-		if (storedAnchor is LineAnchor
-			&& selectedAnchor is LineAnchor
-			&& storedAnchor.lineUuid == selectedAnchor.lineUuid
+		if (firstNode is LineAnchor
+			&& selectedNode is LineAnchor
+			&& firstNode.lineUuid == selectedNode.lineUuid
 		) {
 			player.status(ModMessageLang.SAME_LINE_MESSAGE.toComponent())
 			return
 		}
 
-		if (storedAnchor is BlockAnchor
-			&& selectedAnchor is BlockAnchor
-			&& storedAnchor.face == selectedAnchor.face
+		if (firstNode is BlockAnchor
+			&& selectedNode is BlockAnchor
+			&& firstNode.face == selectedNode.face
 		) {
 			player.status(ModMessageLang.SAME_DIRECTION_MESSAGE.toComponent())
 			return
 		}
 
-		if (storedAnchor.position.distanceToSqr(selectedAnchor.position) >= maxLengthSquared) {
+		if (firstNode.position.distanceToSqr(selectedNode.position) >= maxLengthSquared) {
 			player.status(ModMessageLang.TOO_LONG_MESSAGE.toComponent())
 			return
 		}
 
-		if (!hasLineOfSight(level, player, storedAnchor, selectedAnchor)) {
+		if (!hasLineOfSight(level, player, firstNode, selectedNode)) {
 			player.status(ModMessageLang.OBSTRUCTED_MESSAGE.toComponent())
 			return
 		}
 
-		val line = WebLine(UUID.randomUUID(), storedAnchor, selectedAnchor)
-		WebSavedData.get(level).addLine(level, line)
+		createLine(level, player, itemStack, firstNode, selectedNode)
+	}
+
+	private fun shearLine(
+		level: ServerLevel,
+		player: ServerPlayer,
+		itemStack: ItemStack,
+		lineUuid: UUID,
+		selectedNode: LineAnchor,
+		hand: InteractionHand
+	) {
+		WebSavedData.get(level).removeLine(level, lineUuid)
+		player.playSound(SoundEvents.SHEEP_SHEAR, 1f, 1f)
+		level.gameEvent(player, GameEvent.SHEAR, selectedNode.position)
+		itemStack.hurtAndBreak(1, player, hand.getEquipmentSlot())
+		player.status(ModMessageLang.LINE_REMOVED_MESSAGE.toComponent())
+	}
+
+	private fun storeFirstNode(player: Player, itemStack: ItemStack, selectedNode: WebNode) {
+		itemStack.set(ModDataComponents.WEB_NODE, WebNodeDataComponent(selectedNode))
+		player.status(ModMessageLang.FIRST_NODE_MESSAGE.toComponent())
+	}
+
+	private fun createLine(
+		level: ServerLevel,
+		player: Player,
+		itemStack: ItemStack,
+		firstNode: WebNode,
+		secondNode: WebNode
+	) {
+		val webLine = WebLine(UUID.randomUUID(), firstNode, secondNode)
+		WebSavedData.get(level).addLine(level, webLine)
 		itemStack.remove(ModDataComponents.WEB_NODE)
 		player.status(ModMessageLang.LINE_CREATED_MESSAGE.toComponent())
 	}
@@ -111,20 +136,20 @@ object WebLineInteractionHandler {
 	): LineAnchor? {
 		val selectionRadius = 0.3
 		val selectionRadiusSquared = selectionRadius * selectionRadius
-		var lineAnchor: LineAnchor? = null
+		var closestAnchor: LineAnchor? = null
 		var closestDistanceSquared = selectionRadiusSquared
 
 		for (line in lines) {
-			val position = getClosestPosition(line, lookStart, lookEnd)
-			val lookPosition = getClosestPosition(lookStart, lookEnd, position)
-			val distanceSquared = position.distanceToSqr(lookPosition)
+			val anchorPosition = getClosestPosition(line, lookStart, lookEnd)
+			val closestLookPosition = getClosestPosition(lookStart, lookEnd, anchorPosition)
+			val distanceSquared = anchorPosition.distanceToSqr(closestLookPosition)
 			if (distanceSquared > closestDistanceSquared) continue
 
 			closestDistanceSquared = distanceSquared
-			lineAnchor = LineAnchor(line.uuid, position)
+			closestAnchor = LineAnchor(line.uuid, anchorPosition)
 		}
 
-		return lineAnchor
+		return closestAnchor
 	}
 
 	private fun hasLineOfSight(
