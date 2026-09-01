@@ -21,14 +21,6 @@ import java.util.UUID
 class WebSavedData : SavedData() {
 	private val lines: MutableMap<UUID, WebLine> = mutableMapOf()
 
-	fun getLines(): Collection<WebLine> {
-		return lines.values
-	}
-
-	fun getLine(uuid: UUID): WebLine? {
-		return lines[uuid]
-	}
-
 	fun addLine(level: ServerLevel, line: WebLine) {
 		lines[line.uuid] = line
 		setDirty()
@@ -43,38 +35,31 @@ class WebSavedData : SavedData() {
 	}
 
 	fun syncChunk(player: ServerPlayer, chunkPos: ChunkPos) {
-		val nearbyLines = lines.values.filter { line -> line.getChunkPositions().contains(chunkPos) }
+		val nearbyLines = lines.values.filter { line -> chunkPos in getChunkPositions(line) }
 		if (nearbyLines.isEmpty()) return
 
 		AddWebLinesPacket(nearbyLines).messagePlayer(player)
 	}
 
 	fun removeInvalidLines(level: ServerLevel) {
-		var removedLine = true
-
-		while (removedLine) {
-			removedLine = false
-			val lineIterator = lines.values.iterator()
-
-			while (lineIterator.hasNext()) {
-				val line = lineIterator.next()
-				if (!isLoaded(level, line)) continue
-				if (isValid(level, line)) continue
-
-				lineIterator.remove()
-				setDirty()
-				sendToNearbyPlayers(level, line, RemoveWebLinePacket(line.uuid))
-				removedLine = true
-			}
+		val validityCache: MutableMap<UUID, Boolean> = mutableMapOf()
+		val invalidLines = lines.values.filter { line ->
+			isLoaded(level, line) && !isValid(level, line, mutableSetOf(), validityCache)
 		}
+		if (invalidLines.isEmpty()) return
+
+		for (line in invalidLines) {
+			lines.remove(line.uuid)
+			sendToNearbyPlayers(level, line, RemoveWebLinePacket(line.uuid))
+		}
+
+		setDirty()
 	}
 
 	private fun isLoaded(level: ServerLevel, line: WebLine): Boolean {
-		for (node in listOf(line.firstNode, line.secondNode)) {
-			if (!isNodeLoaded(level, node, mutableSetOf())) return false
-		}
-
-		return true
+		val visitedLines: MutableSet<UUID> = mutableSetOf()
+		return isNodeLoaded(level, line.firstNode, visitedLines)
+			&& isNodeLoaded(level, line.secondNode, visitedLines)
 	}
 
 	private fun isNodeLoaded(level: ServerLevel, node: WebNode, visitedLines: MutableSet<UUID>): Boolean {
@@ -90,9 +75,36 @@ class WebSavedData : SavedData() {
 		}
 	}
 
-	private fun isValid(level: ServerLevel, line: WebLine): Boolean {
-		val firstPosition = getNodePosition(level, line.firstNode, mutableSetOf()) ?: return false
-		val secondPosition = getNodePosition(level, line.secondNode, mutableSetOf()) ?: return false
+	private fun isValid(
+		level: ServerLevel,
+		line: WebLine,
+		visitedLines: MutableSet<UUID>,
+		validityCache: MutableMap<UUID, Boolean>
+	): Boolean {
+		val cachedValidity = validityCache[line.uuid]
+		if (cachedValidity != null) return cachedValidity
+		if (!visitedLines.add(line.uuid)) return false
+
+		val dependenciesValid = isNodeDependencyValid(level, line.firstNode, visitedLines, validityCache)
+			&& isNodeDependencyValid(level, line.secondNode, visitedLines, validityCache)
+		if (!dependenciesValid) {
+			visitedLines.remove(line.uuid)
+			validityCache[line.uuid] = false
+			return false
+		}
+
+		val firstPosition = getNodePosition(level, line.firstNode, mutableSetOf())
+		val secondPosition = getNodePosition(level, line.secondNode, mutableSetOf())
+		val lineValid = firstPosition != null
+			&& secondPosition != null
+			&& hasLineOfSight(level, firstPosition, secondPosition)
+
+		visitedLines.remove(line.uuid)
+		validityCache[line.uuid] = lineValid
+		return lineValid
+	}
+
+	private fun hasLineOfSight(level: ServerLevel, firstPosition: Vec3, secondPosition: Vec3): Boolean {
 		val clipContext = ClipContext(
 			firstPosition,
 			secondPosition,
@@ -102,6 +114,18 @@ class WebSavedData : SavedData() {
 		)
 
 		return level.clip(clipContext).type == HitResult.Type.MISS
+	}
+
+	private fun isNodeDependencyValid(
+		level: ServerLevel,
+		node: WebNode,
+		visitedLines: MutableSet<UUID>,
+		validityCache: MutableMap<UUID, Boolean>
+	): Boolean {
+		if (node !is WebNode.LineAnchor) return true
+
+		val anchoredLine = lines[node.lineUuid] ?: return false
+		return isValid(level, anchoredLine, visitedLines, validityCache)
 	}
 
 	private fun getNodePosition(level: ServerLevel, node: WebNode, visitedLines: MutableSet<UUID>): Vec3? {
@@ -128,10 +152,40 @@ class WebSavedData : SavedData() {
 	}
 
 	private fun sendToNearbyPlayers(level: ServerLevel, line: WebLine, packet: AaronPacket) {
-		val chunkPositions = line.getChunkPositions()
-		for (player in level.players()) {
-			if (chunkPositions.any { chunkPos -> level.chunkSource.chunkMap.getPlayers(chunkPos, false).contains(player) }) {
-				packet.messagePlayer(player)
+		val nearbyPlayers: MutableSet<ServerPlayer> = mutableSetOf()
+
+		for (chunkPos in getChunkPositions(line)) {
+			for (player in level.chunkSource.chunkMap.getPlayers(chunkPos, false)) {
+				nearbyPlayers.add(player)
+			}
+		}
+
+		for (player in nearbyPlayers) {
+			packet.messagePlayer(player)
+		}
+	}
+
+	private fun getChunkPositions(line: WebLine): Set<ChunkPos> {
+		val chunkPositions: MutableSet<ChunkPos> = mutableSetOf()
+		val visitedLines: MutableSet<UUID> = mutableSetOf()
+		addNodeChunkPosition(line.firstNode, chunkPositions, visitedLines)
+		addNodeChunkPosition(line.secondNode, chunkPositions, visitedLines)
+		return chunkPositions
+	}
+
+	private fun addNodeChunkPosition(
+		node: WebNode,
+		chunkPositions: MutableSet<ChunkPos>,
+		visitedLines: MutableSet<UUID>
+	) {
+		when (node) {
+			is WebNode.BlockAnchor -> chunkPositions.add(ChunkPos(node.blockPos))
+			is WebNode.LineAnchor -> {
+				if (!visitedLines.add(node.lineUuid)) return
+
+				val anchoredLine = lines[node.lineUuid] ?: return
+				addNodeChunkPosition(anchoredLine.firstNode, chunkPositions, visitedLines)
+				addNodeChunkPosition(anchoredLine.secondNode, chunkPositions, visitedLines)
 			}
 		}
 	}
@@ -173,9 +227,9 @@ class WebSavedData : SavedData() {
 				return get(level.server.overworld())
 			}
 
-			val storage = level.dataStorage
-			val factory = Factory(::WebSavedData, ::load)
-			return storage.computeIfAbsent(factory, SAVED_DATA_NAME)
+			return level.dataStorage.computeIfAbsent(FACTORY, SAVED_DATA_NAME)
 		}
+
+		private val FACTORY = Factory(::WebSavedData, ::load)
 	}
 }
