@@ -4,6 +4,7 @@ import com.mojang.serialization.DynamicOps
 import dev.aaronhowser.mods.aaron.packet.AaronPacket
 import dev.aaronhowser.mods.critter_carts.packet.server_to_client.AddWebLinesPacket
 import dev.aaronhowser.mods.critter_carts.packet.server_to_client.RemoveWebLinePacket
+import net.minecraft.core.BlockPos
 import net.minecraft.core.HolderLookup
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtOps
@@ -42,9 +43,8 @@ class WebSavedData : SavedData() {
 	}
 
 	fun removeInvalidLines(level: ServerLevel) {
-		val validityCache: MutableMap<UUID, Boolean> = mutableMapOf()
 		val invalidLines = lines.values.filter { line ->
-			isLoaded(level, line) && !isValid(level, line, mutableSetOf(), validityCache)
+			isLoaded(level, line) && !isValid(level, line, mutableSetOf())
 		}
 		if (invalidLines.isEmpty()) return
 
@@ -57,45 +57,23 @@ class WebSavedData : SavedData() {
 	}
 
 	private fun isLoaded(level: ServerLevel, line: WebLine): Boolean {
-		val visitedLines: MutableSet<UUID> = mutableSetOf()
-		return isLoaded(level, line, visitedLines)
-	}
-
-	private fun isLoaded(level: ServerLevel, line: WebLine, visitedLines: MutableSet<UUID>): Boolean {
-		if (!visitedLines.add(line.uuid)) return true
-
-		val lineIsLoaded: (UUID) -> Boolean = { uuid ->
-			val anchoredLine = lines[uuid]
-			anchoredLine == null || isLoaded(level, anchoredLine, visitedLines)
-		}
-
-		return line.firstNode.isLoaded(level, lineIsLoaded)
-			&& line.secondNode.isLoaded(level, lineIsLoaded)
+		val checkedLines: MutableSet<UUID> = mutableSetOf()
+		return line.firstNode.isLoaded(level, lines, checkedLines)
+			&& line.secondNode.isLoaded(level, lines, checkedLines)
 	}
 
 	private fun isValid(
 		level: ServerLevel,
 		line: WebLine,
-		visitedLines: MutableSet<UUID>,
-		validityCache: MutableMap<UUID, Boolean>
+		checkedLines: MutableSet<UUID>
 	): Boolean {
-		val cachedValidity = validityCache[line.uuid]
-		if (cachedValidity != null) return cachedValidity
-		if (!visitedLines.add(line.uuid)) return false
+		if (!checkedLines.add(line.uuid)) return false
 
-		val dependenciesValid = isNodeValid(level, line.firstNode, visitedLines, validityCache)
-			&& isNodeValid(level, line.secondNode, visitedLines, validityCache)
-		if (!dependenciesValid) {
-			visitedLines.remove(line.uuid)
-			validityCache[line.uuid] = false
-			return false
-		}
+		if (!isValid(level, line.firstNode, checkedLines)) return false
+		if (!isValid(level, line.secondNode, checkedLines)) return false
 
-		val lineValid = hasLineOfSight(level, line.firstNode.position, line.secondNode.position)
-
-		visitedLines.remove(line.uuid)
-		validityCache[line.uuid] = lineValid
-		return lineValid
+		checkedLines.remove(line.uuid)
+		return hasLineOfSight(level, line.firstNode.position, line.secondNode.position)
 	}
 
 	private fun hasLineOfSight(level: ServerLevel, firstPosition: Vec3, secondPosition: Vec3): Boolean {
@@ -110,17 +88,16 @@ class WebSavedData : SavedData() {
 		return level.clip(clipContext).type == HitResult.Type.MISS
 	}
 
-	private fun isNodeValid(
+	private fun isValid(
 		level: ServerLevel,
 		node: WebNode,
-		visitedLines: MutableSet<UUID>,
-		validityCache: MutableMap<UUID, Boolean>
+		checkedLines: MutableSet<UUID>
 	): Boolean {
-		if (!node.isValid(level, lines::containsKey)) return false
+		if (!node.isValid(level, lines)) return false
 		if (node !is WebNode.LineAnchor) return true
 
-		val anchoredLine = lines[node.lineUuid] ?: return false
-		return isValid(level, anchoredLine, visitedLines, validityCache)
+		val line = lines[node.lineUuid] ?: return false
+		return isValid(level, line, checkedLines)
 	}
 
 	private fun sendToNearbyPlayers(level: ServerLevel, line: WebLine, packet: AaronPacket) {
@@ -138,28 +115,10 @@ class WebSavedData : SavedData() {
 	}
 
 	private fun getChunkPositions(line: WebLine): Set<ChunkPos> {
-		val chunkPositions: MutableSet<ChunkPos> = mutableSetOf()
-		val visitedLines: MutableSet<UUID> = mutableSetOf()
-		addNodeChunkPosition(line.firstNode, chunkPositions, visitedLines)
-		addNodeChunkPosition(line.secondNode, chunkPositions, visitedLines)
-		return chunkPositions
-	}
-
-	private fun addNodeChunkPosition(
-		node: WebNode,
-		chunkPositions: MutableSet<ChunkPos>,
-		visitedLines: MutableSet<UUID>
-	) {
-		when (node) {
-			is WebNode.BlockAnchor -> chunkPositions.add(ChunkPos(node.blockPos))
-			is WebNode.LineAnchor -> {
-				if (!visitedLines.add(node.lineUuid)) return
-
-				val anchoredLine = lines[node.lineUuid] ?: return
-				addNodeChunkPosition(anchoredLine.firstNode, chunkPositions, visitedLines)
-				addNodeChunkPosition(anchoredLine.secondNode, chunkPositions, visitedLines)
-			}
-		}
+		return setOf(
+			ChunkPos(BlockPos.containing(line.firstNode.position)),
+			ChunkPos(BlockPos.containing(line.secondNode.position))
+		)
 	}
 
 	override fun save(tag: CompoundTag, registries: HolderLookup.Provider): CompoundTag {
@@ -174,8 +133,8 @@ class WebSavedData : SavedData() {
 	}
 
 	companion object {
-		const val SAVED_DATA_NAME = "critter_carts_webs"
-		const val LINES_TAG = "Lines"
+		private const val SAVED_DATA_NAME = "critter_carts_webs"
+		private const val LINES_TAG = "Lines"
 
 		private fun load(tag: CompoundTag, registries: HolderLookup.Provider): WebSavedData {
 			val savedData = WebSavedData()

@@ -13,26 +13,29 @@ import net.minecraft.network.codec.StreamCodec
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.level.ChunkPos
 import net.minecraft.world.phys.Vec3
-import java.util.*
+import java.util.UUID
 
 sealed interface WebNode {
 	val position: Vec3
 
-	fun isLoaded(level: ServerLevel, lineIsLoaded: (UUID) -> Boolean): Boolean
+	fun isLoaded(level: ServerLevel, lines: Map<UUID, WebLine>, checkedLines: MutableSet<UUID>): Boolean
 
-	fun isValid(level: ServerLevel, lineExists: (UUID) -> Boolean): Boolean
+	fun isValid(level: ServerLevel, lines: Map<UUID, WebLine>): Boolean
 
 	data class BlockAnchor(
 		val blockPos: BlockPos,
 		val face: Direction,
 		override val position: Vec3
 	) : WebNode {
-		override fun isLoaded(level: ServerLevel, lineIsLoaded: (UUID) -> Boolean): Boolean {
-			val chunkPos = ChunkPos(blockPos)
-			return level.hasChunk(chunkPos.x, chunkPos.z)
+		override fun isLoaded(
+			level: ServerLevel,
+			lines: Map<UUID, WebLine>,
+			checkedLines: MutableSet<UUID>
+		): Boolean {
+			return isChunkLoaded(level, ChunkPos(blockPos))
 		}
 
-		override fun isValid(level: ServerLevel, lineExists: (UUID) -> Boolean): Boolean {
+		override fun isValid(level: ServerLevel, lines: Map<UUID, WebLine>): Boolean {
 			return level.getBlockState(blockPos).isFaceSturdy(level, blockPos, face)
 		}
 
@@ -68,12 +71,25 @@ sealed interface WebNode {
 		val lineUuid: UUID,
 		override val position: Vec3
 	) : WebNode {
-		override fun isLoaded(level: ServerLevel, lineIsLoaded: (UUID) -> Boolean): Boolean {
-			return lineIsLoaded(lineUuid)
+		override fun isLoaded(
+			level: ServerLevel,
+			lines: Map<UUID, WebLine>,
+			checkedLines: MutableSet<UUID>
+		): Boolean {
+			if (!checkedLines.add(lineUuid)) return true
+
+			val line = lines[lineUuid]
+			if (line == null) {
+				val chunkPos = ChunkPos(BlockPos.containing(position))
+				return isChunkLoaded(level, chunkPos)
+			}
+
+			return line.firstNode.isLoaded(level, lines, checkedLines)
+				&& line.secondNode.isLoaded(level, lines, checkedLines)
 		}
 
-		override fun isValid(level: ServerLevel, lineExists: (UUID) -> Boolean): Boolean {
-			return lineExists(lineUuid)
+		override fun isValid(level: ServerLevel, lines: Map<UUID, WebLine>): Boolean {
+			return lines.containsKey(lineUuid)
 		}
 
 		companion object {
@@ -101,6 +117,9 @@ sealed interface WebNode {
 	}
 
 	companion object {
+		private fun isChunkLoaded(level: ServerLevel, chunkPos: ChunkPos): Boolean {
+			return level.hasChunk(chunkPos.x, chunkPos.z)
+		}
 
 		val CODEC: Codec<WebNode> =
 			Codec.STRING.dispatch(
