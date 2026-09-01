@@ -12,6 +12,8 @@ import net.minecraft.nbt.NbtOps
 import net.minecraft.nbt.Tag
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
+import net.minecraft.sounds.SoundEvents
+import net.minecraft.sounds.SoundSource
 import net.minecraft.world.level.ChunkPos
 import net.minecraft.world.level.saveddata.SavedData
 import java.util.UUID
@@ -100,7 +102,8 @@ class WebSavedData : SavedData() {
 		val invalidLines = getInvalidLines(level, lineUuids)
 		if (invalidLines.isEmpty()) return
 
-		removeInvalidLines(level, invalidLines)
+		val obstructingBlockPositions = removeInvalidLines(level, invalidLines)
+		playObstructionSounds(level, obstructingBlockPositions)
 		setDirty()
 	}
 
@@ -139,10 +142,18 @@ class WebSavedData : SavedData() {
 	private fun removeInvalidLines(
 		level: ServerLevel,
 		invalidLines: Map<WebLine, WebLineInvalidation>
-	) {
-		for (line in invalidLines.keys) {
+	): Set<BlockPos> {
+		val obstructingBlockPositions: MutableSet<BlockPos> = mutableSetOf()
+		for ((line, invalidation) in invalidLines) {
 			removeStoredLine(level, line)
+
+			if (invalidation.reason == WebLineInvalidationReason.OBSTRUCTED) {
+				val blockPos = invalidation.blockPos ?: continue
+				obstructingBlockPositions.add(blockPos)
+			}
 		}
+
+		return obstructingBlockPositions
 	}
 
 	private fun removeStoredLine(level: ServerLevel, line: WebLine) {
@@ -155,6 +166,22 @@ class WebSavedData : SavedData() {
 		removeFromChunkCache(line)
 		removeNodeIfOrphaned(line.firstNode.uuid)
 		removeNodeIfOrphaned(line.secondNode.uuid)
+	}
+
+	private fun playObstructionSounds(
+		level: ServerLevel,
+		blockPositions: Set<BlockPos>
+	) {
+		for (blockPos in blockPositions) {
+			level.playSound(
+				null,
+				blockPos,
+				SoundEvents.ARROW_SHOOT,
+				SoundSource.BLOCKS,
+				0.5f,
+				2f
+			)
+		}
 	}
 
 	private fun addToChunkCache(line: WebLine) {
