@@ -31,6 +31,8 @@ object ClientWebLines {
 	}
 
 	fun interact(player: Player, hand: InteractionHand): Boolean {
+		if (!player.level().isClientSide) return false
+
 		val itemStack = player.getItemInHand(hand)
 		if (!itemStack.isItem(ModItemTagsProvider.WEB_LINE_INTERACTABLE)) return false
 

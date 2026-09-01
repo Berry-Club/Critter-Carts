@@ -72,6 +72,14 @@ object WebLineInteractionHandler {
 			return
 		}
 
+		if (storedAnchor is LineAnchor
+			&& selectedAnchor is LineAnchor
+			&& storedAnchor.lineUuid == selectedAnchor.lineUuid
+		) {
+			player.status(ModMessageLang.SAME_LINE_MESSAGE.toComponent())
+			return
+		}
+
 		if (storedAnchor is BlockAnchor
 			&& selectedAnchor is BlockAnchor
 			&& storedAnchor.face == selectedAnchor.face
