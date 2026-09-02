@@ -8,10 +8,6 @@ import net.neoforged.neoforge.registries.DeferredRegister
 import java.util.function.Supplier
 
 object ModSoundEvents {
-	const val SCOOCHWORM_FOOTSTEP_SUBTITLE = "subtitles.critter_carts.scoochworm_footstep"
-	const val SCOOCHWORM_KISS_SUBTITLE = "subtitles.critter_carts.scoochworm_kiss"
-	const val WEB_SNAP_SUBTITLE = "subtitles.critter_carts.web_snap"
-
 	val SOUND_EVENT_REGISTRY: DeferredRegister<SoundEvent> =
 		DeferredRegister.create(BuiltInRegistries.SOUND_EVENT, CritterCarts.MOD_ID)
 

@@ -1,6 +1,7 @@
 package dev.aaronhowser.mods.critter_carts.datagen.sound
 
 import dev.aaronhowser.mods.critter_carts.CritterCarts
+import dev.aaronhowser.mods.critter_carts.datagen.language.ModSoundLang
 import dev.aaronhowser.mods.critter_carts.registry.ModSoundEvents
 import net.minecraft.data.PackOutput
 import net.minecraft.sounds.SoundEvents
@@ -15,7 +16,7 @@ class ModSoundDefinitionsProvider(
 
 	override fun registerSounds() {
 		val footstepDefinition = definition()
-			.subtitle(ModSoundEvents.SCOOCHWORM_FOOTSTEP_SUBTITLE)
+			.subtitle(ModSoundLang.SCOOCHWORM_FOOTSTEP_SUBTITLE)
 			.with(
 				sound(CritterCarts.modResource("entity/scoochworm/footstep_1"))
 			)
@@ -26,7 +27,7 @@ class ModSoundDefinitionsProvider(
 		add(ModSoundEvents.SCOOCHWORM_FOOTSTEP, footstepDefinition)
 
 		val kissDefinition = definition()
-			.subtitle(ModSoundEvents.SCOOCHWORM_KISS_SUBTITLE)
+			.subtitle(ModSoundLang.SCOOCHWORM_KISS_SUBTITLE)
 			.with(
 				sound(CritterCarts.modResource("entity/kiss_1"))
 			)
@@ -40,7 +41,7 @@ class ModSoundDefinitionsProvider(
 		add(ModSoundEvents.SCOOCHWORM_KISS, kissDefinition)
 
 		val webSnapDefinition = definition()
-			.subtitle(ModSoundEvents.WEB_SNAP_SUBTITLE)
+			.subtitle(ModSoundLang.WEB_SNAP_SUBTITLE)
 			.with(
 				sound(
 					SoundEvents.ARROW_SHOOT.location,
