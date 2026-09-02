@@ -34,7 +34,7 @@ data class BlockAnchor(
 	): WebLineInvalidation? {
 		if (level.getBlockState(blockPos).isFaceSturdy(level, blockPos, face)) return null
 
-		return WebLineInvalidation(WebLineInvalidationReason.INVALID_ANCHOR, blockPos)
+		return WebLineInvalidation(WebLineInvalidationReason.INVALID_ANCHOR)
 	}
 
 	companion object {

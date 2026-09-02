@@ -16,8 +16,6 @@ import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
-import net.minecraft.sounds.SoundEvents
-import net.minecraft.sounds.SoundSource
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
@@ -142,16 +140,6 @@ object WebLineInteractionHandler {
 		itemStack.hurtAndBreak(1, player, hand.getEquipmentSlot())
 
 		player.status(ModMessageLang.LINE_REMOVED_MESSAGE.toComponent())
-
-		level.playSound(
-			null,
-			selectedNode.position.x,
-			selectedNode.position.y,
-			selectedNode.position.z,
-			SoundEvents.SHEEP_SHEAR,
-			SoundSource.PLAYERS,
-			1f, 1f
-		)
 
 		level.gameEvent(player, GameEvent.SHEAR, selectedNode.position)
 	}

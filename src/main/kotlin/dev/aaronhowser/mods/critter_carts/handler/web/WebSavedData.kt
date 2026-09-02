@@ -2,6 +2,8 @@ package dev.aaronhowser.mods.critter_carts.handler.web
 
 import com.mojang.serialization.DynamicOps
 import dev.aaronhowser.mods.aaron.packet.AaronPacket
+import dev.aaronhowser.mods.aaron.scheduler.SchedulerExtensions.scheduleTaskInTicks
+import dev.aaronhowser.mods.critter_carts.handler.web.node.LineAnchor
 import dev.aaronhowser.mods.critter_carts.handler.web.node.WebNode
 import dev.aaronhowser.mods.critter_carts.packet.server_to_client.AddWebLinesPacket
 import dev.aaronhowser.mods.critter_carts.packet.server_to_client.RemoveWebLinePacket
@@ -102,8 +104,7 @@ class WebSavedData : SavedData() {
 		val invalidLines = getInvalidLines(level, lineUuids)
 		if (invalidLines.isEmpty()) return
 
-		val obstructingBlockPositions = removeInvalidLines(level, invalidLines)
-		playObstructionSounds(level, obstructingBlockPositions)
+		removeInvalidLines(level, invalidLines)
 		setDirty()
 	}
 
@@ -133,6 +134,9 @@ class WebSavedData : SavedData() {
 			if (!line.isLoaded(level)) continue
 
 			val invalidation = line.getInvalidation(level, lines) ?: continue
+			if (invalidation.dependencyDepth != 0
+				&& invalidation.reason != WebLineInvalidationReason.CYCLIC_DEPENDENCY
+			) continue
 			invalidLines[line] = invalidation
 		}
 
@@ -142,24 +146,18 @@ class WebSavedData : SavedData() {
 	private fun removeInvalidLines(
 		level: ServerLevel,
 		invalidLines: Map<WebLine, WebLineInvalidation>
-	): Set<BlockPos> {
-		val obstructingBlockPositions: MutableSet<BlockPos> = mutableSetOf()
-		for ((line, invalidation) in invalidLines) {
+	) {
+		for (line in invalidLines.keys) {
 			removeStoredLine(level, line)
-
-			if (invalidation.reason == WebLineInvalidationReason.OBSTRUCTED) {
-				val blockPos = invalidation.blockPos ?: continue
-				obstructingBlockPositions.add(blockPos)
-			}
 		}
-
-		return obstructingBlockPositions
 	}
 
 	private fun removeStoredLine(level: ServerLevel, line: WebLine) {
 		lines.remove(line.uuid)
 		removeLineReferences(line)
 		sendToNearbyPlayers(level, line, RemoveWebLinePacket(line.uuid))
+		playBreakSound(level, line)
+		scheduleDependentLines(level, line.uuid)
 	}
 
 	private fun removeLineReferences(line: WebLine) {
@@ -168,20 +166,44 @@ class WebSavedData : SavedData() {
 		removeNodeIfOrphaned(line.secondNode.uuid)
 	}
 
-	private fun playObstructionSounds(
-		level: ServerLevel,
-		blockPositions: Set<BlockPos>
-	) {
-		for (blockPos in blockPositions) {
-			level.playSound(
-				null,
-				blockPos,
-				SoundEvents.ARROW_SHOOT,
-				SoundSource.BLOCKS,
-				0.5f,
-				2f
-			)
+	private fun scheduleDependentLines(level: ServerLevel, removedLineUuid: UUID) {
+		val dependentLineUuids: MutableList<UUID> = mutableListOf()
+		for (line in lines.values) {
+			val firstParentUuid = (line.firstNode as? LineAnchor)?.lineUuid
+			val secondParentUuid = (line.secondNode as? LineAnchor)?.lineUuid
+			if (firstParentUuid != removedLineUuid && secondParentUuid != removedLineUuid) continue
+
+			dependentLineUuids.add(line.uuid)
 		}
+		if (dependentLineUuids.isEmpty()) return
+
+		level.scheduleTaskInTicks(CASCADE_DELAY_TICKS) {
+			var removedLine = false
+			for (lineUuid in dependentLineUuids) {
+				val line = lines[lineUuid] ?: continue
+				removeStoredLine(level, line)
+				removedLine = true
+			}
+
+			if (removedLine) setDirty()
+		}
+	}
+
+	private fun playBreakSound(level: ServerLevel, line: WebLine) {
+		val center = line.firstNode.position
+			.add(line.secondNode.position)
+			.scale(0.5)
+
+		level.playSound(
+			null,
+			center.x,
+			center.y,
+			center.z,
+			SoundEvents.ARROW_SHOOT,
+			SoundSource.BLOCKS,
+			0.5f,
+			2f
+		)
 	}
 
 	private fun addToChunkCache(line: WebLine) {
@@ -248,6 +270,7 @@ class WebSavedData : SavedData() {
 	}
 
 	companion object {
+		private const val CASCADE_DELAY_TICKS = 2
 		private const val SAVED_DATA_NAME = "critter_carts_webs"
 		private const val NODES_TAG = "Nodes"
 		private const val LINES_TAG = "Lines"

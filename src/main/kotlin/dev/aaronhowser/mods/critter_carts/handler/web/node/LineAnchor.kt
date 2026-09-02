@@ -32,10 +32,14 @@ data class LineAnchor(
 		checkedLines: MutableSet<UUID>
 	): WebLineInvalidation? {
 		val line = lines[lineUuid]
-			?: return WebLineInvalidation(WebLineInvalidationReason.MISSING_LINE)
+			?: return WebLineInvalidation(
+				WebLineInvalidationReason.MISSING_LINE,
+				dependencyDepth = 1
+			)
 		if (!line.isLoaded(level)) return null
 
-		return line.getInvalidation(level, lines, checkedLines)
+		val invalidation = line.getInvalidation(level, lines, checkedLines) ?: return null
+		return invalidation.copy(dependencyDepth = invalidation.dependencyDepth + 1)
 	}
 
 	companion object {

@@ -6,7 +6,6 @@ import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.level.ChunkPos
 import net.minecraft.world.level.ClipContext
 import net.minecraft.world.phys.AABB
-import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.shapes.CollisionContext
 import java.util.UUID
@@ -62,8 +61,7 @@ data class WebLine(
 		val hitResult = level.clip(clipContext)
 		if (hitResult.type == HitResult.Type.MISS) return null
 
-		val blockPos = (hitResult as BlockHitResult).blockPos
-		return WebLineInvalidation(WebLineInvalidationReason.OBSTRUCTED, blockPos)
+		return WebLineInvalidation(WebLineInvalidationReason.OBSTRUCTED)
 	}
 
 	fun getEndpointChunkPositions(): Set<ChunkPos> {
