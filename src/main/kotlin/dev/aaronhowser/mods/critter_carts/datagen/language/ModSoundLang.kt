@@ -7,5 +7,6 @@ object ModSoundLang {
 	fun add(provider: ModLanguageProvider) {
 		provider.add(ModSoundEvents.SCOOCHWORM_FOOTSTEP_SUBTITLE, "Scoochworm scooches")
 		provider.add(ModSoundEvents.SCOOCHWORM_KISS_SUBTITLE, "Scoochworm smooches")
+		provider.add(ModSoundEvents.WEB_SNAP_SUBTITLE, "Web snaps")
 	}
 }

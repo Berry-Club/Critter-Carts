@@ -3,7 +3,9 @@ package dev.aaronhowser.mods.critter_carts.datagen.sound
 import dev.aaronhowser.mods.critter_carts.CritterCarts
 import dev.aaronhowser.mods.critter_carts.registry.ModSoundEvents
 import net.minecraft.data.PackOutput
+import net.minecraft.sounds.SoundEvents
 import net.neoforged.neoforge.common.data.ExistingFileHelper
+import net.neoforged.neoforge.common.data.SoundDefinition
 import net.neoforged.neoforge.common.data.SoundDefinitionsProvider
 
 class ModSoundDefinitionsProvider(
@@ -36,6 +38,17 @@ class ModSoundDefinitionsProvider(
 			)
 
 		add(ModSoundEvents.SCOOCHWORM_KISS, kissDefinition)
+
+		val webSnapDefinition = definition()
+			.subtitle(ModSoundEvents.WEB_SNAP_SUBTITLE)
+			.with(
+				sound(
+					SoundEvents.ARROW_SHOOT.location,
+					SoundDefinition.SoundType.EVENT
+				)
+			)
+
+		add(ModSoundEvents.WEB_SNAP, webSnapDefinition)
 	}
 
 }

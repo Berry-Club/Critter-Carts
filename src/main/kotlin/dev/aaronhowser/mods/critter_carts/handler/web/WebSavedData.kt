@@ -7,6 +7,7 @@ import dev.aaronhowser.mods.critter_carts.handler.web.node.LineAnchor
 import dev.aaronhowser.mods.critter_carts.handler.web.node.WebNode
 import dev.aaronhowser.mods.critter_carts.packet.server_to_client.AddWebLinesPacket
 import dev.aaronhowser.mods.critter_carts.packet.server_to_client.RemoveWebLinePacket
+import dev.aaronhowser.mods.critter_carts.registry.ModSoundEvents
 import net.minecraft.core.BlockPos
 import net.minecraft.core.HolderLookup
 import net.minecraft.nbt.CompoundTag
@@ -14,7 +15,6 @@ import net.minecraft.nbt.NbtOps
 import net.minecraft.nbt.Tag
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
-import net.minecraft.sounds.SoundEvents
 import net.minecraft.sounds.SoundSource
 import net.minecraft.world.level.ChunkPos
 import net.minecraft.world.level.saveddata.SavedData
@@ -199,7 +199,7 @@ class WebSavedData : SavedData() {
 			center.x,
 			center.y,
 			center.z,
-			SoundEvents.ARROW_SHOOT,
+			ModSoundEvents.WEB_SNAP.get(),
 			SoundSource.BLOCKS,
 			0.5f,
 			2f

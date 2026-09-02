@@ -13,5 +13,14 @@
       "critter_carts:entity/kiss_3"
     ],
     "subtitle": "subtitles.critter_carts.scoochworm_kiss"
+  },
+  "web_snap": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "entity.arrow.shoot"
+      }
+    ],
+    "subtitle": "subtitles.critter_carts.web_snap"
   }
 }

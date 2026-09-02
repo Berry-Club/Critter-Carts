@@ -48,6 +48,7 @@
   "item.critter_carts.web_fluid.line_removed": "Web line removed",
   "item.critter_carts.web_fluid.obstructed": "The selected faces do not have line of sight",
   "item.critter_carts.web_fluid.same_direction": "The selected faces cannot point in the same direction",
+  "item.critter_carts.web_fluid.same_line": "A web line cannot attach to the same line twice",
   "item.critter_carts.web_fluid.too_long": "The web line must be shorter than 10 blocks",
   "item.critter_carts.yellow_dyeberry": "Yellow Dyeberry",
   "item.minecraft.lingering_potion.effect.critter_carts.aaron": "Lingering Aaron Juice",
@@ -81,6 +82,7 @@
   "itemGroup.critter_carts": "Critter Carts",
   "subtitles.critter_carts.scoochworm_footstep": "Scoochworm scooches",
   "subtitles.critter_carts.scoochworm_kiss": "Scoochworm smooches",
+  "subtitles.critter_carts.web_snap": "Web snaps",
   "tooltip.critter_carts.container.empty": "Empty",
   "tooltip.critter_carts.container.stack": "Contains %s stack",
   "tooltip.critter_carts.container.stacks": "Contains %s stacks"
