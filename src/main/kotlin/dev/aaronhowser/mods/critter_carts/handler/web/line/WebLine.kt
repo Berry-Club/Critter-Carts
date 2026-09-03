@@ -1,7 +1,7 @@
 package dev.aaronhowser.mods.critter_carts.handler.web.line
 
 import dev.aaronhowser.mods.critter_carts.handler.web.WebNetwork
-import dev.aaronhowser.mods.critter_carts.handler.web.node.LineAnchor
+import dev.aaronhowser.mods.critter_carts.handler.web.node.WebLineAnchor
 import dev.aaronhowser.mods.critter_carts.handler.web.node.WebNode
 import net.minecraft.core.BlockPos
 import net.minecraft.server.level.ServerLevel
@@ -32,7 +32,7 @@ data class WebLine(
 		firstNode.position.distanceTo(secondNode.position)
 	}
 
-	internal fun addAttachedAnchor(anchor: LineAnchor) {
+	internal fun addAttachedAnchor(anchor: WebLineAnchor) {
 		attachmentsByAnchorUuid[anchor.uuid] = LineAnchorAttachment(
 			anchor,
 			anchor.position.distanceTo(firstNode.position),

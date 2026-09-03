@@ -7,8 +7,8 @@ import dev.aaronhowser.mods.aaron.misc.AaronExtensions.toComponent
 import dev.aaronhowser.mods.critter_carts.datagen.language.ModMessageLang
 import dev.aaronhowser.mods.critter_carts.datagen.tag.ModItemTagsProvider
 import dev.aaronhowser.mods.critter_carts.handler.web.line.WebLine
-import dev.aaronhowser.mods.critter_carts.handler.web.node.BlockAnchor
-import dev.aaronhowser.mods.critter_carts.handler.web.node.LineAnchor
+import dev.aaronhowser.mods.critter_carts.handler.web.node.WebBlockAnchor
+import dev.aaronhowser.mods.critter_carts.handler.web.node.WebLineAnchor
 import dev.aaronhowser.mods.critter_carts.handler.web.node.WebNode
 import dev.aaronhowser.mods.critter_carts.item.component.WebNodeDataComponent
 import dev.aaronhowser.mods.critter_carts.packet.server_to_client.ShowWebPathPacket
@@ -89,7 +89,7 @@ object WebLineInteractionHandler {
 		if (selectedNode.position.distanceToSqr(requestedPosition) > positionToleranceSquared) return
 
 		when {
-			itemStack.isItem(Tags.Items.TOOLS_SHEAR) && selectedNode is LineAnchor ->
+			itemStack.isItem(Tags.Items.TOOLS_SHEAR) && selectedNode is WebLineAnchor ->
 				shearLine(level, player, itemStack, targetUuid, selectedNode, hand)
 
 			itemStack.isItem(ModItems.WEB_FLUID) ->
@@ -176,7 +176,7 @@ object WebLineInteractionHandler {
 		player: ServerPlayer,
 		itemStack: ItemStack,
 		lineUuid: UUID,
-		selectedNode: LineAnchor,
+		selectedNode: WebLineAnchor,
 		hand: InteractionHand
 	) {
 		WebSavedData.get(level).removeLine(level, lineUuid)
@@ -201,11 +201,11 @@ object WebLineInteractionHandler {
 		return getInvalidMessage(level, player, firstNode, secondNode) == null
 	}
 
-	fun createBlockAnchor(blockPos: BlockPos, face: Direction, position: Vec3): BlockAnchor {
+	fun createBlockAnchor(blockPos: BlockPos, face: Direction, position: Vec3): WebBlockAnchor {
 		val surfaceOffset = 0.001
 		val faceNormal = Vec3.atLowerCornerOf(face.normal)
 
-		return BlockAnchor(
+		return WebBlockAnchor(
 			UUID.randomUUID(),
 			blockPos,
 			face,
@@ -221,13 +221,13 @@ object WebLineInteractionHandler {
 	): String? {
 		if (firstNode.uuid == secondNode.uuid) return ModMessageLang.SAME_LINE_MESSAGE
 
-		if (firstNode is LineAnchor
-			&& secondNode is LineAnchor
+		if (firstNode is WebLineAnchor
+			&& secondNode is WebLineAnchor
 			&& firstNode.lineUuid == secondNode.lineUuid
 		) return ModMessageLang.SAME_LINE_MESSAGE
 
-		if (firstNode is BlockAnchor
-			&& secondNode is BlockAnchor
+		if (firstNode is WebBlockAnchor
+			&& secondNode is WebBlockAnchor
 			&& firstNode.face == secondNode.face
 		) return ModMessageLang.SAME_DIRECTION_MESSAGE
 
@@ -280,7 +280,7 @@ object WebLineInteractionHandler {
 			val node = if (snapToExistingNode && existingNode != null) {
 				existingNode
 			} else {
-				LineAnchor(UUID.randomUUID(), line.uuid, position)
+				WebLineAnchor(UUID.randomUUID(), line.uuid, position)
 			}
 
 			val targetedLineUuid = if (node === line.firstNode || node === line.secondNode) {

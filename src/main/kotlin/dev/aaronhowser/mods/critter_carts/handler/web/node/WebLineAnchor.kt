@@ -15,7 +15,7 @@ import net.minecraft.world.level.ChunkPos
 import net.minecraft.world.phys.Vec3
 import java.util.UUID
 
-data class LineAnchor(
+data class WebLineAnchor(
 	override val uuid: UUID,
 	val lineUuid: UUID,
 	override val position: Vec3
@@ -46,26 +46,26 @@ data class LineAnchor(
 		const val TYPE = "line"
 		const val TYPE_ID = 1
 
-		val CODEC: MapCodec<LineAnchor> =
+		val CODEC: MapCodec<WebLineAnchor> =
 			RecordCodecBuilder.mapCodec { instance ->
 				instance.group(
 					UUIDUtil.CODEC
 						.fieldOf("uuid")
-						.forGetter(LineAnchor::uuid),
+						.forGetter(WebLineAnchor::uuid),
 					UUIDUtil.CODEC
 						.fieldOf("line_uuid")
-						.forGetter(LineAnchor::lineUuid),
+						.forGetter(WebLineAnchor::lineUuid),
 					Vec3.CODEC
 						.fieldOf("position")
-						.forGetter(LineAnchor::position)
-				).apply(instance, ::LineAnchor)
+						.forGetter(WebLineAnchor::position)
+				).apply(instance, ::WebLineAnchor)
 			}
 
-		val STREAM_CODEC: StreamCodec<ByteBuf, LineAnchor> = StreamCodec.composite(
-			UUIDUtil.STREAM_CODEC, LineAnchor::uuid,
-			UUIDUtil.STREAM_CODEC, LineAnchor::lineUuid,
-			AaronExtraStreamCodecs.VEC3, LineAnchor::position,
-			::LineAnchor
+		val STREAM_CODEC: StreamCodec<ByteBuf, WebLineAnchor> = StreamCodec.composite(
+			UUIDUtil.STREAM_CODEC, WebLineAnchor::uuid,
+			UUIDUtil.STREAM_CODEC, WebLineAnchor::lineUuid,
+			AaronExtraStreamCodecs.VEC3, WebLineAnchor::position,
+			::WebLineAnchor
 		)
 	}
 }

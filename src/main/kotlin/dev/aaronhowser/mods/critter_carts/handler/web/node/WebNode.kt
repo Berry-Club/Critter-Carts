@@ -44,14 +44,14 @@ sealed class WebNode {
 				"type",
 				{ node ->
 					when (node) {
-						is BlockAnchor -> BlockAnchor.TYPE
-						is LineAnchor -> LineAnchor.TYPE
+						is WebBlockAnchor -> WebBlockAnchor.TYPE
+						is WebLineAnchor -> WebLineAnchor.TYPE
 					}
 				},
 				{ type ->
 					when (type) {
-						BlockAnchor.TYPE -> BlockAnchor.CODEC
-						LineAnchor.TYPE -> LineAnchor.CODEC
+						WebBlockAnchor.TYPE -> WebBlockAnchor.CODEC
+						WebLineAnchor.TYPE -> WebLineAnchor.CODEC
 						else -> error("Unknown web node type: $type")
 					}
 				}
@@ -61,14 +61,14 @@ sealed class WebNode {
 			ByteBufCodecs.VAR_INT.dispatch(
 				{ node ->
 					when (node) {
-						is BlockAnchor -> BlockAnchor.TYPE_ID
-						is LineAnchor -> LineAnchor.TYPE_ID
+						is WebBlockAnchor -> WebBlockAnchor.TYPE_ID
+						is WebLineAnchor -> WebLineAnchor.TYPE_ID
 					}
 				},
 				{ typeId ->
 					when (typeId) {
-						BlockAnchor.TYPE_ID -> BlockAnchor.STREAM_CODEC
-						LineAnchor.TYPE_ID -> LineAnchor.STREAM_CODEC
+						WebBlockAnchor.TYPE_ID -> WebBlockAnchor.STREAM_CODEC
+						WebLineAnchor.TYPE_ID -> WebLineAnchor.STREAM_CODEC
 						else -> error("Unknown web node type: $typeId")
 					}
 				}

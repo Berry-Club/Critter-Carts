@@ -3,7 +3,7 @@ package dev.aaronhowser.mods.critter_carts.block_entity
 import dev.aaronhowser.mods.aaron.block_entity.SyncingBlockEntity
 import dev.aaronhowser.mods.critter_carts.handler.web.WebNetwork
 import dev.aaronhowser.mods.critter_carts.handler.web.WebSavedData
-import dev.aaronhowser.mods.critter_carts.handler.web.node.BlockAnchor
+import dev.aaronhowser.mods.critter_carts.handler.web.node.WebBlockAnchor
 import dev.aaronhowser.mods.critter_carts.registry.ModBlockEntityTypes
 import net.minecraft.core.BlockPos
 import net.minecraft.core.HolderLookup
@@ -121,9 +121,9 @@ class HoppingSpiderNestBlockEntity(
 	private fun findJobFromSource(
 		level: ServerLevel,
 		network: WebNetwork,
-		nestNodes: List<BlockAnchor>,
-		inventoryNodes: List<BlockAnchor>,
-		sourceNode: BlockAnchor,
+		nestNodes: List<WebBlockAnchor>,
+		inventoryNodes: List<WebBlockAnchor>,
+		sourceNode: WebBlockAnchor,
 		reservations: HoppingSpiderReservations
 	): HoppingSpiderJob? {
 		val sourceHandler = getItemHandler(level, sourceNode) ?: return null
@@ -152,9 +152,9 @@ class HoppingSpiderNestBlockEntity(
 	private fun findDestinationJob(
 		level: ServerLevel,
 		network: WebNetwork,
-		nestNodes: List<BlockAnchor>,
-		inventoryNodes: List<BlockAnchor>,
-		sourceNode: BlockAnchor,
+		nestNodes: List<WebBlockAnchor>,
+		inventoryNodes: List<WebBlockAnchor>,
+		sourceNode: WebBlockAnchor,
 		sourceSlot: Int,
 		stack: ItemStack,
 		reservations: HoppingSpiderReservations
@@ -177,16 +177,16 @@ class HoppingSpiderNestBlockEntity(
 		return null
 	}
 
-	private fun isSameFace(first: BlockAnchor, second: BlockAnchor): Boolean {
+	private fun isSameFace(first: WebBlockAnchor, second: WebBlockAnchor): Boolean {
 		return first.blockPos == second.blockPos && first.face == second.face
 	}
 
 	private fun findHomeNode(
 		network: WebNetwork,
-		nestNodes: List<BlockAnchor>,
-		sourceNode: BlockAnchor,
-		destinationNode: BlockAnchor
-	): BlockAnchor? {
+		nestNodes: List<WebBlockAnchor>,
+		sourceNode: WebBlockAnchor,
+		destinationNode: WebBlockAnchor
+	): WebBlockAnchor? {
 		if (network.findShortestPath(sourceNode, destinationNode) == null) return null
 
 		for (nestNode in nestNodes) {
@@ -197,10 +197,10 @@ class HoppingSpiderNestBlockEntity(
 		return null
 	}
 
-	private fun getInventoryAnchors(level: ServerLevel, network: WebNetwork): List<BlockAnchor> {
-		val anchors: MutableList<BlockAnchor> = mutableListOf()
+	private fun getInventoryAnchors(level: ServerLevel, network: WebNetwork): List<WebBlockAnchor> {
+		val anchors: MutableList<WebBlockAnchor> = mutableListOf()
 		for (node in network.getNodes()) {
-			if (node !is BlockAnchor || node.blockPos == blockPos) continue
+			if (node !is WebBlockAnchor || node.blockPos == blockPos) continue
 			if (getItemHandler(level, node) == null) continue
 			anchors.add(node)
 		}
@@ -208,10 +208,10 @@ class HoppingSpiderNestBlockEntity(
 		return anchors
 	}
 
-	private fun getAnchors(network: WebNetwork, pos: BlockPos): List<BlockAnchor> {
-		val anchors: MutableList<BlockAnchor> = mutableListOf()
+	private fun getAnchors(network: WebNetwork, pos: BlockPos): List<WebBlockAnchor> {
+		val anchors: MutableList<WebBlockAnchor> = mutableListOf()
 		for (node in network.getNodes()) {
-			if (node is BlockAnchor && node.blockPos == pos) {
+			if (node is WebBlockAnchor && node.blockPos == pos) {
 				anchors.add(node)
 			}
 		}
@@ -219,11 +219,11 @@ class HoppingSpiderNestBlockEntity(
 		return anchors
 	}
 
-	private fun getItemHandler(level: ServerLevel, anchor: BlockAnchor): IItemHandler? {
+	private fun getItemHandler(level: ServerLevel, anchor: WebBlockAnchor): IItemHandler? {
 		return level.getCapability(Capabilities.ItemHandler.BLOCK, anchor.blockPos, anchor.face)
 	}
 
-	private fun canFullyInsert(level: ServerLevel, anchor: BlockAnchor, stack: ItemStack): Boolean {
+	private fun canFullyInsert(level: ServerLevel, anchor: WebBlockAnchor, stack: ItemStack): Boolean {
 		val handler = getItemHandler(level, anchor) ?: return false
 		var remainder = stack
 		for (slot in 0 until handler.slots) {

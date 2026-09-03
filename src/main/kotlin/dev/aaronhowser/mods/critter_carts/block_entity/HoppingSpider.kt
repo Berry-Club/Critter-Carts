@@ -1,7 +1,7 @@
 package dev.aaronhowser.mods.critter_carts.block_entity
 
 import dev.aaronhowser.mods.critter_carts.handler.web.WebSavedData
-import dev.aaronhowser.mods.critter_carts.handler.web.node.BlockAnchor
+import dev.aaronhowser.mods.critter_carts.handler.web.node.WebBlockAnchor
 import dev.aaronhowser.mods.critter_carts.handler.web.path.WebPath
 import net.minecraft.core.HolderLookup
 import net.minecraft.nbt.CompoundTag
@@ -142,11 +142,11 @@ class HoppingSpider(
 		return true
 	}
 
-	private fun getBlockAnchor(level: ServerLevel, uuid: UUID): BlockAnchor? {
-		return WebSavedData.get(level).getNode(uuid) as? BlockAnchor
+	private fun getBlockAnchor(level: ServerLevel, uuid: UUID): WebBlockAnchor? {
+		return WebSavedData.get(level).getNode(uuid) as? WebBlockAnchor
 	}
 
-	private fun getItemHandler(level: ServerLevel, anchor: BlockAnchor): IItemHandler? {
+	private fun getItemHandler(level: ServerLevel, anchor: WebBlockAnchor): IItemHandler? {
 		return level.getCapability(Capabilities.ItemHandler.BLOCK, anchor.blockPos, anchor.face)
 	}
 

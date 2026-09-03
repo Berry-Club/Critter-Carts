@@ -7,8 +7,8 @@ import dev.aaronhowser.mods.critter_carts.handler.web.line.WebLine
 import dev.aaronhowser.mods.critter_carts.handler.web.line.WebLineData
 import dev.aaronhowser.mods.critter_carts.handler.web.line.WebLineInvalidation
 import dev.aaronhowser.mods.critter_carts.handler.web.line.WebLineInvalidationReason
-import dev.aaronhowser.mods.critter_carts.handler.web.node.LineAnchor
-import dev.aaronhowser.mods.critter_carts.handler.web.node.BlockAnchor
+import dev.aaronhowser.mods.critter_carts.handler.web.node.WebLineAnchor
+import dev.aaronhowser.mods.critter_carts.handler.web.node.WebBlockAnchor
 import dev.aaronhowser.mods.critter_carts.handler.web.node.WebNode
 import dev.aaronhowser.mods.critter_carts.packet.server_to_client.AddWebLinesPacket
 import dev.aaronhowser.mods.critter_carts.packet.server_to_client.RemoveWebLinePacket
@@ -72,7 +72,7 @@ class WebSavedData : SavedData() {
 	fun getNetworksAt(blockPos: BlockPos): Set<WebNetwork> {
 		val matchingNetworks: MutableSet<WebNetwork> = mutableSetOf()
 		for (node in nodes.values) {
-			if (node !is BlockAnchor) continue
+			if (node !is WebBlockAnchor) continue
 			if (node.blockPos != blockPos) continue
 
 			for (line in node.lines) {
@@ -207,13 +207,13 @@ class WebSavedData : SavedData() {
 		addAnchorToReferencedLine(line.secondNode)
 
 		for (node in nodes.values) {
-			if (node !is LineAnchor || node.lineUuid != line.uuid) continue
+			if (node !is WebLineAnchor || node.lineUuid != line.uuid) continue
 			line.addAttachedAnchor(node)
 		}
 	}
 
 	private fun addAnchorToReferencedLine(node: WebNode) {
-		if (node !is LineAnchor) return
+		if (node !is WebLineAnchor) return
 
 		val referencedLine = lines[node.lineUuid] ?: return
 		referencedLine.addAttachedAnchor(node)
@@ -314,18 +314,18 @@ class WebSavedData : SavedData() {
 	}
 
 	private fun referencesLine(line: WebLine, referencedLineUuid: UUID): Boolean {
-		val firstLineUuid = (line.firstNode as? LineAnchor)?.lineUuid
+		val firstLineUuid = (line.firstNode as? WebLineAnchor)?.lineUuid
 		if (firstLineUuid == referencedLineUuid) return true
 
-		val secondLineUuid = (line.secondNode as? LineAnchor)?.lineUuid
+		val secondLineUuid = (line.secondNode as? WebLineAnchor)?.lineUuid
 		return secondLineUuid == referencedLineUuid
 	}
 
 	private fun scheduleDependentLines(level: ServerLevel, removedLineUuid: UUID) {
 		val dependentLineUuids: MutableList<UUID> = mutableListOf()
 		for (line in lines.values) {
-			val firstParentUuid = (line.firstNode as? LineAnchor)?.lineUuid
-			val secondParentUuid = (line.secondNode as? LineAnchor)?.lineUuid
+			val firstParentUuid = (line.firstNode as? WebLineAnchor)?.lineUuid
+			val secondParentUuid = (line.secondNode as? WebLineAnchor)?.lineUuid
 			if (firstParentUuid != removedLineUuid && secondParentUuid != removedLineUuid) continue
 
 			dependentLineUuids.add(line.uuid)
@@ -388,7 +388,7 @@ class WebSavedData : SavedData() {
 		val node = nodes[nodeUuid] ?: return
 		if (node.lines.isNotEmpty()) return
 
-		if (node is LineAnchor) {
+		if (node is WebLineAnchor) {
 			lines[node.lineUuid]?.removeAttachedAnchor(node.uuid)
 		}
 

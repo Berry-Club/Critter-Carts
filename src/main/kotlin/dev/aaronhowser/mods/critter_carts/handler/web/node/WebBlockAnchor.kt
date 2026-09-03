@@ -16,7 +16,7 @@ import net.minecraft.world.level.ChunkPos
 import net.minecraft.world.phys.Vec3
 import java.util.UUID
 
-data class BlockAnchor(
+data class WebBlockAnchor(
 	override val uuid: UUID,
 	val blockPos: BlockPos,
 	val face: Direction,
@@ -41,30 +41,30 @@ data class BlockAnchor(
 		const val TYPE = "block"
 		const val TYPE_ID = 0
 
-		val CODEC: MapCodec<BlockAnchor> =
+		val CODEC: MapCodec<WebBlockAnchor> =
 			RecordCodecBuilder.mapCodec { instance ->
 				instance.group(
 					UUIDUtil.CODEC
 						.fieldOf("uuid")
-						.forGetter(BlockAnchor::uuid),
+						.forGetter(WebBlockAnchor::uuid),
 					BlockPos.CODEC
 						.fieldOf("block_pos")
-						.forGetter(BlockAnchor::blockPos),
+						.forGetter(WebBlockAnchor::blockPos),
 					Direction.CODEC
 						.fieldOf("face")
-						.forGetter(BlockAnchor::face),
+						.forGetter(WebBlockAnchor::face),
 					Vec3.CODEC
 						.fieldOf("position")
-						.forGetter(BlockAnchor::position)
-				).apply(instance, ::BlockAnchor)
+						.forGetter(WebBlockAnchor::position)
+				).apply(instance, ::WebBlockAnchor)
 			}
 
-		val STREAM_CODEC: StreamCodec<ByteBuf, BlockAnchor> = StreamCodec.composite(
-			UUIDUtil.STREAM_CODEC, BlockAnchor::uuid,
-			BlockPos.STREAM_CODEC, BlockAnchor::blockPos,
-			Direction.STREAM_CODEC, BlockAnchor::face,
-			AaronExtraStreamCodecs.VEC3, BlockAnchor::position,
-			::BlockAnchor
+		val STREAM_CODEC: StreamCodec<ByteBuf, WebBlockAnchor> = StreamCodec.composite(
+			UUIDUtil.STREAM_CODEC, WebBlockAnchor::uuid,
+			BlockPos.STREAM_CODEC, WebBlockAnchor::blockPos,
+			Direction.STREAM_CODEC, WebBlockAnchor::face,
+			AaronExtraStreamCodecs.VEC3, WebBlockAnchor::position,
+			::WebBlockAnchor
 		)
 	}
 }
