@@ -11,21 +11,23 @@ class HoppingSpiderJob(
 	var phase: Phase = Phase.TO_SOURCE
 ) {
 
-	fun getCurrentNodeUuid(): UUID {
-		return when (phase) {
-			Phase.TO_SOURCE -> homeNodeUuid
-			Phase.TO_DESTINATION -> sourceNodeUuid
-			Phase.RETURNING -> destinationNodeUuid
+	val currentNodeUuid: UUID
+		get() {
+			return when (phase) {
+				Phase.TO_SOURCE -> homeNodeUuid
+				Phase.TO_DESTINATION -> sourceNodeUuid
+				Phase.RETURNING -> destinationNodeUuid
+			}
 		}
-	}
 
-	fun getTargetNodeUuid(): UUID {
-		return when (phase) {
-			Phase.TO_SOURCE -> sourceNodeUuid
-			Phase.TO_DESTINATION -> destinationNodeUuid
-			Phase.RETURNING -> homeNodeUuid
+	val targetNodeUuid: UUID
+		get() {
+			return when (phase) {
+				Phase.TO_SOURCE -> sourceNodeUuid
+				Phase.TO_DESTINATION -> destinationNodeUuid
+				Phase.RETURNING -> homeNodeUuid
+			}
 		}
-	}
 
 	fun save(): CompoundTag {
 		val tag = CompoundTag()

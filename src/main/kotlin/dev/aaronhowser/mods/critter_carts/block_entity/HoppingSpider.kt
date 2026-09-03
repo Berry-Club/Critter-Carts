@@ -10,132 +10,147 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.phys.Vec3
 import net.neoforged.neoforge.capabilities.Capabilities
 import net.neoforged.neoforge.items.IItemHandler
+import java.util.UUID
 
-class HoppingSpider {
+class HoppingSpider(
+	val uuid: UUID = UUID.randomUUID()
+) {
 
 	var job: HoppingSpiderJob? = null
-	var routeProgress: Double = 0.0
 	var carriedStack: ItemStack = ItemStack.EMPTY
 	var position: Vec3? = null
+	var route: HoppingSpiderRoute? = null
+	var routeProgress: Double = 0.0
 
-	fun tick(level: ServerLevel, nestPosition: Vec3, setChanged: () -> Unit) {
+	fun serverTick(level: ServerLevel, nestPosition: Vec3): Boolean {
 		if (position == null) {
 			position = nestPosition
 		}
 
-		val job = job ?: return
-		val route = findRoute(level, job) ?: return
-		if (!advance(route, setChanged)) return
+		val job = job ?: return false
+		val path = findPath(level, job) ?: return false
+		val routeChanged = updateRoute(level, job, path)
+		if (!moveAlong(path)) return routeChanged
 
-		when (job.phase) {
-			HoppingSpiderJob.Phase.TO_SOURCE -> pickUpItem(level, job, setChanged)
-			HoppingSpiderJob.Phase.TO_DESTINATION -> insertItem(level, job, setChanged)
-			HoppingSpiderJob.Phase.RETURNING -> finishJob(nestPosition, setChanged)
-		}
+		return completeCurrentLeg(level, job, nestPosition)
 	}
 
-	private fun pickUpItem(
-		level: ServerLevel,
-		job: HoppingSpiderJob,
-		setChanged: () -> Unit
-	) {
-		val sourceNode = WebSavedData.get(level).getNode(job.sourceNodeUuid)
-		if (sourceNode !is BlockAnchor) {
-			cancelJob(setChanged)
-			return
-		}
-
-		val sourceHandler = getItemHandler(level, sourceNode)
-		if (sourceHandler == null) {
-			cancelJob(setChanged)
-			return
-		}
-
-		val extractedStack = sourceHandler.extractItem(job.sourceSlot, MAX_TRANSFER_SIZE, false)
-		if (extractedStack.isEmpty) {
-			cancelJob(setChanged)
-			return
-		}
-
-		carriedStack = extractedStack
-		job.phase = HoppingSpiderJob.Phase.TO_DESTINATION
-		routeProgress = 0.0
-		setChanged()
-	}
-
-	private fun insertItem(
-		level: ServerLevel,
-		job: HoppingSpiderJob,
-		setChanged: () -> Unit
-	) {
-		val destinationNode = WebSavedData.get(level).getNode(job.destinationNodeUuid)
-		if (destinationNode !is BlockAnchor) return
-
-		val destinationHandler = getItemHandler(level, destinationNode) ?: return
-		carriedStack = insert(destinationHandler, carriedStack)
-		if (!carriedStack.isEmpty) return
-
-		job.phase = HoppingSpiderJob.Phase.RETURNING
-		routeProgress = 0.0
-		setChanged()
-	}
-
-	private fun finishJob(nestPosition: Vec3, setChanged: () -> Unit) {
-		job = null
-		routeProgress = 0.0
-		position = nestPosition
-		setChanged()
-	}
-
-	private fun cancelJob(setChanged: () -> Unit) {
-		job = null
-		routeProgress = 0.0
-		setChanged()
-	}
-
-	private fun findRoute(level: ServerLevel, job: HoppingSpiderJob): WebPath? {
+	private fun findPath(level: ServerLevel, job: HoppingSpiderJob): WebPath? {
 		val savedData = WebSavedData.get(level)
-		val currentNode = savedData.getNode(job.getCurrentNodeUuid()) ?: return null
-		val targetNode = savedData.getNode(job.getTargetNodeUuid()) ?: return null
+		val currentNode = savedData.getNode(job.currentNodeUuid) ?: return null
+		val targetNode = savedData.getNode(job.targetNodeUuid) ?: return null
 
 		for (line in currentNode.lines) {
 			val network = savedData.getNetwork(line.uuid) ?: continue
-			val route = network.findShortestPath(currentNode, targetNode) ?: continue
-			return route
+			return network.findShortestPath(currentNode, targetNode) ?: continue
 		}
 
 		return null
 	}
 
-	private fun advance(route: WebPath, setChanged: () -> Unit): Boolean {
-		routeProgress += TRAVEL_SPEED
-		position = getPosition(route, routeProgress)
-		setChanged()
-		return routeProgress >= route.distance
+	private fun updateRoute(
+		level: ServerLevel,
+		job: HoppingSpiderJob,
+		path: WebPath
+	): Boolean {
+		val newRoute = HoppingSpiderRoute.fromPath(path, level.gameTime, TRAVEL_SPEED)
+		val route = route
+		if (route != null && route.matches(job.targetNodeUuid, newRoute.positions)) return false
+
+		this.route = newRoute
+		routeProgress = 0.0
+		position = newRoute.positions.first()
+		return true
 	}
 
-	private fun getPosition(route: WebPath, progress: Double): Vec3 {
-		if (route.segments.isEmpty()) return route.endNode.position
+	private fun moveAlong(path: WebPath): Boolean {
+		routeProgress += TRAVEL_SPEED
+		position = getPathPosition(path, routeProgress)
+		return routeProgress >= path.distance
+	}
+
+	private fun getPathPosition(path: WebPath, progress: Double): Vec3 {
+		if (path.segments.isEmpty()) return path.endNode.position
 
 		var remainingDistance = progress
-		for (segment in route.segments) {
+		for (segment in path.segments) {
 			if (remainingDistance > segment.distance) {
 				remainingDistance -= segment.distance
 				continue
 			}
 
-			val segmentProgress = (remainingDistance / segment.distance).coerceIn(0.0, 1.0)
+			val segmentProgress = remainingDistance / segment.distance
 			return segment.fromNode.position.lerp(segment.toNode.position, segmentProgress)
 		}
 
-		return route.endNode.position
+		return path.endNode.position
+	}
+
+	private fun completeCurrentLeg(
+		level: ServerLevel,
+		job: HoppingSpiderJob,
+		nestPosition: Vec3
+	): Boolean {
+		return when (job.phase) {
+			HoppingSpiderJob.Phase.TO_SOURCE -> pickUpItem(level, job)
+			HoppingSpiderJob.Phase.TO_DESTINATION -> deliverItem(level, job)
+			HoppingSpiderJob.Phase.RETURNING -> finishJob(nestPosition)
+		}
+	}
+
+	private fun pickUpItem(level: ServerLevel, job: HoppingSpiderJob): Boolean {
+		val source = getBlockAnchor(level, job.sourceNodeUuid) ?: return cancelJob()
+		val handler = getItemHandler(level, source) ?: return cancelJob()
+		val extractedStack = handler.extractItem(job.sourceSlot, MAX_TRANSFER_SIZE, false)
+		if (extractedStack.isEmpty) return cancelJob()
+
+		carriedStack = extractedStack
+		startNextLeg(HoppingSpiderJob.Phase.TO_DESTINATION)
+		return true
+	}
+
+	private fun deliverItem(level: ServerLevel, job: HoppingSpiderJob): Boolean {
+		val destination = getBlockAnchor(level, job.destinationNodeUuid) ?: return false
+		val handler = getItemHandler(level, destination) ?: return false
+
+		carriedStack = insertItem(handler, carriedStack)
+		if (!carriedStack.isEmpty) return false
+
+		startNextLeg(HoppingSpiderJob.Phase.RETURNING)
+		return true
+	}
+
+	private fun startNextLeg(phase: HoppingSpiderJob.Phase) {
+		val job = job ?: return
+		job.phase = phase
+		route = null
+		routeProgress = 0.0
+	}
+
+	private fun finishJob(nestPosition: Vec3): Boolean {
+		job = null
+		position = nestPosition
+		route = null
+		routeProgress = 0.0
+		return true
+	}
+
+	private fun cancelJob(): Boolean {
+		job = null
+		route = null
+		routeProgress = 0.0
+		return true
+	}
+
+	private fun getBlockAnchor(level: ServerLevel, uuid: UUID): BlockAnchor? {
+		return WebSavedData.get(level).getNode(uuid) as? BlockAnchor
 	}
 
 	private fun getItemHandler(level: ServerLevel, anchor: BlockAnchor): IItemHandler? {
 		return level.getCapability(Capabilities.ItemHandler.BLOCK, anchor.blockPos, anchor.face)
 	}
 
-	private fun insert(handler: IItemHandler, stack: ItemStack): ItemStack {
+	private fun insertItem(handler: IItemHandler, stack: ItemStack): ItemStack {
 		var remainder = stack
 		for (slot in 0 until handler.slots) {
 			remainder = handler.insertItem(slot, remainder, false)
@@ -145,13 +160,23 @@ class HoppingSpider {
 		return remainder
 	}
 
+	fun getRenderPosition(gameTime: Long, partialTick: Float): Vec3? {
+		return route?.getPosition(gameTime, partialTick) ?: position
+	}
+
 	fun save(registries: HolderLookup.Provider): CompoundTag {
 		val tag = CompoundTag()
+		tag.putUUID(UUID_TAG, uuid)
 		tag.putDouble(ROUTE_PROGRESS_TAG, routeProgress)
 
 		val job = job
 		if (job != null) {
 			tag.put(JOB_TAG, job.save())
+		}
+
+		val route = route
+		if (route != null) {
+			tag.put(ROUTE_TAG, route.save())
 		}
 
 		if (!carriedStack.isEmpty) {
@@ -169,7 +194,9 @@ class HoppingSpider {
 	}
 
 	companion object {
+		private const val UUID_TAG = "Uuid"
 		private const val JOB_TAG = "Job"
+		private const val ROUTE_TAG = "Route"
 		private const val ROUTE_PROGRESS_TAG = "RouteProgress"
 		private const val CARRIED_STACK_TAG = "CarriedStack"
 		private const val POSITION_X_TAG = "PositionX"
@@ -179,25 +206,46 @@ class HoppingSpider {
 		private const val TRAVEL_SPEED = 0.15
 
 		fun load(tag: CompoundTag, registries: HolderLookup.Provider): HoppingSpider {
-			val spider = HoppingSpider()
+			val uuid = getUuid(tag)
+			val spider = HoppingSpider(uuid)
+			spider.job = getJob(tag)
+			spider.route = getRoute(tag)
 			spider.routeProgress = tag.getDouble(ROUTE_PROGRESS_TAG)
-
-			if (tag.contains(JOB_TAG)) {
-				spider.job = HoppingSpiderJob.load(tag.getCompound(JOB_TAG))
-			}
-
-			val carriedStackTag = tag.getCompound(CARRIED_STACK_TAG)
-			spider.carriedStack = ItemStack.parseOptional(registries, carriedStackTag)
-
-			if (tag.contains(POSITION_X_TAG)) {
-				spider.position = Vec3(
-					tag.getDouble(POSITION_X_TAG),
-					tag.getDouble(POSITION_Y_TAG),
-					tag.getDouble(POSITION_Z_TAG)
-				)
-			}
-
+			spider.carriedStack = getCarriedStack(tag, registries)
+			spider.position = getPosition(tag)
 			return spider
+		}
+
+		private fun getUuid(tag: CompoundTag): UUID {
+			if (tag.hasUUID(UUID_TAG)) return tag.getUUID(UUID_TAG)
+			return UUID.randomUUID()
+		}
+
+		private fun getJob(tag: CompoundTag): HoppingSpiderJob? {
+			if (!tag.contains(JOB_TAG)) return null
+			return HoppingSpiderJob.load(tag.getCompound(JOB_TAG))
+		}
+
+		private fun getRoute(tag: CompoundTag): HoppingSpiderRoute? {
+			if (!tag.contains(ROUTE_TAG)) return null
+			return HoppingSpiderRoute.load(tag.getCompound(ROUTE_TAG))
+		}
+
+		private fun getCarriedStack(
+			tag: CompoundTag,
+			registries: HolderLookup.Provider
+		): ItemStack {
+			return ItemStack.parseOptional(registries, tag.getCompound(CARRIED_STACK_TAG))
+		}
+
+		private fun getPosition(tag: CompoundTag): Vec3? {
+			if (!tag.contains(POSITION_X_TAG)) return null
+
+			return Vec3(
+				tag.getDouble(POSITION_X_TAG),
+				tag.getDouble(POSITION_Y_TAG),
+				tag.getDouble(POSITION_Z_TAG)
+			)
 		}
 	}
 }
