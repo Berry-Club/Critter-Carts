@@ -24,6 +24,10 @@ object ClientWebLines {
 		return lines.values.toList()
 	}
 
+	fun getNodes(): List<WebNode> {
+		return nodes.values.toList()
+	}
+
 	fun addLines(newNodes: List<WebNode>, newLines: List<WebLineData>) {
 		for (node in newNodes) {
 			nodes[node.uuid] = node
@@ -46,6 +50,8 @@ object ClientWebLines {
 	fun removeLine(uuid: UUID) {
 		val line = lines.remove(uuid) ?: return
 		detachLine(line)
+		removeNodeIfOrphaned(line.firstNode)
+		removeNodeIfOrphaned(line.secondNode)
 	}
 
 	fun clear() {
@@ -60,6 +66,13 @@ object ClientWebLines {
 	private fun detachLine(line: WebLine) {
 		line.firstNode.removeLine(line)
 		line.secondNode.removeLine(line)
+	}
+
+	private fun removeNodeIfOrphaned(node: WebNode) {
+		if (node.lines.isNotEmpty()) return
+		if (nodes[node.uuid] !== node) return
+
+		nodes.remove(node.uuid)
 	}
 
 	fun handleInteractionEvent(event: InputEvent.InteractionKeyMappingTriggered) {

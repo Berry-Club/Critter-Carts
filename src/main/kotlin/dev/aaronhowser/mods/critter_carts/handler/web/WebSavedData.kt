@@ -22,6 +22,7 @@ import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.sounds.SoundSource
 import net.minecraft.world.level.ChunkPos
+import net.minecraft.world.Containers
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.saveddata.SavedData
 import java.util.UUID
@@ -59,7 +60,7 @@ class WebSavedData : SavedData() {
 		val previousLine = lines[line.uuid]
 		if (previousLine != null) {
 			removeLineFromNetwork(previousLine)
-			removeLineReferences(previousLine)
+			removeLineReferences(level, previousLine)
 		}
 
 		nodes[line.firstNode.uuid] = line.firstNode
@@ -225,18 +226,18 @@ class WebSavedData : SavedData() {
 	private fun removeStoredLine(level: ServerLevel, line: WebLine) {
 		lines.remove(line.uuid)
 		removeLineFromNetwork(line)
-		removeLineReferences(line)
+		removeLineReferences(level, line)
 		sendToNearbyPlayers(level, line, RemoveWebLinePacket(line.uuid))
 		playBreakSound(level, line)
 		scheduleDependentLines(level, line.uuid)
 	}
 
-	private fun removeLineReferences(line: WebLine) {
+	private fun removeLineReferences(level: ServerLevel, line: WebLine) {
 		removeFromChunkCache(line)
 		line.firstNode.removeLine(line)
 		line.secondNode.removeLine(line)
-		removeNodeIfOrphaned(line.firstNode.uuid)
-		removeNodeIfOrphaned(line.secondNode.uuid)
+		removeNodeIfOrphaned(line.firstNode.uuid, level)
+		removeNodeIfOrphaned(line.secondNode.uuid, level)
 		line.clearAttachedAnchors()
 	}
 
@@ -376,6 +377,9 @@ class WebSavedData : SavedData() {
 			var removedLine = false
 			for (lineUuid in dependentLineUuids) {
 				val line = lines[lineUuid] ?: continue
+				if (!line.isLoaded(level)) continue
+				if (line.getInvalidation(level, lines) == null) continue
+
 				removeStoredLine(level, line)
 				removedLine = true
 			}
@@ -424,12 +428,21 @@ class WebSavedData : SavedData() {
 		}
 	}
 
-	private fun removeNodeIfOrphaned(nodeUuid: UUID) {
+	private fun removeNodeIfOrphaned(nodeUuid: UUID, level: ServerLevel) {
 		val node = nodes[nodeUuid] ?: return
 		if (node.lines.isNotEmpty()) return
 
 		if (node is WebLineAnchor) {
 			lines[node.lineUuid]?.removeAttachedAnchor(node.uuid)
+		}
+		if (node is WebBlockAnchor && node.hasNestInterface) {
+			Containers.dropItemStack(
+				level,
+				node.position.x,
+				node.position.y,
+				node.position.z,
+				node.nestInterface
+			)
 		}
 
 		nodes.remove(nodeUuid)

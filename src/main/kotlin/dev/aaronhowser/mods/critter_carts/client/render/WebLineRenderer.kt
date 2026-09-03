@@ -9,7 +9,9 @@ import dev.aaronhowser.mods.aaron.misc.AaronExtensions.toVec3
 import dev.aaronhowser.mods.critter_carts.CritterCarts
 import dev.aaronhowser.mods.critter_carts.handler.web.WebLineInteractionHandler
 import dev.aaronhowser.mods.critter_carts.handler.web.line.ClientWebLines
+import dev.aaronhowser.mods.critter_carts.handler.web.node.WebBlockAnchor
 import dev.aaronhowser.mods.critter_carts.handler.web.node.WebNode
+import dev.aaronhowser.mods.critter_carts.item.SpiderNestInterfaceItem
 import dev.aaronhowser.mods.critter_carts.registry.ModDataComponents
 import dev.aaronhowser.mods.critter_carts.registry.ModItems
 import net.minecraft.client.Minecraft
@@ -54,8 +56,32 @@ object WebLineRenderer {
 				)
 			}
 
+			renderNestInterfaces(poseStack, cameraPosition)
 			renderPlacementPreview(poseStack, cameraPosition, viewVector)
 			renderLineAnchorPreview(poseStack, cameraPosition, viewVector)
+		}
+	}
+
+	private fun renderNestInterfaces(poseStack: PoseStack, cameraPosition: Vec3) {
+		poseStack.withPose {
+			poseStack.translate(-cameraPosition.x, -cameraPosition.y, -cameraPosition.z)
+			for (node in ClientWebLines.getNodes()) {
+				val anchor = node as? WebBlockAnchor ?: continue
+				if (!anchor.hasNestInterface) continue
+
+				val component = SpiderNestInterfaceItem.getComponent(anchor.nestInterface)
+				val position = anchor.position
+				AaronRenderUtil.renderCubeThroughWalls(
+					poseStack,
+					position.x - INTERFACE_CUBE_RADIUS,
+					position.y - INTERFACE_CUBE_RADIUS,
+					position.z - INTERFACE_CUBE_RADIUS,
+					position.x + INTERFACE_CUBE_RADIUS,
+					position.y + INTERFACE_CUBE_RADIUS,
+					position.z + INTERFACE_CUBE_RADIUS,
+					component.color.textureDiffuseColor
+				)
+			}
 		}
 	}
 
@@ -295,6 +321,7 @@ object WebLineRenderer {
 	private const val WEB_RADIUS = 1f / 64f
 	private const val TEXTURE_REPEAT_DISTANCE = 8.0
 	private const val LIGHT_SAMPLE_DISTANCE = 1.0
+	private const val INTERFACE_CUBE_RADIUS = 0.075
 
 	private val WEB_TEXTURE = ResourceLocation.fromNamespaceAndPath(
 		CritterCarts.MOD_ID,
