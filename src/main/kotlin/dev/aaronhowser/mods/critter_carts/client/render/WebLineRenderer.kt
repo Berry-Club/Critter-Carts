@@ -13,9 +13,10 @@ import dev.aaronhowser.mods.critter_carts.handler.web.node.WebNode
 import dev.aaronhowser.mods.critter_carts.registry.ModDataComponents
 import dev.aaronhowser.mods.critter_carts.registry.ModItems
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.LightTexture
+import net.minecraft.client.renderer.LevelRenderer
 import net.minecraft.client.renderer.RenderType
 import net.minecraft.client.renderer.texture.OverlayTexture
+import net.minecraft.core.BlockPos
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.phys.BlockHitResult
@@ -115,34 +116,76 @@ object WebLineRenderer {
 			poseStack.mulPose(rotation)
 
 			val pose = poseStack.last().pose()
+			val level = minecraft.level ?: return@withPose
+			var segmentStart = 0.0
+			var startLight = LevelRenderer.getLightColor(
+				level,
+				BlockPos.containing(start)
+			)
 
-			addSide(
-				vertexConsumer, pose,
-				-WEB_RADIUS, -WEB_RADIUS,
-				WEB_RADIUS, -WEB_RADIUS,
-				height, 0f, 0.25f, color
-			)
-			addSide(
-				vertexConsumer, pose,
-				WEB_RADIUS, -WEB_RADIUS,
-				WEB_RADIUS, WEB_RADIUS,
-				height, 0.25f, 0.5f, color
-			)
-			addSide(
-				vertexConsumer, pose,
-				WEB_RADIUS, WEB_RADIUS,
-				-WEB_RADIUS, WEB_RADIUS,
-				height, 0.5f, 0.75f, color
-			)
-			addSide(
-				vertexConsumer, pose,
-				-WEB_RADIUS, WEB_RADIUS,
-				-WEB_RADIUS, -WEB_RADIUS,
-				height, 0.75f, 1f, color
-			)
+			while (segmentStart < height) {
+				val segmentEnd = minOf(segmentStart + LIGHT_SAMPLE_DISTANCE, height)
+				val endPosition = start.add(direction.scale(segmentEnd))
+				val endLight = LevelRenderer.getLightColor(
+					level,
+					BlockPos.containing(endPosition)
+				)
+
+				addSegment(
+					vertexConsumer,
+					pose,
+					segmentStart,
+					segmentEnd,
+					startLight,
+					endLight,
+					color
+				)
+
+				segmentStart = segmentEnd
+				startLight = endLight
+			}
 		}
 
 		bufferSource.endBatch(WEB_RENDER_TYPE)
+	}
+
+	private fun addSegment(
+		vertexConsumer: VertexConsumer,
+		pose: Matrix4f,
+		start: Double,
+		end: Double,
+		startLight: Int,
+		endLight: Int,
+		color: Int
+	) {
+		addSide(
+			vertexConsumer, pose,
+			-WEB_RADIUS, -WEB_RADIUS,
+			WEB_RADIUS, -WEB_RADIUS,
+			start, end, 0f, 0.25f,
+			startLight, endLight, color
+		)
+		addSide(
+			vertexConsumer, pose,
+			WEB_RADIUS, -WEB_RADIUS,
+			WEB_RADIUS, WEB_RADIUS,
+			start, end, 0.25f, 0.5f,
+			startLight, endLight, color
+		)
+		addSide(
+			vertexConsumer, pose,
+			WEB_RADIUS, WEB_RADIUS,
+			-WEB_RADIUS, WEB_RADIUS,
+			start, end, 0.5f, 0.75f,
+			startLight, endLight, color
+		)
+		addSide(
+			vertexConsumer, pose,
+			-WEB_RADIUS, WEB_RADIUS,
+			-WEB_RADIUS, -WEB_RADIUS,
+			start, end, 0.75f, 1f,
+			startLight, endLight, color
+		)
 	}
 
 	private fun addSide(
@@ -152,17 +195,21 @@ object WebLineRenderer {
 		firstZ: Float,
 		secondX: Float,
 		secondZ: Float,
-		height: Double,
+		start: Double,
+		end: Double,
 		minU: Float,
 		maxU: Float,
+		startLight: Int,
+		endLight: Int,
 		color: Int
 	) {
-		val maxV = (height / TEXTURE_REPEAT_DISTANCE).toFloat()
+		val minV = (start / TEXTURE_REPEAT_DISTANCE).toFloat()
+		val maxV = (end / TEXTURE_REPEAT_DISTANCE).toFloat()
 
-		addVertex(vertexConsumer, pose, firstX, 0f, firstZ, minU, 0f, color)
-		addVertex(vertexConsumer, pose, secondX, 0f, secondZ, maxU, 0f, color)
-		addVertex(vertexConsumer, pose, secondX, height.toFloat(), secondZ, maxU, maxV, color)
-		addVertex(vertexConsumer, pose, firstX, height.toFloat(), firstZ, minU, maxV, color)
+		addVertex(vertexConsumer, pose, firstX, start.toFloat(), firstZ, minU, minV, startLight, color)
+		addVertex(vertexConsumer, pose, secondX, start.toFloat(), secondZ, maxU, minV, startLight, color)
+		addVertex(vertexConsumer, pose, secondX, end.toFloat(), secondZ, maxU, maxV, endLight, color)
+		addVertex(vertexConsumer, pose, firstX, end.toFloat(), firstZ, minU, maxV, endLight, color)
 	}
 
 	private fun addVertex(
@@ -173,13 +220,14 @@ object WebLineRenderer {
 		z: Float,
 		u: Float,
 		v: Float,
+		light: Int,
 		color: Int
 	) {
 		vertexConsumer.addVertex(pose, x, y, z)
 			.setColor(color)
 			.setUv(u, v)
 			.setOverlay(OverlayTexture.NO_OVERLAY)
-			.setLight(LightTexture.FULL_BRIGHT)
+			.setLight(light)
 			.setNormal(0f, 1f, 0f)
 	}
 
@@ -244,6 +292,7 @@ object WebLineRenderer {
 	private const val INVALID_PREVIEW_COLOR = 0xFFFF0000.toInt()
 	private const val WEB_RADIUS = 1f / 64f
 	private const val TEXTURE_REPEAT_DISTANCE = 8.0
+	private const val LIGHT_SAMPLE_DISTANCE = 1.0
 
 	private val WEB_TEXTURE = ResourceLocation.fromNamespaceAndPath(
 		CritterCarts.MOD_ID,
