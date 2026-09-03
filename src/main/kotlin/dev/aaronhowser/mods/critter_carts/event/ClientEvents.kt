@@ -5,7 +5,7 @@ import dev.aaronhowser.mods.critter_carts.client.render.bewlr.CritterCageItemRen
 import dev.aaronhowser.mods.critter_carts.client.render.block_entity.CritterCageBlockRenderer
 import dev.aaronhowser.mods.critter_carts.client.render.entity.ScoochwormPartRenderer
 import dev.aaronhowser.mods.critter_carts.client.render.entity.ScoochwormRenderer
-import dev.aaronhowser.mods.critter_carts.handler.web.ClientWebLines
+import dev.aaronhowser.mods.critter_carts.handler.web.line.ClientWebLines
 import dev.aaronhowser.mods.critter_carts.registry.ModBlockEntityTypes
 import dev.aaronhowser.mods.critter_carts.registry.ModEntityTypes
 import dev.aaronhowser.mods.critter_carts.registry.ModItems

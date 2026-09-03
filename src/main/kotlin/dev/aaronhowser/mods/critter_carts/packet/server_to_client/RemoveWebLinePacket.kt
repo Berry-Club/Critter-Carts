@@ -2,7 +2,7 @@ package dev.aaronhowser.mods.critter_carts.packet.server_to_client
 
 import dev.aaronhowser.mods.aaron.packet.AaronPacket
 import dev.aaronhowser.mods.critter_carts.CritterCarts
-import dev.aaronhowser.mods.critter_carts.handler.web.ClientWebLines
+import dev.aaronhowser.mods.critter_carts.handler.web.line.ClientWebLines
 import io.netty.buffer.ByteBuf
 import net.minecraft.core.UUIDUtil
 import net.minecraft.network.codec.StreamCodec

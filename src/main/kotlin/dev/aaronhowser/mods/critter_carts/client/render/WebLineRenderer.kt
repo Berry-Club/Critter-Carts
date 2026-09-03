@@ -6,7 +6,7 @@ import dev.aaronhowser.mods.aaron.misc.AaronDsls.withPose
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isItem
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.toVec3
 import dev.aaronhowser.mods.critter_carts.CritterCarts
-import dev.aaronhowser.mods.critter_carts.handler.web.ClientWebLines
+import dev.aaronhowser.mods.critter_carts.handler.web.line.ClientWebLines
 import dev.aaronhowser.mods.critter_carts.handler.web.WebLineInteractionHandler
 import dev.aaronhowser.mods.critter_carts.handler.web.node.WebNode
 import dev.aaronhowser.mods.critter_carts.registry.ModDataComponents

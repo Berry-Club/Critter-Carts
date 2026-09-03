@@ -1,9 +1,9 @@
-package dev.aaronhowser.mods.critter_carts.handler.web
+package dev.aaronhowser.mods.critter_carts.handler.web.line
 
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isItem
 import dev.aaronhowser.mods.critter_carts.datagen.tag.ModItemTagsProvider
-import dev.aaronhowser.mods.critter_carts.handler.web.line.WebLine
-import dev.aaronhowser.mods.critter_carts.handler.web.line.WebLineData
+import dev.aaronhowser.mods.critter_carts.handler.web.TargetedWebNode
+import dev.aaronhowser.mods.critter_carts.handler.web.WebLineInteractionHandler
 import dev.aaronhowser.mods.critter_carts.handler.web.node.WebNode
 import dev.aaronhowser.mods.critter_carts.packet.client_to_server.WebLineInteractPacket
 import dev.aaronhowser.mods.critter_carts.registry.ModItems
@@ -12,7 +12,7 @@ import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.phys.Vec3
 import net.neoforged.neoforge.client.event.InputEvent
-import java.util.*
+import java.util.UUID
 
 object ClientWebLines {
 
