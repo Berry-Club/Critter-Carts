@@ -38,14 +38,20 @@ data class WebLine(
 			anchor.position.distanceTo(firstNode.position),
 			anchor.position.distanceTo(secondNode.position)
 		)
+		network?.invalidatePaths()
 	}
 
 	internal fun removeAttachedAnchor(anchorUuid: UUID) {
-		attachmentsByAnchorUuid.remove(anchorUuid)
+		if (attachmentsByAnchorUuid.remove(anchorUuid) != null) {
+			network?.invalidatePaths()
+		}
 	}
 
 	internal fun clearAttachedAnchors() {
+		if (attachmentsByAnchorUuid.isEmpty()) return
+
 		attachmentsByAnchorUuid.clear()
+		network?.invalidatePaths()
 	}
 
 	fun isLoaded(level: ServerLevel): Boolean {
