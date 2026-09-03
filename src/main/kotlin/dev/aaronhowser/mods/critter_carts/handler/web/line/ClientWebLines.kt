@@ -117,12 +117,15 @@ object ClientWebLines {
 		eyePosition: Vec3,
 		viewVector: Vec3
 	): TargetedWebNode? {
-		if (!player.mainHandItem.isItem(ModItemTagsProvider.WEB_LINE_INTERACTABLE)
-			&& !player.offhandItem.isItem(ModItemTagsProvider.WEB_LINE_INTERACTABLE)
-		) return null
+		val interactionHand = getInteractionHand(player) ?: InteractionHand.MAIN_HAND
+		val targetedNode = getLookedAtNode(player, eyePosition, viewVector, interactionHand) ?: return null
+		if (player.getItemInHand(interactionHand).isItem(ModItemTagsProvider.WEB_LINE_INTERACTABLE)) {
+			return targetedNode
+		}
 
-		val interactionHand = getInteractionHand(player) ?: return null
-		return getLookedAtNode(player, eyePosition, viewVector, interactionHand)
+		val blockAnchor = targetedNode.node as? WebBlockAnchor ?: return null
+		if (!blockAnchor.hasNestInterface || targetedNode.lineUuid != null) return null
+		return targetedNode
 	}
 
 	private fun getLookedAtNode(
