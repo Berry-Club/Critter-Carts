@@ -7,13 +7,13 @@ class WebNetwork(
 	val uuid: UUID = UUID.randomUUID()
 ) {
 
-	private val _lines: MutableSet<WebLine> = mutableSetOf()
+	private val mutableLines: MutableSet<WebLine> = mutableSetOf()
 
 	val lines: Set<WebLine>
-		get() = _lines
+		get() = mutableLines
 
 	internal fun addLine(line: WebLine) {
-		if (_lines.add(line)) {
+		if (mutableLines.add(line)) {
 			line.network = this
 		}
 	}
@@ -25,13 +25,13 @@ class WebNetwork(
 	}
 
 	internal fun removeLine(line: WebLine) {
-		if (_lines.remove(line) && line.network === this) {
+		if (mutableLines.remove(line) && line.network === this) {
 			line.network = null
 		}
 	}
 
 	internal fun clear() {
-		val removedLines = _lines.toList()
+		val removedLines = mutableLines.toList()
 		for (line in removedLines) {
 			removeLine(line)
 		}

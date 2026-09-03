@@ -16,11 +16,12 @@ import java.util.*
 
 object ClientWebLines {
 
-	private val _lines: MutableMap<UUID, WebLine> = mutableMapOf()
+	private val lines: MutableMap<UUID, WebLine> = mutableMapOf()
 	private val nodes: MutableMap<UUID, WebNode> = mutableMapOf()
 
-	val lines: Collection<WebLine>
-		get() = _lines.values
+	fun getLines(): List<WebLine> {
+		return lines.values.toList()
+	}
 
 	fun addLines(newNodes: List<WebNode>, newLines: List<WebLineData>) {
 		for (node in newNodes) {
@@ -33,7 +34,7 @@ object ClientWebLines {
 			val firstNode = nodes[lineData.firstNodeUuid] ?: continue
 			val secondNode = nodes[lineData.secondNodeUuid] ?: continue
 			val line = WebLine(lineData.uuid, firstNode, secondNode)
-			val previousLine = _lines.put(line.uuid, line)
+			val previousLine = lines.put(line.uuid, line)
 			if (previousLine != null) {
 				detachLine(previousLine)
 			}
@@ -44,16 +45,16 @@ object ClientWebLines {
 	}
 
 	fun removeLine(uuid: UUID) {
-		val line = _lines.remove(uuid) ?: return
+		val line = lines.remove(uuid) ?: return
 		detachLine(line)
 	}
 
 	fun clear() {
-		for (line in _lines.values) {
+		for (line in lines.values) {
 			detachLine(line)
 		}
 
-		_lines.clear()
+		lines.clear()
 		nodes.clear()
 	}
 
@@ -132,7 +133,7 @@ object ClientWebLines {
 		val snapToExistingNode = itemStack.isItem(ModItems.WEB_FLUID)
 
 		return WebLineInteractionHandler.getTargetedNode(
-			_lines.values.toList(),
+			lines.values.toList(),
 			eyePosition,
 			lookEnd,
 			snapToExistingNode

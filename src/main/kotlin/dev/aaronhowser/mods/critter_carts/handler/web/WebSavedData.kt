@@ -28,11 +28,8 @@ class WebSavedData : SavedData() {
 
 	private val nodes: MutableMap<UUID, WebNode> = mutableMapOf()
 	private val lines: MutableMap<UUID, WebLine> = mutableMapOf()
-	private val _networks: MutableSet<WebNetwork> = mutableSetOf()
+	private val networks: MutableSet<WebNetwork> = mutableSetOf()
 	private val networksByLineUuid: MutableMap<UUID, WebNetwork> = mutableMapOf()
-
-	val networks: Set<WebNetwork>
-		get() = _networks
 
 	private val lineUuidsByChunk: MutableMap<ChunkPos, MutableSet<UUID>> = mutableMapOf()
 	private val chunksToValidate: MutableSet<ChunkPos> = mutableSetOf()
@@ -69,6 +66,10 @@ class WebSavedData : SavedData() {
 
 	fun getNetwork(lineUuid: UUID): WebNetwork? {
 		return networksByLineUuid[lineUuid]
+	}
+
+	fun getNetworks(): Set<WebNetwork> {
+		return networks.toSet()
 	}
 
 	fun removeLine(level: ServerLevel, uuid: UUID): WebLine? {
@@ -203,7 +204,7 @@ class WebSavedData : SavedData() {
 
 		val network = connectedNetworks.firstOrNull() ?: WebNetwork()
 		if (connectedNetworks.isEmpty()) {
-			_networks.add(network)
+			networks.add(network)
 		} else {
 			for (connectedNetwork in connectedNetworks) {
 				if (connectedNetwork === network) continue
@@ -214,7 +215,7 @@ class WebSavedData : SavedData() {
 				}
 
 				connectedNetwork.clear()
-				_networks.remove(connectedNetwork)
+				networks.remove(connectedNetwork)
 			}
 		}
 
@@ -227,7 +228,7 @@ class WebSavedData : SavedData() {
 		network.removeLine(line)
 
 		if (network.lines.isEmpty()) {
-			_networks.remove(network)
+			networks.remove(network)
 			return
 		}
 
@@ -263,7 +264,7 @@ class WebSavedData : SavedData() {
 
 		for (componentIndex in 1 until components.size) {
 			val splitNetwork = WebNetwork()
-			_networks.add(splitNetwork)
+			networks.add(splitNetwork)
 			assignComponent(splitNetwork, components[componentIndex])
 		}
 	}

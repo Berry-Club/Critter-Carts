@@ -13,13 +13,13 @@ import java.util.UUID
 
 sealed class WebNode {
 
-	private val _lines: MutableSet<WebLine> = mutableSetOf()
+	private val mutableLines: MutableSet<WebLine> = mutableSetOf()
 
 	abstract val uuid: UUID
 	abstract val position: Vec3
 
 	val lines: Set<WebLine>
-		get() = _lines
+		get() = mutableLines
 
 	abstract fun isLoaded(level: ServerLevel): Boolean
 	abstract fun getInvalidation(
@@ -29,11 +29,11 @@ sealed class WebNode {
 	): WebLineInvalidation?
 
 	internal fun addLine(line: WebLine) {
-		_lines.add(line)
+		mutableLines.add(line)
 	}
 
 	internal fun removeLine(line: WebLine) {
-		_lines.remove(line)
+		mutableLines.remove(line)
 	}
 
 	companion object {
