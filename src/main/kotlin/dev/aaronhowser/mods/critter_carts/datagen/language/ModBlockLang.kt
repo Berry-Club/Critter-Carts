@@ -8,6 +8,7 @@ object ModBlockLang {
 		provider.addBlock(ModBlocks.SCOOCHSTEM, "Scoochstem")
 		provider.addBlock(ModBlocks.SCOOCHSTEM_WOOD, "Scoochstem Wood")
 		provider.addBlock(ModBlocks.APPLE_SLICE, "Apple Slice")
+		provider.addBlock(ModBlocks.HOPPING_SPIDER_NEST, "Hopping Spider Nest")
 
 		provider.addBlock(ModBlocks.GREEN_SCOOCHSTEM, "Green Scoochstem")
 		provider.addBlock(ModBlocks.BLUE_SCOOCHSTEM, "Blue Scoochstem")

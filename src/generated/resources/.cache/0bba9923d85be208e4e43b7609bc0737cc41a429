@@ -1,4 +1,4 @@
-// 1.21.1	2026-08-30T16:16:56.8374663	Block States: critter_carts
+// 1.21.1	2026-09-03T04:40:33.659389	Block States: critter_carts
 bff39bd414b05811bbd89c96d8e2121642432d62 assets/critter_carts/blockstates/apple_slice.json
 8de7fb75e6eb64985ddf71c0ef44429ec2cfb20a assets/critter_carts/blockstates/blue_scoochstem.json
 293985f2dda25bca5a6a8ec28f45f31764f350a9 assets/critter_carts/blockstates/critter_cage.json
@@ -6,6 +6,7 @@ bff39bd414b05811bbd89c96d8e2121642432d62 assets/critter_carts/blockstates/apple_
 2bb11fb6430a489e5d16bd3a86e237d36605bab3 assets/critter_carts/blockstates/dyeberry_vines.json
 9d8fb437e8c54e295704df778a132e6f82f55b87 assets/critter_carts/blockstates/dyeberry_vines_plant.json
 b9e4468ac58e6d0022c7bcafe50622a7511b3f35 assets/critter_carts/blockstates/green_scoochstem.json
+3bbf248b41ff78dabba89f7fcf73259458dc3fbb assets/critter_carts/blockstates/hopping_spider_nest.json
 77d4d6068ae839d84e1a80c8d038a9e6bc2011f3 assets/critter_carts/blockstates/magenta_scoochstem.json
 ac6b5a900286da3353f0ebe4e13f56bf1a0318dd assets/critter_carts/blockstates/red_scoochstem.json
 96540a8301f714c23667d81e7cdd2abdae7c812e assets/critter_carts/blockstates/scoochstem.json
@@ -31,6 +32,7 @@ c09b1d4b3c2e18dca2e9618e452d6493477e224e assets/critter_carts/models/block/dyebe
 24e16aa2584293b91ba0ba847ddc92039f2ce852 assets/critter_carts/models/block/dyeberry_vines_yellow_lit.json
 4ae3ba13b8b1b33d55ccf3694a5d2b6fedca84e1 assets/critter_carts/models/block/dyeberry_vines_yellow_plant_lit.json
 0beceb21d348225ed0c16a55f6f87fb4d820436e assets/critter_carts/models/block/green_scoochstem.json
+f93041160ae36ca52752aea9e64795aca3cb3e03 assets/critter_carts/models/block/hopping_spider_nest.json
 1b31656f89107e3d6224ff6d4e75ee42e16fbad5 assets/critter_carts/models/block/magenta_scoochstem.json
 19db687210c42a2bea77a29df840e25e6c9b18d3 assets/critter_carts/models/block/red_scoochstem.json
 6d4304da88ce88d851448a6c7fe7cd627ad2de1d assets/critter_carts/models/block/scoochstem.json
@@ -49,6 +51,7 @@ bbda7bb33900e5dbbea0c6413075076b8a37eb68 assets/critter_carts/models/item/apple_
 1798fe1b2b8bfc4a7027f99d651588b0d2a14f41 assets/critter_carts/models/item/critter_cage.json
 29cab006c376dbee5daea48031a3b0581c89a907 assets/critter_carts/models/item/cyan_scoochstem.json
 8f31d8b41add727ce2a8a60a8da70944548028a2 assets/critter_carts/models/item/green_scoochstem.json
+1de61feedb414e9fc680768571a71bd486158e3a assets/critter_carts/models/item/hopping_spider_nest.json
 2493905db8dd7517a3737faf6cdf480ea499175c assets/critter_carts/models/item/magenta_scoochstem.json
 0582fbbb9cc1d34f53a05ea8bbb78033a22f4e65 assets/critter_carts/models/item/red_scoochstem.json
 aa925f31dbadd99e8810eafb13156d8a40f6f2cb assets/critter_carts/models/item/scoochstem.json

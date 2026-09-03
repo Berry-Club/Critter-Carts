@@ -25,6 +25,7 @@ class ModBlockLootTablesSubProvider(
 		critterCage()
 		dropSelf(ModBlocks.SCOOCHSTEM.get())
 		dropSelf(ModBlocks.SCOOCHSTEM_WOOD.get())
+		dropSelf(ModBlocks.HOPPING_SPIDER_NEST.get())
 		appleSlice()
 
 		dropSelf(ModBlocks.GREEN_SCOOCHSTEM.get())
