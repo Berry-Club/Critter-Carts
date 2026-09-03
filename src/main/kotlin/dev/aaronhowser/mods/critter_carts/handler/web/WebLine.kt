@@ -8,7 +8,7 @@ import net.minecraft.world.level.ClipContext
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.shapes.CollisionContext
-import java.util.UUID
+import java.util.*
 
 data class WebLine(
 	val uuid: UUID,
@@ -19,8 +19,9 @@ data class WebLine(
 	val data = WebLineData(uuid, firstNode.uuid, secondNode.uuid)
 	val intersectedChunkPositions: Set<ChunkPos> = calculateIntersectedChunkPositions()
 
-	val length: Double
-		get() = firstNode.position.distanceTo(secondNode.position)
+	val length: Double by lazy {
+		firstNode.position.distanceTo(secondNode.position)
+	}
 
 	fun isLoaded(level: ServerLevel): Boolean {
 		return firstNode.isLoaded(level) && secondNode.isLoaded(level)
