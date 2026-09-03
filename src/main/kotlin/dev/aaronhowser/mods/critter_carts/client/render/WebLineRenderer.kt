@@ -38,7 +38,7 @@ object WebLineRenderer {
 		poseStack.withPose {
 			poseStack.translate(-cameraPosition.x, -cameraPosition.y, -cameraPosition.z)
 
-			for (line in ClientWebLines.getLines()) {
+			for (line in ClientWebLines.lines) {
 				AaronRenderUtil.renderLineThroughWalls(
 					poseStack,
 					line.firstNode.position,

@@ -14,12 +14,11 @@ import java.util.*
 
 object ClientWebLines {
 
-	private val lines: MutableMap<UUID, WebLine> = mutableMapOf()
+	private val _lines: MutableMap<UUID, WebLine> = mutableMapOf()
 	private val nodes: MutableMap<UUID, WebNode> = mutableMapOf()
 
-	fun getLines(): List<WebLine> {
-		return lines.values.toList()
-	}
+	val lines: Collection<WebLine>
+		get() = _lines.values
 
 	fun addLines(newNodes: List<WebNode>, newLines: List<WebLineData>) {
 		for (node in newNodes) {
@@ -31,16 +30,16 @@ object ClientWebLines {
 		for (lineData in newLines) {
 			val firstNode = nodes[lineData.firstNodeUuid] ?: continue
 			val secondNode = nodes[lineData.secondNodeUuid] ?: continue
-			lines[lineData.uuid] = WebLine(lineData.uuid, firstNode, secondNode)
+			_lines[lineData.uuid] = WebLine(lineData.uuid, firstNode, secondNode)
 		}
 	}
 
 	fun removeLine(uuid: UUID) {
-		lines.remove(uuid)
+		_lines.remove(uuid)
 	}
 
 	fun clear() {
-		lines.clear()
+		_lines.clear()
 		nodes.clear()
 	}
 
@@ -114,7 +113,7 @@ object ClientWebLines {
 		val snapToExistingNode = itemStack.isItem(ModItems.WEB_FLUID)
 
 		return WebLineInteractionHandler.getTargetedNode(
-			lines.values.toList(),
+			_lines.values.toList(),
 			eyePosition,
 			lookEnd,
 			snapToExistingNode
