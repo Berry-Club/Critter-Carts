@@ -131,12 +131,15 @@ object ClientWebLines {
 		val lookEnd = eyePosition.add(lookOffset)
 		val itemStack = player.getItemInHand(interactionHand)
 		val snapToExistingNode = itemStack.isItem(ModItems.WEB_FLUID)
+			|| itemStack.isItem(ModItems.WEB_PATHFINDER)
+		val requireExistingNode = itemStack.isItem(ModItems.WEB_PATHFINDER)
 
 		return WebLineInteractionHandler.getTargetedNode(
 			lines.values.toList(),
 			eyePosition,
 			lookEnd,
-			snapToExistingNode
+			snapToExistingNode,
+			requireExistingNode
 		)
 	}
 

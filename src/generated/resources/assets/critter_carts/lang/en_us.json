@@ -50,6 +50,7 @@
   "item.critter_carts.web_fluid.same_direction": "The selected faces cannot point in the same direction",
   "item.critter_carts.web_fluid.same_line": "A web line cannot attach to the same line twice",
   "item.critter_carts.web_fluid.too_long": "The web line must be shorter than 10 blocks",
+  "item.critter_carts.web_pathfinder": "Web Pathfinder",
   "item.critter_carts.yellow_dyeberry": "Yellow Dyeberry",
   "item.minecraft.lingering_potion.effect.critter_carts.aaron": "Lingering Aaron Juice",
   "item.minecraft.lingering_potion.effect.critter_carts.dyed_blue": "Lingering Blue Dyeberry Juice",

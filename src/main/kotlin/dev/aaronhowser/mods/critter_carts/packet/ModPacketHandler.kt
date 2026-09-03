@@ -4,6 +4,7 @@ import dev.aaronhowser.mods.aaron.packet.AaronPacketRegistrar
 import dev.aaronhowser.mods.critter_carts.packet.client_to_server.WebLineInteractPacket
 import dev.aaronhowser.mods.critter_carts.packet.server_to_client.AddWebLinesPacket
 import dev.aaronhowser.mods.critter_carts.packet.server_to_client.RemoveWebLinePacket
+import dev.aaronhowser.mods.critter_carts.packet.server_to_client.ShowWebPathPacket
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent
 
 object ModPacketHandler : AaronPacketRegistrar {
@@ -13,6 +14,7 @@ object ModPacketHandler : AaronPacketRegistrar {
 
 		toClient(registrar, AddWebLinesPacket.TYPE, AddWebLinesPacket.STREAM_CODEC)
 		toClient(registrar, RemoveWebLinePacket.TYPE, RemoveWebLinePacket.STREAM_CODEC)
+		toClient(registrar, ShowWebPathPacket.TYPE, ShowWebPathPacket.STREAM_CODEC)
 		toServer(registrar, WebLineInteractPacket.TYPE, WebLineInteractPacket.STREAM_CODEC)
 	}
 }

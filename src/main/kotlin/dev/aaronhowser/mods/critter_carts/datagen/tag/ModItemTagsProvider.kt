@@ -43,6 +43,7 @@ class ModItemTagsProvider(
 
 		tag(WEB_LINE_INTERACTABLE)
 			.add(ModItems.WEB_FLUID)
+			.add(ModItems.WEB_PATHFINDER)
 			.addTag(Tags.Items.TOOLS_SHEAR)
 
 		tag(ItemTags.LOGS)

@@ -1,4 +1,4 @@
-// 1.21.1	2026-09-01T05:06:22.5233947	Item Models: critter_carts
+// 1.21.1	2026-09-03T03:08:00.3211414	Item Models: critter_carts
 47841e40bb1a080b65f1fe89428016eb4c445947 assets/critter_carts/models/item/aaronberry.json
 0a6dc26cae7d5d871983d8be623fe28d3cdb328f assets/critter_carts/models/item/blue_dyeberry.json
 376b523fd11e6dbbc8dd1f59f7da0be5e1490c32 assets/critter_carts/models/item/cyan_dyeberry.json
@@ -8,4 +8,5 @@
 bd1f3760191e1aca04dba80a12f2a9aec0aa5d86 assets/critter_carts/models/item/red_dyeberry.json
 63ec6c618a3a23eab4cab9c52d7d3250de9b516e assets/critter_carts/models/item/scoochworm_spawn_egg.json
 136cf6a709108ec51bfcd94f4bf73f9e14c0bd08 assets/critter_carts/models/item/web_fluid.json
+dffa67531f462bc9001d88541598d926247a5d46 assets/critter_carts/models/item/web_pathfinder.json
 8e675d689f425d3f0fce3615e187943c2b648dd7 assets/critter_carts/models/item/yellow_dyeberry.json

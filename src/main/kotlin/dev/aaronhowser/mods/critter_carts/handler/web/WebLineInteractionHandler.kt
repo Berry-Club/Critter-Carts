@@ -11,6 +11,7 @@ import dev.aaronhowser.mods.critter_carts.handler.web.node.BlockAnchor
 import dev.aaronhowser.mods.critter_carts.handler.web.node.LineAnchor
 import dev.aaronhowser.mods.critter_carts.handler.web.node.WebNode
 import dev.aaronhowser.mods.critter_carts.item.component.WebNodeDataComponent
+import dev.aaronhowser.mods.critter_carts.packet.server_to_client.ShowWebPathPacket
 import dev.aaronhowser.mods.critter_carts.registry.ModDataComponents
 import dev.aaronhowser.mods.critter_carts.registry.ModItems
 import net.minecraft.core.BlockPos
@@ -48,7 +49,9 @@ object WebLineInteractionHandler {
 		val level = player.serverLevel()
 		val savedData = WebSavedData.get(level)
 		if (targetsNode) {
-			if (!itemStack.isItem(ModItems.WEB_FLUID)) return
+			if (!itemStack.isItem(ModItems.WEB_FLUID)
+				&& !itemStack.isItem(ModItems.WEB_PATHFINDER)
+			) return
 
 			val selectedNode = savedData.getNode(targetUuid) ?: return
 			if (!isTargetingNode(player, selectedNode)) return
@@ -56,7 +59,11 @@ object WebLineInteractionHandler {
 				REQUESTED_POSITION_TOLERANCE * REQUESTED_POSITION_TOLERANCE
 			if (selectedNode.position.distanceToSqr(requestedPosition) > positionToleranceSquared) return
 
-			handleNodeSelection(level, player, itemStack, selectedNode)
+			if (itemStack.isItem(ModItems.WEB_PATHFINDER)) {
+				handlePathSelection(level, player, itemStack, selectedNode)
+			} else {
+				handleNodeSelection(level, player, itemStack, selectedNode)
+			}
 			return
 		}
 
@@ -66,11 +73,14 @@ object WebLineInteractionHandler {
 		val lookOffset = player.lookAngle.scale(interactionRange)
 		val lookEnd = eyePosition.add(lookOffset)
 		val snapToExistingNode = itemStack.isItem(ModItems.WEB_FLUID)
+			|| itemStack.isItem(ModItems.WEB_PATHFINDER)
+		val requireExistingNode = itemStack.isItem(ModItems.WEB_PATHFINDER)
 		val targetedNode = getTargetedNode(
 			listOf(line),
 			eyePosition,
 			lookEnd,
-			snapToExistingNode
+			snapToExistingNode,
+			requireExistingNode
 		) ?: return
 		val selectedNode = targetedNode.node
 		val positionToleranceSquared =
@@ -84,7 +94,39 @@ object WebLineInteractionHandler {
 
 			itemStack.isItem(ModItems.WEB_FLUID) ->
 				handleNodeSelection(level, player, itemStack, selectedNode)
+
+			itemStack.isItem(ModItems.WEB_PATHFINDER) ->
+				handlePathSelection(level, player, itemStack, selectedNode)
 		}
+	}
+
+	private fun handlePathSelection(
+		level: ServerLevel,
+		player: ServerPlayer,
+		itemStack: ItemStack,
+		selectedNode: WebNode
+	) {
+		val firstNode = itemStack.get(ModDataComponents.WEB_NODE)?.node
+		if (firstNode == null) {
+			storeFirstNode(player, itemStack, selectedNode)
+			return
+		}
+
+		val savedData = WebSavedData.get(level)
+		val canonicalFirstNode = savedData.getCanonicalNode(firstNode)
+		val canonicalSelectedNode = savedData.getCanonicalNode(selectedNode)
+		val network = canonicalFirstNode.lines.firstOrNull()?.network
+		val path = network?.findShortestPath(canonicalFirstNode, canonicalSelectedNode)
+
+		itemStack.remove(ModDataComponents.WEB_NODE)
+		if (path == null) return
+
+		val positions: MutableList<Vec3> = mutableListOf(path.startNode.position)
+		for (segment in path.segments) {
+			positions.add(segment.toNode.position)
+		}
+
+		ShowWebPathPacket(positions).messagePlayer(player)
 	}
 
 	fun handleNodeSelection(
@@ -205,7 +247,8 @@ object WebLineInteractionHandler {
 		lines: List<WebLine>,
 		lookStart: Vec3,
 		lookEnd: Vec3,
-		snapToExistingNode: Boolean
+		snapToExistingNode: Boolean,
+		requireExistingNode: Boolean = false
 	): TargetedWebNode? {
 		val selectionRadiusSquared = LINE_SELECTION_RADIUS * LINE_SELECTION_RADIUS
 		var targetedNode: TargetedWebNode? = null
@@ -228,10 +271,14 @@ object WebLineInteractionHandler {
 
 			if (distanceFromLookSquared > targetedDistanceSquared) continue
 
-			targetedDistanceSquared = distanceFromLookSquared
 			val position = Vec3(anchorPosition.x, anchorPosition.y, anchorPosition.z)
-			val node = if (snapToExistingNode) {
-				getSnappedNode(line, position)
+			val existingNode = getClosestExistingNode(line, position)
+			if (requireExistingNode && existingNode == null) continue
+
+			targetedDistanceSquared = distanceFromLookSquared
+
+			val node = if (snapToExistingNode && existingNode != null) {
+				existingNode
 			} else {
 				LineAnchor(UUID.randomUUID(), line.uuid, position)
 			}
@@ -248,18 +295,38 @@ object WebLineInteractionHandler {
 		return targetedNode
 	}
 
-	private fun getSnappedNode(line: WebLine, position: Vec3): WebNode {
+	private fun getClosestExistingNode(line: WebLine, position: Vec3): WebNode? {
 		val snapRadiusSquared = NODE_SNAP_RADIUS * NODE_SNAP_RADIUS
-		val firstDistanceSquared = line.firstNode.position.distanceToSqr(position)
-		val secondDistanceSquared = line.secondNode.position.distanceToSqr(position)
+		var closestNode = getCloserNode(null, line.firstNode, position, snapRadiusSquared)
+		closestNode = getCloserNode(closestNode, line.secondNode, position, snapRadiusSquared)
 
-		if (firstDistanceSquared <= snapRadiusSquared
-			&& firstDistanceSquared <= secondDistanceSquared
-		) return line.firstNode
+		for (attachment in line.attachedAnchors) {
+			closestNode = getCloserNode(
+				closestNode,
+				attachment.anchor,
+				position,
+				snapRadiusSquared
+			)
+		}
 
-		if (secondDistanceSquared <= snapRadiusSquared) return line.secondNode
+		return closestNode
+	}
 
-		return LineAnchor(UUID.randomUUID(), line.uuid, position)
+	private fun getCloserNode(
+		closestNode: WebNode?,
+		candidateNode: WebNode,
+		position: Vec3,
+		maximumDistanceSquared: Double
+	): WebNode? {
+		val candidateDistanceSquared = candidateNode.position.distanceToSqr(position)
+		if (candidateDistanceSquared > maximumDistanceSquared) return closestNode
+
+		if (closestNode != null) {
+			val closestDistanceSquared = closestNode.position.distanceToSqr(position)
+			if (closestDistanceSquared < candidateDistanceSquared) return closestNode
+		}
+
+		return candidateNode
 	}
 
 	private fun hasLineOfSight(

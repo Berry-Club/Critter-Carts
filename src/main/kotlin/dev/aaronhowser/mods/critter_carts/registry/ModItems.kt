@@ -8,6 +8,7 @@ import dev.aaronhowser.mods.critter_carts.item.DyeberryItem
 import dev.aaronhowser.mods.critter_carts.item.ScoochwormSpawnEggItem
 import dev.aaronhowser.mods.critter_carts.item.StorageAttachmentItem
 import dev.aaronhowser.mods.critter_carts.item.WebFluidItem
+import dev.aaronhowser.mods.critter_carts.item.WebPathfinderItem
 import net.neoforged.neoforge.registries.DeferredItem
 import net.neoforged.neoforge.registries.DeferredRegister
 
@@ -21,6 +22,9 @@ object ModItems : AaronItemRegistry() {
 
 	val WEB_FLUID: DeferredItem<WebFluidItem> =
 		register("web_fluid", ::WebFluidItem, PROPERTIES_SINGLE_STACK)
+
+	val WEB_PATHFINDER: DeferredItem<WebPathfinderItem> =
+		register("web_pathfinder", ::WebPathfinderItem, PROPERTIES_SINGLE_STACK)
 
 	val CRITTER_CAGE: DeferredItem<CritterCageItem> =
 		register(

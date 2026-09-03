@@ -16,6 +16,7 @@ class ModItemModelProvider(
 	override fun registerModels() {
 		basicItem(ModItems.LOCKBOX.get())
 		basicItem(ModItems.WEB_FLUID.get())
+		basicItem(ModItems.WEB_PATHFINDER.get())
 		dyeberryItem(ModItems.GREEN_DYEBERRY.get(), "green")
 		dyeberryItem(ModItems.BLUE_DYEBERRY.get(), "blue")
 		dyeberryItem(ModItems.RED_DYEBERRY.get(), "red")
