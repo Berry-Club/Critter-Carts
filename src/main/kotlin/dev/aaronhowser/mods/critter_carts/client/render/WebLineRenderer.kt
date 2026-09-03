@@ -37,20 +37,19 @@ object WebLineRenderer {
 
 	@SubscribeEvent
 	fun renderWebLines(event: RenderLevelStageEvent) {
-		if (event.stage != RenderLevelStageEvent.Stage.AFTER_WEATHER) return
+		if (event.stage != RenderLevelStageEvent.Stage.AFTER_CUTOUT_BLOCKS) return
 
 		val cameraPosition = event.camera.position
 		val viewVector = event.camera.lookVector.toVec3()
 		val poseStack = event.poseStack
 
 		poseStack.withPose {
-			poseStack.translate(-cameraPosition.x, -cameraPosition.y, -cameraPosition.z)
-
 			for (line in ClientWebLines.getLines()) {
 				renderWebLine(
 					poseStack,
 					line.firstNode.position,
 					line.secondNode.position,
+					cameraPosition,
 					WEB_COLOR
 				)
 			}
@@ -84,6 +83,7 @@ object WebLineRenderer {
 			poseStack,
 			firstNode.position,
 			secondNode.position,
+			eyePosition,
 			color
 		)
 	}
@@ -92,6 +92,7 @@ object WebLineRenderer {
 		poseStack: PoseStack,
 		start: Vec3,
 		end: Vec3,
+		cameraPosition: Vec3,
 		color: Int
 	) {
 		val offset = end.subtract(start)
@@ -112,7 +113,8 @@ object WebLineRenderer {
 		)
 
 		poseStack.withPose {
-			poseStack.translate(start.x, start.y, start.z)
+			val relativeStart = start.subtract(cameraPosition)
+			poseStack.translate(relativeStart.x, relativeStart.y, relativeStart.z)
 			poseStack.mulPose(rotation)
 
 			val pose = poseStack.last().pose()
@@ -273,7 +275,7 @@ object WebLineRenderer {
 
 		val cubeRadius = 0.05
 		val anchorColor = 0xA0FFFFFF.toInt()
-		val position = targetedNode.node.position
+		val position = targetedNode.node.position.subtract(eyePosition)
 
 		AaronRenderUtil.renderCubeThroughWalls(
 			poseStack,
