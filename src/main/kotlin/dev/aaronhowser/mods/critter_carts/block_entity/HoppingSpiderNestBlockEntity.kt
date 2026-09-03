@@ -130,7 +130,7 @@ class HoppingSpiderNestBlockEntity(
 		reservations: HoppingSpiderReservations
 	): HoppingSpiderJob? {
 		val sourceInterface = SpiderNestInterfaceItem.getComponent(sourceNode.nestInterface)
-		if (sourceInterface.transferDirection != NestInterfaceComponent.TransferDirection.OUTPUT) return null
+		if (sourceInterface.transferDirection != NestInterfaceComponent.TransferDirection.INPUT) return null
 
 		val sourceHandler = getItemHandler(level, sourceNode) ?: return null
 		for (sourceSlot in 0 until sourceHandler.slots) {
@@ -170,7 +170,7 @@ class HoppingSpiderNestBlockEntity(
 		for (destinationNode in inventoryNodes) {
 			if (isSameFace(sourceNode, destinationNode)) continue
 			val destinationInterface = SpiderNestInterfaceItem.getComponent(destinationNode.nestInterface)
-			if (destinationInterface.transferDirection != NestInterfaceComponent.TransferDirection.INPUT) continue
+			if (destinationInterface.transferDirection != NestInterfaceComponent.TransferDirection.OUTPUT) continue
 			if (destinationInterface.color != sourceInterface.color) continue
 			if (!passesFilter(destinationInterface, stack)) continue
 			if (reservations.isDestinationReserved(destinationNode.uuid)) continue

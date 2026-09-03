@@ -104,7 +104,7 @@ class HoppingSpider(
 	private fun pickUpItem(level: ServerLevel, job: HoppingSpiderJob): Boolean {
 		val source = getBlockAnchor(level, job.sourceNodeUuid) ?: return cancelJob()
 		val interfaceComponent = SpiderNestInterfaceItem.getComponent(source.nestInterface)
-		if (interfaceComponent.transferDirection != NestInterfaceComponent.TransferDirection.OUTPUT) return cancelJob()
+		if (interfaceComponent.transferDirection != NestInterfaceComponent.TransferDirection.INPUT) return cancelJob()
 		val handler = getItemHandler(level, source) ?: return cancelJob()
 		val filter = interfaceComponent.getFilter()
 		val simulatedStack = handler.extractItem(job.sourceSlot, MAX_TRANSFER_SIZE, true)
@@ -121,7 +121,7 @@ class HoppingSpider(
 	private fun deliverItem(level: ServerLevel, job: HoppingSpiderJob): Boolean {
 		val destination = getBlockAnchor(level, job.destinationNodeUuid) ?: return false
 		val interfaceComponent = SpiderNestInterfaceItem.getComponent(destination.nestInterface)
-		if (interfaceComponent.transferDirection != NestInterfaceComponent.TransferDirection.INPUT) return false
+		if (interfaceComponent.transferDirection != NestInterfaceComponent.TransferDirection.OUTPUT) return false
 		val source = getBlockAnchor(level, job.sourceNodeUuid) ?: return false
 		val sourceComponent = SpiderNestInterfaceItem.getComponent(source.nestInterface)
 		if (sourceComponent.color != interfaceComponent.color) return false
