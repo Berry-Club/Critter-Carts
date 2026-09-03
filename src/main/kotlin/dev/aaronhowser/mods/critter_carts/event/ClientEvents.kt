@@ -3,6 +3,7 @@ package dev.aaronhowser.mods.critter_carts.event
 import dev.aaronhowser.mods.critter_carts.CritterCarts
 import dev.aaronhowser.mods.critter_carts.client.render.bewlr.CritterCageItemRenderer
 import dev.aaronhowser.mods.critter_carts.client.render.block_entity.CritterCageBlockRenderer
+import dev.aaronhowser.mods.critter_carts.client.render.block_entity.HoppingSpiderNestBlockRenderer
 import dev.aaronhowser.mods.critter_carts.client.render.entity.ScoochwormPartRenderer
 import dev.aaronhowser.mods.critter_carts.client.render.entity.ScoochwormRenderer
 import dev.aaronhowser.mods.critter_carts.handler.web.line.ClientWebLines
@@ -35,6 +36,10 @@ object ClientEvents {
 	@SubscribeEvent
 	fun registerEntityRenderers(event: EntityRenderersEvent.RegisterRenderers) {
 		event.registerBlockEntityRenderer(ModBlockEntityTypes.CRITTER_CAGE.get(), ::CritterCageBlockRenderer)
+		event.registerBlockEntityRenderer(
+			ModBlockEntityTypes.HOPPING_SPIDER_NEST.get(),
+			::HoppingSpiderNestBlockRenderer
+		)
 		event.registerEntityRenderer(ModEntityTypes.SCOOCHWORM.get(), ::ScoochwormRenderer)
 		event.registerEntityRenderer(ModEntityTypes.SCOOCHWORM_PART.get(), ::ScoochwormPartRenderer)
 	}
