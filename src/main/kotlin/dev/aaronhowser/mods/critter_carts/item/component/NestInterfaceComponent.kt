@@ -19,7 +19,10 @@ data class NestInterfaceComponent(
 
 	constructor() : this(ItemContainerContents.EMPTY, DyeColor.WHITE, TransferDirection.OUTPUT)
 
-	fun getFilter(): ItemStack = filterContents.getStackInSlot(0)
+	fun getFilter(): ItemStack {
+		if (filterContents.slots == 0) return ItemStack.EMPTY
+		return filterContents.getStackInSlot(0)
+	}
 
 	fun withFilter(filter: ItemStack): NestInterfaceComponent {
 		return copy(filterContents = ItemContainerContents.fromItems(listOf(filter)))
