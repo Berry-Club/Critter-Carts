@@ -16,7 +16,6 @@ import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.phys.Vec3
 import net.neoforged.neoforge.capabilities.Capabilities
 import net.neoforged.neoforge.items.IItemHandler
-import java.util.UUID
 
 class HoppingSpiderNestBlockEntity(
 	pos: BlockPos,
@@ -25,9 +24,8 @@ class HoppingSpiderNestBlockEntity(
 
 	override val syncImmediately: Boolean = true
 
-	val hoppingSpiders: MutableList<HoppingSpider> = MutableList(STARTING_SPIDER_COUNT) {
-		HoppingSpider()
-	}
+	val hoppingSpiders: List<HoppingSpider>
+		field = mutableListOf(HoppingSpider())
 
 	private fun tick() {
 		val level = level ?: return
