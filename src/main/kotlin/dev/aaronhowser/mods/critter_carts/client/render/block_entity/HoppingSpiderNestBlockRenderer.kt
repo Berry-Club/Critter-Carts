@@ -53,7 +53,7 @@ class HoppingSpiderNestBlockRenderer(
 			poseStack.translate(-SPIDER_SCALE / 2.0, -SPIDER_SCALE / 2.0, -SPIDER_SCALE / 2.0)
 			poseStack.scale(SPIDER_SCALE, SPIDER_SCALE, SPIDER_SCALE)
 			Minecraft.getInstance().blockRenderer.renderSingleBlock(
-				Blocks.BLACK_CONCRETE.defaultBlockState(),
+				Blocks.GRAY_CONCRETE.defaultBlockState(),
 				poseStack,
 				bufferSource,
 				packedLight,
@@ -94,7 +94,7 @@ class HoppingSpiderNestBlockRenderer(
 
 	companion object {
 		private const val SPIDER_SCALE = 0.12f
-		private const val ITEM_SCALE = 0.2f
+		private const val ITEM_SCALE = 0.4f
 		private const val ITEM_HEIGHT = 0.18
 		private const val IDLE_OFFSET = 0.14
 	}
