@@ -3,6 +3,9 @@ package dev.aaronhowser.mods.critter_carts.block_entity
 import dev.aaronhowser.mods.critter_carts.handler.web.WebSavedData
 import dev.aaronhowser.mods.critter_carts.handler.web.node.WebBlockAnchor
 import dev.aaronhowser.mods.critter_carts.handler.web.path.WebPath
+import dev.aaronhowser.mods.critter_carts.item.ItemFilterItem
+import dev.aaronhowser.mods.critter_carts.item.SpiderNestInterfaceItem
+import dev.aaronhowser.mods.critter_carts.item.component.NestInterfaceComponent
 import net.minecraft.core.HolderLookup
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.server.level.ServerLevel
@@ -100,7 +103,13 @@ class HoppingSpider(
 
 	private fun pickUpItem(level: ServerLevel, job: HoppingSpiderJob): Boolean {
 		val source = getBlockAnchor(level, job.sourceNodeUuid) ?: return cancelJob()
+		val interfaceComponent = SpiderNestInterfaceItem.getComponent(source.nestInterface)
+		if (interfaceComponent.transferDirection != NestInterfaceComponent.TransferDirection.OUTPUT) return cancelJob()
 		val handler = getItemHandler(level, source) ?: return cancelJob()
+		val filter = interfaceComponent.getFilter()
+		val simulatedStack = handler.extractItem(job.sourceSlot, MAX_TRANSFER_SIZE, true)
+		if (simulatedStack.isEmpty) return cancelJob()
+		if (!filter.isEmpty && !ItemFilterItem.passesFilter(filter, simulatedStack)) return cancelJob()
 		val extractedStack = handler.extractItem(job.sourceSlot, MAX_TRANSFER_SIZE, false)
 		if (extractedStack.isEmpty) return cancelJob()
 
@@ -111,6 +120,13 @@ class HoppingSpider(
 
 	private fun deliverItem(level: ServerLevel, job: HoppingSpiderJob): Boolean {
 		val destination = getBlockAnchor(level, job.destinationNodeUuid) ?: return false
+		val interfaceComponent = SpiderNestInterfaceItem.getComponent(destination.nestInterface)
+		if (interfaceComponent.transferDirection != NestInterfaceComponent.TransferDirection.INPUT) return false
+		val source = getBlockAnchor(level, job.sourceNodeUuid) ?: return false
+		val sourceComponent = SpiderNestInterfaceItem.getComponent(source.nestInterface)
+		if (sourceComponent.color != interfaceComponent.color) return false
+		val filter = interfaceComponent.getFilter()
+		if (!filter.isEmpty && !ItemFilterItem.passesFilter(filter, carriedStack)) return false
 		val handler = getItemHandler(level, destination) ?: return false
 
 		carriedStack = insertItem(handler, carriedStack)

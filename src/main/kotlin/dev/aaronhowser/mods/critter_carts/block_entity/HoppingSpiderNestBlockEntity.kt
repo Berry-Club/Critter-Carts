@@ -4,6 +4,9 @@ import dev.aaronhowser.mods.aaron.block_entity.SyncingBlockEntity
 import dev.aaronhowser.mods.critter_carts.handler.web.WebNetwork
 import dev.aaronhowser.mods.critter_carts.handler.web.WebSavedData
 import dev.aaronhowser.mods.critter_carts.handler.web.node.WebBlockAnchor
+import dev.aaronhowser.mods.critter_carts.item.ItemFilterItem
+import dev.aaronhowser.mods.critter_carts.item.SpiderNestInterfaceItem
+import dev.aaronhowser.mods.critter_carts.item.component.NestInterfaceComponent
 import dev.aaronhowser.mods.critter_carts.registry.ModBlockEntityTypes
 import net.minecraft.core.BlockPos
 import net.minecraft.core.HolderLookup
@@ -126,12 +129,16 @@ class HoppingSpiderNestBlockEntity(
 		sourceNode: WebBlockAnchor,
 		reservations: HoppingSpiderReservations
 	): HoppingSpiderJob? {
+		val sourceInterface = SpiderNestInterfaceItem.getComponent(sourceNode.nestInterface)
+		if (sourceInterface.transferDirection != NestInterfaceComponent.TransferDirection.OUTPUT) return null
+
 		val sourceHandler = getItemHandler(level, sourceNode) ?: return null
 		for (sourceSlot in 0 until sourceHandler.slots) {
 			if (reservations.isSourceReserved(sourceNode.uuid, sourceSlot)) continue
 
 			val stack = sourceHandler.extractItem(sourceSlot, MAX_TRANSFER_SIZE, true)
 			if (stack.isEmpty) continue
+			if (!passesFilter(sourceInterface, stack)) continue
 
 			val job = findDestinationJob(
 				level,
@@ -159,8 +166,13 @@ class HoppingSpiderNestBlockEntity(
 		stack: ItemStack,
 		reservations: HoppingSpiderReservations
 	): HoppingSpiderJob? {
+		val sourceInterface = SpiderNestInterfaceItem.getComponent(sourceNode.nestInterface)
 		for (destinationNode in inventoryNodes) {
 			if (isSameFace(sourceNode, destinationNode)) continue
+			val destinationInterface = SpiderNestInterfaceItem.getComponent(destinationNode.nestInterface)
+			if (destinationInterface.transferDirection != NestInterfaceComponent.TransferDirection.INPUT) continue
+			if (destinationInterface.color != sourceInterface.color) continue
+			if (!passesFilter(destinationInterface, stack)) continue
 			if (reservations.isDestinationReserved(destinationNode.uuid)) continue
 			if (!canFullyInsert(level, destinationNode, stack)) continue
 
@@ -175,6 +187,11 @@ class HoppingSpiderNestBlockEntity(
 		}
 
 		return null
+	}
+
+	private fun passesFilter(interfaceComponent: NestInterfaceComponent, stack: ItemStack): Boolean {
+		val filter = interfaceComponent.getFilter()
+		return filter.isEmpty || ItemFilterItem.passesFilter(filter, stack)
 	}
 
 	private fun isSameFace(first: WebBlockAnchor, second: WebBlockAnchor): Boolean {
