@@ -1,8 +1,10 @@
 package dev.aaronhowser.mods.critter_carts.block_entity
 
+import dev.aaronhowser.mods.aaron.block_entity.SyncingBlockEntity
 import dev.aaronhowser.mods.critter_carts.handler.web.WebNetwork
 import dev.aaronhowser.mods.critter_carts.handler.web.WebSavedData
 import dev.aaronhowser.mods.critter_carts.handler.web.node.BlockAnchor
+import dev.aaronhowser.mods.critter_carts.handler.web.path.WebPath
 import dev.aaronhowser.mods.critter_carts.registry.ModBlockEntityTypes
 import net.minecraft.core.BlockPos
 import net.minecraft.core.HolderLookup
@@ -10,22 +12,30 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
-import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.phys.Vec3
 import net.neoforged.neoforge.capabilities.Capabilities
 import net.neoforged.neoforge.items.IItemHandler
 
 class HoppingSpiderNestBlockEntity(
 	pos: BlockPos,
 	state: BlockState
-) : BlockEntity(ModBlockEntityTypes.HOPPING_SPIDER_NEST.get(), pos, state) {
+) : SyncingBlockEntity(ModBlockEntityTypes.HOPPING_SPIDER_NEST.get(), pos, state) {
 
-	val hoppingSpiders: MutableList<HoppingSpider> = mutableListOf(HoppingSpider())
+	override val syncImmediately: Boolean = true
+
+	val hoppingSpiders: MutableList<HoppingSpider> = MutableList(STARTING_SPIDER_COUNT) {
+		HoppingSpider()
+	}
 
 	private fun tick() {
 		val level = level ?: return
 
 		for (spider in hoppingSpiders) {
+			if (spider.position == null) {
+				spider.position = blockPos.center
+			}
+
 			when (spider.state) {
 				HoppingSpider.State.IDLE -> findWork(level, spider)
 				HoppingSpider.State.TO_SOURCE -> travelToSource(level, spider)
@@ -55,6 +65,7 @@ class HoppingSpiderNestBlockEntity(
 						spider.sourcePos = sourceNode.blockPos
 						spider.destinationPos = destinationNode.blockPos
 						spider.routeProgress = 0.0
+						spider.position = nestNodes.first().position
 						spider.state = HoppingSpider.State.TO_SOURCE
 						setChanged()
 						return
@@ -67,7 +78,7 @@ class HoppingSpiderNestBlockEntity(
 	private fun travelToSource(level: Level, spider: HoppingSpider) {
 		val sourcePos = spider.sourcePos ?: return spider.reset()
 		val route = findRoute(level, blockPos, sourcePos) ?: return
-		if (!advance(spider, route.distance)) return
+		if (!advance(spider, route)) return
 
 		val sourceHandler = getItemHandler(level, route.endNode as BlockAnchor) ?: return spider.reset()
 		for (slot in 0 until sourceHandler.slots) {
@@ -89,7 +100,7 @@ class HoppingSpiderNestBlockEntity(
 		val sourcePos = spider.sourcePos ?: return
 		val destinationPos = spider.destinationPos ?: return
 		val route = findRoute(level, sourcePos, destinationPos) ?: return
-		if (!advance(spider, route.distance)) return
+		if (!advance(spider, route)) return
 
 		val destinationHandler = getItemHandler(level, route.endNode as BlockAnchor) ?: return
 		spider.carriedStack = insert(destinationHandler, spider.carriedStack, false)
@@ -103,16 +114,35 @@ class HoppingSpiderNestBlockEntity(
 	private fun travelHome(level: Level, spider: HoppingSpider) {
 		val destinationPos = spider.destinationPos ?: return
 		val route = findRoute(level, destinationPos, blockPos) ?: return
-		if (!advance(spider, route.distance)) return
+		if (!advance(spider, route)) return
 
 		spider.reset()
+		spider.position = blockPos.center
 		setChanged()
 	}
 
-	private fun advance(spider: HoppingSpider, distance: Double): Boolean {
+	private fun advance(spider: HoppingSpider, route: WebPath): Boolean {
 		spider.routeProgress += TRAVEL_SPEED
+		spider.position = getPosition(route, spider.routeProgress)
 		setChanged()
-		return spider.routeProgress >= distance
+		return spider.routeProgress >= route.distance
+	}
+
+	private fun getPosition(route: WebPath, progress: Double): Vec3 {
+		if (route.segments.isEmpty()) return route.endNode.position
+
+		var remainingDistance = progress
+		for (segment in route.segments) {
+			if (remainingDistance > segment.distance) {
+				remainingDistance -= segment.distance
+				continue
+			}
+
+			val segmentProgress = (remainingDistance / segment.distance).coerceIn(0.0, 1.0)
+			return segment.fromNode.position.lerp(segment.toNode.position, segmentProgress)
+		}
+
+		return route.endNode.position
 	}
 
 	private fun findRoute(level: Level, startPos: BlockPos, endPos: BlockPos) =
@@ -217,6 +247,7 @@ class HoppingSpiderNestBlockEntity(
 
 	companion object {
 		private const val SPIDERS_TAG = "HoppingSpiders"
+		private const val STARTING_SPIDER_COUNT = 4
 		private const val MAX_TRANSFER_SIZE = 64
 		private const val TRAVEL_SPEED = 0.15
 

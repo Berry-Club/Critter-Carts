@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos
 import net.minecraft.core.HolderLookup
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.phys.Vec3
 
 class HoppingSpider {
 
@@ -12,6 +13,7 @@ class HoppingSpider {
 	var destinationPos: BlockPos? = null
 	var routeProgress: Double = 0.0
 	var carriedStack: ItemStack = ItemStack.EMPTY
+	var position: Vec3? = null
 
 	fun save(registries: HolderLookup.Provider): CompoundTag {
 		val tag = CompoundTag()
@@ -32,6 +34,13 @@ class HoppingSpider {
 			tag.put(CARRIED_STACK_TAG, carriedStack.save(registries))
 		}
 
+		val position = position
+		if (position != null) {
+			tag.putDouble(POSITION_X_TAG, position.x)
+			tag.putDouble(POSITION_Y_TAG, position.y)
+			tag.putDouble(POSITION_Z_TAG, position.z)
+		}
+
 		return tag
 	}
 
@@ -41,6 +50,7 @@ class HoppingSpider {
 		destinationPos = null
 		routeProgress = 0.0
 		carriedStack = ItemStack.EMPTY
+		position = null
 	}
 
 	enum class State {
@@ -56,6 +66,9 @@ class HoppingSpider {
 		private const val DESTINATION_POS_TAG = "DestinationPos"
 		private const val ROUTE_PROGRESS_TAG = "RouteProgress"
 		private const val CARRIED_STACK_TAG = "CarriedStack"
+		private const val POSITION_X_TAG = "PositionX"
+		private const val POSITION_Y_TAG = "PositionY"
+		private const val POSITION_Z_TAG = "PositionZ"
 
 		fun load(tag: CompoundTag, registries: HolderLookup.Provider): HoppingSpider {
 			val spider = HoppingSpider()
@@ -74,6 +87,14 @@ class HoppingSpider {
 
 			val carriedStackTag = tag.getCompound(CARRIED_STACK_TAG)
 			spider.carriedStack = ItemStack.parseOptional(registries, carriedStackTag)
+
+			if (tag.contains(POSITION_X_TAG)) {
+				spider.position = Vec3(
+					tag.getDouble(POSITION_X_TAG),
+					tag.getDouble(POSITION_Y_TAG),
+					tag.getDouble(POSITION_Z_TAG)
+				)
+			}
 			return spider
 		}
 	}
