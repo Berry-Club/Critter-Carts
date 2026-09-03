@@ -16,6 +16,7 @@ import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.phys.Vec3
 import net.neoforged.neoforge.capabilities.Capabilities
 import net.neoforged.neoforge.items.IItemHandler
+import java.util.UUID
 
 class HoppingSpiderNestBlockEntity(
 	pos: BlockPos,
@@ -60,12 +61,16 @@ class HoppingSpiderNestBlockEntity(
 					for (destinationNode in inventoryNodes) {
 						if (destinationNode.blockPos == sourceNode.blockPos) continue
 						if (!canFullyInsert(level, destinationNode, extractableStack)) continue
-						if (!hasCompleteRoute(network, nestNodes, sourceNode, destinationNode)) continue
+						val homeNode = findHomeNode(network, nestNodes, sourceNode, destinationNode)
+							?: continue
 
-						spider.sourcePos = sourceNode.blockPos
-						spider.destinationPos = destinationNode.blockPos
+						spider.homeNodeUuid = homeNode.uuid
+						spider.sourceNodeUuid = sourceNode.uuid
+						spider.destinationNodeUuid = destinationNode.uuid
+						spider.currentNodeUuid = homeNode.uuid
+						spider.targetNodeUuid = sourceNode.uuid
 						spider.routeProgress = 0.0
-						spider.position = nestNodes.first().position
+						spider.position = homeNode.position
 						spider.state = HoppingSpider.State.TO_SOURCE
 						setChanged()
 						return
@@ -76,8 +81,7 @@ class HoppingSpiderNestBlockEntity(
 	}
 
 	private fun travelToSource(level: Level, spider: HoppingSpider) {
-		val sourcePos = spider.sourcePos ?: return spider.reset()
-		val route = findRoute(level, blockPos, sourcePos) ?: return
+		val route = findRoute(level, spider) ?: return
 		if (!advance(spider, route)) return
 
 		val sourceHandler = getItemHandler(level, route.endNode as BlockAnchor) ?: return spider.reset()
@@ -86,6 +90,8 @@ class HoppingSpiderNestBlockEntity(
 			if (extractedStack.isEmpty) continue
 
 			spider.carriedStack = extractedStack
+			spider.currentNodeUuid = spider.sourceNodeUuid
+			spider.targetNodeUuid = spider.destinationNodeUuid
 			spider.routeProgress = 0.0
 			spider.state = HoppingSpider.State.TO_DESTINATION
 			setChanged()
@@ -97,23 +103,22 @@ class HoppingSpiderNestBlockEntity(
 	}
 
 	private fun travelToDestination(level: Level, spider: HoppingSpider) {
-		val sourcePos = spider.sourcePos ?: return
-		val destinationPos = spider.destinationPos ?: return
-		val route = findRoute(level, sourcePos, destinationPos) ?: return
+		val route = findRoute(level, spider) ?: return
 		if (!advance(spider, route)) return
 
 		val destinationHandler = getItemHandler(level, route.endNode as BlockAnchor) ?: return
 		spider.carriedStack = insert(destinationHandler, spider.carriedStack, false)
 		if (!spider.carriedStack.isEmpty) return
 
+		spider.currentNodeUuid = spider.destinationNodeUuid
+		spider.targetNodeUuid = spider.homeNodeUuid
 		spider.routeProgress = 0.0
 		spider.state = HoppingSpider.State.RETURNING
 		setChanged()
 	}
 
 	private fun travelHome(level: Level, spider: HoppingSpider) {
-		val destinationPos = spider.destinationPos ?: return
-		val route = findRoute(level, destinationPos, blockPos) ?: return
+		val route = findRoute(level, spider) ?: return
 		if (!advance(spider, route)) return
 
 		spider.reset()
@@ -145,45 +150,36 @@ class HoppingSpiderNestBlockEntity(
 		return route.endNode.position
 	}
 
-	private fun findRoute(level: Level, startPos: BlockPos, endPos: BlockPos) =
-		WebSavedData.get(level.server!!.overworld())
-			.getNetworksAt(startPos)
-			.asSequence()
-			.mapNotNull { network ->
-				val startNodes = getUsableAnchors(level, network, startPos)
-				val endNodes = getUsableAnchors(level, network, endPos)
-				startNodes.asSequence()
-					.flatMap { startNode ->
-						endNodes.asSequence().mapNotNull { endNode ->
-							network.findShortestPath(startNode, endNode)
-						}
-					}
-					.minByOrNull { path -> path.distance }
-			}
-			.minByOrNull { path -> path.distance }
+	private fun findRoute(level: Level, spider: HoppingSpider): WebPath? {
+		val currentNodeUuid = spider.currentNodeUuid ?: return null
+		val targetNodeUuid = spider.targetNodeUuid ?: return null
+		val savedData = WebSavedData.get(level.server!!.overworld())
+		val currentNode = savedData.getNode(currentNodeUuid) ?: return null
+		val targetNode = savedData.getNode(targetNodeUuid) ?: return null
 
-	private fun getUsableAnchors(level: Level, network: WebNetwork, pos: BlockPos): List<BlockAnchor> {
-		val anchors = getAnchors(network, pos)
-		if (pos == blockPos) return anchors
+		for (line in currentNode.lines) {
+			val network = savedData.getNetwork(line.uuid) ?: continue
+			val route = network.findShortestPath(currentNode, targetNode) ?: continue
+			return route
+		}
 
-		return anchors.filter { anchor -> getItemHandler(level, anchor) != null }
+		return null
 	}
 
-	private fun hasCompleteRoute(
+	private fun findHomeNode(
 		network: WebNetwork,
 		nestNodes: List<BlockAnchor>,
 		sourceNode: BlockAnchor,
 		destinationNode: BlockAnchor
-	): Boolean {
-		val sourceToDestination = network.findShortestPath(sourceNode, destinationNode) ?: return false
-		if (sourceToDestination.distance < 0.0) return false
+	): BlockAnchor? {
+		if (network.findShortestPath(sourceNode, destinationNode) == null) return null
 
 		for (nestNode in nestNodes) {
 			if (network.findShortestPath(nestNode, sourceNode) == null) continue
-			if (network.findShortestPath(destinationNode, nestNode) != null) return true
+			if (network.findShortestPath(destinationNode, nestNode) != null) return nestNode
 		}
 
-		return false
+		return null
 	}
 
 	private fun getInventoryAnchors(level: Level, network: WebNetwork): List<BlockAnchor> {
