@@ -5,6 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder
 import dev.aaronhowser.mods.aaron.serialization.AaronExtraStreamCodecs
 import io.netty.buffer.ByteBuf
 import net.minecraft.network.RegistryFriendlyByteBuf
+import net.minecraft.network.codec.ByteBufCodecs
 import net.minecraft.network.codec.StreamCodec
 import net.minecraft.util.StringRepresentable
 import net.minecraft.world.item.DyeColor
@@ -14,10 +15,11 @@ import net.minecraft.world.item.component.ItemContainerContents
 data class NestInterfaceComponent(
 	val filterContents: ItemContainerContents,
 	val color: DyeColor,
-	val transferDirection: TransferDirection
+	val transferDirection: TransferDirection,
+	val priority: Int
 ) {
 
-	constructor() : this(ItemContainerContents.EMPTY, DyeColor.WHITE, TransferDirection.OUTPUT)
+	constructor() : this(ItemContainerContents.EMPTY, DyeColor.WHITE, TransferDirection.OUTPUT, 0)
 
 	fun getFilter(): ItemStack {
 		if (filterContents.slots == 0) return ItemStack.EMPTY
@@ -34,6 +36,8 @@ data class NestInterfaceComponent(
 		return copy(transferDirection = newDirection)
 	}
 
+	fun withPriority(newPriority: Int): NestInterfaceComponent = copy(priority = newPriority)
+
 	companion object {
 		val CODEC: Codec<NestInterfaceComponent> = RecordCodecBuilder.create { instance ->
 			instance.group(
@@ -45,7 +49,10 @@ data class NestInterfaceComponent(
 					.forGetter(NestInterfaceComponent::color),
 				TransferDirection.CODEC
 					.optionalFieldOf("transfer_direction", TransferDirection.OUTPUT)
-					.forGetter(NestInterfaceComponent::transferDirection)
+					.forGetter(NestInterfaceComponent::transferDirection),
+				Codec.INT
+					.optionalFieldOf("priority", 0)
+					.forGetter(NestInterfaceComponent::priority)
 			).apply(instance, ::NestInterfaceComponent)
 		}
 
@@ -54,6 +61,7 @@ data class NestInterfaceComponent(
 				ItemContainerContents.STREAM_CODEC, NestInterfaceComponent::filterContents,
 				AaronExtraStreamCodecs.enumStreamCodec(DyeColor::class.java), NestInterfaceComponent::color,
 				TransferDirection.STREAM_CODEC, NestInterfaceComponent::transferDirection,
+				ByteBufCodecs.VAR_INT, NestInterfaceComponent::priority,
 				::NestInterfaceComponent
 			)
 	}

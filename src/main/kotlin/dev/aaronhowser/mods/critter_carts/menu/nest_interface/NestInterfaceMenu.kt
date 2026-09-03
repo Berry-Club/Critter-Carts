@@ -93,6 +93,12 @@ class NestInterfaceMenu private constructor(
 
 	fun getColor(): DyeColor = getComponent().color
 	fun isInput(): Boolean = getComponent().transferDirection == NestInterfaceComponent.TransferDirection.INPUT
+	fun getPriority(): Int = getComponent().priority
+
+	fun setPriority(priority: Int) {
+		SpiderNestInterfaceItem.setPriority(getInterfaceStack(), priority)
+		syncAnchor()
+	}
 
 	override fun addContainerSlots() {
 		addSlot(SlotItemHandler(filterSlot, 0, 80, 35))

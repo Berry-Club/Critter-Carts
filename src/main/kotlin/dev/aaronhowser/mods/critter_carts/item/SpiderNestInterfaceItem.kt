@@ -47,6 +47,7 @@ class SpiderNestInterfaceItem(properties: Properties) : Item(properties) {
 		tooltipComponents.add(
 			Component.translatable("tooltip.critter_carts.interface.${component.transferDirection.serializedName}")
 		)
+		tooltipComponents.add(Component.translatable("tooltip.critter_carts.interface.priority", component.priority))
 	}
 
 	companion object {
@@ -64,6 +65,10 @@ class SpiderNestInterfaceItem(properties: Properties) : Item(properties) {
 
 		fun setTransferDirection(stack: ItemStack, direction: NestInterfaceComponent.TransferDirection) {
 			stack.set(ModDataComponents.NEST_INTERFACE, getComponent(stack).withTransferDirection(direction))
+		}
+
+		fun setPriority(stack: ItemStack, priority: Int) {
+			stack.set(ModDataComponents.NEST_INTERFACE, getComponent(stack).withPriority(priority))
 		}
 	}
 }

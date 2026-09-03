@@ -29,8 +29,10 @@ object ModMenuLang {
 		provider.add("menu.critter_carts.interface.color", "Color: %s")
 		provider.add("menu.critter_carts.interface.input", "Input")
 		provider.add("menu.critter_carts.interface.output", "Output")
+		provider.add("menu.critter_carts.interface.priority", "Priority")
 		provider.add("tooltip.critter_carts.interface.color", "Color: %s")
 		provider.add("tooltip.critter_carts.interface.input", "Input")
 		provider.add("tooltip.critter_carts.interface.output", "Output")
+		provider.add("tooltip.critter_carts.interface.priority", "Priority: %s")
 	}
 }

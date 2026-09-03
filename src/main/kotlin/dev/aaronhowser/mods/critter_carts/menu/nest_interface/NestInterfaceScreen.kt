@@ -4,7 +4,9 @@ import dev.aaronhowser.mods.aaron.menu.BaseScreen
 import dev.aaronhowser.mods.aaron.menu.textures.ScreenBackground
 import dev.aaronhowser.mods.aaron.packet.c2s.ClientClickedMenuButton
 import dev.aaronhowser.mods.critter_carts.CritterCarts
+import dev.aaronhowser.mods.critter_carts.packet.client_to_server.SetNestInterfacePriorityPacket
 import net.minecraft.client.gui.components.Button
+import net.minecraft.client.gui.components.EditBox
 import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.player.Inventory
 
@@ -16,6 +18,7 @@ class NestInterfaceScreen(menu: NestInterfaceMenu, inventory: Inventory, title: 
 
 	private lateinit var colorButton: Button
 	private lateinit var directionButton: Button
+	private lateinit var priorityInput: EditBox
 
 	override fun baseInit() {
 		super.baseInit()
@@ -25,8 +28,24 @@ class NestInterfaceScreen(menu: NestInterfaceMenu, inventory: Inventory, title: 
 		directionButton = Button.builder(getDirectionMessage()) {
 			ClientClickedMenuButton(NestInterfaceMenu.TOGGLE_DIRECTION_BUTTON_ID).messageServer()
 		}.bounds(leftPos + 92, topPos + 57, 72, 20).build()
+		priorityInput = EditBox(
+			font,
+			leftPos + 12,
+			topPos + 32,
+			56,
+			18,
+			Component.translatable("menu.critter_carts.interface.priority")
+		)
+		priorityInput.setMaxLength(11)
+		priorityInput.setFilter { value -> value.isEmpty() || value == "-" || value.toIntOrNull() != null }
+		priorityInput.value = menu.getPriority().toString()
+		priorityInput.setResponder { value ->
+			val priority = value.toIntOrNull() ?: return@setResponder
+			SetNestInterfacePriorityPacket(priority).messageServer()
+		}
 		addRenderableWidget(colorButton)
 		addRenderableWidget(directionButton)
+		addRenderableWidget(priorityInput)
 	}
 
 	override fun containerTick() {
