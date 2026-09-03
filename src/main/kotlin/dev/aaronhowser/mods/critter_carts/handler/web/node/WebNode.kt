@@ -3,7 +3,7 @@ package dev.aaronhowser.mods.critter_carts.handler.web.node
 import com.mojang.serialization.Codec
 import dev.aaronhowser.mods.critter_carts.handler.web.line.WebLine
 import dev.aaronhowser.mods.critter_carts.handler.web.line.WebLineInvalidation
-import io.netty.buffer.ByteBuf
+import net.minecraft.network.RegistryFriendlyByteBuf
 import net.minecraft.network.codec.ByteBufCodecs
 import net.minecraft.network.codec.StreamCodec
 import net.minecraft.server.level.ServerLevel
@@ -57,22 +57,29 @@ sealed class WebNode {
 				}
 			)
 
-		val STREAM_CODEC: StreamCodec<ByteBuf, WebNode> =
-			ByteBufCodecs.VAR_INT.dispatch(
-				{ node ->
-					when (node) {
-						is WebBlockAnchor -> WebBlockAnchor.TYPE_ID
-						is WebLineAnchor -> WebLineAnchor.TYPE_ID
-					}
-				},
-				{ typeId ->
-					when (typeId) {
-						WebBlockAnchor.TYPE_ID -> WebBlockAnchor.STREAM_CODEC
-						WebLineAnchor.TYPE_ID -> WebLineAnchor.STREAM_CODEC
-						else -> error("Unknown web node type: $typeId")
+		val STREAM_CODEC: StreamCodec<RegistryFriendlyByteBuf, WebNode> =
+			object : StreamCodec<RegistryFriendlyByteBuf, WebNode> {
+				override fun decode(buffer: RegistryFriendlyByteBuf): WebNode {
+					return when (ByteBufCodecs.VAR_INT.decode(buffer)) {
+						WebBlockAnchor.TYPE_ID -> WebBlockAnchor.STREAM_CODEC.decode(buffer)
+						WebLineAnchor.TYPE_ID -> WebLineAnchor.STREAM_CODEC.decode(buffer)
+						else -> error("Unknown web node type")
 					}
 				}
-			)
+
+				override fun encode(buffer: RegistryFriendlyByteBuf, node: WebNode) {
+					when (node) {
+						is WebBlockAnchor -> {
+							ByteBufCodecs.VAR_INT.encode(buffer, WebBlockAnchor.TYPE_ID)
+							WebBlockAnchor.STREAM_CODEC.encode(buffer, node)
+						}
+						is WebLineAnchor -> {
+							ByteBufCodecs.VAR_INT.encode(buffer, WebLineAnchor.TYPE_ID)
+							WebLineAnchor.STREAM_CODEC.encode(buffer, node)
+						}
+					}
+				}
+			}
 	}
 
 }

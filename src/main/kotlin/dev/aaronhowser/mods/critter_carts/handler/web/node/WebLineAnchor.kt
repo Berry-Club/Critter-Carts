@@ -6,9 +6,9 @@ import dev.aaronhowser.mods.aaron.serialization.AaronExtraStreamCodecs
 import dev.aaronhowser.mods.critter_carts.handler.web.line.WebLine
 import dev.aaronhowser.mods.critter_carts.handler.web.line.WebLineInvalidation
 import dev.aaronhowser.mods.critter_carts.handler.web.line.WebLineInvalidationReason
-import io.netty.buffer.ByteBuf
 import net.minecraft.core.BlockPos
 import net.minecraft.core.UUIDUtil
+import net.minecraft.network.RegistryFriendlyByteBuf
 import net.minecraft.network.codec.StreamCodec
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.level.ChunkPos
@@ -61,7 +61,7 @@ data class WebLineAnchor(
 				).apply(instance, ::WebLineAnchor)
 			}
 
-		val STREAM_CODEC: StreamCodec<ByteBuf, WebLineAnchor> = StreamCodec.composite(
+		val STREAM_CODEC: StreamCodec<RegistryFriendlyByteBuf, WebLineAnchor> = StreamCodec.composite(
 			UUIDUtil.STREAM_CODEC, WebLineAnchor::uuid,
 			UUIDUtil.STREAM_CODEC, WebLineAnchor::lineUuid,
 			AaronExtraStreamCodecs.VEC3, WebLineAnchor::position,

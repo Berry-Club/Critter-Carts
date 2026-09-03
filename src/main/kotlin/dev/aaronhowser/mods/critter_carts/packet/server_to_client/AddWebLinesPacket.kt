@@ -6,7 +6,7 @@ import dev.aaronhowser.mods.critter_carts.handler.web.line.ClientWebLines
 import dev.aaronhowser.mods.critter_carts.handler.web.line.WebLine
 import dev.aaronhowser.mods.critter_carts.handler.web.line.WebLineData
 import dev.aaronhowser.mods.critter_carts.handler.web.node.WebNode
-import io.netty.buffer.ByteBuf
+import net.minecraft.network.RegistryFriendlyByteBuf
 import net.minecraft.network.codec.ByteBufCodecs
 import net.minecraft.network.codec.StreamCodec
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload
@@ -29,7 +29,7 @@ class AddWebLinesPacket(
 		val TYPE: CustomPacketPayload.Type<AddWebLinesPacket> =
 			makeType(CritterCarts.MOD_ID, "add_web_lines")
 
-		val STREAM_CODEC: StreamCodec<ByteBuf, AddWebLinesPacket> = StreamCodec.composite(
+		val STREAM_CODEC: StreamCodec<RegistryFriendlyByteBuf, AddWebLinesPacket> = StreamCodec.composite(
 			WebNode.STREAM_CODEC.apply(ByteBufCodecs.list()), AddWebLinesPacket::nodes,
 			WebLineData.STREAM_CODEC.apply(ByteBufCodecs.list()), AddWebLinesPacket::lines,
 			::AddWebLinesPacket

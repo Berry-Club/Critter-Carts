@@ -1,20 +1,19 @@
 package dev.aaronhowser.mods.critter_carts.handler.web.node
 
-import com.mojang.serialization.Codec
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import dev.aaronhowser.mods.aaron.serialization.AaronExtraStreamCodecs
 import dev.aaronhowser.mods.critter_carts.handler.web.line.WebLine
 import dev.aaronhowser.mods.critter_carts.handler.web.line.WebLineInvalidation
 import dev.aaronhowser.mods.critter_carts.handler.web.line.WebLineInvalidationReason
-import io.netty.buffer.ByteBuf
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.core.UUIDUtil
-import net.minecraft.network.codec.ByteBufCodecs
+import net.minecraft.network.RegistryFriendlyByteBuf
 import net.minecraft.network.codec.StreamCodec
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.level.ChunkPos
+import net.minecraft.world.item.ItemStack
 import net.minecraft.world.phys.Vec3
 import java.util.*
 
@@ -23,8 +22,11 @@ class WebBlockAnchor(
 	val blockPos: BlockPos,
 	val face: Direction,
 	override val position: Vec3,
-	var hasNestInterface: Boolean = false
+	var nestInterface: ItemStack = ItemStack.EMPTY
 ) : WebNode() {
+
+	val hasNestInterface: Boolean
+		get() = !nestInterface.isEmpty
 
 	override fun isLoaded(level: ServerLevel): Boolean {
 		return isChunkLoaded(level, ChunkPos(blockPos))
@@ -59,18 +61,18 @@ class WebBlockAnchor(
 					Vec3.CODEC
 						.fieldOf("position")
 						.forGetter(WebBlockAnchor::position),
-					Codec.BOOL
-						.optionalFieldOf("has_nest_interface", false)
-						.forGetter(WebBlockAnchor::hasNestInterface)
+					ItemStack.OPTIONAL_CODEC
+						.optionalFieldOf("nest_interface", ItemStack.EMPTY)
+						.forGetter(WebBlockAnchor::nestInterface)
 				).apply(instance, ::WebBlockAnchor)
 			}
 
-		val STREAM_CODEC: StreamCodec<ByteBuf, WebBlockAnchor> = StreamCodec.composite(
+		val STREAM_CODEC: StreamCodec<RegistryFriendlyByteBuf, WebBlockAnchor> = StreamCodec.composite(
 			UUIDUtil.STREAM_CODEC, WebBlockAnchor::uuid,
 			BlockPos.STREAM_CODEC, WebBlockAnchor::blockPos,
 			Direction.STREAM_CODEC, WebBlockAnchor::face,
 			AaronExtraStreamCodecs.VEC3, WebBlockAnchor::position,
-			ByteBufCodecs.BOOL, WebBlockAnchor::hasNestInterface,
+			ItemStack.OPTIONAL_STREAM_CODEC, WebBlockAnchor::nestInterface,
 			::WebBlockAnchor
 		)
 	}

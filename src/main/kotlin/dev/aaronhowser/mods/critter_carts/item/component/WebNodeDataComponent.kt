@@ -2,7 +2,7 @@ package dev.aaronhowser.mods.critter_carts.item.component
 
 import com.mojang.serialization.Codec
 import dev.aaronhowser.mods.critter_carts.handler.web.node.WebNode
-import io.netty.buffer.ByteBuf
+import net.minecraft.network.RegistryFriendlyByteBuf
 import net.minecraft.network.codec.StreamCodec
 
 data class WebNodeDataComponent(
@@ -15,7 +15,7 @@ data class WebNodeDataComponent(
 				WebNodeDataComponent::node
 			)
 
-		val STREAM_CODEC: StreamCodec<ByteBuf, WebNodeDataComponent> =
+		val STREAM_CODEC: StreamCodec<RegistryFriendlyByteBuf, WebNodeDataComponent> =
 			WebNode.STREAM_CODEC.map(
 				::WebNodeDataComponent,
 				WebNodeDataComponent::node

@@ -22,6 +22,7 @@ import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.sounds.SoundSource
 import net.minecraft.world.level.ChunkPos
+import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.saveddata.SavedData
 import java.util.UUID
 import kotlin.collections.ArrayDeque
@@ -88,8 +89,19 @@ class WebSavedData : SavedData() {
 		return networksByLineUuid[lineUuid]
 	}
 
-	fun installNestInterface(level: ServerLevel, anchor: WebBlockAnchor) {
-		anchor.hasNestInterface = true
+	fun installNestInterface(level: ServerLevel, anchor: WebBlockAnchor, interfaceStack: ItemStack) {
+		anchor.nestInterface = interfaceStack.copyWithCount(1)
+		syncAnchor(level, anchor)
+	}
+
+	fun removeNestInterface(level: ServerLevel, anchor: WebBlockAnchor): ItemStack {
+		val removedStack = anchor.nestInterface
+		anchor.nestInterface = ItemStack.EMPTY
+		syncAnchor(level, anchor)
+		return removedStack
+	}
+
+	fun syncAnchor(level: ServerLevel, anchor: WebBlockAnchor) {
 		setDirty()
 		val packet = AddWebLinesPacket.fromLines(anchor.lines)
 		for (line in anchor.lines) {
