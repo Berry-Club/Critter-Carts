@@ -1,6 +1,7 @@
 package dev.aaronhowser.mods.critter_carts.block_entity
 
 import dev.aaronhowser.mods.aaron.block_entity.SyncingBlockEntity
+import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isTrue
 import dev.aaronhowser.mods.critter_carts.handler.web.WebNetwork
 import dev.aaronhowser.mods.critter_carts.handler.web.WebSavedData
 import dev.aaronhowser.mods.critter_carts.handler.web.node.WebBlockAnchor
@@ -90,24 +91,28 @@ class HoppingSpiderNestBlockEntity(
 
 	private fun findJob(level: ServerLevel, reservations: HoppingSpiderReservations): HoppingSpiderJob? {
 		val savedData = WebSavedData.get(level)
+		var bestCandidate: HoppingSpiderJobCandidate? = null
 		for (network in savedData.getNetworksAt(blockPos)) {
-			val job = findJobInNetwork(level, network, reservations)
-			if (job != null) return job
+			val candidate = findJobInNetwork(level, network, reservations)
+			if (candidate?.isPreferredOver(bestCandidate) == true) {
+				bestCandidate = candidate
+			}
 		}
 
-		return null
+		return bestCandidate?.job
 	}
 
 	private fun findJobInNetwork(
 		level: ServerLevel,
 		network: WebNetwork,
 		reservations: HoppingSpiderReservations
-	): HoppingSpiderJob? {
+	): HoppingSpiderJobCandidate? {
 		val nestNodes = getAnchors(network, blockPos)
 		val inventoryNodes = getInventoryAnchors(level, network)
+		var bestCandidate: HoppingSpiderJobCandidate? = null
 
 		for (sourceNode in inventoryNodes) {
-			val job = findJobFromSource(
+			val candidate = findJobFromSource(
 				level,
 				network,
 				nestNodes,
@@ -115,10 +120,13 @@ class HoppingSpiderNestBlockEntity(
 				sourceNode,
 				reservations
 			)
-			if (job != null) return job
+
+			if (candidate?.isPreferredOver(bestCandidate).isTrue()) {
+				bestCandidate = candidate
+			}
 		}
 
-		return null
+		return bestCandidate
 	}
 
 	private fun findJobFromSource(
@@ -128,11 +136,12 @@ class HoppingSpiderNestBlockEntity(
 		inventoryNodes: List<WebBlockAnchor>,
 		sourceNode: WebBlockAnchor,
 		reservations: HoppingSpiderReservations
-	): HoppingSpiderJob? {
+	): HoppingSpiderJobCandidate? {
 		val sourceInterface = SpiderNestInterfaceItem.getComponent(sourceNode.nestInterface)
 		if (sourceInterface.transferDirection != NestInterfaceComponent.TransferDirection.INPUT) return null
 
 		val sourceHandler = getItemHandler(level, sourceNode) ?: return null
+		var bestCandidate: HoppingSpiderJobCandidate? = null
 		for (sourceSlot in 0 until sourceHandler.slots) {
 			if (reservations.isSourceReserved(sourceNode.uuid, sourceSlot)) continue
 
@@ -140,7 +149,7 @@ class HoppingSpiderNestBlockEntity(
 			if (stack.isEmpty) continue
 			if (!passesFilter(sourceInterface, stack)) continue
 
-			val job = findDestinationJob(
+			val candidate = findDestinationJob(
 				level,
 				network,
 				nestNodes,
@@ -150,10 +159,12 @@ class HoppingSpiderNestBlockEntity(
 				stack,
 				reservations
 			)
-			if (job != null) return job
+			if (candidate?.isPreferredOver(bestCandidate) == true) {
+				bestCandidate = candidate
+			}
 		}
 
-		return null
+		return bestCandidate
 	}
 
 	private fun findDestinationJob(
@@ -165,8 +176,9 @@ class HoppingSpiderNestBlockEntity(
 		sourceSlot: Int,
 		stack: ItemStack,
 		reservations: HoppingSpiderReservations
-	): HoppingSpiderJob? {
+	): HoppingSpiderJobCandidate? {
 		val sourceInterface = SpiderNestInterfaceItem.getComponent(sourceNode.nestInterface)
+		var bestCandidate: HoppingSpiderJobCandidate? = null
 		for (destinationNode in inventoryNodes) {
 			if (isSameFace(sourceNode, destinationNode)) continue
 			val destinationInterface = SpiderNestInterfaceItem.getComponent(destinationNode.nestInterface)
@@ -178,15 +190,19 @@ class HoppingSpiderNestBlockEntity(
 
 			val homeNode = findHomeNode(network, nestNodes, sourceNode, destinationNode)
 				?: continue
-			return HoppingSpiderJob(
-				homeNode.uuid,
-				sourceNode.uuid,
-				destinationNode.uuid,
-				sourceSlot
+			val job = HoppingSpiderJob(homeNode.uuid, sourceNode.uuid, destinationNode.uuid, sourceSlot)
+			val candidate = HoppingSpiderJobCandidate(
+				job,
+				sourceInterface.priority,
+				destinationInterface.priority,
+				stack.count
 			)
+			if (candidate.isPreferredOver(bestCandidate)) {
+				bestCandidate = candidate
+			}
 		}
 
-		return null
+		return bestCandidate
 	}
 
 	private fun passesFilter(interfaceComponent: NestInterfaceComponent, stack: ItemStack): Boolean {
