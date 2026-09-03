@@ -17,6 +17,7 @@ class ModItemModelProvider(
 		basicItem(ModItems.LOCKBOX.get())
 		basicItem(ModItems.WEB_FLUID.get())
 		basicItem(ModItems.WEB_PATHFINDER.get())
+		basicItem(ModItems.ITEM_FILTER.get())
 		withExistingParent("spider_nest_interface", mcLoc("item/generated"))
 			.texture("layer0", modLoc("item/web_pathfinder"))
 		dyeberryItem(ModItems.GREEN_DYEBERRY.get(), "green")

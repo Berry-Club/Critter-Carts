@@ -3,6 +3,7 @@ package dev.aaronhowser.mods.critter_carts
 import dev.aaronhowser.mods.critter_carts.config.ClientConfig
 import dev.aaronhowser.mods.critter_carts.config.ServerConfig
 import dev.aaronhowser.mods.critter_carts.registry.ModRegistries
+import dev.aaronhowser.mods.critter_carts.registry.ModMenuTypes
 import net.minecraft.resources.ResourceLocation
 import net.neoforged.api.distmarker.Dist
 import net.neoforged.fml.ModContainer
@@ -24,6 +25,7 @@ class CritterCarts(
 		ModRegistries.register(MOD_BUS)
 
 		runWhenOn(Dist.CLIENT) {
+			MOD_BUS.addListener(ModMenuTypes::registerScreens)
 			val screenFactory = IConfigScreenFactory { container, screen -> ConfigurationScreen(container, screen) }
 			modContainer.registerExtensionPoint(IConfigScreenFactory::class.java, screenFactory)
 		}

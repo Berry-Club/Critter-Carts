@@ -4,7 +4,6 @@ import dev.aaronhowser.mods.aaron.registry.AaronItemRegistry
 import dev.aaronhowser.mods.critter_carts.CritterCarts
 import dev.aaronhowser.mods.critter_carts.entity.data.WormColor
 import dev.aaronhowser.mods.critter_carts.item.*
-import net.minecraft.world.item.Item
 import net.neoforged.neoforge.registries.DeferredItem
 import net.neoforged.neoforge.registries.DeferredRegister
 
@@ -22,8 +21,11 @@ object ModItems : AaronItemRegistry() {
 	val WEB_PATHFINDER: DeferredItem<WebPathfinderItem> =
 		register("web_pathfinder", ::WebPathfinderItem, PROPERTIES_SINGLE_STACK)
 
-	val SPIDER_NEST_INTERFACE: DeferredItem<Item> =
-		register("spider_nest_interface", ::Item, PROPERTIES_SINGLE_STACK)
+	val ITEM_FILTER: DeferredItem<ItemFilterItem> =
+		register("item_filter", ::ItemFilterItem, PROPERTIES_SINGLE_STACK)
+
+	val SPIDER_NEST_INTERFACE: DeferredItem<SpiderNestInterfaceItem> =
+		register("spider_nest_interface", ::SpiderNestInterfaceItem, PROPERTIES_SINGLE_STACK)
 
 	val CRITTER_CAGE: DeferredItem<CritterCageItem> =
 		register(
