@@ -24,19 +24,27 @@ class WebSavedData : SavedData() {
 
 	private val nodes: MutableMap<UUID, WebNode> = mutableMapOf()
 	private val lines: MutableMap<UUID, WebLine> = mutableMapOf()
+	private val networks: MutableSet<WebNetwork> = mutableSetOf()
+	private val networksByLineUuid: MutableMap<UUID, WebNetwork> = mutableMapOf()
 
 	private val lineUuidsByChunk: MutableMap<ChunkPos, MutableSet<UUID>> = mutableMapOf()
 	private val chunksToValidate: MutableSet<ChunkPos> = mutableSetOf()
 
 	fun addLine(level: ServerLevel, line: WebLine) {
+		val previousLine = lines[line.uuid]
+		if (previousLine != null) {
+			removeLineFromNetwork(previousLine)
+		}
+
 		nodes[line.firstNode.uuid] = line.firstNode
 		nodes[line.secondNode.uuid] = line.secondNode
 
-		val previousLine = lines.put(line.uuid, line)
+		lines[line.uuid] = line
 		if (previousLine != null) {
 			removeLineReferences(previousLine)
 		}
 
+		addLineToNetwork(line)
 		addToChunkCache(line)
 		setDirty()
 		sendToNearbyPlayers(level, line, AddWebLinesPacket.fromLines(listOf(line)))
@@ -52,6 +60,14 @@ class WebSavedData : SavedData() {
 
 	fun getLine(uuid: UUID): WebLine? {
 		return lines[uuid]
+	}
+
+	fun getNetwork(lineUuid: UUID): WebNetwork? {
+		return networksByLineUuid[lineUuid]
+	}
+
+	fun getNetworks(): Set<WebNetwork> {
+		return networks.toSet()
 	}
 
 	fun removeLine(level: ServerLevel, uuid: UUID): WebLine? {
@@ -154,6 +170,7 @@ class WebSavedData : SavedData() {
 
 	private fun removeStoredLine(level: ServerLevel, line: WebLine) {
 		lines.remove(line.uuid)
+		removeLineFromNetwork(line)
 		removeLineReferences(line)
 		sendToNearbyPlayers(level, line, RemoveWebLinePacket(line.uuid))
 		playBreakSound(level, line)
@@ -164,6 +181,108 @@ class WebSavedData : SavedData() {
 		removeFromChunkCache(line)
 		removeNodeIfOrphaned(line.firstNode.uuid)
 		removeNodeIfOrphaned(line.secondNode.uuid)
+	}
+
+	private fun addLineToNetwork(line: WebLine) {
+		val connectedNetworks: MutableSet<WebNetwork> = mutableSetOf()
+		for (otherLine in lines.values) {
+			if (otherLine.uuid == line.uuid) continue
+			if (!areConnected(line, otherLine)) continue
+
+			val network = networksByLineUuid[otherLine.uuid] ?: continue
+			connectedNetworks.add(network)
+		}
+
+		val network = connectedNetworks.firstOrNull() ?: WebNetwork()
+		if (connectedNetworks.isEmpty()) {
+			networks.add(network)
+		} else {
+			for (connectedNetwork in connectedNetworks) {
+				if (connectedNetwork === network) continue
+
+				for (connectedLine in connectedNetwork.lines) {
+					network.addLine(connectedLine)
+					networksByLineUuid[connectedLine.uuid] = network
+				}
+
+				connectedNetwork.clear()
+				networks.remove(connectedNetwork)
+			}
+		}
+
+		network.addLine(line)
+		networksByLineUuid[line.uuid] = network
+	}
+
+	private fun removeLineFromNetwork(line: WebLine) {
+		val network = networksByLineUuid.remove(line.uuid) ?: return
+		network.removeLine(line)
+
+		if (network.lines.isEmpty()) {
+			networks.remove(network)
+			return
+		}
+
+		rebuildNetworkComponents(network)
+	}
+
+	private fun rebuildNetworkComponents(network: WebNetwork) {
+		val remainingLines = network.lines.toMutableSet()
+		val components: MutableList<Set<WebLine>> = mutableListOf()
+
+		while (remainingLines.isNotEmpty()) {
+			val component: MutableSet<WebLine> = mutableSetOf()
+			val pendingLines: ArrayDeque<WebLine> = ArrayDeque()
+			pendingLines.addLast(remainingLines.first())
+
+			while (pendingLines.isNotEmpty()) {
+				val currentLine = pendingLines.removeFirst()
+				if (!remainingLines.remove(currentLine)) continue
+
+				component.add(currentLine)
+				for (candidate in remainingLines) {
+					if (areConnected(currentLine, candidate)) {
+						pendingLines.addLast(candidate)
+					}
+				}
+			}
+
+			components.add(component)
+		}
+
+		network.clear()
+		assignComponent(network, components.first())
+
+		for (componentIndex in 1 until components.size) {
+			val splitNetwork = WebNetwork()
+			networks.add(splitNetwork)
+			assignComponent(splitNetwork, components[componentIndex])
+		}
+	}
+
+	private fun assignComponent(network: WebNetwork, component: Collection<WebLine>) {
+		network.addLines(component)
+		for (line in component) {
+			networksByLineUuid[line.uuid] = network
+		}
+	}
+
+	private fun areConnected(firstLine: WebLine, secondLine: WebLine): Boolean {
+		if (firstLine.firstNode.uuid == secondLine.firstNode.uuid) return true
+		if (firstLine.firstNode.uuid == secondLine.secondNode.uuid) return true
+		if (firstLine.secondNode.uuid == secondLine.firstNode.uuid) return true
+		if (firstLine.secondNode.uuid == secondLine.secondNode.uuid) return true
+
+		return referencesLine(firstLine, secondLine.uuid)
+			|| referencesLine(secondLine, firstLine.uuid)
+	}
+
+	private fun referencesLine(line: WebLine, referencedLineUuid: UUID): Boolean {
+		val firstLineUuid = (line.firstNode as? LineAnchor)?.lineUuid
+		if (firstLineUuid == referencedLineUuid) return true
+
+		val secondLineUuid = (line.secondNode as? LineAnchor)?.lineUuid
+		return secondLineUuid == referencedLineUuid
 	}
 
 	private fun scheduleDependentLines(level: ServerLevel, removedLineUuid: UUID) {
@@ -298,6 +417,7 @@ class WebSavedData : SavedData() {
 				val secondNode = savedData.nodes[lineData.secondNodeUuid] ?: continue
 				val line = WebLine(lineData.uuid, firstNode, secondNode)
 				savedData.lines[line.uuid] = line
+				savedData.addLineToNetwork(line)
 				savedData.addToChunkCache(line)
 			}
 
