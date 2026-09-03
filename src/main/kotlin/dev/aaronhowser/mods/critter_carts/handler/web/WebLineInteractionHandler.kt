@@ -11,6 +11,7 @@ import dev.aaronhowser.mods.critter_carts.handler.web.node.WebBlockAnchor
 import dev.aaronhowser.mods.critter_carts.handler.web.node.WebLineAnchor
 import dev.aaronhowser.mods.critter_carts.handler.web.node.WebNode
 import dev.aaronhowser.mods.critter_carts.item.component.WebNodeDataComponent
+import dev.aaronhowser.mods.critter_carts.menu.nest_interface.NestInterfaceMenu
 import dev.aaronhowser.mods.critter_carts.packet.server_to_client.ShowWebPathPacket
 import dev.aaronhowser.mods.critter_carts.registry.ModDataComponents
 import dev.aaronhowser.mods.critter_carts.registry.ModItems
@@ -19,7 +20,9 @@ import net.minecraft.core.Direction
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.InteractionHand
+import net.minecraft.world.SimpleMenuProvider
 import net.minecraft.world.entity.player.Player
+import net.minecraft.world.inventory.MenuConstructor
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.ClipContext
 import net.minecraft.world.level.Level
@@ -44,27 +47,39 @@ object WebLineInteractionHandler {
 		hand: InteractionHand
 	) {
 		val itemStack = player.getItemInHand(hand)
-		if (!itemStack.isItem(ModItemTagsProvider.WEB_LINE_INTERACTABLE)) return
+		if (!itemStack.isEmpty && !itemStack.isItem(ModItemTagsProvider.WEB_LINE_INTERACTABLE)) return
 
 		val level = player.serverLevel()
 		val savedData = WebSavedData.get(level)
 		if (targetsNode) {
-			if (!itemStack.isItem(ModItems.WEB_FLUID)
-				&& !itemStack.isItem(ModItems.WEB_PATHFINDER)
-				&& !itemStack.isItem(ModItems.SPIDER_NEST_INTERFACE)
-			) return
-
 			val selectedNode = savedData.getNode(targetUuid) ?: return
 			if (!isTargetingNode(player, selectedNode)) return
 			val positionToleranceSquared =
 				REQUESTED_POSITION_TOLERANCE * REQUESTED_POSITION_TOLERANCE
 			if (selectedNode.position.distanceToSqr(requestedPosition) > positionToleranceSquared) return
 
+			if (itemStack.isEmpty) {
+				val blockAnchor = selectedNode as? WebBlockAnchor ?: return
+				if (!blockAnchor.hasNestInterface) return
+				if (player.isSecondaryUseActive) {
+					val removedStack = savedData.removeNestInterface(level, blockAnchor)
+					if (!player.addItem(removedStack)) player.drop(removedStack, false)
+				} else {
+					openNestInterface(player, blockAnchor)
+				}
+				return
+			}
+
+			if (!itemStack.isItem(ModItems.WEB_FLUID)
+				&& !itemStack.isItem(ModItems.WEB_PATHFINDER)
+				&& !itemStack.isItem(ModItems.SPIDER_NEST_INTERFACE)
+			) return
+
 			if (itemStack.isItem(ModItems.SPIDER_NEST_INTERFACE)) {
 				val blockAnchor = selectedNode as? WebBlockAnchor ?: return
 				if (blockAnchor.hasNestInterface) return
 
-				savedData.installNestInterface(level, blockAnchor)
+				savedData.installNestInterface(level, blockAnchor, itemStack)
 				itemStack.consume(1, player)
 			} else if (itemStack.isItem(ModItems.WEB_PATHFINDER)) {
 				handlePathSelection(level, player, itemStack, selectedNode)
@@ -73,6 +88,8 @@ object WebLineInteractionHandler {
 			}
 			return
 		}
+
+		if (itemStack.isEmpty) return
 
 		val line = savedData.getLine(targetUuid) ?: return
 		val eyePosition = player.eyePosition
@@ -106,6 +123,18 @@ object WebLineInteractionHandler {
 
 			itemStack.isItem(ModItems.WEB_PATHFINDER) ->
 				handlePathSelection(level, player, itemStack, selectedNode)
+		}
+	}
+
+	private fun openNestInterface(player: ServerPlayer, anchor: WebBlockAnchor) {
+		val constructor = MenuConstructor { containerId, inventory, _ ->
+			NestInterfaceMenu(containerId, inventory, anchor)
+		}
+		val provider = SimpleMenuProvider(constructor, anchor.nestInterface.hoverName)
+		player.openMenu(provider) { data ->
+			data.writeBoolean(true)
+			data.writeUUID(anchor.uuid)
+			ItemStack.OPTIONAL_STREAM_CODEC.encode(data, anchor.nestInterface)
 		}
 	}
 

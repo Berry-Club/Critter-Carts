@@ -5,6 +5,7 @@ import dev.aaronhowser.mods.critter_carts.datagen.tag.ModItemTagsProvider
 import dev.aaronhowser.mods.critter_carts.handler.web.TargetedWebNode
 import dev.aaronhowser.mods.critter_carts.handler.web.WebLineInteractionHandler
 import dev.aaronhowser.mods.critter_carts.handler.web.node.WebNode
+import dev.aaronhowser.mods.critter_carts.handler.web.node.WebBlockAnchor
 import dev.aaronhowser.mods.critter_carts.packet.client_to_server.WebLineInteractPacket
 import dev.aaronhowser.mods.critter_carts.registry.ModItems
 import net.minecraft.client.Minecraft
@@ -69,7 +70,9 @@ object ClientWebLines {
 
 	private fun rightClickLine(event: InputEvent.InteractionKeyMappingTriggered) {
 		val player = Minecraft.getInstance().player ?: return
-		val interactionHand = getInteractionHand(player) ?: return
+		val interactionHand = getInteractionHand(player)
+			?: event.hand.takeIf { player.getItemInHand(it).isEmpty }
+			?: return
 
 		val targetedNode = getLookedAtNode(
 			player,
@@ -77,6 +80,11 @@ object ClientWebLines {
 			player.lookAngle,
 			interactionHand
 		) ?: return
+		val heldStack = player.getItemInHand(interactionHand)
+		if (heldStack.isEmpty) {
+			val blockAnchor = targetedNode.node as? WebBlockAnchor ?: return
+			if (!blockAnchor.hasNestInterface || targetedNode.lineUuid != null) return
+		}
 
 		val hand = event.hand
 		if (hand == interactionHand) {
@@ -131,8 +139,10 @@ object ClientWebLines {
 		val snapToExistingNode = itemStack.isItem(ModItems.WEB_FLUID)
 			|| itemStack.isItem(ModItems.WEB_PATHFINDER)
 			|| itemStack.isItem(ModItems.SPIDER_NEST_INTERFACE)
+			|| itemStack.isEmpty
 		val requireExistingNode = itemStack.isItem(ModItems.WEB_PATHFINDER)
 			|| itemStack.isItem(ModItems.SPIDER_NEST_INTERFACE)
+			|| itemStack.isEmpty
 
 		return WebLineInteractionHandler.getTargetedNode(
 			lines.values.toList(),
