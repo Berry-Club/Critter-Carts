@@ -181,11 +181,26 @@ class WebSavedData : SavedData() {
 		line.secondNode.removeLine(line)
 		removeNodeIfOrphaned(line.firstNode.uuid)
 		removeNodeIfOrphaned(line.secondNode.uuid)
+		line.clearAttachedAnchors()
 	}
 
 	private fun addLineReferences(line: WebLine) {
 		line.firstNode.addLine(line)
 		line.secondNode.addLine(line)
+		addAnchorToReferencedLine(line.firstNode)
+		addAnchorToReferencedLine(line.secondNode)
+
+		for (node in nodes.values) {
+			if (node !is LineAnchor || node.lineUuid != line.uuid) continue
+			line.addAttachedAnchor(node)
+		}
+	}
+
+	private fun addAnchorToReferencedLine(node: WebNode) {
+		if (node !is LineAnchor) return
+
+		val referencedLine = lines[node.lineUuid] ?: return
+		referencedLine.addAttachedAnchor(node)
 	}
 
 	private fun addLineToNetwork(line: WebLine) {
@@ -356,6 +371,10 @@ class WebSavedData : SavedData() {
 	private fun removeNodeIfOrphaned(nodeUuid: UUID) {
 		val node = nodes[nodeUuid] ?: return
 		if (node.lines.isNotEmpty()) return
+
+		if (node is LineAnchor) {
+			lines[node.lineUuid]?.removeAttachedAnchor(node.uuid)
+		}
 
 		nodes.remove(nodeUuid)
 	}

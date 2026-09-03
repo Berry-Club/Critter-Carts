@@ -1,6 +1,7 @@
 package dev.aaronhowser.mods.critter_carts.handler.web.line
 
 import dev.aaronhowser.mods.critter_carts.handler.web.WebNetwork
+import dev.aaronhowser.mods.critter_carts.handler.web.node.LineAnchor
 import dev.aaronhowser.mods.critter_carts.handler.web.node.WebNode
 import net.minecraft.core.BlockPos
 import net.minecraft.server.level.ServerLevel
@@ -19,11 +20,32 @@ data class WebLine(
 	var network: WebNetwork? = null
 		internal set
 
+	private val attachmentsByAnchorUuid: MutableMap<UUID, LineAnchorAttachment> = mutableMapOf()
+
+	val attachedAnchors: Collection<LineAnchorAttachment>
+		get() = attachmentsByAnchorUuid.values
+
 	val data = WebLineData(uuid, firstNode.uuid, secondNode.uuid)
 	val intersectedChunkPositions: Set<ChunkPos> = calculateIntersectedChunkPositions()
 
 	val length: Double by lazy {
 		firstNode.position.distanceTo(secondNode.position)
+	}
+
+	internal fun addAttachedAnchor(anchor: LineAnchor) {
+		attachmentsByAnchorUuid[anchor.uuid] = LineAnchorAttachment(
+			anchor,
+			anchor.position.distanceTo(firstNode.position),
+			anchor.position.distanceTo(secondNode.position)
+		)
+	}
+
+	internal fun removeAttachedAnchor(anchorUuid: UUID) {
+		attachmentsByAnchorUuid.remove(anchorUuid)
+	}
+
+	internal fun clearAttachedAnchors() {
+		attachmentsByAnchorUuid.clear()
 	}
 
 	fun isLoaded(level: ServerLevel): Boolean {
