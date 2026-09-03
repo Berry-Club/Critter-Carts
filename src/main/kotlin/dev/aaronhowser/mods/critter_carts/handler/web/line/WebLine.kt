@@ -18,7 +18,6 @@ data class WebLine(
 	val secondNode: WebNode
 ) {
 	var network: WebNetwork? = null
-		set
 
 	private val attachmentsByAnchorUuid: MutableMap<UUID, LineAnchorAttachment> = mutableMapOf()
 

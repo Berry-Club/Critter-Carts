@@ -122,6 +122,7 @@ class NestInterfaceMenu private constructor(
 				val nextIndex = (getComponent().color.ordinal + 1) % colors.size
 				SpiderNestInterfaceItem.setColor(stack, colors[nextIndex])
 			}
+
 			TOGGLE_DIRECTION_BUTTON_ID -> {
 				val direction = getComponent().transferDirection.next()
 				SpiderNestInterfaceItem.setTransferDirection(stack, direction)

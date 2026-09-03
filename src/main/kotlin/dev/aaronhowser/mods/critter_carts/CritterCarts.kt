@@ -2,8 +2,8 @@ package dev.aaronhowser.mods.critter_carts
 
 import dev.aaronhowser.mods.critter_carts.config.ClientConfig
 import dev.aaronhowser.mods.critter_carts.config.ServerConfig
-import dev.aaronhowser.mods.critter_carts.registry.ModRegistries
 import dev.aaronhowser.mods.critter_carts.registry.ModMenuTypes
+import dev.aaronhowser.mods.critter_carts.registry.ModRegistries
 import net.minecraft.resources.ResourceLocation
 import net.neoforged.api.distmarker.Dist
 import net.neoforged.fml.ModContainer

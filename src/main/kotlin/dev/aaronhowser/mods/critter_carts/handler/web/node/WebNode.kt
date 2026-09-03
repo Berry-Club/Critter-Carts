@@ -73,6 +73,7 @@ sealed class WebNode {
 							ByteBufCodecs.VAR_INT.encode(buffer, WebBlockAnchor.TYPE_ID)
 							WebBlockAnchor.STREAM_CODEC.encode(buffer, node)
 						}
+
 						is WebLineAnchor -> {
 							ByteBufCodecs.VAR_INT.encode(buffer, WebLineAnchor.TYPE_ID)
 							WebLineAnchor.STREAM_CODEC.encode(buffer, node)

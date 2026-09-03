@@ -3,9 +3,9 @@ package dev.aaronhowser.mods.critter_carts.registry
 import dev.aaronhowser.mods.aaron.registry.AaronDataComponentRegistry
 import dev.aaronhowser.mods.critter_carts.CritterCarts
 import dev.aaronhowser.mods.critter_carts.entity.data.WormColor
-import dev.aaronhowser.mods.critter_carts.item.component.WebNodeDataComponent
 import dev.aaronhowser.mods.critter_carts.item.component.ItemFilterComponent
 import dev.aaronhowser.mods.critter_carts.item.component.NestInterfaceComponent
+import dev.aaronhowser.mods.critter_carts.item.component.WebNodeDataComponent
 import net.minecraft.core.component.DataComponentType
 import net.minecraft.core.registries.Registries
 import net.minecraft.world.item.component.CustomData
