@@ -3,12 +3,7 @@ package dev.aaronhowser.mods.critter_carts.registry
 import dev.aaronhowser.mods.aaron.registry.AaronItemRegistry
 import dev.aaronhowser.mods.critter_carts.CritterCarts
 import dev.aaronhowser.mods.critter_carts.entity.data.WormColor
-import dev.aaronhowser.mods.critter_carts.item.CritterCageItem
-import dev.aaronhowser.mods.critter_carts.item.DyeberryItem
-import dev.aaronhowser.mods.critter_carts.item.ScoochwormSpawnEggItem
-import dev.aaronhowser.mods.critter_carts.item.StorageAttachmentItem
-import dev.aaronhowser.mods.critter_carts.item.WebFluidItem
-import dev.aaronhowser.mods.critter_carts.item.WebPathfinderItem
+import dev.aaronhowser.mods.critter_carts.item.*
 import net.neoforged.neoforge.registries.DeferredItem
 import net.neoforged.neoforge.registries.DeferredRegister
 

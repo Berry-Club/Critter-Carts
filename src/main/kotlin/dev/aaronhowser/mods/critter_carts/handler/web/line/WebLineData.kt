@@ -5,7 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder
 import io.netty.buffer.ByteBuf
 import net.minecraft.core.UUIDUtil
 import net.minecraft.network.codec.StreamCodec
-import java.util.UUID
+import java.util.*
 
 data class WebLineData(
 	val uuid: UUID,

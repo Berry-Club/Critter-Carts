@@ -2,8 +2,7 @@ package dev.aaronhowser.mods.critter_carts.handler.web.path
 
 import dev.aaronhowser.mods.critter_carts.handler.web.line.WebLine
 import dev.aaronhowser.mods.critter_carts.handler.web.node.WebNode
-import java.util.PriorityQueue
-import java.util.UUID
+import java.util.*
 
 internal class WebPathfinder(
 	private val lines: Set<WebLine>

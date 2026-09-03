@@ -1,11 +1,11 @@
 package dev.aaronhowser.mods.critter_carts.entity
 
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isClientSide
-import dev.aaronhowser.mods.critter_carts.entity.data.ScoochwormSegment
-import dev.aaronhowser.mods.critter_carts.entity.data.WormColor
 import dev.aaronhowser.mods.critter_carts.entity.attachment.ScoochwormAttachment
 import dev.aaronhowser.mods.critter_carts.entity.attachment.data.NoAttachmentData
 import dev.aaronhowser.mods.critter_carts.entity.attachment.data.SyncedAttachmentData
+import dev.aaronhowser.mods.critter_carts.entity.data.ScoochwormSegment
+import dev.aaronhowser.mods.critter_carts.entity.data.WormColor
 import dev.aaronhowser.mods.critter_carts.registry.ModEntityDataSerializers
 import net.minecraft.core.Direction
 import net.minecraft.nbt.CompoundTag

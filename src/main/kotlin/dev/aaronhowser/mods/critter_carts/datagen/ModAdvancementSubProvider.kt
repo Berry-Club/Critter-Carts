@@ -12,21 +12,16 @@ import dev.aaronhowser.mods.critter_carts.registry.ModItems
 import net.minecraft.advancements.Advancement
 import net.minecraft.advancements.AdvancementHolder
 import net.minecraft.advancements.AdvancementType
-import net.minecraft.advancements.critereon.ConsumeItemTrigger
-import net.minecraft.advancements.critereon.EntityPredicate
-import net.minecraft.advancements.critereon.EntityTypePredicate
-import net.minecraft.advancements.critereon.ItemPredicate
-import net.minecraft.advancements.critereon.PlayerInteractTrigger
-import net.minecraft.advancements.critereon.PlayerTrigger
+import net.minecraft.advancements.critereon.*
 import net.minecraft.core.HolderLookup
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.ItemLike
 import net.neoforged.neoforge.common.data.ExistingFileHelper
+import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.function.Consumer
-import java.util.Optional
 
 class ModAdvancementSubProvider(
 	lookupProvider: CompletableFuture<HolderLookup.Provider>
@@ -164,10 +159,12 @@ class ModAdvancementSubProvider(
 	private fun interactedWith(entityType: EntityType<*>) =
 		PlayerInteractTrigger.TriggerInstance.itemUsedOnEntity(
 			ItemPredicate.Builder.item(),
-			Optional.of(EntityPredicate.wrap(
-				EntityPredicate.Builder.entity()
-					.entityType(EntityTypePredicate.of(entityType))
-			))
+			Optional.of(
+				EntityPredicate.wrap(
+					EntityPredicate.Builder.entity()
+						.entityType(EntityTypePredicate.of(entityType))
+				)
+			)
 		)
 
 	private fun consumed(item: ItemLike) =

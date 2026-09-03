@@ -12,7 +12,7 @@ import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.phys.Vec3
 import net.neoforged.neoforge.client.event.InputEvent
-import java.util.UUID
+import java.util.*
 
 object ClientWebLines {
 

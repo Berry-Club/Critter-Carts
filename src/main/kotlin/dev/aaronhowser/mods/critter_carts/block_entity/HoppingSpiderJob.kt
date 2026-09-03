@@ -1,7 +1,7 @@
 package dev.aaronhowser.mods.critter_carts.block_entity
 
 import net.minecraft.nbt.CompoundTag
-import java.util.UUID
+import java.util.*
 
 class HoppingSpiderJob(
 	val homeNodeUuid: UUID,

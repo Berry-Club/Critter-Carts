@@ -10,7 +10,7 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.phys.Vec3
 import net.neoforged.neoforge.capabilities.Capabilities
 import net.neoforged.neoforge.items.IItemHandler
-import java.util.UUID
+import java.util.*
 
 class HoppingSpider(
 	val uuid: UUID = UUID.randomUUID()

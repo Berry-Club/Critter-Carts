@@ -13,7 +13,7 @@ import net.minecraft.network.codec.StreamCodec
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.level.ChunkPos
 import net.minecraft.world.phys.Vec3
-import java.util.UUID
+import java.util.*
 
 data class WebLineAnchor(
 	override val uuid: UUID,
@@ -23,7 +23,7 @@ data class WebLineAnchor(
 
 	override fun isLoaded(level: ServerLevel): Boolean {
 		val chunkPos = ChunkPos(BlockPos.containing(position))
-		return WebNode.isChunkLoaded(level, chunkPos)
+		return isChunkLoaded(level, chunkPos)
 	}
 
 	override fun getInvalidation(

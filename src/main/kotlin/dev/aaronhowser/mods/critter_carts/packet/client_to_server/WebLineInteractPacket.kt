@@ -13,7 +13,7 @@ import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.phys.Vec3
 import net.neoforged.neoforge.network.handling.IPayloadContext
-import java.util.UUID
+import java.util.*
 
 class WebLineInteractPacket(
 	val targetUuid: UUID,

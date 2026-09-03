@@ -1,6 +1,6 @@
 package dev.aaronhowser.mods.critter_carts.block_entity
 
-import java.util.UUID
+import java.util.*
 
 class HoppingSpiderReservations {
 

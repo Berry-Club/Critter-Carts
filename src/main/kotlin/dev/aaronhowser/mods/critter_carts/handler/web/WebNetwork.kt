@@ -4,7 +4,7 @@ import dev.aaronhowser.mods.critter_carts.handler.web.line.WebLine
 import dev.aaronhowser.mods.critter_carts.handler.web.node.WebNode
 import dev.aaronhowser.mods.critter_carts.handler.web.path.WebPath
 import dev.aaronhowser.mods.critter_carts.handler.web.path.WebPathfinder
-import java.util.UUID
+import java.util.*
 
 class WebNetwork(
 	val uuid: UUID = UUID.randomUUID()

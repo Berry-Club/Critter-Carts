@@ -4,7 +4,7 @@ import dev.aaronhowser.mods.critter_carts.handler.web.path.WebPath
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
 import net.minecraft.world.phys.Vec3
-import java.util.UUID
+import java.util.*
 import kotlin.math.ceil
 
 class HoppingSpiderRoute(
