@@ -8,6 +8,7 @@ import dev.aaronhowser.mods.critter_carts.handler.web.line.WebLineData
 import dev.aaronhowser.mods.critter_carts.handler.web.line.WebLineInvalidation
 import dev.aaronhowser.mods.critter_carts.handler.web.line.WebLineInvalidationReason
 import dev.aaronhowser.mods.critter_carts.handler.web.node.LineAnchor
+import dev.aaronhowser.mods.critter_carts.handler.web.node.BlockAnchor
 import dev.aaronhowser.mods.critter_carts.handler.web.node.WebNode
 import dev.aaronhowser.mods.critter_carts.packet.server_to_client.AddWebLinesPacket
 import dev.aaronhowser.mods.critter_carts.packet.server_to_client.RemoveWebLinePacket
@@ -66,6 +67,21 @@ class WebSavedData : SavedData() {
 
 	fun getNetwork(lineUuid: UUID): WebNetwork? {
 		return networksByLineUuid[lineUuid]
+	}
+
+	fun getNetworksAt(blockPos: BlockPos): Set<WebNetwork> {
+		val matchingNetworks: MutableSet<WebNetwork> = mutableSetOf()
+		for (node in nodes.values) {
+			if (node !is BlockAnchor) continue
+			if (node.blockPos != blockPos) continue
+
+			for (line in node.lines) {
+				val network = networksByLineUuid[line.uuid] ?: continue
+				matchingNetworks.add(network)
+			}
+		}
+
+		return matchingNetworks
 	}
 
 	fun removeLine(level: ServerLevel, uuid: UUID): WebLine? {

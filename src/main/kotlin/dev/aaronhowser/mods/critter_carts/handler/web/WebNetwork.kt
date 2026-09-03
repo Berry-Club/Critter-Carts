@@ -39,6 +39,16 @@ class WebNetwork(
 		return pathfinder.findShortestPath(startNode, endNode)
 	}
 
+	fun getNodes(): Set<WebNode> {
+		val nodes: MutableSet<WebNode> = mutableSetOf()
+		for (line in lines) {
+			nodes.add(line.firstNode)
+			nodes.add(line.secondNode)
+		}
+
+		return nodes
+	}
+
 	internal fun clear() {
 		val removedLines = lines.toList()
 		for (line in removedLines) {
