@@ -5,9 +5,11 @@ import dev.aaronhowser.mods.aaron.misc.AaronDsls.withPose
 import dev.aaronhowser.mods.critter_carts.block_entity.HoppingSpider
 import dev.aaronhowser.mods.critter_carts.block_entity.HoppingSpiderNestBlockEntity
 import net.minecraft.client.Minecraft
+import net.minecraft.client.renderer.LevelRenderer
 import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider
+import net.minecraft.core.BlockPos
 import net.minecraft.world.item.ItemDisplayContext
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.phys.AABB
@@ -26,14 +28,16 @@ class HoppingSpiderNestBlockRenderer(
 		packedOverlay: Int
 	) {
 		for (index in blockEntity.hoppingSpiders.indices) {
+			val level = blockEntity.level ?: continue
 			val spider = blockEntity.hoppingSpiders[index]
 			val position = spider.position ?: blockEntity.blockPos.center
 			val displayPosition = position.add(getDisplayOffset(index))
 			val localPosition = displayPosition.subtract(Vec3.atLowerCornerOf(blockEntity.blockPos))
+			val spiderLight = LevelRenderer.getLightColor(level, BlockPos.containing(displayPosition))
 
 			poseStack.withPose {
 				poseStack.translate(localPosition.x, localPosition.y, localPosition.z)
-				renderSpider(spider, poseStack, bufferSource, packedLight, packedOverlay)
+				renderSpider(spider, poseStack, bufferSource, spiderLight, packedOverlay)
 			}
 		}
 	}
