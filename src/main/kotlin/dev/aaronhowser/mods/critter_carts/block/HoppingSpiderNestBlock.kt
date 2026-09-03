@@ -35,22 +35,27 @@ class HoppingSpiderNestBlock(
 		movedByPiston: Boolean
 	) {
 		if (!state.isBlock(newState.block)) {
-			val blockEntity = level.getBlockEntity(pos)
-			if (blockEntity is HoppingSpiderNestBlockEntity) {
-				for (spider in blockEntity.hoppingSpiders) {
-					if (spider.carriedStack.isEmpty) continue
-					Containers.dropItemStack(
-						level,
-						pos.x + 0.5,
-						pos.y + 0.5,
-						pos.z + 0.5,
-						spider.carriedStack
-					)
-				}
-			}
+			dropCarriedItems(level, pos)
 		}
 
 		super.onRemove(state, level, pos, newState, movedByPiston)
+	}
+
+	private fun dropCarriedItems(level: Level, pos: BlockPos) {
+		val nest = level.getBlockEntity(pos)
+		if (nest !is HoppingSpiderNestBlockEntity) return
+
+		for (spider in nest.hoppingSpiders) {
+			if (spider.carriedStack.isEmpty) continue
+
+			Containers.dropItemStack(
+				level,
+				pos.x + 0.5,
+				pos.y + 0.5,
+				pos.z + 0.5,
+				spider.carriedStack
+			)
+		}
 	}
 
 	override fun <T : BlockEntity> getTicker(
