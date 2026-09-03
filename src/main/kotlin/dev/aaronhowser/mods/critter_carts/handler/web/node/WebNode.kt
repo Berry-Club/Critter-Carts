@@ -11,17 +11,30 @@ import net.minecraft.world.level.ChunkPos
 import net.minecraft.world.phys.Vec3
 import java.util.UUID
 
-sealed interface WebNode {
+sealed class WebNode {
 
-	val uuid: UUID
-	val position: Vec3
+	private val _lines: MutableSet<WebLine> = mutableSetOf()
 
-	fun isLoaded(level: ServerLevel): Boolean
-	fun getInvalidation(
+	abstract val uuid: UUID
+	abstract val position: Vec3
+
+	val lines: Set<WebLine>
+		get() = _lines
+
+	abstract fun isLoaded(level: ServerLevel): Boolean
+	abstract fun getInvalidation(
 		level: ServerLevel,
 		lines: Map<UUID, WebLine>,
 		checkedLines: MutableSet<UUID>
 	): WebLineInvalidation?
+
+	internal fun addLine(line: WebLine) {
+		_lines.add(line)
+	}
+
+	internal fun removeLine(line: WebLine) {
+		_lines.remove(line)
+	}
 
 	companion object {
 		fun isChunkLoaded(level: ServerLevel, chunkPos: ChunkPos): Boolean {

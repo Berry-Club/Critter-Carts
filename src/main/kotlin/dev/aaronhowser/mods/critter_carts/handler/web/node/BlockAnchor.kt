@@ -21,7 +21,7 @@ data class BlockAnchor(
 	val blockPos: BlockPos,
 	val face: Direction,
 	override val position: Vec3
-) : WebNode {
+) : WebNode() {
 
 	override fun isLoaded(level: ServerLevel): Boolean {
 		return WebNode.isChunkLoaded(level, ChunkPos(blockPos))

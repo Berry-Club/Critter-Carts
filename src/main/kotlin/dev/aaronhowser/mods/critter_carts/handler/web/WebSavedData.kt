@@ -37,16 +37,14 @@ class WebSavedData : SavedData() {
 		val previousLine = lines[line.uuid]
 		if (previousLine != null) {
 			removeLineFromNetwork(previousLine)
+			removeLineReferences(previousLine)
 		}
 
 		nodes[line.firstNode.uuid] = line.firstNode
 		nodes[line.secondNode.uuid] = line.secondNode
 
 		lines[line.uuid] = line
-		if (previousLine != null) {
-			removeLineReferences(previousLine)
-		}
-
+		addLineReferences(line)
 		addLineToNetwork(line)
 		addToChunkCache(line)
 		setDirty()
@@ -178,8 +176,15 @@ class WebSavedData : SavedData() {
 
 	private fun removeLineReferences(line: WebLine) {
 		removeFromChunkCache(line)
+		line.firstNode.removeLine(line)
+		line.secondNode.removeLine(line)
 		removeNodeIfOrphaned(line.firstNode.uuid)
 		removeNodeIfOrphaned(line.secondNode.uuid)
+	}
+
+	private fun addLineReferences(line: WebLine) {
+		line.firstNode.addLine(line)
+		line.secondNode.addLine(line)
 	}
 
 	private fun addLineToNetwork(line: WebLine) {
@@ -348,9 +353,8 @@ class WebSavedData : SavedData() {
 	}
 
 	private fun removeNodeIfOrphaned(nodeUuid: UUID) {
-		for (line in lines.values) {
-			if (line.firstNode.uuid == nodeUuid || line.secondNode.uuid == nodeUuid) return
-		}
+		val node = nodes[nodeUuid] ?: return
+		if (node.lines.isNotEmpty()) return
 
 		nodes.remove(nodeUuid)
 	}
@@ -416,6 +420,7 @@ class WebSavedData : SavedData() {
 				val secondNode = savedData.nodes[lineData.secondNodeUuid] ?: continue
 				val line = WebLine(lineData.uuid, firstNode, secondNode)
 				savedData.lines[line.uuid] = line
+				savedData.addLineReferences(line)
 				savedData.addLineToNetwork(line)
 				savedData.addToChunkCache(line)
 			}

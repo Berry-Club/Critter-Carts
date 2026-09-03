@@ -30,17 +30,34 @@ object ClientWebLines {
 		for (lineData in newLines) {
 			val firstNode = nodes[lineData.firstNodeUuid] ?: continue
 			val secondNode = nodes[lineData.secondNodeUuid] ?: continue
-			_lines[lineData.uuid] = WebLine(lineData.uuid, firstNode, secondNode)
+			val line = WebLine(lineData.uuid, firstNode, secondNode)
+			val previousLine = _lines.put(line.uuid, line)
+			if (previousLine != null) {
+				detachLine(previousLine)
+			}
+
+			firstNode.addLine(line)
+			secondNode.addLine(line)
 		}
 	}
 
 	fun removeLine(uuid: UUID) {
-		_lines.remove(uuid)
+		val line = _lines.remove(uuid) ?: return
+		detachLine(line)
 	}
 
 	fun clear() {
+		for (line in _lines.values) {
+			detachLine(line)
+		}
+
 		_lines.clear()
 		nodes.clear()
+	}
+
+	private fun detachLine(line: WebLine) {
+		line.firstNode.removeLine(line)
+		line.secondNode.removeLine(line)
 	}
 
 	fun handleInteractionEvent(event: InputEvent.InteractionKeyMappingTriggered) {

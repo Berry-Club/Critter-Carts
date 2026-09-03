@@ -15,6 +15,8 @@ data class WebLine(
 	val firstNode: WebNode,
 	val secondNode: WebNode
 ) {
+	var network: WebNetwork? = null
+		internal set
 
 	val data = WebLineData(uuid, firstNode.uuid, secondNode.uuid)
 	val intersectedChunkPositions: Set<ChunkPos> = calculateIntersectedChunkPositions()

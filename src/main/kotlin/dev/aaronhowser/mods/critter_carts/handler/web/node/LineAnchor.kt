@@ -19,7 +19,7 @@ data class LineAnchor(
 	override val uuid: UUID,
 	val lineUuid: UUID,
 	override val position: Vec3
-) : WebNode {
+) : WebNode() {
 
 	override fun isLoaded(level: ServerLevel): Boolean {
 		val chunkPos = ChunkPos(BlockPos.containing(position))

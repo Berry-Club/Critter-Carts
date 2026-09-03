@@ -12,18 +12,27 @@ class WebNetwork(
 		get() = _lines
 
 	internal fun addLine(line: WebLine) {
-		_lines.add(line)
+		if (_lines.add(line)) {
+			line.network = this
+		}
 	}
 
 	internal fun addLines(lines: Collection<WebLine>) {
-		_lines.addAll(lines)
+		for (line in lines) {
+			addLine(line)
+		}
 	}
 
 	internal fun removeLine(line: WebLine) {
-		_lines.remove(line)
+		if (_lines.remove(line) && line.network === this) {
+			line.network = null
+		}
 	}
 
 	internal fun clear() {
-		_lines.clear()
+		val removedLines = _lines.toList()
+		for (line in removedLines) {
+			removeLine(line)
+		}
 	}
 }
