@@ -264,3 +264,9 @@ tasks.named('processResources') {
 		into 'assets/oracle_index/books'
 	}
 }
+
+compileKotlin {
+	compilerOptions {
+		freeCompilerArgs.set(["-Xexplicit-backing-fields"])
+	}
+}

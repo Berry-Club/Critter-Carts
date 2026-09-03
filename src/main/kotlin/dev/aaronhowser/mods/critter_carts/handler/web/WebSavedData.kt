@@ -68,10 +68,6 @@ class WebSavedData : SavedData() {
 		return networksByLineUuid[lineUuid]
 	}
 
-	fun getNetworks(): Set<WebNetwork> {
-		return networks.toSet()
-	}
-
 	fun removeLine(level: ServerLevel, uuid: UUID): WebLine? {
 		val removedLine = lines[uuid] ?: return null
 		removeStoredLine(level, removedLine)

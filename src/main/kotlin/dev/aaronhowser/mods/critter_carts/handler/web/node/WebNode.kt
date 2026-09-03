@@ -9,17 +9,15 @@ import net.minecraft.network.codec.StreamCodec
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.level.ChunkPos
 import net.minecraft.world.phys.Vec3
-import java.util.UUID
+import java.util.*
 
 sealed class WebNode {
-
-	private val mutableLines: MutableSet<WebLine> = mutableSetOf()
 
 	abstract val uuid: UUID
 	abstract val position: Vec3
 
 	val lines: Set<WebLine>
-		get() = mutableLines
+		field = mutableSetOf()
 
 	abstract fun isLoaded(level: ServerLevel): Boolean
 	abstract fun getInvalidation(
@@ -29,11 +27,11 @@ sealed class WebNode {
 	): WebLineInvalidation?
 
 	internal fun addLine(line: WebLine) {
-		mutableLines.add(line)
+		lines.add(line)
 	}
 
 	internal fun removeLine(line: WebLine) {
-		mutableLines.remove(line)
+		lines.remove(line)
 	}
 
 	companion object {
