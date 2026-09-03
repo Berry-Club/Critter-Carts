@@ -2,6 +2,8 @@ package dev.aaronhowser.mods.critter_carts.handler.web
 
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isItem
 import dev.aaronhowser.mods.critter_carts.datagen.tag.ModItemTagsProvider
+import dev.aaronhowser.mods.critter_carts.handler.web.line.WebLine
+import dev.aaronhowser.mods.critter_carts.handler.web.line.WebLineData
 import dev.aaronhowser.mods.critter_carts.handler.web.node.WebNode
 import dev.aaronhowser.mods.critter_carts.packet.client_to_server.WebLineInteractPacket
 import dev.aaronhowser.mods.critter_carts.registry.ModItems

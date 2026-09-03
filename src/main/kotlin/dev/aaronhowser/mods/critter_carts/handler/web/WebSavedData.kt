@@ -3,6 +3,10 @@ package dev.aaronhowser.mods.critter_carts.handler.web
 import com.mojang.serialization.DynamicOps
 import dev.aaronhowser.mods.aaron.packet.AaronPacket
 import dev.aaronhowser.mods.aaron.scheduler.SchedulerExtensions.scheduleTaskInTicks
+import dev.aaronhowser.mods.critter_carts.handler.web.line.WebLine
+import dev.aaronhowser.mods.critter_carts.handler.web.line.WebLineData
+import dev.aaronhowser.mods.critter_carts.handler.web.line.WebLineInvalidation
+import dev.aaronhowser.mods.critter_carts.handler.web.line.WebLineInvalidationReason
 import dev.aaronhowser.mods.critter_carts.handler.web.node.LineAnchor
 import dev.aaronhowser.mods.critter_carts.handler.web.node.WebNode
 import dev.aaronhowser.mods.critter_carts.packet.server_to_client.AddWebLinesPacket

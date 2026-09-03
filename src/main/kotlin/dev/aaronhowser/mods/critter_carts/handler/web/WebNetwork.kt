@@ -1,5 +1,6 @@
 package dev.aaronhowser.mods.critter_carts.handler.web
 
+import dev.aaronhowser.mods.critter_carts.handler.web.line.WebLine
 import java.util.UUID
 
 class WebNetwork(

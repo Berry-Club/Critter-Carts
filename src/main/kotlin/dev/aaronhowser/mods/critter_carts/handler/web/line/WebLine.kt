@@ -1,5 +1,6 @@
-package dev.aaronhowser.mods.critter_carts.handler.web
+package dev.aaronhowser.mods.critter_carts.handler.web.line
 
+import dev.aaronhowser.mods.critter_carts.handler.web.WebNetwork
 import dev.aaronhowser.mods.critter_carts.handler.web.node.WebNode
 import net.minecraft.core.BlockPos
 import net.minecraft.server.level.ServerLevel

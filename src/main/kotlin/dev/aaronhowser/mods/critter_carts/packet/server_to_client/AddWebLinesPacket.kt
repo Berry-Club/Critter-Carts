@@ -3,8 +3,8 @@ package dev.aaronhowser.mods.critter_carts.packet.server_to_client
 import dev.aaronhowser.mods.aaron.packet.AaronPacket
 import dev.aaronhowser.mods.critter_carts.CritterCarts
 import dev.aaronhowser.mods.critter_carts.handler.web.ClientWebLines
-import dev.aaronhowser.mods.critter_carts.handler.web.WebLine
-import dev.aaronhowser.mods.critter_carts.handler.web.WebLineData
+import dev.aaronhowser.mods.critter_carts.handler.web.line.WebLine
+import dev.aaronhowser.mods.critter_carts.handler.web.line.WebLineData
 import dev.aaronhowser.mods.critter_carts.handler.web.node.WebNode
 import io.netty.buffer.ByteBuf
 import net.minecraft.network.codec.ByteBufCodecs

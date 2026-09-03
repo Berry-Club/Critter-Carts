@@ -3,9 +3,9 @@ package dev.aaronhowser.mods.critter_carts.handler.web.node
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import dev.aaronhowser.mods.aaron.serialization.AaronExtraStreamCodecs
-import dev.aaronhowser.mods.critter_carts.handler.web.WebLine
-import dev.aaronhowser.mods.critter_carts.handler.web.WebLineInvalidation
-import dev.aaronhowser.mods.critter_carts.handler.web.WebLineInvalidationReason
+import dev.aaronhowser.mods.critter_carts.handler.web.line.WebLine
+import dev.aaronhowser.mods.critter_carts.handler.web.line.WebLineInvalidation
+import dev.aaronhowser.mods.critter_carts.handler.web.line.WebLineInvalidationReason
 import io.netty.buffer.ByteBuf
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction

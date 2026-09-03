@@ -1,8 +1,8 @@
 package dev.aaronhowser.mods.critter_carts.handler.web.node
 
 import com.mojang.serialization.Codec
-import dev.aaronhowser.mods.critter_carts.handler.web.WebLine
-import dev.aaronhowser.mods.critter_carts.handler.web.WebLineInvalidation
+import dev.aaronhowser.mods.critter_carts.handler.web.line.WebLine
+import dev.aaronhowser.mods.critter_carts.handler.web.line.WebLineInvalidation
 import io.netty.buffer.ByteBuf
 import net.minecraft.network.codec.ByteBufCodecs
 import net.minecraft.network.codec.StreamCodec

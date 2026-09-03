@@ -1,4 +1,4 @@
-package dev.aaronhowser.mods.critter_carts.handler.web
+package dev.aaronhowser.mods.critter_carts.handler.web.line
 
 data class WebLineInvalidation(
 	val reason: WebLineInvalidationReason,
