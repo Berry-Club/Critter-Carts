@@ -2,7 +2,7 @@ package dev.aaronhowser.mods.critter_carts.block
 
 import com.mojang.serialization.MapCodec
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isBlock
-import dev.aaronhowser.mods.critter_carts.block_entity.HoppingSpiderNestBlockEntity
+import dev.aaronhowser.mods.critter_carts.handler.web.spider.HoppingSpiderNestBlockEntity
 import dev.aaronhowser.mods.critter_carts.registry.ModBlockEntityTypes
 import net.minecraft.core.BlockPos
 import net.minecraft.world.Containers

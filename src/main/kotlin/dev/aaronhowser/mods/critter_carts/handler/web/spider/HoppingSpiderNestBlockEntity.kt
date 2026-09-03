@@ -1,4 +1,4 @@
-package dev.aaronhowser.mods.critter_carts.block_entity
+package dev.aaronhowser.mods.critter_carts.handler.web.spider
 
 import dev.aaronhowser.mods.aaron.block_entity.SyncingBlockEntity
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isTrue

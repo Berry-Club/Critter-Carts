@@ -2,8 +2,8 @@ package dev.aaronhowser.mods.critter_carts.client.render.block_entity
 
 import com.mojang.blaze3d.vertex.PoseStack
 import dev.aaronhowser.mods.aaron.misc.AaronDsls.withPose
-import dev.aaronhowser.mods.critter_carts.block_entity.HoppingSpider
-import dev.aaronhowser.mods.critter_carts.block_entity.HoppingSpiderNestBlockEntity
+import dev.aaronhowser.mods.critter_carts.handler.web.spider.HoppingSpider
+import dev.aaronhowser.mods.critter_carts.handler.web.spider.HoppingSpiderNestBlockEntity
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.LevelRenderer
 import net.minecraft.client.renderer.MultiBufferSource
