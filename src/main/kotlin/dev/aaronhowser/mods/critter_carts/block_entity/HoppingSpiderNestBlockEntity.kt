@@ -12,88 +12,173 @@ import net.minecraft.nbt.ListTag
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.state.BlockState
 import net.neoforged.neoforge.capabilities.Capabilities
 import net.neoforged.neoforge.items.IItemHandler
-import java.util.UUID
 
 class HoppingSpiderNestBlockEntity(
 	pos: BlockPos,
 	state: BlockState
 ) : SyncingBlockEntity(ModBlockEntityTypes.HOPPING_SPIDER_NEST.get(), pos, state) {
 
-	override val syncImmediately: Boolean = true
+	override val syncImmediately: Boolean = false
 
 	val hoppingSpiders: MutableList<HoppingSpider> = MutableList(STARTING_SPIDER_COUNT) {
 		HoppingSpider()
 	}
 
-	private fun tick(level: ServerLevel) {
-		assignJobs(level)
+	private fun serverTick(level: ServerLevel) {
+		var shouldSync = assignJobs(level)
 
 		for (spider in hoppingSpiders) {
-			spider.tick(level, blockPos.center, ::setChanged)
+			if (spider.serverTick(level, blockPos.center)) {
+				shouldSync = true
+			}
+		}
+
+		if (shouldSync || hasActiveSpiders()) {
+			setChanged()
+		}
+
+		if (shouldSync) {
+			level.sendBlockUpdated(blockPos, blockState, blockState, Block.UPDATE_CLIENTS)
 		}
 	}
 
-	private fun assignJobs(level: ServerLevel) {
-		val reservedSources: MutableSet<Pair<UUID, Int>> = mutableSetOf()
-		val reservedDestinations: MutableSet<UUID> = mutableSetOf()
+	private fun hasActiveSpiders(): Boolean {
 		for (spider in hoppingSpiders) {
-			val job = spider.job ?: continue
-			reservedSources.add(job.sourceNodeUuid to job.sourceSlot)
-			reservedDestinations.add(job.destinationNodeUuid)
+			if (spider.job != null) return true
 		}
+
+		return false
+	}
+
+	private fun assignJobs(level: ServerLevel): Boolean {
+		val reservations = getReservations()
+		var assignedJob = false
 
 		for (spider in hoppingSpiders) {
 			if (spider.job != null) continue
 
-			val job = findJob(level, reservedSources, reservedDestinations) ?: return
-			spider.job = job
-			spider.position = WebSavedData.get(level).getNode(job.homeNodeUuid)?.position
-			reservedSources.add(job.sourceNodeUuid to job.sourceSlot)
-			reservedDestinations.add(job.destinationNodeUuid)
-			setChanged()
+			val job = findJob(level, reservations) ?: break
+			assignJob(level, spider, job)
+			reservations.reserve(job)
+			assignedJob = true
 		}
+
+		return assignedJob
 	}
 
-	private fun findJob(
-		level: ServerLevel,
-		reservedSources: Set<Pair<UUID, Int>>,
-		reservedDestinations: Set<UUID>
-	): HoppingSpiderJob? {
+	private fun getReservations(): HoppingSpiderReservations {
+		val reservations = HoppingSpiderReservations()
+		for (spider in hoppingSpiders) {
+			val job = spider.job ?: continue
+			reservations.reserve(job)
+		}
+
+		return reservations
+	}
+
+	private fun assignJob(level: ServerLevel, spider: HoppingSpider, job: HoppingSpiderJob) {
+		spider.job = job
+		spider.position = WebSavedData.get(level).getNode(job.homeNodeUuid)?.position
+	}
+
+	private fun findJob(level: ServerLevel, reservations: HoppingSpiderReservations): HoppingSpiderJob? {
 		val savedData = WebSavedData.get(level)
 		for (network in savedData.getNetworksAt(blockPos)) {
-			val nestNodes = getAnchors(network, blockPos)
-			val inventoryNodes = getInventoryAnchors(level, network)
-
-			for (sourceNode in inventoryNodes) {
-				val sourceHandler = getItemHandler(level, sourceNode) ?: continue
-				for (sourceSlot in 0 until sourceHandler.slots) {
-					if (sourceNode.uuid to sourceSlot in reservedSources) continue
-
-					val stack = sourceHandler.extractItem(sourceSlot, MAX_TRANSFER_SIZE, true)
-					if (stack.isEmpty) continue
-
-					for (destinationNode in inventoryNodes) {
-						if (destinationNode.blockPos == sourceNode.blockPos) continue
-						if (destinationNode.uuid in reservedDestinations) continue
-						if (!canFullyInsert(level, destinationNode, stack)) continue
-
-						val homeNode = findHomeNode(network, nestNodes, sourceNode, destinationNode)
-							?: continue
-						return HoppingSpiderJob(
-							homeNode.uuid,
-							sourceNode.uuid,
-							destinationNode.uuid,
-							sourceSlot
-						)
-					}
-				}
-			}
+			val job = findJobInNetwork(level, network, reservations)
+			if (job != null) return job
 		}
 
 		return null
+	}
+
+	private fun findJobInNetwork(
+		level: ServerLevel,
+		network: WebNetwork,
+		reservations: HoppingSpiderReservations
+	): HoppingSpiderJob? {
+		val nestNodes = getAnchors(network, blockPos)
+		val inventoryNodes = getInventoryAnchors(level, network)
+
+		for (sourceNode in inventoryNodes) {
+			val job = findJobFromSource(
+				level,
+				network,
+				nestNodes,
+				inventoryNodes,
+				sourceNode,
+				reservations
+			)
+			if (job != null) return job
+		}
+
+		return null
+	}
+
+	private fun findJobFromSource(
+		level: ServerLevel,
+		network: WebNetwork,
+		nestNodes: List<BlockAnchor>,
+		inventoryNodes: List<BlockAnchor>,
+		sourceNode: BlockAnchor,
+		reservations: HoppingSpiderReservations
+	): HoppingSpiderJob? {
+		val sourceHandler = getItemHandler(level, sourceNode) ?: return null
+		for (sourceSlot in 0 until sourceHandler.slots) {
+			if (reservations.isSourceReserved(sourceNode.uuid, sourceSlot)) continue
+
+			val stack = sourceHandler.extractItem(sourceSlot, MAX_TRANSFER_SIZE, true)
+			if (stack.isEmpty) continue
+
+			val job = findDestinationJob(
+				level,
+				network,
+				nestNodes,
+				inventoryNodes,
+				sourceNode,
+				sourceSlot,
+				stack,
+				reservations
+			)
+			if (job != null) return job
+		}
+
+		return null
+	}
+
+	private fun findDestinationJob(
+		level: ServerLevel,
+		network: WebNetwork,
+		nestNodes: List<BlockAnchor>,
+		inventoryNodes: List<BlockAnchor>,
+		sourceNode: BlockAnchor,
+		sourceSlot: Int,
+		stack: ItemStack,
+		reservations: HoppingSpiderReservations
+	): HoppingSpiderJob? {
+		for (destinationNode in inventoryNodes) {
+			if (isSameFace(sourceNode, destinationNode)) continue
+			if (reservations.isDestinationReserved(destinationNode.uuid)) continue
+			if (!canFullyInsert(level, destinationNode, stack)) continue
+
+			val homeNode = findHomeNode(network, nestNodes, sourceNode, destinationNode)
+				?: continue
+			return HoppingSpiderJob(
+				homeNode.uuid,
+				sourceNode.uuid,
+				destinationNode.uuid,
+				sourceSlot
+			)
+		}
+
+		return null
+	}
+
+	private fun isSameFace(first: BlockAnchor, second: BlockAnchor): Boolean {
+		return first.blockPos == second.blockPos && first.face == second.face
 	}
 
 	private fun findHomeNode(
@@ -151,17 +236,25 @@ class HoppingSpiderNestBlockEntity(
 
 	override fun saveAdditional(tag: CompoundTag, registries: HolderLookup.Provider) {
 		super.saveAdditional(tag, registries)
+		tag.put(SPIDERS_TAG, saveSpiders(registries))
+	}
+
+	private fun saveSpiders(registries: HolderLookup.Provider): ListTag {
 		val spidersTag = ListTag()
 		for (spider in hoppingSpiders) {
 			spidersTag.add(spider.save(registries))
 		}
-		tag.put(SPIDERS_TAG, spidersTag)
+
+		return spidersTag
 	}
 
 	override fun loadAdditional(tag: CompoundTag, registries: HolderLookup.Provider) {
 		super.loadAdditional(tag, registries)
 		hoppingSpiders.clear()
-		val spidersTag = tag.getList(SPIDERS_TAG, CompoundTag.TAG_COMPOUND.toInt())
+		loadSpiders(tag.getList(SPIDERS_TAG, CompoundTag.TAG_COMPOUND.toInt()), registries)
+	}
+
+	private fun loadSpiders(spidersTag: ListTag, registries: HolderLookup.Provider) {
 		for (index in spidersTag.indices) {
 			hoppingSpiders.add(HoppingSpider.load(spidersTag.getCompound(index), registries))
 		}
@@ -174,7 +267,7 @@ class HoppingSpiderNestBlockEntity(
 
 		fun serverTick(level: Level, pos: BlockPos, state: BlockState, blockEntity: HoppingSpiderNestBlockEntity) {
 			if (level is ServerLevel) {
-				blockEntity.tick(level)
+				blockEntity.serverTick(level)
 			}
 		}
 	}
