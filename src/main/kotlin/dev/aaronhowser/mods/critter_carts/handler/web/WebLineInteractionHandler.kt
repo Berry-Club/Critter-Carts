@@ -47,7 +47,6 @@ object WebLineInteractionHandler {
 		hand: InteractionHand
 	) {
 		val itemStack = player.getItemInHand(hand)
-		if (!itemStack.isEmpty && !itemStack.isItem(ModItemTagsProvider.WEB_LINE_INTERACTABLE)) return
 
 		val level = player.serverLevel()
 		val savedData = WebSavedData.get(level)
@@ -58,17 +57,17 @@ object WebLineInteractionHandler {
 				REQUESTED_POSITION_TOLERANCE * REQUESTED_POSITION_TOLERANCE
 			if (selectedNode.position.distanceToSqr(requestedPosition) > positionToleranceSquared) return
 
-			if (itemStack.isEmpty) {
-				val blockAnchor = selectedNode as? WebBlockAnchor ?: return
-				if (!blockAnchor.hasNestInterface) return
-				if (player.isSecondaryUseActive) {
+			val blockAnchor = selectedNode as? WebBlockAnchor
+			if (blockAnchor?.hasNestInterface == true) {
+				if (itemStack.isEmpty && player.isSecondaryUseActive) {
 					val removedStack = savedData.removeNestInterface(level, blockAnchor)
-					if (!player.addItem(removedStack)) player.drop(removedStack, false)
+					player.drop(removedStack, false)
 				} else {
 					openNestInterface(player, blockAnchor)
 				}
 				return
 			}
+			if (!itemStack.isItem(ModItemTagsProvider.WEB_LINE_INTERACTABLE)) return
 
 			if (!itemStack.isItem(ModItems.WEB_FLUID)
 				&& !itemStack.isItem(ModItems.WEB_PATHFINDER)
@@ -89,7 +88,7 @@ object WebLineInteractionHandler {
 			return
 		}
 
-		if (itemStack.isEmpty) return
+		if (!itemStack.isItem(ModItemTagsProvider.WEB_LINE_INTERACTABLE)) return
 
 		val line = savedData.getLine(targetUuid) ?: return
 		val eyePosition = player.eyePosition

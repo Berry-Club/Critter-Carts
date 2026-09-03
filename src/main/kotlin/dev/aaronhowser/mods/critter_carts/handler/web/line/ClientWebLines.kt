@@ -71,8 +71,7 @@ object ClientWebLines {
 	private fun rightClickLine(event: InputEvent.InteractionKeyMappingTriggered) {
 		val player = Minecraft.getInstance().player ?: return
 		val interactionHand = getInteractionHand(player)
-			?: event.hand.takeIf { player.getItemInHand(it).isEmpty }
-			?: return
+			?: event.hand
 
 		val targetedNode = getLookedAtNode(
 			player,
@@ -81,7 +80,7 @@ object ClientWebLines {
 			interactionHand
 		) ?: return
 		val heldStack = player.getItemInHand(interactionHand)
-		if (heldStack.isEmpty) {
+		if (!heldStack.isItem(ModItemTagsProvider.WEB_LINE_INTERACTABLE)) {
 			val blockAnchor = targetedNode.node as? WebBlockAnchor ?: return
 			if (!blockAnchor.hasNestInterface || targetedNode.lineUuid != null) return
 		}
@@ -136,13 +135,23 @@ object ClientWebLines {
 		val lookOffset = viewVector.scale(interactionRange)
 		val lookEnd = eyePosition.add(lookOffset)
 		val itemStack = player.getItemInHand(interactionHand)
+		val installedInterface = WebLineInteractionHandler.getTargetedNode(
+			lines.values.toList(),
+			eyePosition,
+			lookEnd,
+			true,
+			true
+		)
+		val interfaceAnchor = installedInterface?.node as? WebBlockAnchor
+		if (interfaceAnchor?.hasNestInterface == true) return installedInterface
+
 		val snapToExistingNode = itemStack.isItem(ModItems.WEB_FLUID)
 			|| itemStack.isItem(ModItems.WEB_PATHFINDER)
 			|| itemStack.isItem(ModItems.SPIDER_NEST_INTERFACE)
-			|| itemStack.isEmpty
+			|| !itemStack.isItem(ModItemTagsProvider.WEB_LINE_INTERACTABLE)
 		val requireExistingNode = itemStack.isItem(ModItems.WEB_PATHFINDER)
 			|| itemStack.isItem(ModItems.SPIDER_NEST_INTERFACE)
-			|| itemStack.isEmpty
+			|| !itemStack.isItem(ModItemTagsProvider.WEB_LINE_INTERACTABLE)
 
 		return WebLineInteractionHandler.getTargetedNode(
 			lines.values.toList(),
