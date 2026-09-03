@@ -1,10 +1,14 @@
-package dev.aaronhowser.mods.critter_carts.handler.web.spider
+package dev.aaronhowser.mods.critter_carts.block_entity
 
 import dev.aaronhowser.mods.aaron.block_entity.SyncingBlockEntity
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isTrue
 import dev.aaronhowser.mods.critter_carts.handler.web.WebNetwork
 import dev.aaronhowser.mods.critter_carts.handler.web.WebSavedData
 import dev.aaronhowser.mods.critter_carts.handler.web.node.WebBlockAnchor
+import dev.aaronhowser.mods.critter_carts.handler.web.spider.HoppingSpider
+import dev.aaronhowser.mods.critter_carts.handler.web.spider.HoppingSpiderJob
+import dev.aaronhowser.mods.critter_carts.handler.web.spider.HoppingSpiderJobCandidate
+import dev.aaronhowser.mods.critter_carts.handler.web.spider.HoppingSpiderReservations
 import dev.aaronhowser.mods.critter_carts.item.ItemFilterItem
 import dev.aaronhowser.mods.critter_carts.item.SpiderNestInterfaceItem
 import dev.aaronhowser.mods.critter_carts.item.component.NestInterfaceComponent
