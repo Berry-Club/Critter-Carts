@@ -27,10 +27,10 @@ class HoppingSpiderNestBlockRenderer(
 		packedLight: Int,
 		packedOverlay: Int
 	) {
+		val level = blockEntity.level ?: return
 		for (index in blockEntity.hoppingSpiders.indices) {
-			val level = blockEntity.level ?: continue
 			val spider = blockEntity.hoppingSpiders[index]
-			val position = spider.position ?: blockEntity.blockPos.center
+			val position = getPosition(blockEntity, spider, level.gameTime, partialTick)
 			val displayPosition = position.add(getDisplayOffset(index))
 			val localPosition = displayPosition.subtract(Vec3.atLowerCornerOf(blockEntity.blockPos))
 			val spiderLight = LevelRenderer.getLightColor(level, BlockPos.containing(displayPosition))
@@ -40,6 +40,16 @@ class HoppingSpiderNestBlockRenderer(
 				renderSpider(spider, poseStack, bufferSource, spiderLight, packedOverlay)
 			}
 		}
+	}
+
+	private fun getPosition(
+		blockEntity: HoppingSpiderNestBlockEntity,
+		spider: HoppingSpider,
+		gameTime: Long,
+		partialTick: Float
+	): Vec3 {
+		return spider.getRenderPosition(gameTime, partialTick)
+			?: blockEntity.blockPos.center
 	}
 
 	private fun renderSpider(
@@ -73,7 +83,7 @@ class HoppingSpiderNestBlockRenderer(
 				packedOverlay,
 				poseStack,
 				bufferSource,
-				blockEntityLevel,
+				Minecraft.getInstance().level,
 				0
 			)
 		}
@@ -88,9 +98,6 @@ class HoppingSpiderNestBlockRenderer(
 	override fun getRenderBoundingBox(blockEntity: HoppingSpiderNestBlockEntity): AABB {
 		return AABB.INFINITE
 	}
-
-	private val blockEntityLevel
-		get() = Minecraft.getInstance().level
 
 	companion object {
 		private const val SPIDER_SCALE = 0.12f
