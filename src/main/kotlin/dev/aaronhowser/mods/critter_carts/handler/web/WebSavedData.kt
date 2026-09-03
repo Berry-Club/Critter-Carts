@@ -88,6 +88,15 @@ class WebSavedData : SavedData() {
 		return networksByLineUuid[lineUuid]
 	}
 
+	fun installNestInterface(level: ServerLevel, anchor: WebBlockAnchor) {
+		anchor.hasNestInterface = true
+		setDirty()
+		val packet = AddWebLinesPacket.fromLines(anchor.lines)
+		for (line in anchor.lines) {
+			sendToNearbyPlayers(level, line, packet)
+		}
+	}
+
 	fun getNetworksAt(blockPos: BlockPos): Set<WebNetwork> {
 		val matchingNetworks: MutableSet<WebNetwork> = mutableSetOf()
 		for (node in nodes.values) {

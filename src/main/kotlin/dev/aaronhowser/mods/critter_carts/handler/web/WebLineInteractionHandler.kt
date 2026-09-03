@@ -51,6 +51,7 @@ object WebLineInteractionHandler {
 		if (targetsNode) {
 			if (!itemStack.isItem(ModItems.WEB_FLUID)
 				&& !itemStack.isItem(ModItems.WEB_PATHFINDER)
+				&& !itemStack.isItem(ModItems.SPIDER_NEST_INTERFACE)
 			) return
 
 			val selectedNode = savedData.getNode(targetUuid) ?: return
@@ -59,7 +60,13 @@ object WebLineInteractionHandler {
 				REQUESTED_POSITION_TOLERANCE * REQUESTED_POSITION_TOLERANCE
 			if (selectedNode.position.distanceToSqr(requestedPosition) > positionToleranceSquared) return
 
-			if (itemStack.isItem(ModItems.WEB_PATHFINDER)) {
+			if (itemStack.isItem(ModItems.SPIDER_NEST_INTERFACE)) {
+				val blockAnchor = selectedNode as? WebBlockAnchor ?: return
+				if (blockAnchor.hasNestInterface) return
+
+				savedData.installNestInterface(level, blockAnchor)
+				itemStack.consume(1, player)
+			} else if (itemStack.isItem(ModItems.WEB_PATHFINDER)) {
 				handlePathSelection(level, player, itemStack, selectedNode)
 			} else {
 				handleNodeSelection(level, player, itemStack, selectedNode)
@@ -74,7 +81,9 @@ object WebLineInteractionHandler {
 		val lookEnd = eyePosition.add(lookOffset)
 		val snapToExistingNode = itemStack.isItem(ModItems.WEB_FLUID)
 			|| itemStack.isItem(ModItems.WEB_PATHFINDER)
+			|| itemStack.isItem(ModItems.SPIDER_NEST_INTERFACE)
 		val requireExistingNode = itemStack.isItem(ModItems.WEB_PATHFINDER)
+			|| itemStack.isItem(ModItems.SPIDER_NEST_INTERFACE)
 		val targetedNode = getTargetedNode(
 			listOf(line),
 			eyePosition,

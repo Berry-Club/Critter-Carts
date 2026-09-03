@@ -201,6 +201,7 @@ class HoppingSpiderNestBlockEntity(
 		val anchors: MutableList<WebBlockAnchor> = mutableListOf()
 		for (node in network.getNodes()) {
 			if (node !is WebBlockAnchor || node.blockPos == blockPos) continue
+			if (!node.hasNestInterface) continue
 			if (getItemHandler(level, node) == null) continue
 			anchors.add(node)
 		}

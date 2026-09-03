@@ -1,5 +1,6 @@
 package dev.aaronhowser.mods.critter_carts.handler.web.node
 
+import com.mojang.serialization.Codec
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import dev.aaronhowser.mods.aaron.serialization.AaronExtraStreamCodecs
@@ -10,17 +11,19 @@ import io.netty.buffer.ByteBuf
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.core.UUIDUtil
+import net.minecraft.network.codec.ByteBufCodecs
 import net.minecraft.network.codec.StreamCodec
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.level.ChunkPos
 import net.minecraft.world.phys.Vec3
 import java.util.*
 
-data class WebBlockAnchor(
+class WebBlockAnchor(
 	override val uuid: UUID,
 	val blockPos: BlockPos,
 	val face: Direction,
-	override val position: Vec3
+	override val position: Vec3,
+	var hasNestInterface: Boolean = false
 ) : WebNode() {
 
 	override fun isLoaded(level: ServerLevel): Boolean {
@@ -55,7 +58,10 @@ data class WebBlockAnchor(
 						.forGetter(WebBlockAnchor::face),
 					Vec3.CODEC
 						.fieldOf("position")
-						.forGetter(WebBlockAnchor::position)
+						.forGetter(WebBlockAnchor::position),
+					Codec.BOOL
+						.optionalFieldOf("has_nest_interface", false)
+						.forGetter(WebBlockAnchor::hasNestInterface)
 				).apply(instance, ::WebBlockAnchor)
 			}
 
@@ -64,6 +70,7 @@ data class WebBlockAnchor(
 			BlockPos.STREAM_CODEC, WebBlockAnchor::blockPos,
 			Direction.STREAM_CODEC, WebBlockAnchor::face,
 			AaronExtraStreamCodecs.VEC3, WebBlockAnchor::position,
+			ByteBufCodecs.BOOL, WebBlockAnchor::hasNestInterface,
 			::WebBlockAnchor
 		)
 	}

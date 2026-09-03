@@ -44,6 +44,7 @@ class ModItemTagsProvider(
 		tag(WEB_LINE_INTERACTABLE)
 			.add(ModItems.WEB_FLUID)
 			.add(ModItems.WEB_PATHFINDER)
+			.add(ModItems.SPIDER_NEST_INTERFACE)
 			.addTag(Tags.Items.TOOLS_SHEAR)
 
 		tag(ItemTags.LOGS)

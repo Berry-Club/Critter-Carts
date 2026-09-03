@@ -147,6 +147,7 @@ class HoppingSpider(
 	}
 
 	private fun getItemHandler(level: ServerLevel, anchor: WebBlockAnchor): IItemHandler? {
+		if (!anchor.hasNestInterface) return null
 		return level.getCapability(Capabilities.ItemHandler.BLOCK, anchor.blockPos, anchor.face)
 	}
 

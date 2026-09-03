@@ -25,9 +25,7 @@ object ClientWebLines {
 
 	fun addLines(newNodes: List<WebNode>, newLines: List<WebLineData>) {
 		for (node in newNodes) {
-			if (node.uuid !in nodes) {
-				nodes[node.uuid] = node
-			}
+			nodes[node.uuid] = node
 		}
 
 		for (lineData in newLines) {
@@ -132,7 +130,9 @@ object ClientWebLines {
 		val itemStack = player.getItemInHand(interactionHand)
 		val snapToExistingNode = itemStack.isItem(ModItems.WEB_FLUID)
 			|| itemStack.isItem(ModItems.WEB_PATHFINDER)
+			|| itemStack.isItem(ModItems.SPIDER_NEST_INTERFACE)
 		val requireExistingNode = itemStack.isItem(ModItems.WEB_PATHFINDER)
+			|| itemStack.isItem(ModItems.SPIDER_NEST_INTERFACE)
 
 		return WebLineInteractionHandler.getTargetedNode(
 			lines.values.toList(),

@@ -10,6 +10,7 @@ object ModItemLang {
 			addItem(ModItems.LOCKBOX, "Lockbox")
 			addItem(ModItems.WEB_FLUID, "Web Fluid")
 			addItem(ModItems.WEB_PATHFINDER, "Web Pathfinder")
+			addItem(ModItems.SPIDER_NEST_INTERFACE, "Spider Nest Interface")
 			addItem(ModItems.GREEN_DYEBERRY, "Green Dyeberry")
 			addItem(ModItems.BLUE_DYEBERRY, "Blue Dyeberry")
 			addItem(ModItems.RED_DYEBERRY, "Red Dyeberry")
