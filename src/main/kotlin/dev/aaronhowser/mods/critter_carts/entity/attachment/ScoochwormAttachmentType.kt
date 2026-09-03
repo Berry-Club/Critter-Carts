@@ -27,12 +27,12 @@ class ScoochwormAttachmentType<T : SyncedAttachmentData>(
 		return attachment
 	}
 
-	internal fun decode(buffer: ByteBuf): T {
+	fun decode(buffer: ByteBuf): T {
 		return streamCodec.decode(buffer)
 	}
 
 	@Suppress("UNCHECKED_CAST")
-	internal fun encode(buffer: ByteBuf, data: SyncedAttachmentData) {
+	fun encode(buffer: ByteBuf, data: SyncedAttachmentData) {
 		streamCodec.encode(buffer, data as T)
 	}
 }

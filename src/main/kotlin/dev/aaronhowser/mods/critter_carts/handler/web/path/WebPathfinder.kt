@@ -4,7 +4,7 @@ import dev.aaronhowser.mods.critter_carts.handler.web.line.WebLine
 import dev.aaronhowser.mods.critter_carts.handler.web.node.WebNode
 import java.util.*
 
-internal class WebPathfinder(
+class WebPathfinder(
 	private val lines: Set<WebLine>
 ) {
 

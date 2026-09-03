@@ -15,20 +15,20 @@ class WebNetwork(
 
 	private val pathfinder = WebPathfinder(lines)
 
-	internal fun addLine(line: WebLine) {
+	fun addLine(line: WebLine) {
 		if (lines.add(line)) {
 			line.network = this
 			pathfinder.invalidate()
 		}
 	}
 
-	internal fun addLines(lines: Collection<WebLine>) {
+	fun addLines(lines: Collection<WebLine>) {
 		for (line in lines) {
 			addLine(line)
 		}
 	}
 
-	internal fun removeLine(line: WebLine) {
+	fun removeLine(line: WebLine) {
 		if (lines.remove(line) && line.network === this) {
 			line.network = null
 			pathfinder.invalidate()
@@ -49,14 +49,14 @@ class WebNetwork(
 		return nodes
 	}
 
-	internal fun clear() {
+	fun clear() {
 		val removedLines = lines.toList()
 		for (line in removedLines) {
 			removeLine(line)
 		}
 	}
 
-	internal fun invalidatePaths() {
+	fun invalidatePaths() {
 		pathfinder.invalidate()
 	}
 }

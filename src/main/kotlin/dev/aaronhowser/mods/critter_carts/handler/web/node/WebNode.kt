@@ -26,11 +26,11 @@ sealed class WebNode {
 		checkedLines: MutableSet<UUID>
 	): WebLineInvalidation?
 
-	internal fun addLine(line: WebLine) {
+	fun addLine(line: WebLine) {
 		lines.add(line)
 	}
 
-	internal fun removeLine(line: WebLine) {
+	fun removeLine(line: WebLine) {
 		lines.remove(line)
 	}
 

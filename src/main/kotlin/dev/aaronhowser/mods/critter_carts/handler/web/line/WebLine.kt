@@ -18,7 +18,7 @@ data class WebLine(
 	val secondNode: WebNode
 ) {
 	var network: WebNetwork? = null
-		internal set
+		set
 
 	private val attachmentsByAnchorUuid: MutableMap<UUID, LineAnchorAttachment> = mutableMapOf()
 
@@ -32,7 +32,7 @@ data class WebLine(
 		firstNode.position.distanceTo(secondNode.position)
 	}
 
-	internal fun addAttachedAnchor(anchor: WebLineAnchor) {
+	fun addAttachedAnchor(anchor: WebLineAnchor) {
 		attachmentsByAnchorUuid[anchor.uuid] = LineAnchorAttachment(
 			anchor,
 			anchor.position.distanceTo(firstNode.position),
@@ -41,13 +41,13 @@ data class WebLine(
 		network?.invalidatePaths()
 	}
 
-	internal fun removeAttachedAnchor(anchorUuid: UUID) {
+	fun removeAttachedAnchor(anchorUuid: UUID) {
 		if (attachmentsByAnchorUuid.remove(anchorUuid) != null) {
 			network?.invalidatePaths()
 		}
 	}
 
-	internal fun clearAttachedAnchors() {
+	fun clearAttachedAnchors() {
 		if (attachmentsByAnchorUuid.isEmpty()) return
 
 		attachmentsByAnchorUuid.clear()
