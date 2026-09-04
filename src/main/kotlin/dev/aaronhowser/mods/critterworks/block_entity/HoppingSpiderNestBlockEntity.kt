@@ -94,13 +94,21 @@ class HoppingSpiderNestBlockEntity(
 		val reservations = getTransportReservations(level)
 		var assignedBehavior = false
 
-		for (spider in hoppingSpiders) {
-			val startingNode = getStartingNode(level, spider) ?: continue
+		while (true) {
+			var bestCandidate: HoppingSpiderTransportCandidate? = null
 
-			val transportBehavior = findTransportBehavior(level, reservations, startingNode) ?: continue
+			for (spider in hoppingSpiders) {
+				val startingNode = getStartingNode(level, spider) ?: continue
+				val candidate = findTransportCandidate(level, reservations, spider, startingNode) ?: continue
 
-			if (!assignTransportBehavior(spider, transportBehavior)) continue
-			reservations.reserve(transportBehavior)
+				if (candidate.isPreferredOver(bestCandidate)) {
+					bestCandidate = candidate
+				}
+			}
+
+			val candidate = bestCandidate ?: break
+			if (!assignTransportBehavior(candidate.spider, candidate.behavior)) break
+			reservations.reserve(candidate.behavior)
 
 			assignedBehavior = true
 		}
@@ -175,29 +183,31 @@ class HoppingSpiderNestBlockEntity(
 		return WebSavedData.get(level).getNode(nodeUuid)
 	}
 
-	private fun findTransportBehavior(
+	private fun findTransportCandidate(
 		level: ServerLevel,
 		reservations: HoppingSpiderTransportReservations,
+		spider: HoppingSpider,
 		startingNode: WebNode
-	): HoppingSpiderTransportBehavior? {
+	): HoppingSpiderTransportCandidate? {
 		val savedData = WebSavedData.get(level)
 		var bestCandidate: HoppingSpiderTransportCandidate? = null
 
 		for (network in savedData.getNetworksAt(blockPos)) {
-			val candidate = findTransportBehaviorInNetwork(level, network, reservations, startingNode)
+			val candidate = findTransportBehaviorInNetwork(level, network, reservations, spider, startingNode)
 
 			if (candidate?.isPreferredOver(bestCandidate) == true) {
 				bestCandidate = candidate
 			}
 		}
 
-		return bestCandidate?.behavior
+		return bestCandidate
 	}
 
 	private fun findTransportBehaviorInNetwork(
 		level: ServerLevel,
 		network: WebNetwork,
 		reservations: HoppingSpiderTransportReservations,
+		spider: HoppingSpider,
 		startingNode: WebNode
 	): HoppingSpiderTransportCandidate? {
 		val nestNodes = getAnchors(network, blockPos)
@@ -212,6 +222,7 @@ class HoppingSpiderNestBlockEntity(
 				inventoryNodes,
 				sourceNode,
 				reservations,
+				spider,
 				startingNode
 			)
 
@@ -230,6 +241,7 @@ class HoppingSpiderNestBlockEntity(
 		inventoryNodes: List<WebBlockAnchor>,
 		sourceNode: WebBlockAnchor,
 		reservations: HoppingSpiderTransportReservations,
+		spider: HoppingSpider,
 		startingNode: WebNode
 	): HoppingSpiderTransportCandidate? {
 		val sourceInterface = SpiderNestInterfaceItem.getComponent(sourceNode.nestInterface)
@@ -255,6 +267,7 @@ class HoppingSpiderNestBlockEntity(
 				sourceSlot,
 				stack,
 				reservations,
+				spider,
 				startingNode
 			)
 
@@ -275,6 +288,7 @@ class HoppingSpiderNestBlockEntity(
 		sourceSlot: Int,
 		stack: ItemStack,
 		reservations: HoppingSpiderTransportReservations,
+		spider: HoppingSpider,
 		startingNode: WebNode
 	): HoppingSpiderTransportCandidate? {
 		val sourceInterface = SpiderNestInterfaceItem.getComponent(sourceNode.nestInterface)
@@ -294,7 +308,7 @@ class HoppingSpiderNestBlockEntity(
 			val transferAmount = getInsertableAmount(level, destinationNode, stack)
 			if (transferAmount == 0) continue
 
-			if (network.findShortestPath(startingNode, sourceNode) == null) continue
+			val pathToSource = network.findShortestPath(startingNode, sourceNode) ?: continue
 
 			val homeNode = findHomeNode(network, nestNodes, destinationNode)
 				?: continue
@@ -309,9 +323,11 @@ class HoppingSpiderNestBlockEntity(
 			)
 
 			val candidate = HoppingSpiderTransportCandidate(
+				spider,
 				transportBehavior,
 				sourceInterface.priority,
 				destinationInterface.priority,
+				pathToSource.distance,
 				transferAmount
 			)
 
