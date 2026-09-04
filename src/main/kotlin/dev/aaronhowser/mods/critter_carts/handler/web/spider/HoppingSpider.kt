@@ -9,6 +9,7 @@ import dev.aaronhowser.mods.critter_carts.item.component.NestInterfaceComponent
 import net.minecraft.core.HolderLookup
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.server.level.ServerLevel
+import net.minecraft.world.Containers
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.phys.Vec3
 import net.neoforged.neoforge.capabilities.Capabilities
@@ -31,7 +32,8 @@ class HoppingSpider(
 		}
 
 		val job = job ?: return false
-		val path = findPath(level, job) ?: return false
+		val path = findPath(level, job)
+		if (path == null) return handleMissingPath(level)
 
 		val routeChanged = updateRoute(level, job, path)
 		if (!moveAlong(path)) return routeChanged
@@ -103,7 +105,17 @@ class HoppingSpider(
 
 			HoppingSpiderJob.Phase.TO_DESTINATION -> deliverItem(level, job)
 
+			HoppingSpiderJob.Phase.RETURNING_ITEM -> {
+				returnItem(level, job)
+				true
+			}
+
 			HoppingSpiderJob.Phase.RETURNING -> {
+				finishJob(nestPosition)
+				true
+			}
+
+			HoppingSpiderJob.Phase.RETURNING_FROM_SOURCE -> {
 				finishJob(nestPosition)
 				true
 			}
@@ -154,31 +166,128 @@ class HoppingSpider(
 	}
 
 	private fun deliverItem(level: ServerLevel, job: HoppingSpiderJob): Boolean {
-		val destination = getBlockAnchor(level, job.destinationNodeUuid) ?: return false
+		val destination = getBlockAnchor(level, job.destinationNodeUuid)
+			?: return failDelivery(level, job, HoppingSpiderJob.FailureReason.DESTINATION_MISSING)
+
 		val destinationInterface = SpiderNestInterfaceItem.getComponent(destination.nestInterface)
 
 		if (destinationInterface.transferDirection != NestInterfaceComponent.TransferDirection.OUTPUT) {
-			return false
+			return failDelivery(level, job, HoppingSpiderJob.FailureReason.DESTINATION_NOT_OUTPUT)
 		}
 
-		val source = getBlockAnchor(level, job.sourceNodeUuid) ?: return false
-		val sourceComponent = SpiderNestInterfaceItem.getComponent(source.nestInterface)
+		val source = getBlockAnchor(level, job.sourceNodeUuid)
+			?: return failDelivery(level, job, HoppingSpiderJob.FailureReason.SOURCE_MISSING)
 
-		if (sourceComponent.color != destinationInterface.color) return false
+		val sourceInterface = SpiderNestInterfaceItem.getComponent(source.nestInterface)
+
+		if (sourceInterface.color != destinationInterface.color) {
+			return failDelivery(level, job, HoppingSpiderJob.FailureReason.CHANNEL_CHANGED)
+		}
 
 		val filter = destinationInterface.getFilter()
 		if (!filter.isEmpty && !ItemFilterItem.passesFilter(filter, carriedStack)) {
-			return false
+			return failDelivery(level, job, HoppingSpiderJob.FailureReason.FILTER_CHANGED)
 		}
 
-		val handler = getItemHandler(level, destination) ?: return false
+		val handler = getItemHandler(level, destination)
+			?: return failDelivery(level, job, HoppingSpiderJob.FailureReason.DESTINATION_UNAVAILABLE)
 
 		carriedStack = insertItem(handler, carriedStack)
-		if (!carriedStack.isEmpty) return false
+		if (!carriedStack.isEmpty) {
+			return failDelivery(level, job, HoppingSpiderJob.FailureReason.DESTINATION_FULL)
+		}
 
+		job.failureReason = null
 		startNextLeg(HoppingSpiderJob.Phase.RETURNING)
 
 		return true
+	}
+
+	private fun failDelivery(
+		level: ServerLevel,
+		job: HoppingSpiderJob,
+		reason: HoppingSpiderJob.FailureReason
+	): Boolean {
+		val reasonChanged = job.failureReason != reason
+		job.failureReason = reason
+
+		if (reason.shouldRetry) return reasonChanged
+
+		if (reason == HoppingSpiderJob.FailureReason.DESTINATION_MISSING
+			|| reason == HoppingSpiderJob.FailureReason.SOURCE_MISSING
+		) {
+			dropCarriedItem(level)
+			cancelJob()
+			return true
+		}
+
+		startNextLeg(HoppingSpiderJob.Phase.RETURNING_ITEM)
+
+		return true
+	}
+
+	private fun returnItem(level: ServerLevel, job: HoppingSpiderJob) {
+		val source = getBlockAnchor(level, job.sourceNodeUuid)
+		if (source == null) {
+			dropCarriedItem(level)
+			cancelJob()
+			return
+		}
+
+		val handler = getItemHandler(level, source)
+		if (handler == null) {
+			dropCarriedItem(level)
+			startNextLeg(HoppingSpiderJob.Phase.RETURNING_FROM_SOURCE)
+			return
+		}
+
+		carriedStack = returnToSource(handler, job.sourceSlot, carriedStack)
+
+		if (!carriedStack.isEmpty) {
+			dropCarriedItem(level)
+		}
+
+		startNextLeg(HoppingSpiderJob.Phase.RETURNING_FROM_SOURCE)
+	}
+
+	private fun returnToSource(handler: IItemHandler, sourceSlot: Int, stack: ItemStack): ItemStack {
+		var remainder = stack
+
+		if (sourceSlot in 0 until handler.slots) {
+			remainder = handler.insertItem(sourceSlot, remainder, false)
+		}
+
+		for (slot in 0 until handler.slots) {
+			if (slot == sourceSlot) continue
+
+			remainder = handler.insertItem(slot, remainder, false)
+			if (remainder.isEmpty) break
+		}
+
+		return remainder
+	}
+
+	private fun handleMissingPath(level: ServerLevel): Boolean {
+		if (carriedStack.isEmpty) return false
+
+		dropCarriedItem(level)
+		cancelJob()
+
+		return true
+	}
+
+	private fun dropCarriedItem(level: ServerLevel) {
+		val position = position ?: return
+
+		Containers.dropItemStack(
+			level,
+			position.x,
+			position.y,
+			position.z,
+			carriedStack
+		)
+
+		carriedStack = ItemStack.EMPTY
 	}
 
 	private fun startNextLeg(phase: HoppingSpiderJob.Phase) {

@@ -9,7 +9,8 @@ class HoppingSpiderJob(
 	val destinationNodeUuid: UUID,
 	val sourceSlot: Int,
 	val transferAmount: Int,
-	var phase: Phase = Phase.TO_SOURCE
+	var phase: Phase = Phase.TO_SOURCE,
+	var failureReason: FailureReason? = null
 ) {
 
 	val currentNodeUuid: UUID
@@ -18,6 +19,8 @@ class HoppingSpiderJob(
 				Phase.TO_SOURCE -> homeNodeUuid
 				Phase.TO_DESTINATION -> sourceNodeUuid
 				Phase.RETURNING -> destinationNodeUuid
+				Phase.RETURNING_ITEM -> destinationNodeUuid
+				Phase.RETURNING_FROM_SOURCE -> sourceNodeUuid
 			}
 		}
 
@@ -27,6 +30,8 @@ class HoppingSpiderJob(
 				Phase.TO_SOURCE -> sourceNodeUuid
 				Phase.TO_DESTINATION -> destinationNodeUuid
 				Phase.RETURNING -> homeNodeUuid
+				Phase.RETURNING_ITEM -> sourceNodeUuid
+				Phase.RETURNING_FROM_SOURCE -> homeNodeUuid
 			}
 		}
 
@@ -40,13 +45,32 @@ class HoppingSpiderJob(
 		tag.putInt(TRANSFER_AMOUNT_TAG, transferAmount)
 		tag.putString(PHASE_TAG, phase.name)
 
+		val failureReason = failureReason
+		if (failureReason != null) {
+			tag.putString(FAILURE_REASON_TAG, failureReason.name)
+		}
+
 		return tag
 	}
 
 	enum class Phase {
 		TO_SOURCE,
 		TO_DESTINATION,
-		RETURNING
+		RETURNING,
+		RETURNING_ITEM,
+		RETURNING_FROM_SOURCE
+	}
+
+	enum class FailureReason(
+		val shouldRetry: Boolean
+	) {
+		DESTINATION_MISSING(false),
+		SOURCE_MISSING(false),
+		DESTINATION_NOT_OUTPUT(false),
+		CHANNEL_CHANGED(false),
+		FILTER_CHANGED(false),
+		DESTINATION_UNAVAILABLE(false),
+		DESTINATION_FULL(true)
 	}
 
 	companion object {
@@ -56,6 +80,7 @@ class HoppingSpiderJob(
 		private const val SOURCE_SLOT_TAG = "SourceSlot"
 		private const val TRANSFER_AMOUNT_TAG = "TransferAmount"
 		private const val PHASE_TAG = "Phase"
+		private const val FAILURE_REASON_TAG = "FailureReason"
 
 		fun load(tag: CompoundTag): HoppingSpiderJob? {
 			if (!tag.hasUUID(HOME_NODE_UUID_TAG)) return null
@@ -72,8 +97,17 @@ class HoppingSpiderJob(
 				tag.getUUID(DESTINATION_NODE_UUID_TAG),
 				tag.getInt(SOURCE_SLOT_TAG),
 				getTransferAmount(tag),
-				phase
+				phase,
+				getFailureReason(tag)
 			)
+		}
+
+		private fun getFailureReason(tag: CompoundTag): FailureReason? {
+			if (!tag.contains(FAILURE_REASON_TAG)) return null
+
+			return FailureReason.entries.firstOrNull { reason ->
+				reason.name == tag.getString(FAILURE_REASON_TAG)
+			}
 		}
 
 		private fun getTransferAmount(tag: CompoundTag): Int {

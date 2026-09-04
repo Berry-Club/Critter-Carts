@@ -70,14 +70,41 @@ class SpiderNestScreen(
 				job.transferAmount
 			)
 
-			HoppingSpiderJob.Phase.TO_DESTINATION -> Component.translatable(
-				"menu.critter_carts.spider_nest.delivering",
-				spider.carriedStack.hoverName
+			HoppingSpiderJob.Phase.TO_DESTINATION -> getDeliveryText(spider, job)
+
+			HoppingSpiderJob.Phase.RETURNING_ITEM -> Component.translatable(
+				"menu.critter_carts.spider_nest.returning_item",
+				getFailureText(job.failureReason)
 			)
 
-			HoppingSpiderJob.Phase.RETURNING ->
+			HoppingSpiderJob.Phase.RETURNING,
+			HoppingSpiderJob.Phase.RETURNING_FROM_SOURCE ->
 				Component.translatable("menu.critter_carts.spider_nest.returning")
 		}
+	}
+
+	private fun getDeliveryText(spider: HoppingSpider, job: HoppingSpiderJob): Component {
+		val failureReason = job.failureReason
+
+		if (failureReason != null) {
+			return Component.translatable(
+				"menu.critter_carts.spider_nest.waiting",
+				getFailureText(failureReason)
+			)
+		}
+
+		return Component.translatable(
+			"menu.critter_carts.spider_nest.delivering",
+			spider.carriedStack.hoverName
+		)
+	}
+
+	private fun getFailureText(reason: HoppingSpiderJob.FailureReason?): Component {
+		if (reason == null) return Component.empty()
+
+		val name = reason.name.lowercase(Locale.ROOT)
+
+		return Component.translatable("menu.critter_carts.spider_nest.failure.$name")
 	}
 
 	companion object {
