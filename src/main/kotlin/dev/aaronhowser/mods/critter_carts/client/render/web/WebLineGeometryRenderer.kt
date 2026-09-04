@@ -154,18 +154,12 @@ object WebLineGeometryRenderer {
 	private fun addSide(
 		vertexConsumer: VertexConsumer,
 		pose: PoseStack.Pose,
-		firstX: Float,
-		firstZ: Float,
-		secondX: Float,
-		secondZ: Float,
-		normalX: Float,
-		normalZ: Float,
-		start: Double,
-		end: Double,
-		minU: Float,
-		maxU: Float,
-		startLight: Int,
-		endLight: Int,
+		firstX: Float, firstZ: Float,
+		secondX: Float, secondZ: Float,
+		normalX: Float, normalZ: Float,
+		start: Double, end: Double,
+		minU: Float, maxU: Float,
+		startLight: Int, endLight: Int,
 		color: Int
 	) {
 		val minV = (start / TEXTURE_REPEAT_DISTANCE).toFloat()
@@ -180,16 +174,10 @@ object WebLineGeometryRenderer {
 	private fun addVertex(
 		vertexConsumer: VertexConsumer,
 		pose: PoseStack.Pose,
-		x: Float,
-		y: Float,
-		z: Float,
-		u: Float,
-		v: Float,
-		light: Int,
-		color: Int,
-		normalX: Float,
-		normalY: Float,
-		normalZ: Float
+		x: Float, y: Float, z: Float,
+		u: Float, v: Float,
+		light: Int, color: Int,
+		normalX: Float, normalY: Float, normalZ: Float
 	) {
 		vertexConsumer.addVertex(pose.pose(), x, y, z)
 			.setColor(color)
