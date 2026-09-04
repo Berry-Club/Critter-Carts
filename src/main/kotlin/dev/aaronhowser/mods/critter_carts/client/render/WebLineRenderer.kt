@@ -217,6 +217,7 @@ object WebLineRenderer {
 		val bufferSource = minecraft.renderBuffers().bufferSource()
 		val vertexConsumer = bufferSource.getBuffer(WEB_RENDER_TYPE)
 		val direction = offset.scale(1.0 / height)
+
 		val rotation = Quaternionf().rotationTo(
 			0f,
 			1f,
@@ -242,6 +243,7 @@ object WebLineRenderer {
 			while (segmentStart < height) {
 				val segmentEnd = minOf(segmentStart + LIGHT_SAMPLE_DISTANCE, height)
 				val endPosition = start.add(direction.scale(segmentEnd))
+
 				val endLight = LevelRenderer.getLightColor(
 					level,
 					BlockPos.containing(endPosition)
@@ -335,10 +337,41 @@ object WebLineRenderer {
 		val minV = (start / TEXTURE_REPEAT_DISTANCE).toFloat()
 		val maxV = (end / TEXTURE_REPEAT_DISTANCE).toFloat()
 
-		addVertex(vertexConsumer, pose, firstX, start.toFloat(), firstZ, minU, minV, startLight, color, normalX, 0f, normalZ)
-		addVertex(vertexConsumer, pose, secondX, start.toFloat(), secondZ, maxU, minV, startLight, color, normalX, 0f, normalZ)
-		addVertex(vertexConsumer, pose, secondX, end.toFloat(), secondZ, maxU, maxV, endLight, color, normalX, 0f, normalZ)
-		addVertex(vertexConsumer, pose, firstX, end.toFloat(), firstZ, minU, maxV, endLight, color, normalX, 0f, normalZ)
+		addVertex(
+			vertexConsumer,
+			pose,
+			firstX, start.toFloat(), firstZ,
+			minU, minV,
+			startLight, color,
+			normalX, 0f, normalZ
+		)
+
+		addVertex(
+			vertexConsumer,
+			pose,
+			secondX, start.toFloat(), secondZ,
+			maxU, minV,
+			startLight, color,
+			normalX, 0f, normalZ
+		)
+
+		addVertex(
+			vertexConsumer,
+			pose,
+			secondX, end.toFloat(), secondZ,
+			maxU, maxV,
+			endLight, color,
+			normalX, 0f, normalZ
+		)
+
+		addVertex(
+			vertexConsumer,
+			pose,
+			firstX, end.toFloat(), firstZ,
+			minU, maxV,
+			endLight, color,
+			normalX, 0f, normalZ
+		)
 	}
 
 	private fun addVertex(
