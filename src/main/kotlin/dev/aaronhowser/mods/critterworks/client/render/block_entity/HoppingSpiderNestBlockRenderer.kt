@@ -14,6 +14,10 @@ import net.minecraft.core.BlockPos
 import net.minecraft.world.item.ItemDisplayContext
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
+import org.joml.Matrix3f
+import org.joml.Quaternionf
+import kotlin.math.cos
+import kotlin.math.sin
 
 class HoppingSpiderNestBlockRenderer(
 	context: BlockEntityRendererProvider.Context
@@ -33,16 +37,64 @@ class HoppingSpiderNestBlockRenderer(
 
 		for (index in blockEntity.hoppingSpiders.indices) {
 			val spider = blockEntity.hoppingSpiders[index]
+
 			val position = getPosition(blockEntity, spider, level.gameTime, partialTick)
-			val displayPosition = position.add(getDisplayOffset(index))
+			val direction = spider.route?.getDirection(level.gameTime, partialTick)
+			val spiderUp = if (direction == null) null else getSpiderUp(spider, direction)
+
+			val displayOffset = spiderUp?.scale(DISTANCE_FROM_LINE) ?: getDisplayOffset(index)
+			val displayPosition = position.add(displayOffset)
 			val localPosition = displayPosition.subtract(Vec3.atLowerCornerOf(blockEntity.blockPos))
+
 			val spiderLight = LevelRenderer.getLightColor(level, BlockPos.containing(displayPosition))
 
 			poseStack.withPose {
 				poseStack.translate(localPosition.x, localPosition.y, localPosition.z)
+
+				if (direction != null && spiderUp != null) {
+					poseStack.mulPose(getTravelRotation(direction, spiderUp))
+				}
+
 				renderSpider(spider, poseStack, bufferSource, spiderLight, packedOverlay)
 			}
 		}
+	}
+
+	private fun getTravelRotation(direction: Vec3, spiderUp: Vec3): Quaternionf {
+		val backward = direction.scale(-1.0)
+		val right = spiderUp.cross(backward).normalize()
+		val rotationMatrix = Matrix3f()
+			.setColumn(0, right.toVector3f())
+			.setColumn(1, spiderUp.toVector3f())
+			.setColumn(2, backward.toVector3f())
+
+		return Quaternionf().setFromNormalized(rotationMatrix)
+	}
+
+	private fun getSpiderUp(spider: HoppingSpider, travelDirection: Vec3): Vec3 {
+		val lineDirection = getConsistentLineDirection(travelDirection)
+		var startingUp = UP.subtract(lineDirection.scale(UP.dot(lineDirection)))
+
+		if (startingUp.lengthSqr() < MIN_DIRECTION_LENGTH_SQUARED) {
+			startingUp = NORTH.subtract(lineDirection.scale(NORTH.dot(lineDirection)))
+		}
+
+		startingUp = startingUp.normalize()
+		val side = lineDirection.cross(startingUp).normalize()
+		val angle = Math.toRadians((spider.uuid.hashCode() % 360).toDouble())
+
+		return startingUp.scale(cos(angle))
+			.add(side.scale(sin(angle)))
+	}
+
+	private fun getConsistentLineDirection(direction: Vec3): Vec3 {
+		if (direction.x < 0.0) return direction.scale(-1.0)
+		if (direction.x > 0.0) return direction
+		if (direction.y < 0.0) return direction.scale(-1.0)
+		if (direction.y > 0.0) return direction
+		if (direction.z < 0.0) return direction.scale(-1.0)
+
+		return direction
 	}
 
 	private fun getPosition(
@@ -116,5 +168,10 @@ class HoppingSpiderNestBlockRenderer(
 		private const val ITEM_SCALE = 0.6f
 		private const val ITEM_HEIGHT = 0.18
 		private const val IDLE_OFFSET = 0.14
+		private const val DISTANCE_FROM_LINE = 0.04
+		private const val MIN_DIRECTION_LENGTH_SQUARED = 1.0e-6
+
+		private val UP = Vec3(0.0, 1.0, 0.0)
+		private val NORTH = Vec3(0.0, 0.0, -1.0)
 	}
 }
