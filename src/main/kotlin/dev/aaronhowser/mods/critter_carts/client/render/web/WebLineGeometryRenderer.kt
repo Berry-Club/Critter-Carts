@@ -189,7 +189,7 @@ object WebLineGeometryRenderer {
 
 	private const val WEB_COLOR = 0xFFFFFFFF.toInt()
 	private const val WEB_RADIUS = 1f / 64f
-	private const val TEXTURE_REPEAT_DISTANCE = 8.0
+	private const val TEXTURE_REPEAT_DISTANCE = 4.0
 	private const val LIGHT_SAMPLE_DISTANCE = 1.0
 
 	private val WEB_TEXTURE = CritterCarts.modResource("textures/misc/web_line.png")
