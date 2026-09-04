@@ -21,7 +21,6 @@ import net.minecraft.client.renderer.LevelRenderer
 import net.minecraft.client.renderer.RenderType
 import net.minecraft.client.renderer.texture.OverlayTexture
 import net.minecraft.core.BlockPos
-import net.minecraft.resources.ResourceLocation
 import net.minecraft.util.Mth
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.phys.BlockHitResult
@@ -423,9 +422,6 @@ object WebLineRenderer {
 	private const val INTERFACE_TOP_TEXTURE_HEIGHT = 4f / 128f
 	private const val INTERFACE_SIDE_TEXTURE_HEIGHT = 2f / 128f
 
-	private val WEB_TEXTURE = ResourceLocation.fromNamespaceAndPath(
-		CritterCarts.MOD_ID,
-		"textures/misc/web_line.png"
-	)
-	private val WEB_RENDER_TYPE = RenderType.entityCutoutNoCull(WEB_TEXTURE)
+	private val WEB_TEXTURE = CritterCarts.modResource("textures/misc/web_line.png")
+	private val WEB_RENDER_TYPE = RenderType.entitySolid(WEB_TEXTURE)
 }
