@@ -27,6 +27,9 @@ object ModItems : AaronItemRegistry() {
 	val SPIDER_NEST_INTERFACE: DeferredItem<SpiderNestInterfaceItem> =
 		register("spider_nest_interface", ::SpiderNestInterfaceItem, PROPERTIES_SINGLE_STACK)
 
+	val HOPPING_SPIDER: DeferredItem<HoppingSpiderItem> =
+		register("hopping_spider", ::HoppingSpiderItem, PROPERTIES_SINGLE_STACK)
+
 	val CRITTER_CAGE: DeferredItem<CritterCageItem> =
 		register(
 			"critter_cage",

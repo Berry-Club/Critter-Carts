@@ -12,6 +12,7 @@ object ModItemLang {
 			addItem(ModItems.WEB_PATHFINDER, "Web Pathfinder")
 			addItem(ModItems.ITEM_FILTER, "Item Filter")
 			addItem(ModItems.SPIDER_NEST_INTERFACE, "Spider Nest Interface")
+			addItem(ModItems.HOPPING_SPIDER, "Hopping Spider")
 			addItem(ModItems.GREEN_DYEBERRY, "Green Dyeberry")
 			addItem(ModItems.BLUE_DYEBERRY, "Blue Dyeberry")
 			addItem(ModItems.RED_DYEBERRY, "Red Dyeberry")
