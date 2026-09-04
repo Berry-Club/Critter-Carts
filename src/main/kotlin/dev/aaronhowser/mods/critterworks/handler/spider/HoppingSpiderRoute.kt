@@ -1,4 +1,4 @@
-package dev.aaronhowser.mods.critterworks.handler.web.spider
+package dev.aaronhowser.mods.critterworks.handler.spider
 
 import dev.aaronhowser.mods.critterworks.handler.web.path.WebPath
 import net.minecraft.nbt.CompoundTag

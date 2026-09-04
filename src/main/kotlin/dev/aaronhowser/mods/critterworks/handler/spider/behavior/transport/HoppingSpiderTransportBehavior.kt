@@ -1,7 +1,7 @@
-package dev.aaronhowser.mods.critterworks.handler.web.spider.behavior.transport
+package dev.aaronhowser.mods.critterworks.handler.spider.behavior.transport
 
-import dev.aaronhowser.mods.critterworks.handler.web.spider.HoppingSpider
-import dev.aaronhowser.mods.critterworks.handler.web.spider.behavior.HoppingSpiderBehavior
+import dev.aaronhowser.mods.critterworks.handler.spider.HoppingSpider
+import dev.aaronhowser.mods.critterworks.handler.spider.behavior.HoppingSpiderBehavior
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.phys.Vec3

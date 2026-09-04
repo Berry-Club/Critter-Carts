@@ -1,6 +1,6 @@
-package dev.aaronhowser.mods.critterworks.handler.web.spider.behavior.transport
+package dev.aaronhowser.mods.critterworks.handler.spider.behavior.transport
 
-import dev.aaronhowser.mods.critterworks.handler.web.spider.HoppingSpider
+import dev.aaronhowser.mods.critterworks.handler.spider.HoppingSpider
 
 class HoppingSpiderTransportCandidate(
 	val spider: HoppingSpider,

@@ -1,8 +1,8 @@
-package dev.aaronhowser.mods.critterworks.handler.web.spider.behavior
+package dev.aaronhowser.mods.critterworks.handler.spider.behavior
 
+import dev.aaronhowser.mods.critterworks.handler.spider.HoppingSpider
 import dev.aaronhowser.mods.critterworks.handler.web.WebSavedData
 import dev.aaronhowser.mods.critterworks.handler.web.node.WebNode
-import dev.aaronhowser.mods.critterworks.handler.web.spider.HoppingSpider
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.phys.Vec3

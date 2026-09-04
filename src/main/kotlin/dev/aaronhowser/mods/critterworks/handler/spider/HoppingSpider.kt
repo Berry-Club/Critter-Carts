@@ -1,11 +1,11 @@
-package dev.aaronhowser.mods.critterworks.handler.web.spider
+package dev.aaronhowser.mods.critterworks.handler.spider
 
+import dev.aaronhowser.mods.critterworks.handler.spider.behavior.HoppingSpiderBehavior
+import dev.aaronhowser.mods.critterworks.handler.spider.behavior.HoppingSpiderWanderBehavior
+import dev.aaronhowser.mods.critterworks.handler.spider.behavior.transport.HoppingSpiderTransportBehavior
 import dev.aaronhowser.mods.critterworks.handler.web.WebSavedData
 import dev.aaronhowser.mods.critterworks.handler.web.node.WebBlockAnchor
 import dev.aaronhowser.mods.critterworks.handler.web.path.WebPath
-import dev.aaronhowser.mods.critterworks.handler.web.spider.behavior.HoppingSpiderBehavior
-import dev.aaronhowser.mods.critterworks.handler.web.spider.behavior.transport.HoppingSpiderTransportBehavior
-import dev.aaronhowser.mods.critterworks.handler.web.spider.behavior.HoppingSpiderWanderBehavior
 import dev.aaronhowser.mods.critterworks.item.ItemFilterItem
 import dev.aaronhowser.mods.critterworks.item.SpiderNestInterfaceItem
 import dev.aaronhowser.mods.critterworks.item.component.NestInterfaceComponent

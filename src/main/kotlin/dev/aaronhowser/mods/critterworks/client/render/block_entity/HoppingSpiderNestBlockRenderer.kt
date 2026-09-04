@@ -3,7 +3,7 @@ package dev.aaronhowser.mods.critterworks.client.render.block_entity
 import com.mojang.blaze3d.vertex.PoseStack
 import dev.aaronhowser.mods.aaron.misc.AaronDsls.withPose
 import dev.aaronhowser.mods.critterworks.block_entity.HoppingSpiderNestBlockEntity
-import dev.aaronhowser.mods.critterworks.handler.web.spider.HoppingSpider
+import dev.aaronhowser.mods.critterworks.handler.spider.HoppingSpider
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.LevelRenderer
 import net.minecraft.client.renderer.MultiBufferSource

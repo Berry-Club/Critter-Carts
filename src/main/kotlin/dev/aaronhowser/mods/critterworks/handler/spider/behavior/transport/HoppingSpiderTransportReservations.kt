@@ -1,4 +1,4 @@
-package dev.aaronhowser.mods.critterworks.handler.web.spider.behavior.transport
+package dev.aaronhowser.mods.critterworks.handler.spider.behavior.transport
 
 import java.util.*
 
