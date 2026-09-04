@@ -132,10 +132,10 @@ object WebLineGeometryRenderer {
 		val minV = (start / TEXTURE_REPEAT_DISTANCE).toFloat()
 		val maxV = (end / TEXTURE_REPEAT_DISTANCE).toFloat()
 
-		addVertex(vertexConsumer, pose, firstX, start.toFloat(), firstZ, minU, minV, startLight, color, normalX, 0f, normalZ)
-		addVertex(vertexConsumer, pose, secondX, start.toFloat(), secondZ, maxU, minV, startLight, color, normalX, 0f, normalZ)
-		addVertex(vertexConsumer, pose, secondX, end.toFloat(), secondZ, maxU, maxV, endLight, color, normalX, 0f, normalZ)
-		addVertex(vertexConsumer, pose, firstX, end.toFloat(), firstZ, minU, maxV, endLight, color, normalX, 0f, normalZ)
+		addVertex(vertexConsumer, pose, firstX, start.toFloat(), firstZ, minU, minV, startLight, color, -normalX, 0f, -normalZ)
+		addVertex(vertexConsumer, pose, firstX, end.toFloat(), firstZ, minU, maxV, endLight, color, -normalX, 0f, -normalZ)
+		addVertex(vertexConsumer, pose, secondX, end.toFloat(), secondZ, maxU, maxV, endLight, color, -normalX, 0f, -normalZ)
+		addVertex(vertexConsumer, pose, secondX, start.toFloat(), secondZ, maxU, minV, startLight, color, -normalX, 0f, -normalZ)
 	}
 
 	private fun addVertex(
