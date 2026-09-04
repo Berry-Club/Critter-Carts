@@ -106,10 +106,49 @@ object WebLineGeometryRenderer {
 		endLight: Int,
 		color: Int
 	) {
-		addSide(vertexConsumer, pose, -WEB_RADIUS, -WEB_RADIUS, WEB_RADIUS, -WEB_RADIUS, 0f, 1f, start, end, 0f, 0.25f, startLight, endLight, color)
-		addSide(vertexConsumer, pose, WEB_RADIUS, -WEB_RADIUS, WEB_RADIUS, WEB_RADIUS, -1f, 0f, start, end, 0.25f, 0.5f, startLight, endLight, color)
-		addSide(vertexConsumer, pose, WEB_RADIUS, WEB_RADIUS, -WEB_RADIUS, WEB_RADIUS, 0f, -1f, start, end, 0.5f, 0.75f, startLight, endLight, color)
-		addSide(vertexConsumer, pose, -WEB_RADIUS, WEB_RADIUS, -WEB_RADIUS, -WEB_RADIUS, 1f, 0f, start, end, 0.75f, 1f, startLight, endLight, color)
+		addSide(
+			vertexConsumer, pose,
+			-WEB_RADIUS, -WEB_RADIUS,
+			WEB_RADIUS, -WEB_RADIUS,
+			0f, 1f,
+			start, end,
+			0f, 0.25f,
+			startLight, endLight,
+			color
+		)
+
+		addSide(
+			vertexConsumer, pose,
+			WEB_RADIUS, -WEB_RADIUS,
+			WEB_RADIUS, WEB_RADIUS,
+			-1f, 0f,
+			start, end,
+			0.25f, 0.5f,
+			startLight, endLight,
+			color
+		)
+
+		addSide(
+			vertexConsumer, pose,
+			WEB_RADIUS, WEB_RADIUS,
+			-WEB_RADIUS, WEB_RADIUS,
+			0f, -1f,
+			start, end,
+			0.5f, 0.75f,
+			startLight, endLight,
+			color
+		)
+
+		addSide(
+			vertexConsumer, pose,
+			-WEB_RADIUS, WEB_RADIUS,
+			-WEB_RADIUS, -WEB_RADIUS,
+			1f, 0f,
+			start, end,
+			0.75f, 1f,
+			startLight, endLight,
+			color
+		)
 	}
 
 	private fun addSide(
