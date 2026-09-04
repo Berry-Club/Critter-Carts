@@ -12,7 +12,6 @@ import dev.aaronhowser.mods.critter_carts.handler.web.spider.HoppingSpiderReserv
 import dev.aaronhowser.mods.critter_carts.item.ItemFilterItem
 import dev.aaronhowser.mods.critter_carts.item.SpiderNestInterfaceItem
 import dev.aaronhowser.mods.critter_carts.item.component.NestInterfaceComponent
-import dev.aaronhowser.mods.critter_carts.menu.spider_nest.SpiderNestData
 import dev.aaronhowser.mods.critter_carts.menu.spider_nest.SpiderNestMenu
 import dev.aaronhowser.mods.critter_carts.registry.ModBlockEntityTypes
 import net.minecraft.core.BlockPos
@@ -42,8 +41,6 @@ class HoppingSpiderNestBlockEntity(
 	val hoppingSpiders: MutableList<HoppingSpider> = MutableList(STARTING_SPIDER_COUNT) {
 		HoppingSpider()
 	}
-
-	val menuData = SpiderNestData(this)
 
 	override fun getDisplayName(): Component {
 		return Component.translatable("menu.critter_carts.spider_nest.title")
