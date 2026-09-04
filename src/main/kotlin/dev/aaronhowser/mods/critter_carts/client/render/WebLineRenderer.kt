@@ -30,7 +30,6 @@ import net.neoforged.api.distmarker.Dist
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent
-import org.joml.Matrix4f
 import org.joml.Quaternionf
 import org.joml.Vector3f
 
@@ -93,7 +92,7 @@ object WebLineRenderer {
 				poseStack.mulPose(rotation)
 				poseStack.translate(0.0, INTERFACE_SURFACE_OFFSET, 0.0)
 
-				val pose = poseStack.last().pose()
+				val pose = poseStack.last()
 				renderNestInterface(
 					vertexConsumer,
 					pose,
@@ -108,7 +107,7 @@ object WebLineRenderer {
 
 	private fun renderNestInterface(
 		vertexConsumer: VertexConsumer,
-		pose: Matrix4f,
+		pose: PoseStack.Pose,
 		light: Int,
 		color: Int
 	) {
@@ -155,7 +154,7 @@ object WebLineRenderer {
 
 	private fun addInterfaceFace(
 		vertexConsumer: VertexConsumer,
-		pose: Matrix4f,
+		pose: PoseStack.Pose,
 		first: Vector3f,
 		second: Vector3f,
 		third: Vector3f,
@@ -164,10 +163,14 @@ object WebLineRenderer {
 		light: Int,
 		color: Int
 	) {
-		addVertex(vertexConsumer, pose, first.x, first.y, first.z, 0f, 0f, light, color)
-		addVertex(vertexConsumer, pose, second.x, second.y, second.z, 1f, 0f, light, color)
-		addVertex(vertexConsumer, pose, third.x, third.y, third.z, 1f, textureHeight, light, color)
-		addVertex(vertexConsumer, pose, fourth.x, fourth.y, fourth.z, 0f, textureHeight, light, color)
+		val normal = second.sub(first, Vector3f())
+			.cross(fourth.sub(first, Vector3f()))
+			.normalize()
+
+		addVertex(vertexConsumer, pose, first.x, first.y, first.z, 0f, 0f, light, color, normal.x, normal.y, normal.z)
+		addVertex(vertexConsumer, pose, second.x, second.y, second.z, 1f, 0f, light, color, normal.x, normal.y, normal.z)
+		addVertex(vertexConsumer, pose, third.x, third.y, third.z, 1f, textureHeight, light, color, normal.x, normal.y, normal.z)
+		addVertex(vertexConsumer, pose, fourth.x, fourth.y, fourth.z, 0f, textureHeight, light, color, normal.x, normal.y, normal.z)
 	}
 
 	private fun renderPlacementPreview(
@@ -228,7 +231,7 @@ object WebLineRenderer {
 			poseStack.translate(relativeStart.x, relativeStart.y, relativeStart.z)
 			poseStack.mulPose(rotation)
 
-			val pose = poseStack.last().pose()
+			val pose = poseStack.last()
 			val level = minecraft.level ?: return@withPose
 			var segmentStart = 0.0
 			var startLight = LevelRenderer.getLightColor(
@@ -274,7 +277,7 @@ object WebLineRenderer {
 
 	private fun addSegment(
 		vertexConsumer: VertexConsumer,
-		pose: Matrix4f,
+		pose: PoseStack.Pose,
 		start: Double,
 		end: Double,
 		startLight: Int,
@@ -285,27 +288,34 @@ object WebLineRenderer {
 			vertexConsumer, pose,
 			-WEB_RADIUS, -WEB_RADIUS,
 			WEB_RADIUS, -WEB_RADIUS,
+			0f, 1f,
 			start, end, 0f, 0.25f,
 			startLight, endLight, color
 		)
+
 		addSide(
 			vertexConsumer, pose,
 			WEB_RADIUS, -WEB_RADIUS,
 			WEB_RADIUS, WEB_RADIUS,
+			-1f, 0f,
 			start, end, 0.25f, 0.5f,
 			startLight, endLight, color
 		)
+
 		addSide(
 			vertexConsumer, pose,
 			WEB_RADIUS, WEB_RADIUS,
 			-WEB_RADIUS, WEB_RADIUS,
+			0f, -1f,
 			start, end, 0.5f, 0.75f,
 			startLight, endLight, color
 		)
+
 		addSide(
 			vertexConsumer, pose,
 			-WEB_RADIUS, WEB_RADIUS,
 			-WEB_RADIUS, -WEB_RADIUS,
+			1f, 0f,
 			start, end, 0.75f, 1f,
 			startLight, endLight, color
 		)
@@ -313,45 +323,38 @@ object WebLineRenderer {
 
 	private fun addSide(
 		vertexConsumer: VertexConsumer,
-		pose: Matrix4f,
-		firstX: Float,
-		firstZ: Float,
-		secondX: Float,
-		secondZ: Float,
-		start: Double,
-		end: Double,
-		minU: Float,
-		maxU: Float,
-		startLight: Int,
-		endLight: Int,
+		pose: PoseStack.Pose,
+		firstX: Float, firstZ: Float,
+		secondX: Float, secondZ: Float,
+		normalX: Float, normalZ: Float,
+		start: Double, end: Double,
+		minU: Float, maxU: Float,
+		startLight: Int, endLight: Int,
 		color: Int
 	) {
 		val minV = (start / TEXTURE_REPEAT_DISTANCE).toFloat()
 		val maxV = (end / TEXTURE_REPEAT_DISTANCE).toFloat()
 
-		addVertex(vertexConsumer, pose, firstX, start.toFloat(), firstZ, minU, minV, startLight, color)
-		addVertex(vertexConsumer, pose, secondX, start.toFloat(), secondZ, maxU, minV, startLight, color)
-		addVertex(vertexConsumer, pose, secondX, end.toFloat(), secondZ, maxU, maxV, endLight, color)
-		addVertex(vertexConsumer, pose, firstX, end.toFloat(), firstZ, minU, maxV, endLight, color)
+		addVertex(vertexConsumer, pose, firstX, start.toFloat(), firstZ, minU, minV, startLight, color, normalX, 0f, normalZ)
+		addVertex(vertexConsumer, pose, secondX, start.toFloat(), secondZ, maxU, minV, startLight, color, normalX, 0f, normalZ)
+		addVertex(vertexConsumer, pose, secondX, end.toFloat(), secondZ, maxU, maxV, endLight, color, normalX, 0f, normalZ)
+		addVertex(vertexConsumer, pose, firstX, end.toFloat(), firstZ, minU, maxV, endLight, color, normalX, 0f, normalZ)
 	}
 
 	private fun addVertex(
 		vertexConsumer: VertexConsumer,
-		pose: Matrix4f,
-		x: Float,
-		y: Float,
-		z: Float,
-		u: Float,
-		v: Float,
-		light: Int,
-		color: Int
+		pose: PoseStack.Pose,
+		x: Float, y: Float, z: Float,
+		u: Float, v: Float,
+		light: Int, color: Int,
+		normalX: Float, normalY: Float, normalZ: Float
 	) {
-		vertexConsumer.addVertex(pose, x, y, z)
+		vertexConsumer.addVertex(pose.pose(), x, y, z)
 			.setColor(color)
 			.setUv(u, v)
 			.setOverlay(OverlayTexture.NO_OVERLAY)
 			.setLight(light)
-			.setNormal(0f, 1f, 0f)
+			.setNormal(pose, normalX, normalY, normalZ)
 	}
 
 	private fun getHeldWebFluid(mainHandItem: ItemStack, offhandItem: ItemStack): ItemStack? {
