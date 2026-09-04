@@ -7,8 +7,10 @@ import dev.aaronhowser.mods.aaron.misc.AaronDsls.withPose
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isItem
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.toVec3
 import dev.aaronhowser.mods.critter_carts.CritterCarts
+import dev.aaronhowser.mods.critter_carts.config.ClientConfig
 import dev.aaronhowser.mods.critter_carts.handler.web.WebLineInteractionHandler
 import dev.aaronhowser.mods.critter_carts.handler.web.line.ClientWebLines
+import dev.aaronhowser.mods.critter_carts.handler.web.line.WebLine
 import dev.aaronhowser.mods.critter_carts.handler.web.node.WebBlockAnchor
 import dev.aaronhowser.mods.critter_carts.handler.web.node.WebNode
 import dev.aaronhowser.mods.critter_carts.item.SpiderNestInterfaceItem
@@ -20,6 +22,7 @@ import net.minecraft.client.renderer.RenderType
 import net.minecraft.client.renderer.texture.OverlayTexture
 import net.minecraft.core.BlockPos
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.util.Mth
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.HitResult
@@ -47,12 +50,13 @@ object WebLineRenderer {
 
 		poseStack.withPose {
 			for (line in ClientWebLines.getLines()) {
+				val color = getWebLineColor(line)
 				renderWebLine(
 					poseStack,
 					line.firstNode.position,
 					line.secondNode.position,
 					cameraPosition,
-					WEB_COLOR
+					color
 				)
 			}
 
@@ -175,6 +179,16 @@ object WebLineRenderer {
 		}
 
 		bufferSource.endBatch(WEB_RENDER_TYPE)
+	}
+
+	private fun getWebLineColor(line: WebLine): Int {
+		if (!ClientConfig.CONFIG.renderWebLineDebugColors.get()) return WEB_COLOR
+
+		val hash = line.uuid.mostSignificantBits xor line.uuid.leastSignificantBits
+		val hue = (hash and 0xFFFF).toFloat() / 0x10000
+		val rgb = Mth.hsvToRgb(hue, 0.9f, 1f)
+
+		return 0xFF000000.toInt() or rgb
 	}
 
 	private fun addSegment(
