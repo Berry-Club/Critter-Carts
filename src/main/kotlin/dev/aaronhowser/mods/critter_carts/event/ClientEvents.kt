@@ -6,6 +6,7 @@ import dev.aaronhowser.mods.critter_carts.client.render.block_entity.CritterCage
 import dev.aaronhowser.mods.critter_carts.client.render.block_entity.HoppingSpiderNestBlockRenderer
 import dev.aaronhowser.mods.critter_carts.client.render.entity.ScoochwormPartRenderer
 import dev.aaronhowser.mods.critter_carts.client.render.entity.ScoochwormRenderer
+import dev.aaronhowser.mods.critter_carts.handler.web.line.ClientWebLineInteractionHandler
 import dev.aaronhowser.mods.critter_carts.handler.web.line.ClientWebLines
 import dev.aaronhowser.mods.critter_carts.registry.ModBlockEntityTypes
 import dev.aaronhowser.mods.critter_carts.registry.ModEntityTypes
@@ -25,7 +26,7 @@ import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsE
 object ClientEvents {
 	@SubscribeEvent
 	fun interactWithWebLine(event: InputEvent.InteractionKeyMappingTriggered) {
-		ClientWebLines.handleInteractionEvent(event)
+		ClientWebLineInteractionHandler.handleInteraction(event)
 	}
 
 	@SubscribeEvent

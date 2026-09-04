@@ -4,7 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack
 import dev.aaronhowser.mods.aaron.client.render.AaronRenderUtil
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isItem
 import dev.aaronhowser.mods.critter_carts.handler.web.WebLineInteractionHandler
-import dev.aaronhowser.mods.critter_carts.handler.web.line.ClientWebLines
+import dev.aaronhowser.mods.critter_carts.handler.web.line.ClientWebLineInteractionHandler
 import dev.aaronhowser.mods.critter_carts.handler.web.node.WebNode
 import dev.aaronhowser.mods.critter_carts.registry.ModDataComponents
 import dev.aaronhowser.mods.critter_carts.registry.ModItems
@@ -42,7 +42,11 @@ object WebLinePreviewRenderer {
 	private fun renderHoveredAnchor(poseStack: PoseStack, eyePosition: Vec3, viewVector: Vec3) {
 		val minecraft = Minecraft.getInstance()
 		val player = minecraft.player ?: return
-		val targetedNode = ClientWebLines.getHoveredAnchor(player, eyePosition, viewVector) ?: return
+		val targetedNode = ClientWebLineInteractionHandler.getHoveredAnchor(
+			player,
+			eyePosition,
+			viewVector
+		) ?: return
 		val position = targetedNode.node.position.subtract(eyePosition)
 
 		AaronRenderUtil.renderCubeThroughWalls(
@@ -66,7 +70,11 @@ object WebLinePreviewRenderer {
 
 	private fun getTargetedNode(minecraft: Minecraft, eyePosition: Vec3, viewVector: Vec3): WebNode? {
 		val player = minecraft.player ?: return null
-		val targetedNode = ClientWebLines.getHoveredAnchor(player, eyePosition, viewVector)
+		val targetedNode = ClientWebLineInteractionHandler.getHoveredAnchor(
+			player,
+			eyePosition,
+			viewVector
+		)
 		if (targetedNode != null) return targetedNode.node
 
 		val hitResult = minecraft.hitResult
