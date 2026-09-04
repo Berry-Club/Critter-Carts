@@ -12,12 +12,19 @@ import dev.aaronhowser.mods.critter_carts.handler.web.spider.HoppingSpiderReserv
 import dev.aaronhowser.mods.critter_carts.item.ItemFilterItem
 import dev.aaronhowser.mods.critter_carts.item.SpiderNestInterfaceItem
 import dev.aaronhowser.mods.critter_carts.item.component.NestInterfaceComponent
+import dev.aaronhowser.mods.critter_carts.menu.spider_nest.SpiderNestData
+import dev.aaronhowser.mods.critter_carts.menu.spider_nest.SpiderNestMenu
 import dev.aaronhowser.mods.critter_carts.registry.ModBlockEntityTypes
 import net.minecraft.core.BlockPos
 import net.minecraft.core.HolderLookup
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
+import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerLevel
+import net.minecraft.world.MenuProvider
+import net.minecraft.world.entity.player.Inventory
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.inventory.AbstractContainerMenu
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.Block
@@ -28,12 +35,26 @@ import net.neoforged.neoforge.items.IItemHandler
 class HoppingSpiderNestBlockEntity(
 	pos: BlockPos,
 	state: BlockState
-) : SyncingBlockEntity(ModBlockEntityTypes.HOPPING_SPIDER_NEST.get(), pos, state) {
+) : SyncingBlockEntity(ModBlockEntityTypes.HOPPING_SPIDER_NEST.get(), pos, state), MenuProvider {
 
 	override val syncImmediately: Boolean = false
 
 	val hoppingSpiders: MutableList<HoppingSpider> = MutableList(STARTING_SPIDER_COUNT) {
 		HoppingSpider()
+	}
+
+	val menuData = SpiderNestData(this)
+
+	override fun getDisplayName(): Component {
+		return Component.translatable("menu.critter_carts.spider_nest.title")
+	}
+
+	override fun createMenu(
+		containerId: Int,
+		playerInventory: Inventory,
+		player: Player
+	): AbstractContainerMenu {
+		return SpiderNestMenu(containerId, playerInventory, this)
 	}
 
 	private fun serverTick(level: ServerLevel) {

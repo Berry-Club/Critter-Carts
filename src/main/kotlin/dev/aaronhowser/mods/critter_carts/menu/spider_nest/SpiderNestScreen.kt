@@ -3,7 +3,6 @@ package dev.aaronhowser.mods.critter_carts.menu.spider_nest
 import dev.aaronhowser.mods.aaron.menu.BaseScreen
 import dev.aaronhowser.mods.aaron.menu.textures.ScreenBackground
 import dev.aaronhowser.mods.critter_carts.CritterCarts
-import dev.aaronhowser.mods.critter_carts.handler.web.spider.HoppingSpider
 import dev.aaronhowser.mods.critter_carts.handler.web.spider.HoppingSpiderJob
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.network.chat.Component
@@ -21,10 +20,7 @@ class SpiderNestScreen(
 
 	override fun renderLabels(guiGraphics: GuiGraphics, mouseX: Int, mouseY: Int) {
 		super.renderLabels(guiGraphics, mouseX, mouseY)
-		val nest = menu.getNest() ?: return
-		val gameTime = nest.level?.gameTime ?: 0
-
-		for ((index, spider) in nest.hoppingSpiders.withIndex()) {
+		for (index in 0 until SpiderNestMenu.SPIDER_COUNT) {
 			val rowY = FIRST_ROW_Y + index * ROW_HEIGHT
 			guiGraphics.drawString(
 				font,
@@ -34,13 +30,13 @@ class SpiderNestScreen(
 				LABEL_COLOR,
 				false
 			)
-			guiGraphics.drawString(font, getPositionText(spider, gameTime), TEXT_X, rowY + LINE_HEIGHT, TEXT_COLOR, false)
-			guiGraphics.drawString(font, getJobText(spider), TEXT_X, rowY + LINE_HEIGHT * 2, TEXT_COLOR, false)
+			guiGraphics.drawString(font, getPositionText(index), TEXT_X, rowY + LINE_HEIGHT, TEXT_COLOR, false)
+			guiGraphics.drawString(font, getJobText(index), TEXT_X, rowY + LINE_HEIGHT * 2, TEXT_COLOR, false)
 		}
 	}
 
-	private fun getPositionText(spider: HoppingSpider, gameTime: Long): Component {
-		val position = spider.getRenderPosition(gameTime, 0f)
+	private fun getPositionText(spiderIndex: Int): Component {
+		val position = menu.getPosition(spiderIndex)
 			?: return Component.translatable("menu.critter_carts.spider_nest.position", "?", "?", "?")
 
 		return Component.translatable(
@@ -55,21 +51,22 @@ class SpiderNestScreen(
 		return String.format(Locale.ROOT, "%.1f", coordinate)
 	}
 
-	private fun getJobText(spider: HoppingSpider): Component {
-		val job = spider.job ?: return Component.translatable("menu.critter_carts.spider_nest.idle")
-		return when (job.phase) {
+	private fun getJobText(spiderIndex: Int): Component {
+		return when (menu.getPhase(spiderIndex)) {
 			HoppingSpiderJob.Phase.TO_SOURCE -> Component.translatable(
 				"menu.critter_carts.spider_nest.collecting",
-				job.transferAmount
+				menu.getTransferAmount(spiderIndex)
 			)
 
 			HoppingSpiderJob.Phase.TO_DESTINATION -> Component.translatable(
 				"menu.critter_carts.spider_nest.delivering",
-				spider.carriedStack.hoverName
+				menu.getCarriedStack(spiderIndex).hoverName
 			)
 
 			HoppingSpiderJob.Phase.RETURNING ->
 				Component.translatable("menu.critter_carts.spider_nest.returning")
+
+			null -> Component.translatable("menu.critter_carts.spider_nest.idle")
 		}
 	}
 
