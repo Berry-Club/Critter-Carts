@@ -98,6 +98,7 @@
   "menu.critterworks.spider_nest.failure.filter_changed": "filter changed",
   "menu.critterworks.spider_nest.failure.source_missing": "source missing",
   "menu.critterworks.spider_nest.idle": "Job: Idle",
+  "menu.critterworks.spider_nest.wandering": "Job: Wandering",
   "menu.critterworks.spider_nest.position": "Position: %s, %s, %s",
   "menu.critterworks.spider_nest.returning": "Job: Returning to nest",
   "menu.critterworks.spider_nest.returning_item": "Job: Returning item (%s)",

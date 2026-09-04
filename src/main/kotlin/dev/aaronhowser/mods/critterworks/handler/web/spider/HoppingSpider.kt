@@ -3,6 +3,9 @@ package dev.aaronhowser.mods.critterworks.handler.web.spider
 import dev.aaronhowser.mods.critterworks.handler.web.WebSavedData
 import dev.aaronhowser.mods.critterworks.handler.web.node.WebBlockAnchor
 import dev.aaronhowser.mods.critterworks.handler.web.path.WebPath
+import dev.aaronhowser.mods.critterworks.handler.web.spider.behavior.HoppingSpiderBehavior
+import dev.aaronhowser.mods.critterworks.handler.web.spider.behavior.transport.HoppingSpiderTransportBehavior
+import dev.aaronhowser.mods.critterworks.handler.web.spider.behavior.HoppingSpiderWanderBehavior
 import dev.aaronhowser.mods.critterworks.item.ItemFilterItem
 import dev.aaronhowser.mods.critterworks.item.SpiderNestInterfaceItem
 import dev.aaronhowser.mods.critterworks.item.component.NestInterfaceComponent
@@ -20,7 +23,12 @@ class HoppingSpider(
 	val uuid: UUID = UUID.randomUUID()
 ) {
 
-	var job: HoppingSpiderJob? = null
+	var activeBehavior: HoppingSpiderBehavior? = null
+	var transportBehavior: HoppingSpiderTransportBehavior?
+		get() = activeBehavior as? HoppingSpiderTransportBehavior
+		set(value) {
+			activeBehavior = value
+		}
 	var carriedStack: ItemStack = ItemStack.EMPTY
 	var position: Vec3? = null
 	var route: HoppingSpiderRoute? = null
@@ -31,37 +39,61 @@ class HoppingSpider(
 			position = nestPosition
 		}
 
-		val job = job ?: return false
-		val path = findPath(level, job)
-		if (path == null) return handleMissingPath(level)
-
-		val routeChanged = updateRoute(level, job, path)
-		if (!moveAlong(path)) return routeChanged
-
-		return completeCurrentLeg(level, job, nestPosition)
+		val activeBehavior = activeBehavior ?: return false
+		return activeBehavior.tick(level, this, nestPosition)
 	}
 
-	private fun findPath(level: ServerLevel, job: HoppingSpiderJob): WebPath? {
+	fun tryStartBehavior(behavior: HoppingSpiderBehavior): Boolean {
+		val activeBehavior = activeBehavior
+		if (activeBehavior != null) {
+			if (!activeBehavior.canBeInterrupted) return false
+			if (activeBehavior.priority >= behavior.priority) return false
+		}
+
+		this.activeBehavior = behavior
+		clearRoute()
+		return true
+	}
+
+	internal fun stopBehavior(behavior: HoppingSpiderBehavior) {
+		if (activeBehavior !== behavior) return
+		activeBehavior = null
+		clearRoute()
+	}
+
+	internal fun travelTo(
+		level: ServerLevel,
+		currentNodeUuid: UUID,
+		targetNodeUuid: UUID
+	): TravelResult {
 		val savedData = WebSavedData.get(level)
-		val currentNode = savedData.getNode(job.currentNodeUuid) ?: return null
-		val targetNode = savedData.getNode(job.targetNodeUuid) ?: return null
+		val currentNode = savedData.getNode(currentNodeUuid) ?: return TravelResult.MISSING_PATH
+		val targetNode = savedData.getNode(targetNodeUuid) ?: return TravelResult.MISSING_PATH
+		var path: WebPath? = null
 
 		for (line in currentNode.lines) {
 			val network = savedData.getNetwork(line.uuid) ?: continue
-			return network.findShortestPath(currentNode, targetNode) ?: continue
+			path = network.findShortestPath(currentNode, targetNode) ?: continue
+			break
 		}
 
-		return null
+		val resolvedPath = path ?: return TravelResult.MISSING_PATH
+		val routeChanged = updateRoute(level, targetNodeUuid, resolvedPath)
+		if (!moveAlong(resolvedPath)) {
+			return if (routeChanged) TravelResult.STARTED else TravelResult.TRAVELLING
+		}
+
+		return TravelResult.ARRIVED
 	}
 
 	private fun updateRoute(
 		level: ServerLevel,
-		job: HoppingSpiderJob,
+		targetNodeUuid: UUID,
 		path: WebPath
 	): Boolean {
-		val newRoute = HoppingSpiderRoute.fromPath(path, level.gameTime, TRAVEL_SPEED)
+		val newRoute = HoppingSpiderRoute.fromPath(path, level.gameTime, travelSpeed)
 		val route = route
-		if (route != null && route.matches(job.targetNodeUuid, newRoute.positions)) return false
+		if (route != null && route.matches(targetNodeUuid, newRoute.positions)) return false
 
 		this.route = newRoute
 		routeProgress = 0.0
@@ -70,7 +102,7 @@ class HoppingSpider(
 	}
 
 	private fun moveAlong(path: WebPath): Boolean {
-		routeProgress += TRAVEL_SPEED
+		routeProgress += travelSpeed
 		position = getPathPosition(path, routeProgress)
 		return routeProgress >= path.distance
 	}
@@ -92,162 +124,162 @@ class HoppingSpider(
 		return path.endNode.position
 	}
 
-	private fun completeCurrentLeg(
+	internal fun completeTransportLeg(
 		level: ServerLevel,
-		job: HoppingSpiderJob,
+		transportBehavior: HoppingSpiderTransportBehavior,
 		nestPosition: Vec3
 	): Boolean {
-		return when (job.phase) {
-			HoppingSpiderJob.Phase.TO_SOURCE -> {
-				pickUpItem(level, job)
+		return when (transportBehavior.phase) {
+			HoppingSpiderTransportBehavior.Phase.TO_SOURCE -> {
+				pickUpItem(level, transportBehavior)
 				true
 			}
 
-			HoppingSpiderJob.Phase.TO_DESTINATION -> deliverItem(level, job)
+			HoppingSpiderTransportBehavior.Phase.TO_DESTINATION -> deliverItem(level, transportBehavior)
 
-			HoppingSpiderJob.Phase.RETURNING_ITEM -> {
-				returnItem(level, job)
+			HoppingSpiderTransportBehavior.Phase.RETURNING_ITEM -> {
+				returnItem(level, transportBehavior)
 				true
 			}
 
-			HoppingSpiderJob.Phase.RETURNING -> {
-				finishJob(nestPosition)
+			HoppingSpiderTransportBehavior.Phase.RETURNING -> {
+				finishTransport(nestPosition)
 				true
 			}
 
-			HoppingSpiderJob.Phase.RETURNING_FROM_SOURCE -> {
-				finishJob(nestPosition)
+			HoppingSpiderTransportBehavior.Phase.RETURNING_FROM_SOURCE -> {
+				finishTransport(nestPosition)
 				true
 			}
 		}
 	}
 
-	private fun pickUpItem(level: ServerLevel, job: HoppingSpiderJob) {
-		val source = getBlockAnchor(level, job.sourceNodeUuid)
+	private fun pickUpItem(level: ServerLevel, transportBehavior: HoppingSpiderTransportBehavior) {
+		val source = getBlockAnchor(level, transportBehavior.sourceNodeUuid)
 		if (source == null) {
-			cancelJob()
+			cancelTransport()
 			return
 		}
 
 		val nestInterface = SpiderNestInterfaceItem.getComponent(source.nestInterface)
 
 		if (nestInterface.transferDirection != NestInterfaceComponent.TransferDirection.INPUT) {
-			cancelJob()
+			cancelTransport()
 			return
 		}
 
 		val handler = getItemHandler(level, source)
 		if (handler == null) {
-			cancelJob()
+			cancelTransport()
 			return
 		}
 
 		val filter = nestInterface.getFilter()
-		val stack = handler.extractItem(job.sourceSlot, job.transferAmount, true)
+		val stack = handler.extractItem(transportBehavior.sourceSlot, transportBehavior.transferAmount, true)
 
 		if (stack.isEmpty) {
-			cancelJob()
+			cancelTransport()
 			return
 		}
 
 		if (!filter.isEmpty && !ItemFilterItem.passesFilter(filter, stack)) {
-			cancelJob()
+			cancelTransport()
 			return
 		}
 
-		val extracted = handler.extractItem(job.sourceSlot, job.transferAmount, false)
+		val extracted = handler.extractItem(transportBehavior.sourceSlot, transportBehavior.transferAmount, false)
 		if (extracted.isEmpty) {
-			cancelJob()
+			cancelTransport()
 			return
 		}
 
 		carriedStack = extracted
-		startNextLeg(HoppingSpiderJob.Phase.TO_DESTINATION)
+		startNextLeg(HoppingSpiderTransportBehavior.Phase.TO_DESTINATION)
 	}
 
-	private fun deliverItem(level: ServerLevel, job: HoppingSpiderJob): Boolean {
-		val destination = getBlockAnchor(level, job.destinationNodeUuid)
-			?: return failDelivery(level, job, HoppingSpiderJob.FailureReason.DESTINATION_MISSING)
+	private fun deliverItem(level: ServerLevel, transportBehavior: HoppingSpiderTransportBehavior): Boolean {
+		val destination = getBlockAnchor(level, transportBehavior.destinationNodeUuid)
+			?: return failDelivery(level, transportBehavior, HoppingSpiderTransportBehavior.FailureReason.DESTINATION_MISSING)
 
 		val destinationInterface = SpiderNestInterfaceItem.getComponent(destination.nestInterface)
 
 		if (destinationInterface.transferDirection != NestInterfaceComponent.TransferDirection.OUTPUT) {
-			return failDelivery(level, job, HoppingSpiderJob.FailureReason.DESTINATION_NOT_OUTPUT)
+			return failDelivery(level, transportBehavior, HoppingSpiderTransportBehavior.FailureReason.DESTINATION_NOT_OUTPUT)
 		}
 
-		val source = getBlockAnchor(level, job.sourceNodeUuid)
-			?: return failDelivery(level, job, HoppingSpiderJob.FailureReason.SOURCE_MISSING)
+		val source = getBlockAnchor(level, transportBehavior.sourceNodeUuid)
+			?: return failDelivery(level, transportBehavior, HoppingSpiderTransportBehavior.FailureReason.SOURCE_MISSING)
 
 		val sourceInterface = SpiderNestInterfaceItem.getComponent(source.nestInterface)
 
 		if (sourceInterface.color != destinationInterface.color) {
-			return failDelivery(level, job, HoppingSpiderJob.FailureReason.CHANNEL_CHANGED)
+			return failDelivery(level, transportBehavior, HoppingSpiderTransportBehavior.FailureReason.CHANNEL_CHANGED)
 		}
 
 		val filter = destinationInterface.getFilter()
 		if (!filter.isEmpty && !ItemFilterItem.passesFilter(filter, carriedStack)) {
-			return failDelivery(level, job, HoppingSpiderJob.FailureReason.FILTER_CHANGED)
+			return failDelivery(level, transportBehavior, HoppingSpiderTransportBehavior.FailureReason.FILTER_CHANGED)
 		}
 
 		val handler = getItemHandler(level, destination)
-			?: return failDelivery(level, job, HoppingSpiderJob.FailureReason.DESTINATION_UNAVAILABLE)
+			?: return failDelivery(level, transportBehavior, HoppingSpiderTransportBehavior.FailureReason.DESTINATION_UNAVAILABLE)
 
 		carriedStack = insertItem(handler, carriedStack)
 		if (!carriedStack.isEmpty) {
-			return failDelivery(level, job, HoppingSpiderJob.FailureReason.DESTINATION_FULL)
+			return failDelivery(level, transportBehavior, HoppingSpiderTransportBehavior.FailureReason.DESTINATION_FULL)
 		}
 
-		job.failureReason = null
-		startNextLeg(HoppingSpiderJob.Phase.RETURNING)
+		transportBehavior.failureReason = null
+		startNextLeg(HoppingSpiderTransportBehavior.Phase.RETURNING)
 
 		return true
 	}
 
 	private fun failDelivery(
 		level: ServerLevel,
-		job: HoppingSpiderJob,
-		reason: HoppingSpiderJob.FailureReason
+		transportBehavior: HoppingSpiderTransportBehavior,
+		reason: HoppingSpiderTransportBehavior.FailureReason
 	): Boolean {
-		val reasonChanged = job.failureReason != reason
-		job.failureReason = reason
+		val reasonChanged = transportBehavior.failureReason != reason
+		transportBehavior.failureReason = reason
 
 		if (reason.shouldRetry) return reasonChanged
 
-		if (reason == HoppingSpiderJob.FailureReason.DESTINATION_MISSING
-			|| reason == HoppingSpiderJob.FailureReason.SOURCE_MISSING
+		if (reason == HoppingSpiderTransportBehavior.FailureReason.DESTINATION_MISSING
+			|| reason == HoppingSpiderTransportBehavior.FailureReason.SOURCE_MISSING
 		) {
 			dropCarriedItem(level)
-			cancelJob()
+			cancelTransport()
 			return true
 		}
 
-		startNextLeg(HoppingSpiderJob.Phase.RETURNING_ITEM)
+		startNextLeg(HoppingSpiderTransportBehavior.Phase.RETURNING_ITEM)
 
 		return true
 	}
 
-	private fun returnItem(level: ServerLevel, job: HoppingSpiderJob) {
-		val source = getBlockAnchor(level, job.sourceNodeUuid)
+	private fun returnItem(level: ServerLevel, transportBehavior: HoppingSpiderTransportBehavior) {
+		val source = getBlockAnchor(level, transportBehavior.sourceNodeUuid)
 		if (source == null) {
 			dropCarriedItem(level)
-			cancelJob()
+			cancelTransport()
 			return
 		}
 
 		val handler = getItemHandler(level, source)
 		if (handler == null) {
 			dropCarriedItem(level)
-			startNextLeg(HoppingSpiderJob.Phase.RETURNING_FROM_SOURCE)
+			startNextLeg(HoppingSpiderTransportBehavior.Phase.RETURNING_FROM_SOURCE)
 			return
 		}
 
-		carriedStack = returnToSource(handler, job.sourceSlot, carriedStack)
+		carriedStack = returnToSource(handler, transportBehavior.sourceSlot, carriedStack)
 
 		if (!carriedStack.isEmpty) {
 			dropCarriedItem(level)
 		}
 
-		startNextLeg(HoppingSpiderJob.Phase.RETURNING_FROM_SOURCE)
+		startNextLeg(HoppingSpiderTransportBehavior.Phase.RETURNING_FROM_SOURCE)
 	}
 
 	private fun returnToSource(handler: IItemHandler, sourceSlot: Int, stack: ItemStack): ItemStack {
@@ -267,11 +299,9 @@ class HoppingSpider(
 		return remainder
 	}
 
-	private fun handleMissingPath(level: ServerLevel): Boolean {
-		if (carriedStack.isEmpty) return false
-
-		dropCarriedItem(level)
-		cancelJob()
+	internal fun handleMissingTransportPath(level: ServerLevel): Boolean {
+		if (!carriedStack.isEmpty) dropCarriedItem(level)
+		cancelTransport()
 
 		return true
 	}
@@ -290,22 +320,27 @@ class HoppingSpider(
 		carriedStack = ItemStack.EMPTY
 	}
 
-	private fun startNextLeg(phase: HoppingSpiderJob.Phase) {
-		val job = job ?: return
-		job.phase = phase
+	private fun startNextLeg(phase: HoppingSpiderTransportBehavior.Phase) {
+		val transportBehavior = transportBehavior ?: return
+		transportBehavior.phase = phase
 		route = null
 		routeProgress = 0.0
 	}
 
-	private fun finishJob(nestPosition: Vec3) {
-		job = null
+	private fun finishTransport(nestPosition: Vec3) {
+		transportBehavior = null
 		position = nestPosition
 		route = null
 		routeProgress = 0.0
 	}
 
-	private fun cancelJob() {
-		job = null
+	private fun cancelTransport() {
+		activeBehavior = null
+		route = null
+		routeProgress = 0.0
+	}
+
+	internal fun clearRoute() {
 		route = null
 		routeProgress = 0.0
 	}
@@ -338,9 +373,9 @@ class HoppingSpider(
 		tag.putUUID(UUID_TAG, uuid)
 		tag.putDouble(ROUTE_PROGRESS_TAG, routeProgress)
 
-		val job = job
-		if (job != null) {
-			tag.put(JOB_TAG, job.save())
+		val activeBehavior = activeBehavior
+		if (activeBehavior != null) {
+			tag.put(ACTIVE_BEHAVIOR_TAG, activeBehavior.save())
 		}
 
 		val route = route
@@ -362,21 +397,35 @@ class HoppingSpider(
 		return tag
 	}
 
+	private val travelSpeed: Double
+		get() {
+			val normalizedVariation = ((uuid.leastSignificantBits and 0xffffL).toDouble() / 0xffff) * 2.0 - 1.0
+			return BASE_TRAVEL_SPEED * (1.0 + normalizedVariation * SPEED_VARIATION)
+		}
+
+	enum class TravelResult {
+		STARTED,
+		TRAVELLING,
+		ARRIVED,
+		MISSING_PATH
+	}
+
 	companion object {
 		private const val UUID_TAG = "Uuid"
-		private const val JOB_TAG = "Job"
+		private const val ACTIVE_BEHAVIOR_TAG = "ActiveBehavior"
 		private const val ROUTE_TAG = "Route"
 		private const val ROUTE_PROGRESS_TAG = "RouteProgress"
 		private const val CARRIED_STACK_TAG = "CarriedStack"
 		private const val POSITION_X_TAG = "PositionX"
 		private const val POSITION_Y_TAG = "PositionY"
 		private const val POSITION_Z_TAG = "PositionZ"
-		private const val TRAVEL_SPEED = 0.15
+		private const val BASE_TRAVEL_SPEED = 0.15
+		private const val SPEED_VARIATION = 0.1
 
 		fun load(tag: CompoundTag, registries: HolderLookup.Provider): HoppingSpider {
 			val uuid = getUuid(tag)
 			val spider = HoppingSpider(uuid)
-			spider.job = getJob(tag)
+			spider.activeBehavior = getActiveBehavior(tag)
 			spider.route = getRoute(tag)
 			spider.routeProgress = tag.getDouble(ROUTE_PROGRESS_TAG)
 			spider.carriedStack = getCarriedStack(tag, registries)
@@ -389,9 +438,15 @@ class HoppingSpider(
 			return UUID.randomUUID()
 		}
 
-		private fun getJob(tag: CompoundTag): HoppingSpiderJob? {
-			if (!tag.contains(JOB_TAG)) return null
-			return HoppingSpiderJob.load(tag.getCompound(JOB_TAG))
+		private fun getActiveBehavior(tag: CompoundTag): HoppingSpiderBehavior? {
+			if (!tag.contains(ACTIVE_BEHAVIOR_TAG)) return null
+
+			val behaviorTag = tag.getCompound(ACTIVE_BEHAVIOR_TAG)
+			return when (behaviorTag.getString("Type")) {
+				HoppingSpiderTransportBehavior.TYPE -> HoppingSpiderTransportBehavior.load(behaviorTag)
+				HoppingSpiderWanderBehavior.TYPE -> HoppingSpiderWanderBehavior.load(behaviorTag)
+				else -> null
+			}
 		}
 
 		private fun getRoute(tag: CompoundTag): HoppingSpiderRoute? {

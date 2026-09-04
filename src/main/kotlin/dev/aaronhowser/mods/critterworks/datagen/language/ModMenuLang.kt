@@ -34,6 +34,7 @@ object ModMenuLang {
 		provider.add("menu.critterworks.spider_nest.spider", "Spider %s")
 		provider.add("menu.critterworks.spider_nest.position", "Position: %s, %s, %s")
 		provider.add("menu.critterworks.spider_nest.idle", "Job: Idle")
+		provider.add("menu.critterworks.spider_nest.wandering", "Job: Wandering")
 		provider.add("menu.critterworks.spider_nest.collecting", "Job: Collecting %s items")
 		provider.add("menu.critterworks.spider_nest.delivering", "Job: Delivering %s")
 		provider.add("menu.critterworks.spider_nest.waiting", "Job: Waiting (%s)")

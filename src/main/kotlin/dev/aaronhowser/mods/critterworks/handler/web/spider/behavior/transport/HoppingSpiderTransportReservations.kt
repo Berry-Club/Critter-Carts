@@ -1,16 +1,16 @@
-package dev.aaronhowser.mods.critterworks.handler.web.spider
+package dev.aaronhowser.mods.critterworks.handler.web.spider.behavior.transport
 
 import java.util.*
 
-class HoppingSpiderReservations {
+class HoppingSpiderTransportReservations {
 
 	private val sources: MutableSet<Pair<UUID, Int>> = mutableSetOf()
 	private val destinations: MutableSet<UUID> = mutableSetOf()
 
-	fun reserve(job: HoppingSpiderJob) {
-		sources.add(job.sourceNodeUuid to job.sourceSlot)
+	fun reserve(behavior: HoppingSpiderTransportBehavior) {
+		sources.add(behavior.sourceNodeUuid to behavior.sourceSlot)
 
-		destinations.add(job.destinationNodeUuid)
+		destinations.add(behavior.destinationNodeUuid)
 	}
 
 	fun isSourceReserved(nodeUuid: UUID, slot: Int): Boolean {

@@ -4,7 +4,7 @@ import dev.aaronhowser.mods.aaron.menu.BaseScreen
 import dev.aaronhowser.mods.aaron.menu.textures.ScreenBackground
 import dev.aaronhowser.mods.critterworks.Critterworks
 import dev.aaronhowser.mods.critterworks.handler.web.spider.HoppingSpider
-import dev.aaronhowser.mods.critterworks.handler.web.spider.HoppingSpiderJob
+import dev.aaronhowser.mods.critterworks.handler.web.spider.behavior.transport.HoppingSpiderTransportBehavior
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.player.Inventory
@@ -38,11 +38,11 @@ class SpiderNestScreen(
 		val rowY = FIRST_ROW_Y + index * ROW_HEIGHT
 		val name = Component.translatable("menu.critterworks.spider_nest.spider", index + 1)
 		val position = getPositionText(spider, gameTime)
-		val job = getJobText(spider)
+		val transportBehavior = getJobText(spider)
 
 		guiGraphics.drawString(font, name, TEXT_X, rowY, LABEL_COLOR, false)
 		guiGraphics.drawString(font, position, TEXT_X, rowY + LINE_HEIGHT, TEXT_COLOR, false)
-		guiGraphics.drawString(font, job, TEXT_X, rowY + LINE_HEIGHT * 2, TEXT_COLOR, false)
+		guiGraphics.drawString(font, transportBehavior, TEXT_X, rowY + LINE_HEIGHT * 2, TEXT_COLOR, false)
 	}
 
 	private fun getPositionText(spider: HoppingSpider, gameTime: Long): Component {
@@ -62,29 +62,36 @@ class SpiderNestScreen(
 	}
 
 	private fun getJobText(spider: HoppingSpider): Component {
-		val job = spider.job ?: return Component.translatable("menu.critterworks.spider_nest.idle")
+		val transportBehavior = spider.transportBehavior
+		if (transportBehavior == null) {
+			if (spider.activeBehavior != null) {
+				return Component.translatable("menu.critterworks.spider_nest.wandering")
+			}
 
-		return when (job.phase) {
-			HoppingSpiderJob.Phase.TO_SOURCE -> Component.translatable(
+			return Component.translatable("menu.critterworks.spider_nest.idle")
+		}
+
+		return when (transportBehavior.phase) {
+			HoppingSpiderTransportBehavior.Phase.TO_SOURCE -> Component.translatable(
 				"menu.critterworks.spider_nest.collecting",
-				job.transferAmount
+				transportBehavior.transferAmount
 			)
 
-			HoppingSpiderJob.Phase.TO_DESTINATION -> getDeliveryText(spider, job)
+			HoppingSpiderTransportBehavior.Phase.TO_DESTINATION -> getDeliveryText(spider, transportBehavior)
 
-			HoppingSpiderJob.Phase.RETURNING_ITEM -> Component.translatable(
+			HoppingSpiderTransportBehavior.Phase.RETURNING_ITEM -> Component.translatable(
 				"menu.critterworks.spider_nest.returning_item",
-				getFailureText(job.failureReason)
+				getFailureText(transportBehavior.failureReason)
 			)
 
-			HoppingSpiderJob.Phase.RETURNING,
-			HoppingSpiderJob.Phase.RETURNING_FROM_SOURCE ->
+			HoppingSpiderTransportBehavior.Phase.RETURNING,
+			HoppingSpiderTransportBehavior.Phase.RETURNING_FROM_SOURCE ->
 				Component.translatable("menu.critterworks.spider_nest.returning")
 		}
 	}
 
-	private fun getDeliveryText(spider: HoppingSpider, job: HoppingSpiderJob): Component {
-		val failureReason = job.failureReason
+	private fun getDeliveryText(spider: HoppingSpider, transportBehavior: HoppingSpiderTransportBehavior): Component {
+		val failureReason = transportBehavior.failureReason
 
 		if (failureReason != null) {
 			return Component.translatable(
@@ -99,7 +106,7 @@ class SpiderNestScreen(
 		)
 	}
 
-	private fun getFailureText(reason: HoppingSpiderJob.FailureReason?): Component {
+	private fun getFailureText(reason: HoppingSpiderTransportBehavior.FailureReason?): Component {
 		if (reason == null) return Component.empty()
 
 		val name = reason.name.lowercase(Locale.ROOT)
