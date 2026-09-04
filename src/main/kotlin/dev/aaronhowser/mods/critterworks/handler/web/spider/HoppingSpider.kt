@@ -55,13 +55,13 @@ class HoppingSpider(
 		return true
 	}
 
-	internal fun stopBehavior(behavior: HoppingSpiderBehavior) {
+	fun stopBehavior(behavior: HoppingSpiderBehavior) {
 		if (activeBehavior !== behavior) return
 		activeBehavior = null
 		clearRoute()
 	}
 
-	internal fun travelTo(
+	fun travelTo(
 		level: ServerLevel,
 		currentNodeUuid: UUID,
 		targetNodeUuid: UUID
@@ -124,7 +124,7 @@ class HoppingSpider(
 		return path.endNode.position
 	}
 
-	internal fun completeTransportLeg(
+	fun completeTransportLeg(
 		level: ServerLevel,
 		transportBehavior: HoppingSpiderTransportBehavior,
 		nestPosition: Vec3
@@ -299,7 +299,7 @@ class HoppingSpider(
 		return remainder
 	}
 
-	internal fun handleMissingTransportPath(level: ServerLevel): Boolean {
+	fun handleMissingTransportPath(level: ServerLevel): Boolean {
 		if (!carriedStack.isEmpty) dropCarriedItem(level)
 		cancelTransport()
 
@@ -340,7 +340,7 @@ class HoppingSpider(
 		routeProgress = 0.0
 	}
 
-	internal fun clearRoute() {
+	fun clearRoute() {
 		route = null
 		routeProgress = 0.0
 	}
