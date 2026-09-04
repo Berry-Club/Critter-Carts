@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack
 import dev.aaronhowser.mods.aaron.misc.AaronDsls.withPose
 import dev.aaronhowser.mods.critterworks.block_entity.HoppingSpiderNestBlockEntity
 import dev.aaronhowser.mods.critterworks.handler.spider.HoppingSpider
+import dev.aaronhowser.mods.critterworks.registry.ModItems
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.LevelRenderer
 import net.minecraft.client.renderer.MultiBufferSource
@@ -11,13 +12,14 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderer
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider
 import net.minecraft.core.BlockPos
 import net.minecraft.world.item.ItemDisplayContext
-import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
 
 class HoppingSpiderNestBlockRenderer(
 	context: BlockEntityRendererProvider.Context
 ) : BlockEntityRenderer<HoppingSpiderNestBlockEntity> {
+
+	private val hoppingSpiderStack by lazy { ModItems.HOPPING_SPIDER.get().defaultInstance }
 
 	override fun render(
 		blockEntity: HoppingSpiderNestBlockEntity,
@@ -61,20 +63,21 @@ class HoppingSpiderNestBlockRenderer(
 		packedOverlay: Int
 	) {
 		poseStack.withPose {
-			poseStack.translate(
-				-SPIDER_SCALE / 2.0,
-				-SPIDER_SCALE / 2.0,
-				-SPIDER_SCALE / 2.0
+			poseStack.scale(
+				HOPPING_SPIDER_SCALE,
+				HOPPING_SPIDER_SCALE,
+				HOPPING_SPIDER_SCALE
 			)
 
-			poseStack.scale(SPIDER_SCALE, SPIDER_SCALE, SPIDER_SCALE)
-
-			Minecraft.getInstance().blockRenderer.renderSingleBlock(
-				Blocks.GRAY_CONCRETE.defaultBlockState(),
+			Minecraft.getInstance().itemRenderer.renderStatic(
+				hoppingSpiderStack,
+				ItemDisplayContext.GROUND,
+				packedLight,
+				packedOverlay,
 				poseStack,
 				bufferSource,
-				packedLight,
-				packedOverlay
+				Minecraft.getInstance().level,
+				0
 			)
 		}
 
@@ -109,8 +112,8 @@ class HoppingSpiderNestBlockRenderer(
 	}
 
 	companion object {
-		private const val SPIDER_SCALE = 0.12f
-		private const val ITEM_SCALE = 0.4f
+		private const val HOPPING_SPIDER_SCALE = 0.5f
+		private const val ITEM_SCALE = 0.6f
 		private const val ITEM_HEIGHT = 0.18
 		private const val IDLE_OFFSET = 0.14
 	}
