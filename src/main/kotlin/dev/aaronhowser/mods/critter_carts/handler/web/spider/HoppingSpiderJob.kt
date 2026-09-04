@@ -8,6 +8,7 @@ class HoppingSpiderJob(
 	val sourceNodeUuid: UUID,
 	val destinationNodeUuid: UUID,
 	val sourceSlot: Int,
+	val transferAmount: Int,
 	var phase: Phase = Phase.TO_SOURCE
 ) {
 
@@ -35,6 +36,7 @@ class HoppingSpiderJob(
 		tag.putUUID(SOURCE_NODE_UUID_TAG, sourceNodeUuid)
 		tag.putUUID(DESTINATION_NODE_UUID_TAG, destinationNodeUuid)
 		tag.putInt(SOURCE_SLOT_TAG, sourceSlot)
+		tag.putInt(TRANSFER_AMOUNT_TAG, transferAmount)
 		tag.putString(PHASE_TAG, phase.name)
 		return tag
 	}
@@ -50,6 +52,7 @@ class HoppingSpiderJob(
 		private const val SOURCE_NODE_UUID_TAG = "SourceNodeUuid"
 		private const val DESTINATION_NODE_UUID_TAG = "DestinationNodeUuid"
 		private const val SOURCE_SLOT_TAG = "SourceSlot"
+		private const val TRANSFER_AMOUNT_TAG = "TransferAmount"
 		private const val PHASE_TAG = "Phase"
 
 		fun load(tag: CompoundTag): HoppingSpiderJob? {
@@ -66,8 +69,14 @@ class HoppingSpiderJob(
 				tag.getUUID(SOURCE_NODE_UUID_TAG),
 				tag.getUUID(DESTINATION_NODE_UUID_TAG),
 				tag.getInt(SOURCE_SLOT_TAG),
+				getTransferAmount(tag),
 				phase
 			)
+		}
+
+		private fun getTransferAmount(tag: CompoundTag): Int {
+			if (!tag.contains(TRANSFER_AMOUNT_TAG)) return 64
+			return tag.getInt(TRANSFER_AMOUNT_TAG)
 		}
 	}
 }

@@ -107,10 +107,10 @@ class HoppingSpider(
 		if (interfaceComponent.transferDirection != NestInterfaceComponent.TransferDirection.INPUT) return cancelJob()
 		val handler = getItemHandler(level, source) ?: return cancelJob()
 		val filter = interfaceComponent.getFilter()
-		val simulatedStack = handler.extractItem(job.sourceSlot, MAX_TRANSFER_SIZE, true)
+		val simulatedStack = handler.extractItem(job.sourceSlot, job.transferAmount, true)
 		if (simulatedStack.isEmpty) return cancelJob()
 		if (!filter.isEmpty && !ItemFilterItem.passesFilter(filter, simulatedStack)) return cancelJob()
-		val extractedStack = handler.extractItem(job.sourceSlot, MAX_TRANSFER_SIZE, false)
+		val extractedStack = handler.extractItem(job.sourceSlot, job.transferAmount, false)
 		if (extractedStack.isEmpty) return cancelJob()
 
 		carriedStack = extractedStack
@@ -219,7 +219,6 @@ class HoppingSpider(
 		private const val POSITION_X_TAG = "PositionX"
 		private const val POSITION_Y_TAG = "PositionY"
 		private const val POSITION_Z_TAG = "PositionZ"
-		private const val MAX_TRANSFER_SIZE = 64
 		private const val TRAVEL_SPEED = 0.15
 
 		fun load(tag: CompoundTag, registries: HolderLookup.Provider): HoppingSpider {
