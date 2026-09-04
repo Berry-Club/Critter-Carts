@@ -88,8 +88,10 @@ class HoppingSpiderNestBlockEntity(
 			if (spider.job != null) continue
 
 			val job = findJob(level, reservations) ?: break
+
 			assignJob(level, spider, job)
 			reservations.reserve(job)
+
 			assignedJob = true
 		}
 
@@ -98,20 +100,24 @@ class HoppingSpiderNestBlockEntity(
 
 	private fun getReservations(level: ServerLevel): HoppingSpiderReservations {
 		val reservations = HoppingSpiderReservations()
-		val nestPositions: MutableSet<BlockPos> = mutableSetOf(blockPos)
+		val nestPositions = mutableSetOf(blockPos)
 		val savedData = WebSavedData.get(level)
+
 		for (network in savedData.getNetworksAt(blockPos)) {
 			for (node in network.getNodes()) {
 				if (node !is WebBlockAnchor) continue
 				if (level.getBlockEntity(node.blockPos) !is HoppingSpiderNestBlockEntity) continue
+
 				nestPositions.add(node.blockPos)
 			}
 		}
 
-		for (nestPosition in nestPositions) {
-			val nest = level.getBlockEntity(nestPosition) as? HoppingSpiderNestBlockEntity ?: continue
+		for (pos in nestPositions) {
+			val nest = level.getBlockEntity(pos) as? HoppingSpiderNestBlockEntity ?: continue
+
 			for (spider in nest.hoppingSpiders) {
 				val job = spider.job ?: continue
+
 				reservations.reserve(job)
 			}
 		}
@@ -121,14 +127,18 @@ class HoppingSpiderNestBlockEntity(
 
 	private fun assignJob(level: ServerLevel, spider: HoppingSpider, job: HoppingSpiderJob) {
 		spider.job = job
-		spider.position = WebSavedData.get(level).getNode(job.homeNodeUuid)?.position
+
+		val homeNode = WebSavedData.get(level).getNode(job.homeNodeUuid)
+		spider.position = homeNode?.position
 	}
 
 	private fun findJob(level: ServerLevel, reservations: HoppingSpiderReservations): HoppingSpiderJob? {
 		val savedData = WebSavedData.get(level)
 		var bestCandidate: HoppingSpiderJobCandidate? = null
+
 		for (network in savedData.getNetworksAt(blockPos)) {
 			val candidate = findJobInNetwork(level, network, reservations)
+
 			if (candidate?.isPreferredOver(bestCandidate) == true) {
 				bestCandidate = candidate
 			}
@@ -177,10 +187,12 @@ class HoppingSpiderNestBlockEntity(
 
 		val sourceHandler = getItemHandler(level, sourceNode) ?: return null
 		var bestCandidate: HoppingSpiderJobCandidate? = null
+
 		for (sourceSlot in 0 until sourceHandler.slots) {
 			if (reservations.isSourceReserved(sourceNode.uuid, sourceSlot)) continue
 
 			val stack = sourceHandler.extractItem(sourceSlot, MAX_TRANSFER_SIZE, true)
+
 			if (stack.isEmpty) continue
 			if (!passesFilter(sourceInterface, stack)) continue
 
@@ -194,6 +206,7 @@ class HoppingSpiderNestBlockEntity(
 				stack,
 				reservations
 			)
+
 			if (candidate?.isPreferredOver(bestCandidate) == true) {
 				bestCandidate = candidate
 			}
@@ -214,18 +227,23 @@ class HoppingSpiderNestBlockEntity(
 	): HoppingSpiderJobCandidate? {
 		val sourceInterface = SpiderNestInterfaceItem.getComponent(sourceNode.nestInterface)
 		var bestCandidate: HoppingSpiderJobCandidate? = null
+
 		for (destinationNode in inventoryNodes) {
 			if (isSameFace(sourceNode, destinationNode)) continue
+
 			val destinationInterface = SpiderNestInterfaceItem.getComponent(destinationNode.nestInterface)
+
 			if (destinationInterface.transferDirection != NestInterfaceComponent.TransferDirection.OUTPUT) continue
 			if (destinationInterface.color != sourceInterface.color) continue
 			if (!passesFilter(destinationInterface, stack)) continue
 			if (reservations.isDestinationReserved(destinationNode.uuid)) continue
+
 			val transferAmount = getInsertableAmount(level, destinationNode, stack)
 			if (transferAmount == 0) continue
 
 			val homeNode = findHomeNode(network, nestNodes, sourceNode, destinationNode)
 				?: continue
+
 			val job = HoppingSpiderJob(
 				homeNode.uuid,
 				sourceNode.uuid,
@@ -233,12 +251,14 @@ class HoppingSpiderNestBlockEntity(
 				sourceSlot,
 				transferAmount
 			)
+
 			val candidate = HoppingSpiderJobCandidate(
 				job,
 				sourceInterface.priority,
 				destinationInterface.priority,
 				transferAmount
 			)
+
 			if (candidate.isPreferredOver(bestCandidate)) {
 				bestCandidate = candidate
 			}
@@ -273,11 +293,13 @@ class HoppingSpiderNestBlockEntity(
 	}
 
 	private fun getInventoryAnchors(level: ServerLevel, network: WebNetwork): List<WebBlockAnchor> {
-		val anchors: MutableList<WebBlockAnchor> = mutableListOf()
+		val anchors = mutableListOf<WebBlockAnchor>()
+
 		for (node in network.getNodes()) {
 			if (node !is WebBlockAnchor || node.blockPos == blockPos) continue
 			if (!node.hasNestInterface) continue
 			if (getItemHandler(level, node) == null) continue
+
 			anchors.add(node)
 		}
 
@@ -285,7 +307,8 @@ class HoppingSpiderNestBlockEntity(
 	}
 
 	private fun getAnchors(network: WebNetwork, pos: BlockPos): List<WebBlockAnchor> {
-		val anchors: MutableList<WebBlockAnchor> = mutableListOf()
+		val anchors = mutableListOf<WebBlockAnchor>()
+
 		for (node in network.getNodes()) {
 			if (node is WebBlockAnchor && node.blockPos == pos) {
 				anchors.add(node)
@@ -302,6 +325,7 @@ class HoppingSpiderNestBlockEntity(
 	private fun getInsertableAmount(level: ServerLevel, anchor: WebBlockAnchor, stack: ItemStack): Int {
 		val handler = getItemHandler(level, anchor) ?: return 0
 		var remainder = stack
+
 		for (slot in 0 until handler.slots) {
 			remainder = handler.insertItem(slot, remainder, true)
 			if (remainder.isEmpty) break
@@ -317,6 +341,7 @@ class HoppingSpiderNestBlockEntity(
 
 	private fun saveSpiders(registries: HolderLookup.Provider): ListTag {
 		val spidersTag = ListTag()
+
 		for (spider in hoppingSpiders) {
 			spidersTag.add(spider.save(registries))
 		}
@@ -341,7 +366,12 @@ class HoppingSpiderNestBlockEntity(
 		private const val STARTING_SPIDER_COUNT = 4
 		private const val MAX_TRANSFER_SIZE = 64
 
-		fun serverTick(level: Level, pos: BlockPos, state: BlockState, blockEntity: HoppingSpiderNestBlockEntity) {
+		fun serverTick(
+			level: Level,
+			pos: BlockPos,
+			state: BlockState,
+			blockEntity: HoppingSpiderNestBlockEntity
+		) {
 			if (level is ServerLevel) {
 				blockEntity.serverTick(level)
 			}

@@ -22,11 +22,14 @@ class SpiderNestMenu(
 	) : this(containerId, playerInventory, nest.blockPos)
 
 	fun getNest(): HoppingSpiderNestBlockEntity? {
-		return playerInventory.player.level().getBlockEntity(nestPos) as? HoppingSpiderNestBlockEntity
+		val level = playerInventory.player.level()
+
+		return level.getBlockEntity(nestPos) as? HoppingSpiderNestBlockEntity
 	}
 
 	override fun stillValid(player: Player): Boolean {
 		if (getNest() == null) return false
+
 		return player.distanceToSqr(nestPos.center) <= MAX_DISTANCE_SQUARED
 	}
 

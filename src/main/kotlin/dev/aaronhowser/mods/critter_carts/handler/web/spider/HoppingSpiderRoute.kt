@@ -23,6 +23,7 @@ class HoppingSpiderRoute(
 
 		val elapsedTicks = gameTime - startGameTime + partialTick.toDouble()
 		val progress = (elapsedTicks / durationTicks).coerceIn(0.0, 1.0)
+
 		return getPositionAtDistance(getDistance() * progress)
 	}
 
@@ -32,7 +33,9 @@ class HoppingSpiderRoute(
 			val start = positions[index - 1]
 			val end = positions[index]
 			val segmentDistance = start.distanceTo(end)
+
 			if (segmentDistance == 0.0) continue
+
 			if (remainingDistance > segmentDistance) {
 				remainingDistance -= segmentDistance
 				continue
@@ -55,6 +58,7 @@ class HoppingSpiderRoute(
 
 	fun save(): CompoundTag {
 		val tag = CompoundTag()
+
 		tag.putUUID(TARGET_NODE_UUID_TAG, targetNodeUuid)
 		tag.putLong(START_GAME_TIME_TAG, startGameTime)
 		tag.putInt(DURATION_TICKS_TAG, durationTicks)
@@ -64,11 +68,14 @@ class HoppingSpiderRoute(
 
 	private fun savePositions(): ListTag {
 		val tag = ListTag()
+
 		for (position in positions) {
 			val positionTag = CompoundTag()
+
 			positionTag.putDouble(X_TAG, position.x)
 			positionTag.putDouble(Y_TAG, position.y)
 			positionTag.putDouble(Z_TAG, position.z)
+
 			tag.add(positionTag)
 		}
 
@@ -86,6 +93,7 @@ class HoppingSpiderRoute(
 
 		fun fromPath(path: WebPath, startGameTime: Long, speed: Double): HoppingSpiderRoute {
 			val positions: MutableList<Vec3> = mutableListOf(path.startNode.position)
+
 			for (segment in path.segments) {
 				positions.add(segment.toNode.position)
 			}
@@ -93,6 +101,7 @@ class HoppingSpiderRoute(
 			val durationTicks = ceil(path.distance / speed)
 				.toInt()
 				.coerceAtLeast(1)
+
 			return HoppingSpiderRoute(
 				path.endNode.uuid,
 				positions,
@@ -117,6 +126,7 @@ class HoppingSpiderRoute(
 
 		private fun loadPositions(tag: ListTag): List<Vec3> {
 			val positions: MutableList<Vec3> = mutableListOf()
+
 			for (index in tag.indices) {
 				val positionTag = tag.getCompound(index)
 				positions.add(

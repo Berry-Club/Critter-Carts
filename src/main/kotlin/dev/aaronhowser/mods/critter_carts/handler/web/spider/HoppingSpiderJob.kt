@@ -32,12 +32,14 @@ class HoppingSpiderJob(
 
 	fun save(): CompoundTag {
 		val tag = CompoundTag()
+
 		tag.putUUID(HOME_NODE_UUID_TAG, homeNodeUuid)
 		tag.putUUID(SOURCE_NODE_UUID_TAG, sourceNodeUuid)
 		tag.putUUID(DESTINATION_NODE_UUID_TAG, destinationNodeUuid)
 		tag.putInt(SOURCE_SLOT_TAG, sourceSlot)
 		tag.putInt(TRANSFER_AMOUNT_TAG, transferAmount)
 		tag.putString(PHASE_TAG, phase.name)
+
 		return tag
 	}
 
@@ -76,6 +78,7 @@ class HoppingSpiderJob(
 
 		private fun getTransferAmount(tag: CompoundTag): Int {
 			if (!tag.contains(TRANSFER_AMOUNT_TAG)) return 64
+
 			return tag.getInt(TRANSFER_AMOUNT_TAG)
 		}
 	}

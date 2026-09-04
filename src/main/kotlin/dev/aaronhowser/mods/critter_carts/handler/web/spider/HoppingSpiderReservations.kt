@@ -9,6 +9,7 @@ class HoppingSpiderReservations {
 
 	fun reserve(job: HoppingSpiderJob) {
 		sources.add(job.sourceNodeUuid to job.sourceSlot)
+
 		destinations.add(job.destinationNodeUuid)
 	}
 

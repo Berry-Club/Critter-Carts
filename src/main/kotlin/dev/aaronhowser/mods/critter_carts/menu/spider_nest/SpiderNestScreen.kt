@@ -25,18 +25,24 @@ class SpiderNestScreen(
 		val gameTime = nest.level?.gameTime ?: 0
 
 		for ((index, spider) in nest.hoppingSpiders.withIndex()) {
-			val rowY = FIRST_ROW_Y + index * ROW_HEIGHT
-			guiGraphics.drawString(
-				font,
-				Component.translatable("menu.critter_carts.spider_nest.spider", index + 1),
-				TEXT_X,
-				rowY,
-				LABEL_COLOR,
-				false
-			)
-			guiGraphics.drawString(font, getPositionText(spider, gameTime), TEXT_X, rowY + LINE_HEIGHT, TEXT_COLOR, false)
-			guiGraphics.drawString(font, getJobText(spider), TEXT_X, rowY + LINE_HEIGHT * 2, TEXT_COLOR, false)
+			renderSpider(guiGraphics, spider, index, gameTime)
 		}
+	}
+
+	private fun renderSpider(
+		guiGraphics: GuiGraphics,
+		spider: HoppingSpider,
+		index: Int,
+		gameTime: Long
+	) {
+		val rowY = FIRST_ROW_Y + index * ROW_HEIGHT
+		val name = Component.translatable("menu.critter_carts.spider_nest.spider", index + 1)
+		val position = getPositionText(spider, gameTime)
+		val job = getJobText(spider)
+
+		guiGraphics.drawString(font, name, TEXT_X, rowY, LABEL_COLOR, false)
+		guiGraphics.drawString(font, position, TEXT_X, rowY + LINE_HEIGHT, TEXT_COLOR, false)
+		guiGraphics.drawString(font, job, TEXT_X, rowY + LINE_HEIGHT * 2, TEXT_COLOR, false)
 	}
 
 	private fun getPositionText(spider: HoppingSpider, gameTime: Long): Component {
@@ -57,6 +63,7 @@ class SpiderNestScreen(
 
 	private fun getJobText(spider: HoppingSpider): Component {
 		val job = spider.job ?: return Component.translatable("menu.critter_carts.spider_nest.idle")
+
 		return when (job.phase) {
 			HoppingSpiderJob.Phase.TO_SOURCE -> Component.translatable(
 				"menu.critter_carts.spider_nest.collecting",

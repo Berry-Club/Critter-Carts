@@ -24,15 +24,18 @@ class SpiderNestInterfaceItem(properties: Properties) : Item(properties) {
 		usedHand: InteractionHand
 	): InteractionResultHolder<ItemStack?> {
 		val usedStack = player.getItemInHand(usedHand)
+
 		if (level.isServerSide) {
 			val constructor = MenuConstructor { containerId, inventory, _ ->
 				NestInterfaceMenu(containerId, inventory, usedHand)
 			}
+
 			player.openMenu(SimpleMenuProvider(constructor, usedStack.hoverName)) {
 				it.writeBoolean(false)
 				it.writeEnum(usedHand)
 			}
 		}
+
 		return InteractionResultHolder.sidedSuccess(usedStack, level.isClientSide)
 	}
 
@@ -43,11 +46,21 @@ class SpiderNestInterfaceItem(properties: Properties) : Item(properties) {
 		tooltipFlag: TooltipFlag
 	) {
 		val component = getComponent(stack)
-		tooltipComponents.add(Component.translatable("tooltip.critter_carts.interface.color", component.color.name))
-		tooltipComponents.add(
-			Component.translatable("tooltip.critter_carts.interface.${component.transferDirection.serializedName}")
+		val color = Component.translatable(
+			"tooltip.critter_carts.interface.color",
+			component.color.name
 		)
-		tooltipComponents.add(Component.translatable("tooltip.critter_carts.interface.priority", component.priority))
+		val direction = Component.translatable(
+			"tooltip.critter_carts.interface.${component.transferDirection.serializedName}"
+		)
+		val priority = Component.translatable(
+			"tooltip.critter_carts.interface.priority",
+			component.priority
+		)
+
+		tooltipComponents.add(color)
+		tooltipComponents.add(direction)
+		tooltipComponents.add(priority)
 	}
 
 	companion object {

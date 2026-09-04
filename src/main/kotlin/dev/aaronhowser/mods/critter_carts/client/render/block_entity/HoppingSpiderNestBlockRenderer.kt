@@ -2,8 +2,8 @@ package dev.aaronhowser.mods.critter_carts.client.render.block_entity
 
 import com.mojang.blaze3d.vertex.PoseStack
 import dev.aaronhowser.mods.aaron.misc.AaronDsls.withPose
-import dev.aaronhowser.mods.critter_carts.handler.web.spider.HoppingSpider
 import dev.aaronhowser.mods.critter_carts.block_entity.HoppingSpiderNestBlockEntity
+import dev.aaronhowser.mods.critter_carts.handler.web.spider.HoppingSpider
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.LevelRenderer
 import net.minecraft.client.renderer.MultiBufferSource
@@ -28,6 +28,7 @@ class HoppingSpiderNestBlockRenderer(
 		packedOverlay: Int
 	) {
 		val level = blockEntity.level ?: return
+
 		for (index in blockEntity.hoppingSpiders.indices) {
 			val spider = blockEntity.hoppingSpiders[index]
 			val position = getPosition(blockEntity, spider, level.gameTime, partialTick)
@@ -60,8 +61,14 @@ class HoppingSpiderNestBlockRenderer(
 		packedOverlay: Int
 	) {
 		poseStack.withPose {
-			poseStack.translate(-SPIDER_SCALE / 2.0, -SPIDER_SCALE / 2.0, -SPIDER_SCALE / 2.0)
+			poseStack.translate(
+				-SPIDER_SCALE / 2.0,
+				-SPIDER_SCALE / 2.0,
+				-SPIDER_SCALE / 2.0
+			)
+
 			poseStack.scale(SPIDER_SCALE, SPIDER_SCALE, SPIDER_SCALE)
+
 			Minecraft.getInstance().blockRenderer.renderSingleBlock(
 				Blocks.GRAY_CONCRETE.defaultBlockState(),
 				poseStack,
@@ -76,6 +83,7 @@ class HoppingSpiderNestBlockRenderer(
 		poseStack.withPose {
 			poseStack.translate(0.0, ITEM_HEIGHT, 0.0)
 			poseStack.scale(ITEM_SCALE, ITEM_SCALE, ITEM_SCALE)
+
 			Minecraft.getInstance().itemRenderer.renderStatic(
 				spider.carriedStack,
 				ItemDisplayContext.GROUND,
@@ -92,6 +100,7 @@ class HoppingSpiderNestBlockRenderer(
 	private fun getDisplayOffset(index: Int): Vec3 {
 		val offsetX = if (index % 2 == 0) -IDLE_OFFSET else IDLE_OFFSET
 		val offsetZ = if (index / 2 == 0) -IDLE_OFFSET else IDLE_OFFSET
+
 		return Vec3(offsetX, 0.0, offsetZ)
 	}
 

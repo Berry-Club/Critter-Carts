@@ -9,8 +9,11 @@ class HoppingSpiderJobCandidate(
 
 	fun isPreferredOver(other: HoppingSpiderJobCandidate?): Boolean {
 		if (other == null) return true
+
 		if (inputPriority != other.inputPriority) return inputPriority > other.inputPriority
+
 		if (outputPriority != other.outputPriority) return outputPriority > other.outputPriority
+
 		return stackSize > other.stackSize
 	}
 }

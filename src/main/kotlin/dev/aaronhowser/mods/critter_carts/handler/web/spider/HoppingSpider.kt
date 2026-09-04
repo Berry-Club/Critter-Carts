@@ -32,6 +32,7 @@ class HoppingSpider(
 
 		val job = job ?: return false
 		val path = findPath(level, job) ?: return false
+
 		val routeChanged = updateRoute(level, job, path)
 		if (!moveAlong(path)) return routeChanged
 
@@ -103,36 +104,56 @@ class HoppingSpider(
 
 	private fun pickUpItem(level: ServerLevel, job: HoppingSpiderJob): Boolean {
 		val source = getBlockAnchor(level, job.sourceNodeUuid) ?: return cancelJob()
-		val interfaceComponent = SpiderNestInterfaceItem.getComponent(source.nestInterface)
-		if (interfaceComponent.transferDirection != NestInterfaceComponent.TransferDirection.INPUT) return cancelJob()
-		val handler = getItemHandler(level, source) ?: return cancelJob()
-		val filter = interfaceComponent.getFilter()
-		val simulatedStack = handler.extractItem(job.sourceSlot, job.transferAmount, true)
-		if (simulatedStack.isEmpty) return cancelJob()
-		if (!filter.isEmpty && !ItemFilterItem.passesFilter(filter, simulatedStack)) return cancelJob()
-		val extractedStack = handler.extractItem(job.sourceSlot, job.transferAmount, false)
-		if (extractedStack.isEmpty) return cancelJob()
+		val nestInterface = SpiderNestInterfaceItem.getComponent(source.nestInterface)
 
-		carriedStack = extractedStack
+		if (nestInterface.transferDirection != NestInterfaceComponent.TransferDirection.INPUT) {
+			return cancelJob()
+		}
+
+		val handler = getItemHandler(level, source) ?: return cancelJob()
+		val filter = nestInterface.getFilter()
+		val stack = handler.extractItem(job.sourceSlot, job.transferAmount, true)
+
+		if (stack.isEmpty) return cancelJob()
+
+		if (!filter.isEmpty && !ItemFilterItem.passesFilter(filter, stack)) {
+			return cancelJob()
+		}
+
+		val extracted = handler.extractItem(job.sourceSlot, job.transferAmount, false)
+		if (extracted.isEmpty) return cancelJob()
+
+		carriedStack = extracted
 		startNextLeg(HoppingSpiderJob.Phase.TO_DESTINATION)
+
 		return true
 	}
 
 	private fun deliverItem(level: ServerLevel, job: HoppingSpiderJob): Boolean {
 		val destination = getBlockAnchor(level, job.destinationNodeUuid) ?: return false
-		val interfaceComponent = SpiderNestInterfaceItem.getComponent(destination.nestInterface)
-		if (interfaceComponent.transferDirection != NestInterfaceComponent.TransferDirection.OUTPUT) return false
+		val destinationInterface = SpiderNestInterfaceItem.getComponent(destination.nestInterface)
+
+		if (destinationInterface.transferDirection != NestInterfaceComponent.TransferDirection.OUTPUT) {
+			return false
+		}
+
 		val source = getBlockAnchor(level, job.sourceNodeUuid) ?: return false
 		val sourceComponent = SpiderNestInterfaceItem.getComponent(source.nestInterface)
-		if (sourceComponent.color != interfaceComponent.color) return false
-		val filter = interfaceComponent.getFilter()
-		if (!filter.isEmpty && !ItemFilterItem.passesFilter(filter, carriedStack)) return false
+
+		if (sourceComponent.color != destinationInterface.color) return false
+
+		val filter = destinationInterface.getFilter()
+		if (!filter.isEmpty && !ItemFilterItem.passesFilter(filter, carriedStack)) {
+			return false
+		}
+
 		val handler = getItemHandler(level, destination) ?: return false
 
 		carriedStack = insertItem(handler, carriedStack)
 		if (!carriedStack.isEmpty) return false
 
 		startNextLeg(HoppingSpiderJob.Phase.RETURNING)
+
 		return true
 	}
 
@@ -148,6 +169,7 @@ class HoppingSpider(
 		position = nestPosition
 		route = null
 		routeProgress = 0.0
+
 		return true
 	}
 
@@ -155,6 +177,7 @@ class HoppingSpider(
 		job = null
 		route = null
 		routeProgress = 0.0
+
 		return true
 	}
 
