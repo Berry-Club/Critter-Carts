@@ -2,8 +2,10 @@ package dev.aaronhowser.mods.critterworks.menu.nest_interface
 
 import dev.aaronhowser.mods.aaron.menu.BaseScreen
 import dev.aaronhowser.mods.aaron.menu.textures.ScreenBackground
+import dev.aaronhowser.mods.aaron.misc.AaronExtensions.toComponent
 import dev.aaronhowser.mods.aaron.packet.c2s.ClientClickedMenuButton
 import dev.aaronhowser.mods.critterworks.Critterworks
+import dev.aaronhowser.mods.critterworks.datagen.language.ModMenuLang
 import dev.aaronhowser.mods.critterworks.packet.client_to_server.SetNestInterfacePriorityPacket
 import net.minecraft.client.gui.components.Button
 import net.minecraft.client.gui.components.EditBox
@@ -34,7 +36,7 @@ class NestInterfaceScreen(menu: NestInterfaceMenu, inventory: Inventory, title: 
 			topPos + 32,
 			56,
 			18,
-			Component.translatable("menu.critterworks.interface.priority")
+			ModMenuLang.INTERFACE_PRIORITY.toComponent()
 		)
 		priorityInput.setMaxLength(11)
 		priorityInput.setFilter { value -> value.isEmpty() || value == "-" || value.toIntOrNull() != null }
@@ -55,12 +57,12 @@ class NestInterfaceScreen(menu: NestInterfaceMenu, inventory: Inventory, title: 
 	}
 
 	private fun getColorMessage(): Component {
-		return Component.translatable("menu.critterworks.interface.color", menu.getColor().name)
+		return ModMenuLang.INTERFACE_COLOR.toComponent(menu.getColor().name)
 	}
 
 	private fun getDirectionMessage(): Component {
-		val key = if (menu.isInput()) "menu.critterworks.interface.input" else "menu.critterworks.interface.output"
-		return Component.translatable(key)
+		val key = if (menu.isInput()) ModMenuLang.INTERFACE_INPUT else ModMenuLang.INTERFACE_OUTPUT
+		return key.toComponent()
 	}
 
 	companion object {

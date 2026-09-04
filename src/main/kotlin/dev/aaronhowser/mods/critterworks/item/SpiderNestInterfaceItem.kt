@@ -1,6 +1,8 @@
 package dev.aaronhowser.mods.critterworks.item
 
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isServerSide
+import dev.aaronhowser.mods.aaron.misc.AaronExtensions.toComponent
+import dev.aaronhowser.mods.critterworks.datagen.language.ModMenuLang
 import dev.aaronhowser.mods.critterworks.item.component.NestInterfaceComponent
 import dev.aaronhowser.mods.critterworks.menu.nest_interface.NestInterfaceMenu
 import dev.aaronhowser.mods.critterworks.registry.ModDataComponents
@@ -46,17 +48,13 @@ class SpiderNestInterfaceItem(properties: Properties) : Item(properties) {
 		tooltipFlag: TooltipFlag
 	) {
 		val component = getComponent(stack)
-		val color = Component.translatable(
-			"tooltip.critterworks.interface.color",
-			component.color.name
-		)
-		val direction = Component.translatable(
-			"tooltip.critterworks.interface.${component.transferDirection.serializedName}"
-		)
-		val priority = Component.translatable(
-			"tooltip.critterworks.interface.priority",
-			component.priority
-		)
+		val color = ModMenuLang.INTERFACE_COLOR_TOOLTIP.toComponent(component.color.name)
+		val directionKey = when (component.transferDirection) {
+			NestInterfaceComponent.TransferDirection.INPUT -> ModMenuLang.INTERFACE_INPUT_TOOLTIP
+			NestInterfaceComponent.TransferDirection.OUTPUT -> ModMenuLang.INTERFACE_OUTPUT_TOOLTIP
+		}
+		val direction = directionKey.toComponent()
+		val priority = ModMenuLang.INTERFACE_PRIORITY_TOOLTIP.toComponent(component.priority)
 
 		tooltipComponents.add(color)
 		tooltipComponents.add(direction)

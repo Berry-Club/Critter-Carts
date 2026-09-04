@@ -3,6 +3,7 @@ package dev.aaronhowser.mods.critterworks.item.component
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isItem
+import dev.aaronhowser.mods.aaron.misc.AaronExtensions.toComponent
 import dev.aaronhowser.mods.aaron.serialization.AaronExtraStreamCodecs
 import dev.aaronhowser.mods.critterworks.datagen.language.ModMenuLang
 import dev.aaronhowser.mods.critterworks.item.ItemFilterItem
@@ -13,7 +14,6 @@ import net.minecraft.core.NonNullList
 import net.minecraft.core.component.DataComponentType
 import net.minecraft.core.component.DataComponents
 import net.minecraft.network.RegistryFriendlyByteBuf
-import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.network.codec.ByteBufCodecs
 import net.minecraft.network.codec.StreamCodec
@@ -153,7 +153,7 @@ data class ItemFilterComponent(
 		override fun getSerializedName(): String = id
 
 		fun getMessage(isOn: Boolean): MutableComponent {
-			return Component.translatable(if (isOn) messageOn else messageOff)
+			return (if (isOn) messageOn else messageOff).toComponent()
 		}
 
 		companion object {
