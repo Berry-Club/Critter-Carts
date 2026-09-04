@@ -33,6 +33,7 @@ import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent
 import org.joml.Matrix4f
 import org.joml.Quaternionf
+import org.joml.Vector3f
 
 @EventBusSubscriber(
 	modid = CritterCarts.MOD_ID,
@@ -67,26 +68,107 @@ object WebLineRenderer {
 	}
 
 	private fun renderNestInterfaces(poseStack: PoseStack, cameraPosition: Vec3) {
-		poseStack.withPose {
-			poseStack.translate(-cameraPosition.x, -cameraPosition.y, -cameraPosition.z)
-			for (node in ClientWebLines.getNodes()) {
-				val anchor = node as? WebBlockAnchor ?: continue
-				if (!anchor.hasNestInterface) continue
+		val minecraft = Minecraft.getInstance()
+		val level = minecraft.level ?: return
+		val bufferSource = minecraft.renderBuffers().bufferSource()
+		val vertexConsumer = bufferSource.getBuffer(WEB_RENDER_TYPE)
 
-				val component = SpiderNestInterfaceItem.getComponent(anchor.nestInterface)
-				val position = anchor.position
-				AaronRenderUtil.renderCubeThroughWalls(
-					poseStack,
-					position.x - INTERFACE_CUBE_RADIUS,
-					position.y - INTERFACE_CUBE_RADIUS,
-					position.z - INTERFACE_CUBE_RADIUS,
-					position.x + INTERFACE_CUBE_RADIUS,
-					position.y + INTERFACE_CUBE_RADIUS,
-					position.z + INTERFACE_CUBE_RADIUS,
+		for (node in ClientWebLines.getNodes()) {
+			val anchor = node as? WebBlockAnchor ?: continue
+			if (!anchor.hasNestInterface) continue
+
+			val component = SpiderNestInterfaceItem.getComponent(anchor.nestInterface)
+			val rotation = Quaternionf().rotationTo(
+				0f,
+				1f,
+				0f,
+				anchor.face.stepX.toFloat(),
+				anchor.face.stepY.toFloat(),
+				anchor.face.stepZ.toFloat()
+			)
+			val light = LevelRenderer.getLightColor(level, anchor.blockPos.relative(anchor.face))
+
+			poseStack.withPose {
+				val position = anchor.position.subtract(cameraPosition)
+				poseStack.translate(position.x, position.y, position.z)
+				poseStack.mulPose(rotation)
+				poseStack.translate(0.0, INTERFACE_SURFACE_OFFSET, 0.0)
+
+				val pose = poseStack.last().pose()
+				renderNestInterface(
+					vertexConsumer,
+					pose,
+					light,
 					component.color.textureDiffuseColor
 				)
 			}
 		}
+
+		bufferSource.endBatch(WEB_RENDER_TYPE)
+	}
+
+	private fun renderNestInterface(
+		vertexConsumer: VertexConsumer,
+		pose: Matrix4f,
+		light: Int,
+		color: Int
+	) {
+		val bottomNorthWest = Vector3f(-INTERFACE_RADIUS, 0f, -INTERFACE_RADIUS)
+		val bottomNorthEast = Vector3f(INTERFACE_RADIUS, 0f, -INTERFACE_RADIUS)
+		val bottomSouthEast = Vector3f(INTERFACE_RADIUS, 0f, INTERFACE_RADIUS)
+		val bottomSouthWest = Vector3f(-INTERFACE_RADIUS, 0f, INTERFACE_RADIUS)
+		val topNorthWest = Vector3f(-INTERFACE_RADIUS, INTERFACE_HEIGHT, -INTERFACE_RADIUS)
+		val topNorthEast = Vector3f(INTERFACE_RADIUS, INTERFACE_HEIGHT, -INTERFACE_RADIUS)
+		val topSouthEast = Vector3f(INTERFACE_RADIUS, INTERFACE_HEIGHT, INTERFACE_RADIUS)
+		val topSouthWest = Vector3f(-INTERFACE_RADIUS, INTERFACE_HEIGHT, INTERFACE_RADIUS)
+
+		addInterfaceFace(
+			vertexConsumer, pose,
+			bottomNorthWest, bottomNorthEast, bottomSouthEast, bottomSouthWest,
+			INTERFACE_TOP_TEXTURE_HEIGHT, light, color
+		)
+		addInterfaceFace(
+			vertexConsumer, pose,
+			topSouthWest, topSouthEast, topNorthEast, topNorthWest,
+			INTERFACE_TOP_TEXTURE_HEIGHT, light, color
+		)
+		addInterfaceFace(
+			vertexConsumer, pose,
+			bottomNorthEast, bottomNorthWest, topNorthWest, topNorthEast,
+			INTERFACE_SIDE_TEXTURE_HEIGHT, light, color
+		)
+		addInterfaceFace(
+			vertexConsumer, pose,
+			bottomSouthWest, bottomSouthEast, topSouthEast, topSouthWest,
+			INTERFACE_SIDE_TEXTURE_HEIGHT, light, color
+		)
+		addInterfaceFace(
+			vertexConsumer, pose,
+			bottomNorthWest, bottomSouthWest, topSouthWest, topNorthWest,
+			INTERFACE_SIDE_TEXTURE_HEIGHT, light, color
+		)
+		addInterfaceFace(
+			vertexConsumer, pose,
+			bottomSouthEast, bottomNorthEast, topNorthEast, topSouthEast,
+			INTERFACE_SIDE_TEXTURE_HEIGHT, light, color
+		)
+	}
+
+	private fun addInterfaceFace(
+		vertexConsumer: VertexConsumer,
+		pose: Matrix4f,
+		first: Vector3f,
+		second: Vector3f,
+		third: Vector3f,
+		fourth: Vector3f,
+		textureHeight: Float,
+		light: Int,
+		color: Int
+	) {
+		addVertex(vertexConsumer, pose, first.x, first.y, first.z, 0f, 0f, light, color)
+		addVertex(vertexConsumer, pose, second.x, second.y, second.z, 1f, 0f, light, color)
+		addVertex(vertexConsumer, pose, third.x, third.y, third.z, 1f, textureHeight, light, color)
+		addVertex(vertexConsumer, pose, fourth.x, fourth.y, fourth.z, 0f, textureHeight, light, color)
 	}
 
 	private fun renderPlacementPreview(
@@ -335,7 +417,11 @@ object WebLineRenderer {
 	private const val WEB_RADIUS = 1f / 64f
 	private const val TEXTURE_REPEAT_DISTANCE = 8.0
 	private const val LIGHT_SAMPLE_DISTANCE = 1.0
-	private const val INTERFACE_CUBE_RADIUS = 0.075
+	private const val INTERFACE_RADIUS = 2f / 16f
+	private const val INTERFACE_HEIGHT = 2f / 16f
+	private const val INTERFACE_SURFACE_OFFSET = 0.001
+	private const val INTERFACE_TOP_TEXTURE_HEIGHT = 4f / 128f
+	private const val INTERFACE_SIDE_TEXTURE_HEIGHT = 2f / 128f
 
 	private val WEB_TEXTURE = ResourceLocation.fromNamespaceAndPath(
 		CritterCarts.MOD_ID,
