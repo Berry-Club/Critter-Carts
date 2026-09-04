@@ -37,7 +37,9 @@ class WebBlockAnchor(
 		lines: Map<UUID, WebLine>,
 		checkedLines: MutableSet<UUID>
 	): WebLineInvalidation? {
-		if (level.getBlockState(blockPos).isFaceSturdy(level, blockPos, face)) return null
+		val collisionShape = level.getBlockState(blockPos)
+			.getCollisionShape(level, blockPos)
+		if (!collisionShape.isEmpty) return null
 
 		return WebLineInvalidation(WebLineInvalidationReason.INVALID_ANCHOR)
 	}
