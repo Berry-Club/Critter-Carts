@@ -98,8 +98,7 @@ class HoppingSpiderNestBlockEntity(
 			var bestCandidate: HoppingSpiderTransportCandidate? = null
 
 			for (spider in hoppingSpiders) {
-				val startingNode = getStartingNode(level, spider) ?: continue
-				val candidate = findTransportCandidate(level, reservations, spider, startingNode) ?: continue
+				val candidate = findTransportCandidate(level, reservations, spider) ?: continue
 
 				if (candidate.isPreferredOver(bestCandidate)) {
 					bestCandidate = candidate
@@ -158,41 +157,38 @@ class HoppingSpiderNestBlockEntity(
 		}
 	}
 
-	private fun getStartingNode(level: ServerLevel, spider: HoppingSpider): WebNode? {
+	private fun getCurrentNode(level: ServerLevel, spider: HoppingSpider): WebNode? {
 		val activeBehavior = spider.activeBehavior
 		if (activeBehavior != null && !activeBehavior.canBeInterrupted) return null
 
 		val transportBehavior = spider.transportBehavior
-		if (transportBehavior == null) {
-			val currentNodeUuid = activeBehavior?.currentNodeUuid
-			if (currentNodeUuid != null) return WebSavedData.get(level).getNode(currentNodeUuid)
+		if (transportBehavior != null) return null
 
-			for (network in WebSavedData.get(level).getNetworksAt(blockPos)) {
-				return getAnchors(network, blockPos).firstOrNull() ?: continue
-			}
-
-			return null
-		}
-
-		val nodeUuid = when (transportBehavior.phase) {
-			HoppingSpiderTransportBehavior.Phase.RETURNING -> transportBehavior.destinationNodeUuid
-			HoppingSpiderTransportBehavior.Phase.RETURNING_FROM_SOURCE -> transportBehavior.sourceNodeUuid
-			else -> return null
-		}
-
-		return WebSavedData.get(level).getNode(nodeUuid)
+		val currentNodeUuid = activeBehavior?.currentNodeUuid ?: return null
+		return WebSavedData.get(level).getNode(currentNodeUuid)
 	}
 
 	private fun findTransportCandidate(
 		level: ServerLevel,
 		reservations: HoppingSpiderTransportReservations,
-		spider: HoppingSpider,
-		startingNode: WebNode
+		spider: HoppingSpider
 	): HoppingSpiderTransportCandidate? {
+		val activeBehavior = spider.activeBehavior
+		if (activeBehavior != null && !activeBehavior.canBeInterrupted) return null
+		if (spider.transportBehavior != null) return null
+
 		val savedData = WebSavedData.get(level)
+		val currentNode = getCurrentNode(level, spider)
 		var bestCandidate: HoppingSpiderTransportCandidate? = null
 
 		for (network in savedData.getNetworksAt(blockPos)) {
+			val nestNodes = getAnchors(network, blockPos)
+			val startingNode = if (currentNode == null || isNestNode(currentNode)) {
+				nestNodes.firstOrNull() ?: continue
+			} else {
+				currentNode
+			}
+
 			val candidate = findTransportBehaviorInNetwork(level, network, reservations, spider, startingNode)
 
 			if (candidate?.isPreferredOver(bestCandidate) == true) {
@@ -201,6 +197,10 @@ class HoppingSpiderNestBlockEntity(
 		}
 
 		return bestCandidate
+	}
+
+	private fun isNestNode(node: WebNode): Boolean {
+		return node is WebBlockAnchor && node.blockPos == blockPos
 	}
 
 	private fun findTransportBehaviorInNetwork(

@@ -7,7 +7,9 @@ type: block
 
 The **Hopping Spider Nest** sends out four tiny spiders to carry items between inventories connected by [Web Lines](@critterworks:web_lines).
 
-Connect the nest itself to the web network, then install [Spider Nest Interfaces](@critterworks:spider_nest_interface) at the inventories that should supply or receive items. The spiders automatically choose available work, collect up to one stack at a time, and deliver it. A spider can accept more work from its current node instead of returning to the nest between deliveries.
+Connect the nest itself to a web network, then install [Spider Nest Interfaces](@critterworks:spider_nest_interface) at the inventories that should supply or receive items. The spiders automatically choose available work, collect up to one stack at a time, and deliver it.
+
+A nest can connect to multiple separate web networks. Its spiders choose work from any of them, returning to the nest after each delivery so they can depart on a different network when needed. Connecting the same network to the nest more than once still counts as one network.
 
 Multiple nests can share the same web network. Their spiders coordinate with one another so they do not try to collect from or deliver to the same place at once.
 
@@ -17,7 +19,7 @@ A job begins when the network has an item in an **Input** inventory and room for
 
 When several jobs are available, spiders prefer the highest Input priority, followed by the highest Output priority. The nest then prefers a spider that is not already transporting anything, choosing whichever available spider has the shortest Web Line route to the Input. If the remaining choices are equal, it prefers the job that can move the most items.
 
-Each spider reserves its pickup and delivery while working so another spider does not choose the same job. It travels from its current node to the Input, collects up to one stack, carries it to the Output, and then becomes available for another job while returning home. If the Output fills while the spider is traveling, it waits there and tries again. If the job becomes invalid because an interface, color, or filter changed, the spider returns the item to its original inventory before going home.
+Each spider reserves its pickup and delivery while working so another spider does not choose the same job. It travels from its current node to the Input, collects up to one stack, carries it to the Output, and then returns home before accepting another job. If the Output fills while the spider is traveling, it waits there and tries again. If the job becomes invalid because an interface, color, or filter changed, the spider returns the item to its original inventory before going home.
 
 ## Idle Wandering
 
