@@ -20,7 +20,8 @@ import net.neoforged.neoforge.items.IItemHandler
 import java.util.*
 
 class HoppingSpider(
-	val uuid: UUID = UUID.randomUUID()
+	val uuid: UUID = UUID.randomUUID(),
+	val customName: String? = null
 ) {
 
 	var activeBehavior: HoppingSpiderBehavior? = null
@@ -373,6 +374,10 @@ class HoppingSpider(
 		tag.putUUID(UUID_TAG, uuid)
 		tag.putDouble(ROUTE_PROGRESS_TAG, routeProgress)
 
+		if (customName != null) {
+			tag.putString(CUSTOM_NAME_TAG, customName)
+		}
+
 		val activeBehavior = activeBehavior
 		if (activeBehavior != null) {
 			tag.put(ACTIVE_BEHAVIOR_TAG, activeBehavior.save())
@@ -412,6 +417,7 @@ class HoppingSpider(
 
 	companion object {
 		private const val UUID_TAG = "Uuid"
+		private const val CUSTOM_NAME_TAG = "CustomName"
 		private const val ACTIVE_BEHAVIOR_TAG = "ActiveBehavior"
 		private const val ROUTE_TAG = "Route"
 		private const val ROUTE_PROGRESS_TAG = "RouteProgress"
@@ -424,7 +430,8 @@ class HoppingSpider(
 
 		fun load(tag: CompoundTag, registries: HolderLookup.Provider): HoppingSpider {
 			val uuid = getUuid(tag)
-			val spider = HoppingSpider(uuid)
+			val customName = if (tag.contains(CUSTOM_NAME_TAG)) tag.getString(CUSTOM_NAME_TAG) else null
+			val spider = HoppingSpider(uuid, customName)
 			spider.activeBehavior = getActiveBehavior(tag)
 			spider.route = getRoute(tag)
 			spider.routeProgress = tag.getDouble(ROUTE_PROGRESS_TAG)
