@@ -1,0 +1,26 @@
+---
+title: Hopping Spider Nest
+id: critterworks:hopping_spider_nest
+related_items: [critterworks:hopping_spider_nest]
+type: block
+---
+
+The **Hopping Spider Nest** sends out four tiny spiders to carry items between inventories connected by [Web Lines](@critterworks:web_lines).
+
+Connect the nest itself to the web network, then install [Spider Nest Interfaces](@critterworks:spider_nest_interface) at the inventories that should supply or receive items. The spiders automatically choose available work, collect up to one stack at a time, deliver it, and return to the nest.
+
+Multiple nests can share the same web network. Their spiders coordinate with one another so they do not try to collect from or deliver to the same place at once.
+
+## Spider Jobs
+
+A job begins when the network has an item in an **Input** inventory and room for it in a matching **Output** inventory. Both interfaces must use the same color, allow the item through their filters, and have a complete Web Line route connecting them to the nest.
+
+When several jobs are available, spiders prefer the highest Input priority, followed by the highest Output priority. If those are equal, they prefer the job that can move the most items. Each spider reserves its pickup and delivery while working so another spider does not choose the same job.
+
+The spider travels from its nest to the Input, collects up to one stack, carries it to the Output, and then returns home. If the Output fills while the spider is traveling, it waits there and tries again. If the job becomes invalid because an interface, color, or filter changed, the spider returns the item to its original inventory before going home.
+
+## Checking the Spiders
+
+Interact with the nest to view each spider's position and current job. This screen also shows when a delivery is waiting or can no longer be completed.
+
+If the nest is broken while a spider is carrying something, the carried item is dropped at the nest.

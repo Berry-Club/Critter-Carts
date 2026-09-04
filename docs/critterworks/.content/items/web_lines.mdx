@@ -1,0 +1,22 @@
+---
+title: Web Lines
+id: critterworks:web_lines
+related_items: [critterworks:web_fluid, critterworks:web_pathfinder]
+type: item
+---
+
+**Web Lines** form routes for the spiders from a [Hopping Spider Nest](@critterworks:hopping_spider_nest). Any connected group of lines makes a web network.
+
+## Creating Lines
+
+Use **Web Fluid** on a block face to select the first endpoint, then use it on another block face to create a line between them. Web Fluid can also select a point on an existing line, allowing routes to branch.
+
+A line must be shorter than 10 blocks and have a clear path between its endpoints. Its two block faces also cannot point in the same direction.
+
+Use **Shears** on a Web Line to remove it. Any other Web Lines that depended on it will also be lost.
+
+## Finding Routes
+
+Use a **Web Pathfinder** on one point in the network, then use it on another point. If the two points are connected, the shortest route between them is briefly highlighted.
+
+The Web Pathfinder also glints after its first point is selected. Sneak and use it in the air to clear the selection.
