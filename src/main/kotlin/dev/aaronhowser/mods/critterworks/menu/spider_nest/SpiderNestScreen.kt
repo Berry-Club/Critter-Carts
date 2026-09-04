@@ -2,7 +2,9 @@ package dev.aaronhowser.mods.critterworks.menu.spider_nest
 
 import dev.aaronhowser.mods.aaron.menu.BaseScreen
 import dev.aaronhowser.mods.aaron.menu.textures.ScreenBackground
+import dev.aaronhowser.mods.aaron.misc.AaronExtensions.toComponent
 import dev.aaronhowser.mods.critterworks.Critterworks
+import dev.aaronhowser.mods.critterworks.datagen.language.ModMenuLang
 import dev.aaronhowser.mods.critterworks.handler.spider.HoppingSpider
 import dev.aaronhowser.mods.critterworks.handler.spider.behavior.transport.HoppingSpiderTransportBehavior
 import net.minecraft.client.gui.GuiGraphics
@@ -36,7 +38,11 @@ class SpiderNestScreen(
 		gameTime: Long
 	) {
 		val rowY = FIRST_ROW_Y + index * ROW_HEIGHT
-		val name = Component.translatable("menu.critterworks.spider_nest.spider", index + 1)
+		val name = if (spider.customName == null) {
+			ModMenuLang.SPIDER_NEST_SPIDER.toComponent(index + 1)
+		} else {
+			spider.customName.toComponent()
+		}
 		val position = getPositionText(spider, gameTime)
 		val transportBehavior = getJobText(spider)
 
@@ -47,10 +53,9 @@ class SpiderNestScreen(
 
 	private fun getPositionText(spider: HoppingSpider, gameTime: Long): Component {
 		val position = spider.getRenderPosition(gameTime, 0f)
-			?: return Component.translatable("menu.critterworks.spider_nest.position", "?", "?", "?")
+			?: return ModMenuLang.SPIDER_NEST_POSITION.toComponent("?", "?", "?")
 
-		return Component.translatable(
-			"menu.critterworks.spider_nest.position",
+		return ModMenuLang.SPIDER_NEST_POSITION.toComponent(
 			formatCoordinate(position.x),
 			formatCoordinate(position.y),
 			formatCoordinate(position.z)
@@ -65,28 +70,26 @@ class SpiderNestScreen(
 		val transportBehavior = spider.transportBehavior
 		if (transportBehavior == null) {
 			if (spider.activeBehavior != null) {
-				return Component.translatable("menu.critterworks.spider_nest.wandering")
+				return ModMenuLang.SPIDER_NEST_WANDERING.toComponent()
 			}
 
-			return Component.translatable("menu.critterworks.spider_nest.idle")
+			return ModMenuLang.SPIDER_NEST_IDLE.toComponent()
 		}
 
 		return when (transportBehavior.phase) {
-			HoppingSpiderTransportBehavior.Phase.TO_SOURCE -> Component.translatable(
-				"menu.critterworks.spider_nest.collecting",
+			HoppingSpiderTransportBehavior.Phase.TO_SOURCE -> ModMenuLang.SPIDER_NEST_COLLECTING.toComponent(
 				transportBehavior.transferAmount
 			)
 
 			HoppingSpiderTransportBehavior.Phase.TO_DESTINATION -> getDeliveryText(spider, transportBehavior)
 
-			HoppingSpiderTransportBehavior.Phase.RETURNING_ITEM -> Component.translatable(
-				"menu.critterworks.spider_nest.returning_item",
+			HoppingSpiderTransportBehavior.Phase.RETURNING_ITEM -> ModMenuLang.SPIDER_NEST_RETURNING_ITEM.toComponent(
 				getFailureText(transportBehavior.failureReason)
 			)
 
 			HoppingSpiderTransportBehavior.Phase.RETURNING,
 			HoppingSpiderTransportBehavior.Phase.RETURNING_FROM_SOURCE ->
-				Component.translatable("menu.critterworks.spider_nest.returning")
+				ModMenuLang.SPIDER_NEST_RETURNING.toComponent()
 		}
 	}
 
@@ -94,14 +97,12 @@ class SpiderNestScreen(
 		val failureReason = transportBehavior.failureReason
 
 		if (failureReason != null) {
-			return Component.translatable(
-				"menu.critterworks.spider_nest.waiting",
+			return ModMenuLang.SPIDER_NEST_WAITING.toComponent(
 				getFailureText(failureReason)
 			)
 		}
 
-		return Component.translatable(
-			"menu.critterworks.spider_nest.delivering",
+		return ModMenuLang.SPIDER_NEST_DELIVERING.toComponent(
 			spider.carriedStack.hoverName
 		)
 	}
@@ -111,7 +112,7 @@ class SpiderNestScreen(
 
 		val name = reason.name.lowercase(Locale.ROOT)
 
-		return Component.translatable("menu.critterworks.spider_nest.failure.$name")
+		return "${ModMenuLang.SPIDER_NEST_FAILURE}.$name".toComponent()
 	}
 
 	companion object {

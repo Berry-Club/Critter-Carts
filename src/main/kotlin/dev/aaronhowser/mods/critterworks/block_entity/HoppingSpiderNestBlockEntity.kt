@@ -2,6 +2,8 @@ package dev.aaronhowser.mods.critterworks.block_entity
 
 import dev.aaronhowser.mods.aaron.block_entity.SyncingBlockEntity
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isTrue
+import dev.aaronhowser.mods.aaron.misc.AaronExtensions.toComponent
+import dev.aaronhowser.mods.critterworks.datagen.language.ModMenuLang
 import dev.aaronhowser.mods.critterworks.handler.web.WebNetwork
 import dev.aaronhowser.mods.critterworks.handler.web.WebSavedData
 import dev.aaronhowser.mods.critterworks.handler.web.node.WebBlockAnchor
@@ -12,6 +14,7 @@ import dev.aaronhowser.mods.critterworks.handler.spider.behavior.transport.Hoppi
 import dev.aaronhowser.mods.critterworks.handler.spider.behavior.transport.HoppingSpiderTransportBehavior
 import dev.aaronhowser.mods.critterworks.handler.spider.behavior.HoppingSpiderWanderBehavior
 import dev.aaronhowser.mods.critterworks.item.ItemFilterItem
+import dev.aaronhowser.mods.critterworks.item.HoppingSpiderItem
 import dev.aaronhowser.mods.critterworks.item.SpiderNestInterfaceItem
 import dev.aaronhowser.mods.critterworks.item.component.NestInterfaceComponent
 import dev.aaronhowser.mods.critterworks.menu.spider_nest.SpiderNestMenu
@@ -40,12 +43,33 @@ class HoppingSpiderNestBlockEntity(
 
 	override val syncImmediately: Boolean = false
 
-	val hoppingSpiders: MutableList<HoppingSpider> = MutableList(STARTING_SPIDER_COUNT) {
-		HoppingSpider()
+	val hoppingSpiders: MutableList<HoppingSpider> = mutableListOf()
+
+	fun addSpider(stack: ItemStack): Boolean {
+		if (hoppingSpiders.size >= MAX_SPIDERS) return false
+
+		hoppingSpiders.add(HoppingSpiderItem.createSpider(stack))
+		setChangedAndSync()
+		return true
+	}
+
+	fun removeLastSpider(): HoppingSpider? {
+		if (hoppingSpiders.isEmpty()) return null
+
+		val spider = hoppingSpiders.removeLast()
+		setChangedAndSync()
+		return spider
+	}
+
+	private fun setChangedAndSync() {
+		setChanged()
+
+		val level = level ?: return
+		level.sendBlockUpdated(blockPos, blockState, blockState, Block.UPDATE_CLIENTS)
 	}
 
 	override fun getDisplayName(): Component {
-		return Component.translatable("menu.critterworks.spider_nest.title")
+		return ModMenuLang.SPIDER_NEST_TITLE.toComponent()
 	}
 
 	override fun createMenu(
@@ -425,13 +449,14 @@ class HoppingSpiderNestBlockEntity(
 
 	private fun loadSpiders(spidersTag: ListTag, registries: HolderLookup.Provider) {
 		for (index in spidersTag.indices) {
+			if (hoppingSpiders.size >= MAX_SPIDERS) break
 			hoppingSpiders.add(HoppingSpider.load(spidersTag.getCompound(index), registries))
 		}
 	}
 
 	companion object {
 		private const val SPIDERS_TAG = "HoppingSpiders"
-		private const val STARTING_SPIDER_COUNT = 4
+		const val MAX_SPIDERS = 64
 		private const val MAX_TRANSFER_SIZE = 64
 
 		fun serverTick(
