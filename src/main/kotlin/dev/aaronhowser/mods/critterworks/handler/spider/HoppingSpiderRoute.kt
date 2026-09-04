@@ -21,10 +21,40 @@ class HoppingSpiderRoute(
 	fun getPosition(gameTime: Long, partialTick: Float): Vec3 {
 		if (positions.size < 2 || durationTicks <= 0) return positions.last()
 
+		return getPositionAtDistance(getTravelDistance(gameTime, partialTick))
+	}
+
+	fun getDirection(gameTime: Long, partialTick: Float): Vec3? {
+		if (positions.size < 2) return null
+
+		var remainingDistance = getTravelDistance(gameTime, partialTick)
+		var lastDirection: Vec3? = null
+		for (index in 1 until positions.size) {
+			val start = positions[index - 1]
+			val end = positions[index]
+			val segment = end.subtract(start)
+			val segmentDistance = segment.length()
+
+			if (segmentDistance == 0.0) continue
+			lastDirection = segment.scale(1.0 / segmentDistance)
+
+			if (remainingDistance > segmentDistance) {
+				remainingDistance -= segmentDistance
+				continue
+			}
+
+			return lastDirection
+		}
+
+		return lastDirection
+	}
+
+	private fun getTravelDistance(gameTime: Long, partialTick: Float): Double {
+		if (durationTicks <= 0) return getDistance()
+
 		val elapsedTicks = gameTime - startGameTime + partialTick.toDouble()
 		val progress = (elapsedTicks / durationTicks).coerceIn(0.0, 1.0)
-
-		return getPositionAtDistance(getDistance() * progress)
+		return getDistance() * progress
 	}
 
 	private fun getPositionAtDistance(distance: Double): Vec3 {
