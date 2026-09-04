@@ -110,7 +110,7 @@ object WebLineGeometryRenderer {
 			vertexConsumer, pose,
 			-WEB_RADIUS, -WEB_RADIUS,
 			WEB_RADIUS, -WEB_RADIUS,
-			0f, 1f, 0f,
+			1f, 0f, 0f,
 			start, end,
 			0f, 0.25f,
 			startLight, endLight,
@@ -132,7 +132,7 @@ object WebLineGeometryRenderer {
 			vertexConsumer, pose,
 			WEB_RADIUS, WEB_RADIUS,
 			-WEB_RADIUS, WEB_RADIUS,
-			0f, 1f, 0f,
+			1f, 0f, 0f,
 			start, end,
 			0.5f, 0.75f,
 			startLight, endLight,
@@ -184,7 +184,7 @@ object WebLineGeometryRenderer {
 			.setUv(u, v)
 			.setOverlay(OverlayTexture.NO_OVERLAY)
 			.setLight(light)
-			.setNormal(pose, normalX, normalY, normalZ)
+			.setNormal(normalX, normalY, normalZ)
 	}
 
 	private const val WEB_COLOR = 0xFFFFFFFF.toInt()
