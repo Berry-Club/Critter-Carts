@@ -1,8 +1,0 @@
-{
-  "values": [
-    "critter_carts:web_fluid",
-    "critter_carts:web_pathfinder",
-    "critter_carts:spider_nest_interface",
-    "#c:tools/shear"
-  ]
-}

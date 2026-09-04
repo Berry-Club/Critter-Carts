@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "critterworks:block/scoochstem/top",
+    "east": "critterworks:block/colored_scoochstem/red",
+    "north": "critterworks:block/colored_scoochstem/red",
+    "particle": "critterworks:block/colored_scoochstem/red",
+    "south": "critterworks:block/colored_scoochstem/red",
+    "up": "critterworks:block/scoochstem/top",
+    "west": "critterworks:block/colored_scoochstem/red"
+  }
+}

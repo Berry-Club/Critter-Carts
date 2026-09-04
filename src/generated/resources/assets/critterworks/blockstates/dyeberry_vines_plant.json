@@ -1,0 +1,28 @@
+{
+  "variants": {
+    "berries=false": {
+      "model": "critterworks:block/dyeberry_vines_plant"
+    },
+    "berries=true,color=aaron": {
+      "model": "critterworks:block/dyeberry_vines_aaron_plant_lit"
+    },
+    "berries=true,color=blue": {
+      "model": "critterworks:block/dyeberry_vines_blue_plant_lit"
+    },
+    "berries=true,color=cyan": {
+      "model": "critterworks:block/dyeberry_vines_cyan_plant_lit"
+    },
+    "berries=true,color=green": {
+      "model": "critterworks:block/dyeberry_vines_green_plant_lit"
+    },
+    "berries=true,color=magenta": {
+      "model": "critterworks:block/dyeberry_vines_magenta_plant_lit"
+    },
+    "berries=true,color=red": {
+      "model": "critterworks:block/dyeberry_vines_red_plant_lit"
+    },
+    "berries=true,color=yellow": {
+      "model": "critterworks:block/dyeberry_vines_yellow_plant_lit"
+    }
+  }
+}

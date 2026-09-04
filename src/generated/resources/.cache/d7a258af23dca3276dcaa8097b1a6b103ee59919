@@ -1,7 +1,7 @@
-// 1.21.1	2026-09-03T05:24:23.8119742	Tags for minecraft:item mod id critter_carts
-01ea947468425e8fa9b1297c4f5264ae03c483e9 data/critter_carts/tags/item/dyeberries.json
-7d0d0097fb229ec0f1c7c23650dc0abe5158d1f6 data/critter_carts/tags/item/scoochworm_look_at.json
-471061c3ad8a5e7467f471173c341089fd2df4b3 data/critter_carts/tags/item/scoochworm_saddles.json
-5c7ee2548f43e417fc99691b0a057e55b4be8e1f data/critter_carts/tags/item/web_line_interactable.json
+// 1.21.1	2026-09-03T05:24:23.8119742	Tags for minecraft:item mod id critterworks
+01ea947468425e8fa9b1297c4f5264ae03c483e9 data/critterworks/tags/item/dyeberries.json
+7d0d0097fb229ec0f1c7c23650dc0abe5158d1f6 data/critterworks/tags/item/scoochworm_look_at.json
+471061c3ad8a5e7467f471173c341089fd2df4b3 data/critterworks/tags/item/scoochworm_saddles.json
+5c7ee2548f43e417fc99691b0a057e55b4be8e1f data/critterworks/tags/item/web_line_interactable.json
 4654bd784c57d2f51fcd087fd773ca10e1f1c7a2 data/minecraft/tags/item/logs.json
 4654bd784c57d2f51fcd087fd773ca10e1f1c7a2 data/minecraft/tags/item/logs_that_burn.json

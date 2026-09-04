@@ -1,0 +1,54 @@
+{
+  "parent": "critterworks:guide/break_apple_slice",
+  "criteria": {
+    "scoochworm": {
+      "conditions": {
+        "entity": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "type": "critterworks:scoochworm"
+            }
+          }
+        ],
+        "item": {}
+      },
+      "trigger": "minecraft:player_interacted_with_entity"
+    },
+    "scoochworm_segment": {
+      "conditions": {
+        "entity": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "type": "critterworks:scoochworm_part"
+            }
+          }
+        ],
+        "item": {}
+      },
+      "trigger": "minecraft:player_interacted_with_entity"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.critterworks.interact_with_scoochworm.desc"
+    },
+    "icon": {
+      "count": 1,
+      "id": "critterworks:scoochworm_spawn_egg"
+    },
+    "title": {
+      "translate": "advancements.critterworks.interact_with_scoochworm.title"
+    }
+  },
+  "requirements": [
+    [
+      "scoochworm",
+      "scoochworm_segment"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

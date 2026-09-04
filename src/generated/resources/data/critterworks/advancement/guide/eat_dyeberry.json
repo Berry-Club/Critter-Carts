@@ -1,0 +1,76 @@
+{
+  "parent": "critterworks:guide/root",
+  "criteria": {
+    "blue": {
+      "conditions": {
+        "item": {
+          "items": "critterworks:blue_dyeberry"
+        }
+      },
+      "trigger": "minecraft:consume_item"
+    },
+    "cyan": {
+      "conditions": {
+        "item": {
+          "items": "critterworks:cyan_dyeberry"
+        }
+      },
+      "trigger": "minecraft:consume_item"
+    },
+    "green": {
+      "conditions": {
+        "item": {
+          "items": "critterworks:green_dyeberry"
+        }
+      },
+      "trigger": "minecraft:consume_item"
+    },
+    "magenta": {
+      "conditions": {
+        "item": {
+          "items": "critterworks:magenta_dyeberry"
+        }
+      },
+      "trigger": "minecraft:consume_item"
+    },
+    "red": {
+      "conditions": {
+        "item": {
+          "items": "critterworks:red_dyeberry"
+        }
+      },
+      "trigger": "minecraft:consume_item"
+    },
+    "yellow": {
+      "conditions": {
+        "item": {
+          "items": "critterworks:yellow_dyeberry"
+        }
+      },
+      "trigger": "minecraft:consume_item"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.critterworks.eat_dyeberry.desc"
+    },
+    "icon": {
+      "count": 1,
+      "id": "critterworks:green_dyeberry"
+    },
+    "title": {
+      "translate": "advancements.critterworks.eat_dyeberry.title"
+    }
+  },
+  "requirements": [
+    [
+      "green",
+      "blue",
+      "red",
+      "yellow",
+      "magenta",
+      "cyan"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

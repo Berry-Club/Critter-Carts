@@ -1,0 +1,30 @@
+{
+  "parent": "critterworks:guide/interact_with_scoochworm",
+  "criteria": {
+    "attach_to_scoochworm": {
+      "conditions": {
+        "action": "critterworks:guide/attach_to_scoochworm"
+      },
+      "trigger": "aaron:player_action"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.critterworks.attach_to_scoochworm.desc"
+    },
+    "frame": "goal",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:saddle"
+    },
+    "title": {
+      "translate": "advancements.critterworks.attach_to_scoochworm.title"
+    }
+  },
+  "requirements": [
+    [
+      "attach_to_scoochworm"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

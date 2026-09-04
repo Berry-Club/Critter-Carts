@@ -1,0 +1,30 @@
+{
+  "parent": "critterworks:guide/interact_with_scoochworm",
+  "criteria": {
+    "split_scoochworm": {
+      "conditions": {
+        "action": "critterworks:guide/split_scoochworm"
+      },
+      "trigger": "aaron:player_action"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.critterworks.split_scoochworm.desc"
+    },
+    "frame": "goal",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:shears"
+    },
+    "title": {
+      "translate": "advancements.critterworks.split_scoochworm.title"
+    }
+  },
+  "requirements": [
+    [
+      "split_scoochworm"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

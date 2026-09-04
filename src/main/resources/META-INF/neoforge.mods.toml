@@ -46,4 +46,4 @@ ordering = "NONE"
 side = "BOTH"
 
 [[mixins]]
-config = "mixins.critter_carts.json"
+config = "mixins.critterworks.json"

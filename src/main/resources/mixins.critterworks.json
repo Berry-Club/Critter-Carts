@@ -1,0 +1,20 @@
+{
+	"required": true,
+	"minVersion": "0.8",
+	"package": "dev.aaronhowser.mods.critterworks.mixin",
+	"mixins": [
+		"BlockColumnFeatureMixin",
+		"CaveVinesBlockMixin",
+		"GrowingPlantBlockMixin",
+		"GrowingPlantBodyBlockMixin",
+		"GrowingPlantHeadBlockMixin"
+	],
+	"client": [
+		"client.AbstractClientPlayerMixin",
+		"client.ItemInHandRendererMixin",
+		"client.LivingEntityRendererMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

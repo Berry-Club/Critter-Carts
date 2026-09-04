@@ -1,0 +1,43 @@
+---
+title: Scoochworms
+id: critterworks:scoochworms
+related_entities: [critterworks:scoochworm]
+type: entity
+---
+
+Scoochworms are segmented creatures that carry players and items across solid surfaces and along [Scoochstem](@critterworks:scoochstem) paths.
+
+## Movement
+
+Interact with a Scoochworm's head to start or stop it. A moving Scoochworm wanders across solid surfaces and can crawl around corners between floors, walls, and ceilings.
+
+When it reaches [Scoochstem](@critterworks:scoochstem), it follows the path in its current direction.
+
+At a flat branch, the Scoochworm first tries to continue forward. If forward travel is unavailable, it chooses an available left or right path. If both side paths are available, it chooses one randomly.
+
+Scoochworms stop at the end of a valid Scoochstem path and turn away from edges they cannot crawl around while wandering.
+
+## Segments
+
+New Scoochworms begin with one body segment. Feeding the head a **Melon** adds another segment, up to a maximum of 16.
+
+Each segment can hold one attachment.
+
+The [Lockbox](@critterworks:lockbox) provides an accessible 27-slot inventory, automatically collects dropped items, and unloads them while upside down. A standard [Saddle](@minecraft:saddle) allows one player to ride its segment without controlling the Scoochworm.
+
+Using **Shears** on a middle segment splits the Scoochworm in two. The original keeps the segments before the cut, while the tail reverses direction and becomes the head of a new Scoochworm. Attachments remain on the transferred segments, but the old tail's attachment drops because that segment becomes the new head. The shears take one point of durability.
+
+The first and last body segments cannot be split.
+
+## Interacting Safely
+
+| Target | Interaction | Result |
+| --- | --- | --- |
+| Head | Use | Starts or stops movement. |
+| Head or segment | Use with Melon | Adds one segment if the Scoochworm is not at maximum length. |
+| Head or segment | Use with Dyeberry | Changes the entire Scoochworm to the berry's color. |
+| Segment | Use with attachment | Equips the attachment. |
+| Attached segment | Sneak-use with empty hand | Removes the attachment. |
+| Middle segment | Use with Shears | Splits the Scoochworm into two creatures. |
+
+When a Scoochworm dies, attachments on all of its segments are dropped.

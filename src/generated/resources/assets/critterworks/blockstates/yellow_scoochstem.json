@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "critterworks:block/yellow_scoochstem",
+      "x": 90,
+      "y": 90
+    },
+    "axis=y": {
+      "model": "critterworks:block/yellow_scoochstem"
+    },
+    "axis=z": {
+      "model": "critterworks:block/yellow_scoochstem",
+      "x": 90
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "parent": "critterworks:guide/root",
+  "criteria": {
+    "break_apple_slice": {
+      "conditions": {
+        "block": {
+          "blocks": "critterworks:apple_slice"
+        }
+      },
+      "trigger": "aaron:block_broken"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.critterworks.break_apple_slice.desc"
+    },
+    "icon": {
+      "count": 1,
+      "id": "critterworks:apple_slice"
+    },
+    "title": {
+      "translate": "advancements.critterworks.break_apple_slice.title"
+    }
+  },
+  "requirements": [
+    [
+      "break_apple_slice"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

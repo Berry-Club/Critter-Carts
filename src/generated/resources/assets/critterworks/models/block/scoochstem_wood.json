@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "critterworks:block/scoochstem/side",
+    "particle": "critterworks:block/scoochstem/side"
+  }
+}

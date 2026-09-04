@@ -216,7 +216,7 @@ publishing {
 
 publishMods {
 	file = jar.archiveFile
-	displayName = "Critter Carts ${project.minecraft_version} ${project.version}"
+	displayName = "Critterworks ${project.minecraft_version} ${project.version}"
 	changelog = providers.fileContents(layout.projectDirectory.file('CHANGELOG.md')).asText
 	modLoaders.add('neoforge')
 
@@ -253,8 +253,8 @@ wiki {
 	wikiAccessToken = environment.MODDED_MC_WIKI_TOKEN
 
 	docs {
-		critter_carts {
-			root = file('docs/critter_carts')
+		critterworks {
+			root = file('docs/critterworks')
 		}
 	}
 }

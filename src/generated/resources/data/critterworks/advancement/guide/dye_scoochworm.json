@@ -1,0 +1,29 @@
+{
+  "parent": "critterworks:guide/interact_with_scoochworm",
+  "criteria": {
+    "dye_scoochworm": {
+      "conditions": {
+        "action": "critterworks:guide/dye_scoochworm"
+      },
+      "trigger": "aaron:player_action"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.critterworks.dye_scoochworm.desc"
+    },
+    "icon": {
+      "count": 1,
+      "id": "critterworks:green_dyeberry"
+    },
+    "title": {
+      "translate": "advancements.critterworks.dye_scoochworm.title"
+    }
+  },
+  "requirements": [
+    [
+      "dye_scoochworm"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

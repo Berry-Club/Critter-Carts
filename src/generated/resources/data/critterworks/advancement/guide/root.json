@@ -1,0 +1,28 @@
+{
+  "criteria": {
+    "tick": {
+      "trigger": "minecraft:tick"
+    }
+  },
+  "display": {
+    "announce_to_chat": false,
+    "background": "critterworks:textures/block/scoochstem/side.png",
+    "description": {
+      "translate": "advancements.critterworks.root.desc"
+    },
+    "icon": {
+      "count": 1,
+      "id": "critterworks:scoochworm_spawn_egg"
+    },
+    "show_toast": false,
+    "title": {
+      "translate": "advancements.critterworks.root.title"
+    }
+  },
+  "requirements": [
+    [
+      "tick"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

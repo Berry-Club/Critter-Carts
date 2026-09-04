@@ -1,0 +1,26 @@
+{
+  "scoochworm_footstep": {
+    "sounds": [
+      "critterworks:entity/scoochworm/footstep_1",
+      "critterworks:entity/scoochworm/footstep_2"
+    ],
+    "subtitle": "subtitles.critterworks.scoochworm_footstep"
+  },
+  "scoochworm_kiss": {
+    "sounds": [
+      "critterworks:entity/kiss_1",
+      "critterworks:entity/kiss_2",
+      "critterworks:entity/kiss_3"
+    ],
+    "subtitle": "subtitles.critterworks.scoochworm_kiss"
+  },
+  "web_snap": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "entity.arrow.shoot"
+      }
+    ],
+    "subtitle": "subtitles.critterworks.web_snap"
+  }
+}
