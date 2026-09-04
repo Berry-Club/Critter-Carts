@@ -1,4 +1,4 @@
-package dev.aaronhowser.mods.critter_carts.client.render
+package dev.aaronhowser.mods.critter_carts.client.render.web
 
 import com.mojang.blaze3d.vertex.PoseStack
 import dev.aaronhowser.mods.aaron.client.render.AaronRenderUtil
