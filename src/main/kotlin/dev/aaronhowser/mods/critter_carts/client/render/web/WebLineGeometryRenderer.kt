@@ -110,7 +110,7 @@ object WebLineGeometryRenderer {
 			vertexConsumer, pose,
 			-WEB_RADIUS, -WEB_RADIUS,
 			WEB_RADIUS, -WEB_RADIUS,
-			0f, 1f,
+			0f, 1f, 0f,
 			start, end,
 			0f, 0.25f,
 			startLight, endLight,
@@ -121,7 +121,7 @@ object WebLineGeometryRenderer {
 			vertexConsumer, pose,
 			WEB_RADIUS, -WEB_RADIUS,
 			WEB_RADIUS, WEB_RADIUS,
-			-1f, 0f,
+			0f, 1f, 0f,
 			start, end,
 			0.25f, 0.5f,
 			startLight, endLight,
@@ -132,7 +132,7 @@ object WebLineGeometryRenderer {
 			vertexConsumer, pose,
 			WEB_RADIUS, WEB_RADIUS,
 			-WEB_RADIUS, WEB_RADIUS,
-			0f, -1f,
+			0f, 1f, 0f,
 			start, end,
 			0.5f, 0.75f,
 			startLight, endLight,
@@ -143,7 +143,7 @@ object WebLineGeometryRenderer {
 			vertexConsumer, pose,
 			-WEB_RADIUS, WEB_RADIUS,
 			-WEB_RADIUS, -WEB_RADIUS,
-			1f, 0f,
+			0f, 1f, 0f,
 			start, end,
 			0.75f, 1f,
 			startLight, endLight,
@@ -156,7 +156,7 @@ object WebLineGeometryRenderer {
 		pose: PoseStack.Pose,
 		firstX: Float, firstZ: Float,
 		secondX: Float, secondZ: Float,
-		normalX: Float, normalZ: Float,
+		normalX: Float, normalY: Float, normalZ: Float,
 		start: Double, end: Double,
 		minU: Float, maxU: Float,
 		startLight: Int, endLight: Int,
@@ -165,10 +165,10 @@ object WebLineGeometryRenderer {
 		val minV = (start / TEXTURE_REPEAT_DISTANCE).toFloat()
 		val maxV = (end / TEXTURE_REPEAT_DISTANCE).toFloat()
 
-		addVertex(vertexConsumer, pose, firstX, start.toFloat(), firstZ, minU, minV, startLight, color, normalX, 0f, normalZ)
-		addVertex(vertexConsumer, pose, firstX, end.toFloat(), firstZ, minU, maxV, endLight, color, normalX, 0f, normalZ)
-		addVertex(vertexConsumer, pose, secondX, end.toFloat(), secondZ, maxU, maxV, endLight, color, normalX, 0f, normalZ)
-		addVertex(vertexConsumer, pose, secondX, start.toFloat(), secondZ, maxU, minV, startLight, color, normalX, 0f, normalZ)
+		addVertex(vertexConsumer, pose, firstX, start.toFloat(), firstZ, minU, minV, startLight, color, normalX, normalY, normalZ)
+		addVertex(vertexConsumer, pose, firstX, end.toFloat(), firstZ, minU, maxV, endLight, color, normalX, normalY, normalZ)
+		addVertex(vertexConsumer, pose, secondX, end.toFloat(), secondZ, maxU, maxV, endLight, color, normalX, normalY, normalZ)
+		addVertex(vertexConsumer, pose, secondX, start.toFloat(), secondZ, maxU, minV, startLight, color, normalX, normalY, normalZ)
 	}
 
 	private fun addVertex(
