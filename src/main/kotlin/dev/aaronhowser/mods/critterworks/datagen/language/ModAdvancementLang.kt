@@ -24,7 +24,7 @@ object ModAdvancementLang {
 	fun add(provider: ModLanguageProvider) {
 		provider.apply {
 			add(ROOT_TITLE, "Critterworks")
-			add(ROOT_DESC, "Critterworks")
+			add(ROOT_DESC, "I sure hope it does!")
 			add(BREAK_APPLE_SLICE_TITLE, "The Big Apple")
 			add(BREAK_APPLE_SLICE_DESC, "Find and break into a Big Apple, which spawns in Lush Caves")
 			add(INTERACT_WITH_SCOOCHWORM_TITLE, "The Hungry Hungry Scoochworm")

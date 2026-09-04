@@ -1,4 +1,4 @@
-// 1.21.1	2026-08-26T15:56:12.7645589	Registries
-e291301f9cddf44662a93116006081385e508c5e data/critterworks/neoforge/biome_modifier/add_scoochworm_apple.json
-3a374621470371d610368974371cacdda7709684 data/critterworks/worldgen/configured_feature/scoochworm_apple.json
-079af5296024f07694e791f6dbb2ea0a99444fc0 data/critterworks/worldgen/placed_feature/scoochworm_apple.json
+// 1.21.1	2026-09-04T12:07:17.4878275	Registries
+3f26f6e81355f9dc0aab9447f9207925c997f40c data/critterworks/neoforge/biome_modifier/add_scoochworm_apple.json
+ff3cdeb4697c31b6f5273a37958b5e8253826413 data/critterworks/worldgen/configured_feature/scoochworm_apple.json
+c230cca328df090f95f12e47a51b710671affdd1 data/critterworks/worldgen/placed_feature/scoochworm_apple.json
