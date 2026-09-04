@@ -96,37 +96,61 @@ class HoppingSpider(
 		nestPosition: Vec3
 	): Boolean {
 		return when (job.phase) {
-			HoppingSpiderJob.Phase.TO_SOURCE -> pickUpItem(level, job)
+			HoppingSpiderJob.Phase.TO_SOURCE -> {
+				pickUpItem(level, job)
+				true
+			}
+
 			HoppingSpiderJob.Phase.TO_DESTINATION -> deliverItem(level, job)
-			HoppingSpiderJob.Phase.RETURNING -> finishJob(nestPosition)
+
+			HoppingSpiderJob.Phase.RETURNING -> {
+				finishJob(nestPosition)
+				true
+			}
 		}
 	}
 
-	private fun pickUpItem(level: ServerLevel, job: HoppingSpiderJob): Boolean {
-		val source = getBlockAnchor(level, job.sourceNodeUuid) ?: return cancelJob()
+	private fun pickUpItem(level: ServerLevel, job: HoppingSpiderJob) {
+		val source = getBlockAnchor(level, job.sourceNodeUuid)
+		if (source == null) {
+			cancelJob()
+			return
+		}
+
 		val nestInterface = SpiderNestInterfaceItem.getComponent(source.nestInterface)
 
 		if (nestInterface.transferDirection != NestInterfaceComponent.TransferDirection.INPUT) {
-			return cancelJob()
+			cancelJob()
+			return
 		}
 
-		val handler = getItemHandler(level, source) ?: return cancelJob()
+		val handler = getItemHandler(level, source)
+		if (handler == null) {
+			cancelJob()
+			return
+		}
+
 		val filter = nestInterface.getFilter()
 		val stack = handler.extractItem(job.sourceSlot, job.transferAmount, true)
 
-		if (stack.isEmpty) return cancelJob()
+		if (stack.isEmpty) {
+			cancelJob()
+			return
+		}
 
 		if (!filter.isEmpty && !ItemFilterItem.passesFilter(filter, stack)) {
-			return cancelJob()
+			cancelJob()
+			return
 		}
 
 		val extracted = handler.extractItem(job.sourceSlot, job.transferAmount, false)
-		if (extracted.isEmpty) return cancelJob()
+		if (extracted.isEmpty) {
+			cancelJob()
+			return
+		}
 
 		carriedStack = extracted
 		startNextLeg(HoppingSpiderJob.Phase.TO_DESTINATION)
-
-		return true
 	}
 
 	private fun deliverItem(level: ServerLevel, job: HoppingSpiderJob): Boolean {
@@ -164,21 +188,17 @@ class HoppingSpider(
 		routeProgress = 0.0
 	}
 
-	private fun finishJob(nestPosition: Vec3): Boolean {
+	private fun finishJob(nestPosition: Vec3) {
 		job = null
 		position = nestPosition
 		route = null
 		routeProgress = 0.0
-
-		return true
 	}
 
-	private fun cancelJob(): Boolean {
+	private fun cancelJob() {
 		job = null
 		route = null
 		routeProgress = 0.0
-
-		return true
 	}
 
 	private fun getBlockAnchor(level: ServerLevel, uuid: UUID): WebBlockAnchor? {
