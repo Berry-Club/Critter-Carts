@@ -1,4 +1,4 @@
-package dev.aaronhowser.mods.critterworks.block
+package dev.aaronhowser.mods.critterworks.block.base
 
 import dev.aaronhowser.mods.critterworks.entity.ScoochwormEntity
 import net.minecraft.core.BlockPos

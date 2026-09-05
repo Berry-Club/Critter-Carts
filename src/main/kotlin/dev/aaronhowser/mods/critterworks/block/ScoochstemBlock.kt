@@ -3,6 +3,7 @@ package dev.aaronhowser.mods.critterworks.block
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isBlock
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isItem
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.roll
+import dev.aaronhowser.mods.critterworks.block.base.ScoochwormTravelBlock
 import dev.aaronhowser.mods.critterworks.datagen.tag.ModBlockTagsProvider
 import dev.aaronhowser.mods.critterworks.entity.ScoochwormEntity
 import net.minecraft.core.BlockPos
@@ -29,7 +30,7 @@ import net.minecraft.world.phys.BlockHitResult
 import net.neoforged.neoforge.common.ItemAbilities
 import net.neoforged.neoforge.common.ItemAbility
 
-class ScoochstemBlock : RotatedPillarBlock(Properties.ofFullCopy(Blocks.OAK_LOG)), ScoochwormTravelBlock {
+open class ScoochstemBlock : RotatedPillarBlock(Properties.ofFullCopy(Blocks.OAK_LOG)), ScoochwormTravelBlock {
 
 	init {
 		registerDefaultState(

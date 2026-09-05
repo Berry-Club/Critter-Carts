@@ -1,5 +1,6 @@
 package dev.aaronhowser.mods.critterworks.block
 
+import dev.aaronhowser.mods.critterworks.block.base.ScoochwormTravelBlock
 import dev.aaronhowser.mods.critterworks.entity.ScoochwormEntity
 import dev.aaronhowser.mods.critterworks.entity.data.WormColor
 import net.minecraft.core.BlockPos

@@ -4,6 +4,7 @@ import dev.aaronhowser.mods.aaron.misc.AaronExtensions.getEquipmentSlot
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isItem
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.nextRange
 import dev.aaronhowser.mods.critterworks.advancement.ModAdvancements
+import dev.aaronhowser.mods.critterworks.block.base.ScoochwormSegmentSupportBlock
 import dev.aaronhowser.mods.critterworks.entity.ScoochwormEntity
 import dev.aaronhowser.mods.critterworks.entity.ScoochwormPartEntity
 import dev.aaronhowser.mods.critterworks.entity.attachment.ScoochwormAttachment
@@ -11,7 +12,9 @@ import dev.aaronhowser.mods.critterworks.entity.attachment.builtin.LockboxAttach
 import dev.aaronhowser.mods.critterworks.entity.attachment.builtin.NoAttachment
 import dev.aaronhowser.mods.critterworks.entity.attachment.data.SyncedAttachmentData
 import dev.aaronhowser.mods.critterworks.registry.ModEntityTypes
+import net.minecraft.core.BlockPos
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.server.level.ServerLevel
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
@@ -19,6 +22,7 @@ import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
+import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.gameevent.GameEvent
 import net.minecraft.world.phys.Vec3
 import net.neoforged.neoforge.items.IItemHandler
@@ -28,6 +32,8 @@ import net.neoforged.neoforge.items.IItemHandler
 class ScoochwormSegment {
 
 	private var attachment: ScoochwormAttachment = NoAttachment()
+	private var previousSupportPosition: BlockPos? = null
+	private var previousSupportState: BlockState? = null
 
 	// The segment owns the entity, not the other way around
 	// The entity doesn't even save anything, actually
@@ -50,8 +56,23 @@ class ScoochwormSegment {
 	}
 
 	fun discardBodyPart() {
+		val existingBodyPart = bodyPart
+		if (existingBodyPart != null) {
+			val level = existingBodyPart.level()
+			if (level is ServerLevel) {
+				notifyDetached(
+					level,
+					previousSupportPosition,
+					previousSupportState,
+					existingBodyPart
+				)
+			}
+		}
+
 		bodyPart?.discard()
 		bodyPart = null
+		previousSupportPosition = null
+		previousSupportState = null
 	}
 
 	fun bindClientBodyPart(
@@ -187,6 +208,55 @@ class ScoochwormSegment {
 	fun serverTick() {
 		val bodyPart = bodyPart ?: return
 		attachment.serverTick(bodyPart)
+		updateSupportBlock(bodyPart)
+	}
+
+	private fun updateSupportBlock(bodyPart: ScoochwormPartEntity) {
+		val level = bodyPart.level() as? ServerLevel ?: return
+		val supportPosition = ScoochwormEntity.getSupportBlockPosition(
+			bodyPart.position(),
+			bodyPart.supportDirection
+		)
+
+		val supportState = level.getBlockState(supportPosition)
+		val supportBlock = supportState.block as? ScoochwormSegmentSupportBlock
+
+		val listenerPosition = if (supportBlock != null) {
+			supportPosition
+		} else {
+			null
+		}
+
+		val supportChanged = previousSupportPosition != listenerPosition
+			|| previousSupportState?.block !== supportState.block
+
+		if (supportChanged) {
+			notifyDetached(
+				level,
+				previousSupportPosition,
+				previousSupportState,
+				bodyPart
+			)
+
+			supportBlock?.onSegmentAttached(supportState, level, supportPosition, bodyPart)
+		}
+
+		supportBlock?.onSegmentTick(supportState, level, supportPosition, bodyPart)
+
+		previousSupportPosition = listenerPosition
+		previousSupportState = if (supportBlock != null) supportState else null
+	}
+
+	private fun notifyDetached(
+		level: ServerLevel,
+		position: BlockPos?,
+		state: BlockState?,
+		bodyPart: ScoochwormPartEntity
+	) {
+		if (position == null || state == null) return
+		val supportBlock = state.block as? ScoochwormSegmentSupportBlock ?: return
+
+		supportBlock.onSegmentDetached(state, level, position, bodyPart)
 	}
 
 	fun clientTick() {

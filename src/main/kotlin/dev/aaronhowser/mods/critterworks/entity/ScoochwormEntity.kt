@@ -7,7 +7,7 @@ import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isServerSide
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.nextRange
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.toVec3
 import dev.aaronhowser.mods.critterworks.advancement.ModAdvancements
-import dev.aaronhowser.mods.critterworks.block.ScoochwormTravelBlock
+import dev.aaronhowser.mods.critterworks.block.base.ScoochwormTravelBlock
 import dev.aaronhowser.mods.critterworks.datagen.tag.ModBlockTagsProvider
 import dev.aaronhowser.mods.critterworks.entity.control.ScoochwormStemMoveControl
 import dev.aaronhowser.mods.critterworks.entity.data.*
