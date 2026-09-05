@@ -19,6 +19,9 @@ object ModBlocks : AaronBlockRegistry() {
 	val SCOOCHSTEM: DeferredBlock<ScoochstemBlock> =
 		registerBlock("scoochstem", ::ScoochstemBlock)
 
+	val STEM_ENCASED_COMPARATOR: DeferredBlock<StemEncasedComparatorBlock> =
+		registerBlock("stem_encased_comparator", ::StemEncasedComparatorBlock)
+
 	val CRITTER_CAGE: DeferredBlock<CritterCageBlock> =
 		registerBlockWithoutItem("critter_cage", ::CritterCageBlock)
 
