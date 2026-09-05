@@ -4,8 +4,8 @@ import dev.aaronhowser.mods.aaron.registry.AaronMenuTypesRegistry
 import dev.aaronhowser.mods.critterworks.Critterworks
 import dev.aaronhowser.mods.critterworks.menu.item_filter.ItemFilterMenu
 import dev.aaronhowser.mods.critterworks.menu.item_filter.ItemFilterScreen
-import dev.aaronhowser.mods.critterworks.menu.nest_interface.NestInterfaceMenu
-import dev.aaronhowser.mods.critterworks.menu.nest_interface.NestInterfaceScreen
+import dev.aaronhowser.mods.critterworks.menu.web_port.WebPortMenu
+import dev.aaronhowser.mods.critterworks.menu.web_port.WebPortScreen
 import dev.aaronhowser.mods.critterworks.menu.spider_nest.SpiderNestMenu
 import dev.aaronhowser.mods.critterworks.menu.spider_nest.SpiderNestScreen
 import net.minecraft.core.registries.BuiltInRegistries
@@ -25,15 +25,15 @@ object ModMenuTypes : AaronMenuTypesRegistry() {
 	val ITEM_FILTER: DeferredHolder<MenuType<*>, MenuType<ItemFilterMenu>> =
 		register("item_filter") { IMenuTypeExtension.create(::ItemFilterMenu) }
 
-	val NEST_INTERFACE: DeferredHolder<MenuType<*>, MenuType<NestInterfaceMenu>> =
-		register("nest_interface") { IMenuTypeExtension.create(NestInterfaceMenu::fromNetwork) }
+	val WEB_PORT: DeferredHolder<MenuType<*>, MenuType<WebPortMenu>> =
+		register("web_port") { IMenuTypeExtension.create(WebPortMenu::fromNetwork) }
 
 	val SPIDER_NEST: DeferredHolder<MenuType<*>, MenuType<SpiderNestMenu>> =
 		register("spider_nest") { IMenuTypeExtension.create(SpiderNestMenu::fromNetwork) }
 
 	override fun registerScreens(event: RegisterMenuScreensEvent) {
 		event.register(ITEM_FILTER.get(), ::ItemFilterScreen)
-		event.register(NEST_INTERFACE.get(), ::NestInterfaceScreen)
+		event.register(WEB_PORT.get(), ::WebPortScreen)
 		event.register(SPIDER_NEST.get(), ::SpiderNestScreen)
 	}
 }

@@ -6,7 +6,7 @@ import dev.aaronhowser.mods.aaron.misc.AaronDsls.withPose
 import dev.aaronhowser.mods.critterworks.Critterworks
 import dev.aaronhowser.mods.critterworks.handler.web.line.ClientWebLines
 import dev.aaronhowser.mods.critterworks.handler.web.node.WebBlockAnchor
-import dev.aaronhowser.mods.critterworks.item.SpiderNestInterfaceItem
+import dev.aaronhowser.mods.critterworks.item.WebPortItem
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.LevelRenderer
 import net.minecraft.client.renderer.RenderType
@@ -15,7 +15,7 @@ import net.minecraft.world.phys.Vec3
 import org.joml.Quaternionf
 import org.joml.Vector3f
 
-object NestInterfaceRenderer {
+object WebPortRenderer {
 
 	fun renderAll(poseStack: PoseStack, cameraPosition: Vec3) {
 		val minecraft = Minecraft.getInstance()
@@ -25,9 +25,9 @@ object NestInterfaceRenderer {
 
 		for (node in ClientWebLines.getNodes()) {
 			val anchor = node as? WebBlockAnchor ?: continue
-			if (!anchor.hasNestInterface) continue
+			if (!anchor.hasWebPort) continue
 
-			val component = SpiderNestInterfaceItem.getComponent(anchor.nestInterface)
+			val component = WebPortItem.getComponent(anchor.webPort)
 			val rotation = Quaternionf().rotationTo(
 				0f,
 				1f,
@@ -42,7 +42,7 @@ object NestInterfaceRenderer {
 				val position = anchor.position.subtract(cameraPosition)
 				poseStack.translate(position.x, position.y, position.z)
 				poseStack.mulPose(rotation)
-				poseStack.translate(0.0, INTERFACE_SURFACE_OFFSET, 0.0)
+				poseStack.translate(0.0, WEB_PORT_SURFACE_OFFSET, 0.0)
 
 				render(vertexConsumer, poseStack.last(), light, component.color.textureDiffuseColor)
 			}
@@ -52,21 +52,21 @@ object NestInterfaceRenderer {
 	}
 
 	private fun render(vertexConsumer: VertexConsumer, pose: PoseStack.Pose, light: Int, color: Int) {
-		val bottomNorthWest = Vector3f(-INTERFACE_RADIUS, 0f, -INTERFACE_RADIUS)
-		val bottomNorthEast = Vector3f(INTERFACE_RADIUS, 0f, -INTERFACE_RADIUS)
-		val bottomSouthEast = Vector3f(INTERFACE_RADIUS, 0f, INTERFACE_RADIUS)
-		val bottomSouthWest = Vector3f(-INTERFACE_RADIUS, 0f, INTERFACE_RADIUS)
-		val topNorthWest = Vector3f(-INTERFACE_RADIUS, INTERFACE_HEIGHT, -INTERFACE_RADIUS)
-		val topNorthEast = Vector3f(INTERFACE_RADIUS, INTERFACE_HEIGHT, -INTERFACE_RADIUS)
-		val topSouthEast = Vector3f(INTERFACE_RADIUS, INTERFACE_HEIGHT, INTERFACE_RADIUS)
-		val topSouthWest = Vector3f(-INTERFACE_RADIUS, INTERFACE_HEIGHT, INTERFACE_RADIUS)
+		val bottomNorthWest = Vector3f(-WEB_PORT_RADIUS, 0f, -WEB_PORT_RADIUS)
+		val bottomNorthEast = Vector3f(WEB_PORT_RADIUS, 0f, -WEB_PORT_RADIUS)
+		val bottomSouthEast = Vector3f(WEB_PORT_RADIUS, 0f, WEB_PORT_RADIUS)
+		val bottomSouthWest = Vector3f(-WEB_PORT_RADIUS, 0f, WEB_PORT_RADIUS)
+		val topNorthWest = Vector3f(-WEB_PORT_RADIUS, WEB_PORT_HEIGHT, -WEB_PORT_RADIUS)
+		val topNorthEast = Vector3f(WEB_PORT_RADIUS, WEB_PORT_HEIGHT, -WEB_PORT_RADIUS)
+		val topSouthEast = Vector3f(WEB_PORT_RADIUS, WEB_PORT_HEIGHT, WEB_PORT_RADIUS)
+		val topSouthWest = Vector3f(-WEB_PORT_RADIUS, WEB_PORT_HEIGHT, WEB_PORT_RADIUS)
 
-		addFace(vertexConsumer, pose, bottomNorthWest, bottomNorthEast, bottomSouthEast, bottomSouthWest, INTERFACE_TOP_TEXTURE_HEIGHT, light, color)
-		addFace(vertexConsumer, pose, topSouthWest, topSouthEast, topNorthEast, topNorthWest, INTERFACE_TOP_TEXTURE_HEIGHT, light, color)
-		addFace(vertexConsumer, pose, bottomNorthEast, bottomNorthWest, topNorthWest, topNorthEast, INTERFACE_SIDE_TEXTURE_HEIGHT, light, color)
-		addFace(vertexConsumer, pose, bottomSouthWest, bottomSouthEast, topSouthEast, topSouthWest, INTERFACE_SIDE_TEXTURE_HEIGHT, light, color)
-		addFace(vertexConsumer, pose, bottomNorthWest, bottomSouthWest, topSouthWest, topNorthWest, INTERFACE_SIDE_TEXTURE_HEIGHT, light, color)
-		addFace(vertexConsumer, pose, bottomSouthEast, bottomNorthEast, topNorthEast, topSouthEast, INTERFACE_SIDE_TEXTURE_HEIGHT, light, color)
+		addFace(vertexConsumer, pose, bottomNorthWest, bottomNorthEast, bottomSouthEast, bottomSouthWest, WEB_PORT_TOP_TEXTURE_HEIGHT, light, color)
+		addFace(vertexConsumer, pose, topSouthWest, topSouthEast, topNorthEast, topNorthWest, WEB_PORT_TOP_TEXTURE_HEIGHT, light, color)
+		addFace(vertexConsumer, pose, bottomNorthEast, bottomNorthWest, topNorthWest, topNorthEast, WEB_PORT_SIDE_TEXTURE_HEIGHT, light, color)
+		addFace(vertexConsumer, pose, bottomSouthWest, bottomSouthEast, topSouthEast, topSouthWest, WEB_PORT_SIDE_TEXTURE_HEIGHT, light, color)
+		addFace(vertexConsumer, pose, bottomNorthWest, bottomSouthWest, topSouthWest, topNorthWest, WEB_PORT_SIDE_TEXTURE_HEIGHT, light, color)
+		addFace(vertexConsumer, pose, bottomSouthEast, bottomNorthEast, topNorthEast, topSouthEast, WEB_PORT_SIDE_TEXTURE_HEIGHT, light, color)
 	}
 
 	private fun addFace(
@@ -108,11 +108,11 @@ object NestInterfaceRenderer {
 			.setNormal(pose, normal.x, normal.y, normal.z)
 	}
 
-	private const val INTERFACE_RADIUS = 2f / 16f
-	private const val INTERFACE_HEIGHT = 2f / 16f
-	private const val INTERFACE_SURFACE_OFFSET = 0.001
-	private const val INTERFACE_TOP_TEXTURE_HEIGHT = 4f / 128f
-	private const val INTERFACE_SIDE_TEXTURE_HEIGHT = 2f / 128f
+	private const val WEB_PORT_RADIUS = 2f / 16f
+	private const val WEB_PORT_HEIGHT = 2f / 16f
+	private const val WEB_PORT_SURFACE_OFFSET = 0.001
+	private const val WEB_PORT_TOP_TEXTURE_HEIGHT = 4f / 128f
+	private const val WEB_PORT_SIDE_TEXTURE_HEIGHT = 2f / 128f
 
 	private val WEB_TEXTURE = Critterworks.modResource("textures/misc/web_line.png")
 	private val WEB_RENDER_TYPE = RenderType.entitySolid(WEB_TEXTURE)

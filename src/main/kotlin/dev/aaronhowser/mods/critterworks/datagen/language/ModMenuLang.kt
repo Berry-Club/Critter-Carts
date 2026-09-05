@@ -13,14 +13,14 @@ object ModMenuLang {
 	const val IGNORE_DAMAGE_OFF = "tooltip.critterworks.item_filter.ignore_damage_off"
 	const val IGNORE_ALL_COMPONENTS_ON = "tooltip.critterworks.item_filter.ignore_all_components_on"
 	const val IGNORE_ALL_COMPONENTS_OFF = "tooltip.critterworks.item_filter.ignore_all_components_off"
-	const val INTERFACE_COLOR = "menu.critterworks.interface.color"
-	const val INTERFACE_INPUT = "menu.critterworks.interface.input"
-	const val INTERFACE_OUTPUT = "menu.critterworks.interface.output"
-	const val INTERFACE_PRIORITY = "menu.critterworks.interface.priority"
-	const val INTERFACE_COLOR_TOOLTIP = "tooltip.critterworks.interface.color"
-	const val INTERFACE_INPUT_TOOLTIP = "tooltip.critterworks.interface.input"
-	const val INTERFACE_OUTPUT_TOOLTIP = "tooltip.critterworks.interface.output"
-	const val INTERFACE_PRIORITY_TOOLTIP = "tooltip.critterworks.interface.priority"
+	const val WEB_PORT_COLOR = "menu.critterworks.web_port.color"
+	const val WEB_PORT_INPUT = "menu.critterworks.web_port.input"
+	const val WEB_PORT_OUTPUT = "menu.critterworks.web_port.output"
+	const val WEB_PORT_PRIORITY = "menu.critterworks.web_port.priority"
+	const val WEB_PORT_COLOR_TOOLTIP = "tooltip.critterworks.web_port.color"
+	const val WEB_PORT_INPUT_TOOLTIP = "tooltip.critterworks.web_port.input"
+	const val WEB_PORT_OUTPUT_TOOLTIP = "tooltip.critterworks.web_port.output"
+	const val WEB_PORT_PRIORITY_TOOLTIP = "tooltip.critterworks.web_port.priority"
 	const val SPIDER_NEST_TITLE = "menu.critterworks.spider_nest.title"
 	const val SPIDER_NEST_SPIDER = "menu.critterworks.spider_nest.spider"
 	const val SPIDER_NEST_POSITION = "menu.critterworks.spider_nest.position"
@@ -45,10 +45,10 @@ object ModMenuLang {
 		provider.add(IGNORE_DAMAGE_OFF, "Ignore Damage: OFF")
 		provider.add(IGNORE_ALL_COMPONENTS_ON, "Ignore All Components: ON")
 		provider.add(IGNORE_ALL_COMPONENTS_OFF, "Ignore All Components: OFF")
-		provider.add(INTERFACE_COLOR, "Color: %s")
-		provider.add(INTERFACE_INPUT, "Input")
-		provider.add(INTERFACE_OUTPUT, "Output")
-		provider.add(INTERFACE_PRIORITY, "Priority")
+		provider.add(WEB_PORT_COLOR, "Color: %s")
+		provider.add(WEB_PORT_INPUT, "Input")
+		provider.add(WEB_PORT_OUTPUT, "Output")
+		provider.add(WEB_PORT_PRIORITY, "Priority")
 		provider.add(SPIDER_NEST_TITLE, "Hopping Spiders")
 		provider.add(SPIDER_NEST_SPIDER, "Spider %s")
 		provider.add(SPIDER_NEST_POSITION, "Position: %s, %s, %s")
@@ -66,9 +66,9 @@ object ModMenuLang {
 		provider.add("$SPIDER_NEST_FAILURE.filter_changed", "filter changed")
 		provider.add("$SPIDER_NEST_FAILURE.destination_unavailable", "inventory unavailable")
 		provider.add("$SPIDER_NEST_FAILURE.destination_full", "destination full")
-		provider.add(INTERFACE_COLOR_TOOLTIP, "Color: %s")
-		provider.add(INTERFACE_INPUT_TOOLTIP, "Input")
-		provider.add(INTERFACE_OUTPUT_TOOLTIP, "Output")
-		provider.add(INTERFACE_PRIORITY_TOOLTIP, "Priority: %s")
+		provider.add(WEB_PORT_COLOR_TOOLTIP, "Color: %s")
+		provider.add(WEB_PORT_INPUT_TOOLTIP, "Input")
+		provider.add(WEB_PORT_OUTPUT_TOOLTIP, "Output")
+		provider.add(WEB_PORT_PRIORITY_TOOLTIP, "Priority: %s")
 	}
 }

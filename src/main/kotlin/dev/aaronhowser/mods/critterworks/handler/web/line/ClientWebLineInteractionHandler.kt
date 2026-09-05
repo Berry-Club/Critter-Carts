@@ -40,7 +40,7 @@ object ClientWebLineInteractionHandler {
 			return targetedNode
 		}
 
-		if (!targetsInstalledInterface(targetedNode)) return null
+		if (!targetsInstalledWebPort(targetedNode)) return null
 
 		return targetedNode
 	}
@@ -57,7 +57,7 @@ object ClientWebLineInteractionHandler {
 
 		val heldStack = player.getItemInHand(interactionHand)
 		if (!heldStack.isItem(ModItemTagsProvider.WEB_LINE_INTERACTABLE)
-			&& !targetsInstalledInterface(targetedNode)
+			&& !targetsInstalledWebPort(targetedNode)
 		) {
 			return
 		}
@@ -102,7 +102,7 @@ object ClientWebLineInteractionHandler {
 		val lookEnd = eyePosition.add(viewVector.scale(player.blockInteractionRange()))
 
 		val lines = ClientWebLines.getLines()
-		val installedInterface = WebLineInteractionHandler.getTargetedNode(
+		val installedWebPort = WebLineInteractionHandler.getTargetedNode(
 			lines,
 			eyePosition,
 			lookEnd,
@@ -110,10 +110,10 @@ object ClientWebLineInteractionHandler {
 			requireExistingNode = true
 		)
 
-		if (installedInterface != null && targetsInstalledInterface(installedInterface)) {
-			if (isBehindCurrentHit(installedInterface, eyePosition)) return null
+		if (installedWebPort != null && targetsInstalledWebPort(installedWebPort)) {
+			if (isBehindCurrentHit(installedWebPort, eyePosition)) return null
 
-			return installedInterface
+			return installedWebPort
 		}
 
 		val heldStack = player.getItemInHand(interactionHand)
@@ -126,11 +126,11 @@ object ClientWebLineInteractionHandler {
 		)
 	}
 
-	private fun targetsInstalledInterface(targetedNode: TargetedWebNode): Boolean {
+	private fun targetsInstalledWebPort(targetedNode: TargetedWebNode): Boolean {
 		if (targetedNode.lineUuid != null) return false
 
 		val blockAnchor = targetedNode.node as? WebBlockAnchor ?: return false
-		return blockAnchor.hasNestInterface
+		return blockAnchor.hasWebPort
 	}
 
 	private fun isBehindCurrentHit(targetedNode: TargetedWebNode, eyePosition: Vec3): Boolean {
@@ -138,18 +138,18 @@ object ClientWebLineInteractionHandler {
 		if (hitResult.type == HitResult.Type.MISS) return false
 
 		val hitDistanceSquared = eyePosition.distanceToSqr(hitResult.location)
-		val interfaceDistanceSquared = eyePosition.distanceToSqr(targetedNode.node.position)
-		return hitDistanceSquared < interfaceDistanceSquared
+		val webPortDistanceSquared = eyePosition.distanceToSqr(targetedNode.node.position)
+		return hitDistanceSquared < webPortDistanceSquared
 	}
 
 	private fun shouldSnapToExistingNode(itemStack: ItemStack): Boolean {
-		return itemStack.isItem(ModItems.WEB_FLUID)
+		return itemStack.isItem(ModItems.ARTIFICIAL_SPINNERETS)
 			|| requiresExistingNode(itemStack)
 	}
 
 	private fun requiresExistingNode(itemStack: ItemStack): Boolean {
 		return itemStack.isItem(ModItems.WEB_PATHFINDER)
-			|| itemStack.isItem(ModItems.SPIDER_NEST_INTERFACE)
+			|| itemStack.isItem(ModItems.WEB_PORT)
 			|| !itemStack.isItem(ModItemTagsProvider.WEB_LINE_INTERACTABLE)
 	}
 

@@ -7,8 +7,8 @@ import dev.aaronhowser.mods.critterworks.handler.web.WebSavedData
 import dev.aaronhowser.mods.critterworks.handler.web.node.WebBlockAnchor
 import dev.aaronhowser.mods.critterworks.handler.web.path.WebPath
 import dev.aaronhowser.mods.critterworks.item.ItemFilterItem
-import dev.aaronhowser.mods.critterworks.item.SpiderNestInterfaceItem
-import dev.aaronhowser.mods.critterworks.item.component.NestInterfaceComponent
+import dev.aaronhowser.mods.critterworks.item.WebPortItem
+import dev.aaronhowser.mods.critterworks.item.component.WebPortComponent
 import net.minecraft.core.HolderLookup
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.server.level.ServerLevel
@@ -162,9 +162,9 @@ class HoppingSpider(
 			return
 		}
 
-		val nestInterface = SpiderNestInterfaceItem.getComponent(source.nestInterface)
+		val webPort = WebPortItem.getComponent(source.webPort)
 
-		if (nestInterface.transferDirection != NestInterfaceComponent.TransferDirection.INPUT) {
+		if (webPort.transferDirection != WebPortComponent.TransferDirection.INPUT) {
 			cancelTransport()
 			return
 		}
@@ -175,7 +175,7 @@ class HoppingSpider(
 			return
 		}
 
-		val filter = nestInterface.getFilter()
+		val filter = webPort.getFilter()
 		val stack = handler.extractItem(transportBehavior.sourceSlot, transportBehavior.transferAmount, true)
 
 		if (stack.isEmpty) {
@@ -202,22 +202,22 @@ class HoppingSpider(
 		val destination = getBlockAnchor(level, transportBehavior.destinationNodeUuid)
 			?: return failDelivery(level, transportBehavior, HoppingSpiderTransportBehavior.FailureReason.DESTINATION_MISSING)
 
-		val destinationInterface = SpiderNestInterfaceItem.getComponent(destination.nestInterface)
+		val destinationWebPort = WebPortItem.getComponent(destination.webPort)
 
-		if (destinationInterface.transferDirection != NestInterfaceComponent.TransferDirection.OUTPUT) {
+		if (destinationWebPort.transferDirection != WebPortComponent.TransferDirection.OUTPUT) {
 			return failDelivery(level, transportBehavior, HoppingSpiderTransportBehavior.FailureReason.DESTINATION_NOT_OUTPUT)
 		}
 
 		val source = getBlockAnchor(level, transportBehavior.sourceNodeUuid)
 			?: return failDelivery(level, transportBehavior, HoppingSpiderTransportBehavior.FailureReason.SOURCE_MISSING)
 
-		val sourceInterface = SpiderNestInterfaceItem.getComponent(source.nestInterface)
+		val sourceWebPort = WebPortItem.getComponent(source.webPort)
 
-		if (sourceInterface.color != destinationInterface.color) {
+		if (sourceWebPort.color != destinationWebPort.color) {
 			return failDelivery(level, transportBehavior, HoppingSpiderTransportBehavior.FailureReason.CHANNEL_CHANGED)
 		}
 
-		val filter = destinationInterface.getFilter()
+		val filter = destinationWebPort.getFilter()
 		if (!filter.isEmpty && !ItemFilterItem.passesFilter(filter, carriedStack)) {
 			return failDelivery(level, transportBehavior, HoppingSpiderTransportBehavior.FailureReason.FILTER_CHANGED)
 		}
@@ -351,7 +351,7 @@ class HoppingSpider(
 	}
 
 	private fun getItemHandler(level: ServerLevel, anchor: WebBlockAnchor): IItemHandler? {
-		if (!anchor.hasNestInterface) return null
+		if (!anchor.hasWebPort) return null
 		return level.getCapability(Capabilities.ItemHandler.BLOCK, anchor.blockPos, anchor.face)
 	}
 

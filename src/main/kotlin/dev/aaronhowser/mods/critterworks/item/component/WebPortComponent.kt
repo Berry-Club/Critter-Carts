@@ -12,7 +12,7 @@ import net.minecraft.world.item.DyeColor
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.component.ItemContainerContents
 
-data class NestInterfaceComponent(
+data class WebPortComponent(
 	val filterContents: ItemContainerContents,
 	val color: DyeColor,
 	val transferDirection: TransferDirection,
@@ -26,43 +26,43 @@ data class NestInterfaceComponent(
 		return filterContents.getStackInSlot(0)
 	}
 
-	fun withFilter(filter: ItemStack): NestInterfaceComponent {
+	fun withFilter(filter: ItemStack): WebPortComponent {
 		return copy(filterContents = ItemContainerContents.fromItems(listOf(filter)))
 	}
 
-	fun withColor(newColor: DyeColor): NestInterfaceComponent = copy(color = newColor)
+	fun withColor(newColor: DyeColor): WebPortComponent = copy(color = newColor)
 
-	fun withTransferDirection(newDirection: TransferDirection): NestInterfaceComponent {
+	fun withTransferDirection(newDirection: TransferDirection): WebPortComponent {
 		return copy(transferDirection = newDirection)
 	}
 
-	fun withPriority(newPriority: Int): NestInterfaceComponent = copy(priority = newPriority)
+	fun withPriority(newPriority: Int): WebPortComponent = copy(priority = newPriority)
 
 	companion object {
-		val CODEC: Codec<NestInterfaceComponent> = RecordCodecBuilder.create { instance ->
+		val CODEC: Codec<WebPortComponent> = RecordCodecBuilder.create { instance ->
 			instance.group(
 				ItemContainerContents.CODEC
 					.optionalFieldOf("filter", ItemContainerContents.EMPTY)
-					.forGetter(NestInterfaceComponent::filterContents),
+					.forGetter(WebPortComponent::filterContents),
 				DyeColor.CODEC
 					.optionalFieldOf("color", DyeColor.WHITE)
-					.forGetter(NestInterfaceComponent::color),
+					.forGetter(WebPortComponent::color),
 				TransferDirection.CODEC
 					.optionalFieldOf("transfer_direction", TransferDirection.OUTPUT)
-					.forGetter(NestInterfaceComponent::transferDirection),
+					.forGetter(WebPortComponent::transferDirection),
 				Codec.INT
 					.optionalFieldOf("priority", 0)
-					.forGetter(NestInterfaceComponent::priority)
-			).apply(instance, ::NestInterfaceComponent)
+					.forGetter(WebPortComponent::priority)
+			).apply(instance, ::WebPortComponent)
 		}
 
-		val STREAM_CODEC: StreamCodec<RegistryFriendlyByteBuf, NestInterfaceComponent> =
+		val STREAM_CODEC: StreamCodec<RegistryFriendlyByteBuf, WebPortComponent> =
 			StreamCodec.composite(
-				ItemContainerContents.STREAM_CODEC, NestInterfaceComponent::filterContents,
-				AaronExtraStreamCodecs.enumStreamCodec(DyeColor::class.java), NestInterfaceComponent::color,
-				TransferDirection.STREAM_CODEC, NestInterfaceComponent::transferDirection,
-				ByteBufCodecs.VAR_INT, NestInterfaceComponent::priority,
-				::NestInterfaceComponent
+				ItemContainerContents.STREAM_CODEC, WebPortComponent::filterContents,
+				AaronExtraStreamCodecs.enumStreamCodec(DyeColor::class.java), WebPortComponent::color,
+				TransferDirection.STREAM_CODEC, WebPortComponent::transferDirection,
+				ByteBufCodecs.VAR_INT, WebPortComponent::priority,
+				::WebPortComponent
 			)
 	}
 

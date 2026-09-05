@@ -15,8 +15,8 @@ import dev.aaronhowser.mods.critterworks.handler.spider.behavior.transport.Hoppi
 import dev.aaronhowser.mods.critterworks.handler.spider.behavior.HoppingSpiderWanderBehavior
 import dev.aaronhowser.mods.critterworks.item.ItemFilterItem
 import dev.aaronhowser.mods.critterworks.item.HoppingSpiderItem
-import dev.aaronhowser.mods.critterworks.item.SpiderNestInterfaceItem
-import dev.aaronhowser.mods.critterworks.item.component.NestInterfaceComponent
+import dev.aaronhowser.mods.critterworks.item.WebPortItem
+import dev.aaronhowser.mods.critterworks.item.component.WebPortComponent
 import dev.aaronhowser.mods.critterworks.menu.spider_nest.SpiderNestMenu
 import dev.aaronhowser.mods.critterworks.registry.ModBlockEntityTypes
 import net.minecraft.core.BlockPos
@@ -268,8 +268,8 @@ class HoppingSpiderNestBlockEntity(
 		spider: HoppingSpider,
 		startingNode: WebNode
 	): HoppingSpiderTransportCandidate? {
-		val sourceInterface = SpiderNestInterfaceItem.getComponent(sourceNode.nestInterface)
-		if (sourceInterface.transferDirection != NestInterfaceComponent.TransferDirection.INPUT) return null
+		val sourceWebPort = WebPortItem.getComponent(sourceNode.webPort)
+		if (sourceWebPort.transferDirection != WebPortComponent.TransferDirection.INPUT) return null
 
 		val sourceHandler = getItemHandler(level, sourceNode) ?: return null
 		var bestCandidate: HoppingSpiderTransportCandidate? = null
@@ -280,7 +280,7 @@ class HoppingSpiderNestBlockEntity(
 			val stack = sourceHandler.extractItem(sourceSlot, MAX_TRANSFER_SIZE, true)
 
 			if (stack.isEmpty) continue
-			if (!passesFilter(sourceInterface, stack)) continue
+			if (!passesFilter(sourceWebPort, stack)) continue
 
 			val candidate = findDestinationTransportBehavior(
 				level,
@@ -315,17 +315,17 @@ class HoppingSpiderNestBlockEntity(
 		spider: HoppingSpider,
 		startingNode: WebNode
 	): HoppingSpiderTransportCandidate? {
-		val sourceInterface = SpiderNestInterfaceItem.getComponent(sourceNode.nestInterface)
+		val sourceWebPort = WebPortItem.getComponent(sourceNode.webPort)
 		var bestCandidate: HoppingSpiderTransportCandidate? = null
 
 		for (destinationNode in inventoryNodes) {
 			if (isSameFace(sourceNode, destinationNode)) continue
 
-			val destinationInterface = SpiderNestInterfaceItem.getComponent(destinationNode.nestInterface)
+			val destinationWebPort = WebPortItem.getComponent(destinationNode.webPort)
 
-			if (destinationInterface.transferDirection != NestInterfaceComponent.TransferDirection.OUTPUT) continue
-			if (destinationInterface.color != sourceInterface.color) continue
-			if (!passesFilter(destinationInterface, stack)) continue
+			if (destinationWebPort.transferDirection != WebPortComponent.TransferDirection.OUTPUT) continue
+			if (destinationWebPort.color != sourceWebPort.color) continue
+			if (!passesFilter(destinationWebPort, stack)) continue
 			if (reservations.isDestinationReserved(destinationNode.uuid)) continue
 			if (network.findShortestPath(sourceNode, destinationNode) == null) continue
 
@@ -349,8 +349,8 @@ class HoppingSpiderNestBlockEntity(
 			val candidate = HoppingSpiderTransportCandidate(
 				spider,
 				transportBehavior,
-				sourceInterface.priority,
-				destinationInterface.priority,
+				sourceWebPort.priority,
+				destinationWebPort.priority,
 				pathToSource.distance,
 				transferAmount
 			)
@@ -363,8 +363,8 @@ class HoppingSpiderNestBlockEntity(
 		return bestCandidate
 	}
 
-	private fun passesFilter(interfaceComponent: NestInterfaceComponent, stack: ItemStack): Boolean {
-		val filter = interfaceComponent.getFilter()
+	private fun passesFilter(webPortComponent: WebPortComponent, stack: ItemStack): Boolean {
+		val filter = webPortComponent.getFilter()
 		return filter.isEmpty || ItemFilterItem.passesFilter(filter, stack)
 	}
 
@@ -389,7 +389,7 @@ class HoppingSpiderNestBlockEntity(
 
 		for (node in network.getNodes()) {
 			if (node !is WebBlockAnchor || node.blockPos == blockPos) continue
-			if (!node.hasNestInterface) continue
+			if (!node.hasWebPort) continue
 			if (getItemHandler(level, node) == null) continue
 
 			anchors.add(node)

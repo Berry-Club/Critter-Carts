@@ -15,8 +15,8 @@ object ModItems : AaronItemRegistry() {
 	val LOCKBOX: DeferredItem<StorageAttachmentItem> =
 		register("lockbox", ::StorageAttachmentItem, StorageAttachmentItem.DEFAULT_PROPERTIES)
 
-	val WEB_FLUID: DeferredItem<WebFluidItem> =
-		register("web_fluid", ::WebFluidItem, PROPERTIES_SINGLE_STACK)
+	val ARTIFICIAL_SPINNERETS: DeferredItem<ArtificialSpinneretsItem> =
+		register("artificial_spinnerets", ::ArtificialSpinneretsItem, PROPERTIES_SINGLE_STACK)
 
 	val WEB_PATHFINDER: DeferredItem<WebPathfinderItem> =
 		register("web_pathfinder", ::WebPathfinderItem, PROPERTIES_SINGLE_STACK)
@@ -24,8 +24,8 @@ object ModItems : AaronItemRegistry() {
 	val ITEM_FILTER: DeferredItem<ItemFilterItem> =
 		register("item_filter", ::ItemFilterItem, PROPERTIES_SINGLE_STACK)
 
-	val SPIDER_NEST_INTERFACE: DeferredItem<SpiderNestInterfaceItem> =
-		register("spider_nest_interface", ::SpiderNestInterfaceItem, PROPERTIES_SINGLE_STACK)
+	val WEB_PORT: DeferredItem<WebPortItem> =
+		register("web_port", ::WebPortItem, PROPERTIES_SINGLE_STACK)
 
 	val HOPPING_SPIDER: DeferredItem<HoppingSpiderItem> =
 		register("hopping_spider", ::HoppingSpiderItem, PROPERTIES_SINGLE_STACK)

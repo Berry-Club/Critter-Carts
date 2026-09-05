@@ -1,4 +1,4 @@
-package dev.aaronhowser.mods.critterworks.menu.nest_interface
+package dev.aaronhowser.mods.critterworks.menu.web_port
 
 import dev.aaronhowser.mods.aaron.menu.BaseScreen
 import dev.aaronhowser.mods.aaron.menu.textures.ScreenBackground
@@ -6,14 +6,14 @@ import dev.aaronhowser.mods.aaron.misc.AaronExtensions.toComponent
 import dev.aaronhowser.mods.aaron.packet.c2s.ClientClickedMenuButton
 import dev.aaronhowser.mods.critterworks.Critterworks
 import dev.aaronhowser.mods.critterworks.datagen.language.ModMenuLang
-import dev.aaronhowser.mods.critterworks.packet.client_to_server.SetNestInterfacePriorityPacket
+import dev.aaronhowser.mods.critterworks.packet.client_to_server.SetWebPortPriorityPacket
 import net.minecraft.client.gui.components.Button
 import net.minecraft.client.gui.components.EditBox
 import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.player.Inventory
 
-class NestInterfaceScreen(menu: NestInterfaceMenu, inventory: Inventory, title: Component) :
-	BaseScreen<NestInterfaceMenu>(menu, inventory, title) {
+class WebPortScreen(menu: WebPortMenu, inventory: Inventory, title: Component) :
+	BaseScreen<WebPortMenu>(menu, inventory, title) {
 
 	override val background: ScreenBackground = BACKGROUND
 	override val inventoryLabelOffsetY: Int = -2
@@ -25,10 +25,10 @@ class NestInterfaceScreen(menu: NestInterfaceMenu, inventory: Inventory, title: 
 	override fun baseInit() {
 		super.baseInit()
 		colorButton = Button.builder(getColorMessage()) {
-			ClientClickedMenuButton(NestInterfaceMenu.CYCLE_COLOR_BUTTON_ID).messageServer()
+			ClientClickedMenuButton(WebPortMenu.CYCLE_COLOR_BUTTON_ID).messageServer()
 		}.bounds(leftPos + 12, topPos + 57, 72, 20).build()
 		directionButton = Button.builder(getDirectionMessage()) {
-			ClientClickedMenuButton(NestInterfaceMenu.TOGGLE_DIRECTION_BUTTON_ID).messageServer()
+			ClientClickedMenuButton(WebPortMenu.TOGGLE_DIRECTION_BUTTON_ID).messageServer()
 		}.bounds(leftPos + 92, topPos + 57, 72, 20).build()
 		priorityInput = EditBox(
 			font,
@@ -36,14 +36,14 @@ class NestInterfaceScreen(menu: NestInterfaceMenu, inventory: Inventory, title: 
 			topPos + 32,
 			56,
 			18,
-			ModMenuLang.INTERFACE_PRIORITY.toComponent()
+			ModMenuLang.WEB_PORT_PRIORITY.toComponent()
 		)
 		priorityInput.setMaxLength(11)
 		priorityInput.setFilter { value -> value.isEmpty() || value == "-" || value.toIntOrNull() != null }
 		priorityInput.value = menu.getPriority().toString()
 		priorityInput.setResponder { value ->
 			val priority = value.toIntOrNull() ?: return@setResponder
-			SetNestInterfacePriorityPacket(priority).messageServer()
+			SetWebPortPriorityPacket(priority).messageServer()
 		}
 		addRenderableWidget(colorButton)
 		addRenderableWidget(directionButton)
@@ -57,15 +57,15 @@ class NestInterfaceScreen(menu: NestInterfaceMenu, inventory: Inventory, title: 
 	}
 
 	private fun getColorMessage(): Component {
-		return ModMenuLang.INTERFACE_COLOR.toComponent(menu.getColor().name)
+		return ModMenuLang.WEB_PORT_COLOR.toComponent(menu.getColor().name)
 	}
 
 	private fun getDirectionMessage(): Component {
-		val key = if (menu.isInput()) ModMenuLang.INTERFACE_INPUT else ModMenuLang.INTERFACE_OUTPUT
+		val key = if (menu.isInput()) ModMenuLang.WEB_PORT_INPUT else ModMenuLang.WEB_PORT_OUTPUT
 		return key.toComponent()
 	}
 
 	companion object {
-		val BACKGROUND = ScreenBackground(Critterworks.modResource("textures/gui/nest_interface.png"), 176, 166)
+		val BACKGROUND = ScreenBackground(Critterworks.modResource("textures/gui/web_port.png"), 176, 166)
 	}
 }

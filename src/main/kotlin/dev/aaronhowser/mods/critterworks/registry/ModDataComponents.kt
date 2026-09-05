@@ -4,7 +4,7 @@ import dev.aaronhowser.mods.aaron.registry.AaronDataComponentRegistry
 import dev.aaronhowser.mods.critterworks.Critterworks
 import dev.aaronhowser.mods.critterworks.entity.data.WormColor
 import dev.aaronhowser.mods.critterworks.item.component.ItemFilterComponent
-import dev.aaronhowser.mods.critterworks.item.component.NestInterfaceComponent
+import dev.aaronhowser.mods.critterworks.item.component.WebPortComponent
 import dev.aaronhowser.mods.critterworks.item.component.WebNodeDataComponent
 import net.minecraft.core.component.DataComponentType
 import net.minecraft.core.registries.Registries
@@ -31,6 +31,6 @@ object ModDataComponents : AaronDataComponentRegistry() {
 	val ITEM_FILTER: DeferredHolder<DataComponentType<*>, DataComponentType<ItemFilterComponent>> =
 		register("item_filter", ItemFilterComponent.CODEC, ItemFilterComponent.STREAM_CODEC)
 
-	val NEST_INTERFACE: DeferredHolder<DataComponentType<*>, DataComponentType<NestInterfaceComponent>> =
-		register("nest_interface", NestInterfaceComponent.CODEC, NestInterfaceComponent.STREAM_CODEC)
+	val WEB_PORT: DeferredHolder<DataComponentType<*>, DataComponentType<WebPortComponent>> =
+		register("web_port", WebPortComponent.CODEC, WebPortComponent.STREAM_CODEC)
 }

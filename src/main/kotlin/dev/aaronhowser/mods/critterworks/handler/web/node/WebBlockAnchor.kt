@@ -22,11 +22,11 @@ class WebBlockAnchor(
 	val blockPos: BlockPos,
 	val face: Direction,
 	override val position: Vec3,
-	var nestInterface: ItemStack = ItemStack.EMPTY
+	var webPort: ItemStack = ItemStack.EMPTY
 ) : WebNode() {
 
-	val hasNestInterface: Boolean
-		get() = !nestInterface.isEmpty
+	val hasWebPort: Boolean
+		get() = !webPort.isEmpty
 
 	override fun isLoaded(level: ServerLevel): Boolean {
 		return isChunkLoaded(level, ChunkPos(blockPos))
@@ -64,8 +64,8 @@ class WebBlockAnchor(
 						.fieldOf("position")
 						.forGetter(WebBlockAnchor::position),
 					ItemStack.OPTIONAL_CODEC
-						.optionalFieldOf("nest_interface", ItemStack.EMPTY)
-						.forGetter(WebBlockAnchor::nestInterface)
+						.optionalFieldOf("web_port", ItemStack.EMPTY)
+						.forGetter(WebBlockAnchor::webPort)
 				).apply(instance, ::WebBlockAnchor)
 			}
 
@@ -74,7 +74,7 @@ class WebBlockAnchor(
 			BlockPos.STREAM_CODEC, WebBlockAnchor::blockPos,
 			Direction.STREAM_CODEC, WebBlockAnchor::face,
 			AaronExtraStreamCodecs.VEC3, WebBlockAnchor::position,
-			ItemStack.OPTIONAL_STREAM_CODEC, WebBlockAnchor::nestInterface,
+			ItemStack.OPTIONAL_STREAM_CODEC, WebBlockAnchor::webPort,
 			::WebBlockAnchor
 		)
 	}

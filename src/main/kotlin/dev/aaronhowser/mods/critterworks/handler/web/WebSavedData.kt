@@ -72,14 +72,14 @@ class WebSavedData : SavedData() {
 		return networksByLineUuid[lineUuid]
 	}
 
-	fun installNestInterface(level: ServerLevel, anchor: WebBlockAnchor, interfaceStack: ItemStack) {
-		anchor.nestInterface = interfaceStack.copyWithCount(1)
+	fun installWebPort(level: ServerLevel, anchor: WebBlockAnchor, webPortStack: ItemStack) {
+		anchor.webPort = webPortStack.copyWithCount(1)
 		syncAnchor(level, anchor)
 	}
 
-	fun removeNestInterface(level: ServerLevel, anchor: WebBlockAnchor): ItemStack {
-		val removedStack = anchor.nestInterface
-		anchor.nestInterface = ItemStack.EMPTY
+	fun removeWebPort(level: ServerLevel, anchor: WebBlockAnchor): ItemStack {
+		val removedStack = anchor.webPort
+		anchor.webPort = ItemStack.EMPTY
 		syncAnchor(level, anchor)
 		return removedStack
 	}
@@ -417,13 +417,13 @@ class WebSavedData : SavedData() {
 		if (node is WebLineAnchor) {
 			lines[node.lineUuid]?.removeAttachedAnchor(node.uuid)
 		}
-		if (node is WebBlockAnchor && node.hasNestInterface) {
+		if (node is WebBlockAnchor && node.hasWebPort) {
 			Containers.dropItemStack(
 				level,
 				node.position.x,
 				node.position.y,
 				node.position.z,
-				node.nestInterface
+				node.webPort
 			)
 		}
 

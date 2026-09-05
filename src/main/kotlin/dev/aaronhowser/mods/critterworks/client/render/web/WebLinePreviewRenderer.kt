@@ -24,7 +24,7 @@ object WebLinePreviewRenderer {
 	private fun renderPlacement(poseStack: PoseStack, eyePosition: Vec3, viewVector: Vec3) {
 		val minecraft = Minecraft.getInstance()
 		val player = minecraft.player ?: return
-		val itemStack = getHeldWebFluid(player.mainHandItem, player.offhandItem) ?: return
+		val itemStack = getHeldArtificialSpinnerets(player.mainHandItem, player.offhandItem) ?: return
 		val firstNode = itemStack.get(ModDataComponents.WEB_NODE)?.node ?: return
 		val secondNode = getTargetedNode(minecraft, eyePosition, viewVector) ?: return
 		val isValid = WebLineInteractionHandler.canCreateLine(player.level(), player, firstNode, secondNode)
@@ -61,9 +61,9 @@ object WebLinePreviewRenderer {
 		)
 	}
 
-	private fun getHeldWebFluid(mainHandItem: ItemStack, offhandItem: ItemStack): ItemStack? {
-		if (mainHandItem.isItem(ModItems.WEB_FLUID.get())) return mainHandItem
-		if (offhandItem.isItem(ModItems.WEB_FLUID.get())) return offhandItem
+	private fun getHeldArtificialSpinnerets(mainHandItem: ItemStack, offhandItem: ItemStack): ItemStack? {
+		if (mainHandItem.isItem(ModItems.ARTIFICIAL_SPINNERETS.get())) return mainHandItem
+		if (offhandItem.isItem(ModItems.ARTIFICIAL_SPINNERETS.get())) return offhandItem
 
 		return null
 	}

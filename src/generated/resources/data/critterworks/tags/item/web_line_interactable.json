@@ -1,8 +1,8 @@
 {
   "values": [
-    "critterworks:web_fluid",
+    "critterworks:artificial_spinnerets",
     "critterworks:web_pathfinder",
-    "critterworks:spider_nest_interface",
+    "critterworks:web_port",
     "#c:tools/shear"
   ]
 }

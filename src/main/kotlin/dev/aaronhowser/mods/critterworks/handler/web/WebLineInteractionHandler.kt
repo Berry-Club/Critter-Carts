@@ -11,7 +11,7 @@ import dev.aaronhowser.mods.critterworks.handler.web.node.WebBlockAnchor
 import dev.aaronhowser.mods.critterworks.handler.web.node.WebLineAnchor
 import dev.aaronhowser.mods.critterworks.handler.web.node.WebNode
 import dev.aaronhowser.mods.critterworks.item.component.WebNodeDataComponent
-import dev.aaronhowser.mods.critterworks.menu.nest_interface.NestInterfaceMenu
+import dev.aaronhowser.mods.critterworks.menu.web_port.WebPortMenu
 import dev.aaronhowser.mods.critterworks.packet.server_to_client.ShowWebPathPacket
 import dev.aaronhowser.mods.critterworks.registry.ModDataComponents
 import dev.aaronhowser.mods.critterworks.registry.ModItems
@@ -58,27 +58,27 @@ object WebLineInteractionHandler {
 			if (selectedNode.position.distanceToSqr(requestedPosition) > positionToleranceSquared) return
 
 			val blockAnchor = selectedNode as? WebBlockAnchor
-			if (blockAnchor?.hasNestInterface == true) {
+			if (blockAnchor?.hasWebPort == true) {
 				if (itemStack.isEmpty && player.isSecondaryUseActive) {
-					val removedStack = savedData.removeNestInterface(level, blockAnchor)
+					val removedStack = savedData.removeWebPort(level, blockAnchor)
 					player.drop(removedStack, false)
 				} else {
-					openNestInterface(player, blockAnchor)
+					openWebPort(player, blockAnchor)
 				}
 				return
 			}
 			if (!itemStack.isItem(ModItemTagsProvider.WEB_LINE_INTERACTABLE)) return
 
-			if (!itemStack.isItem(ModItems.WEB_FLUID)
+			if (!itemStack.isItem(ModItems.ARTIFICIAL_SPINNERETS)
 				&& !itemStack.isItem(ModItems.WEB_PATHFINDER)
-				&& !itemStack.isItem(ModItems.SPIDER_NEST_INTERFACE)
+				&& !itemStack.isItem(ModItems.WEB_PORT)
 			) return
 
-			if (itemStack.isItem(ModItems.SPIDER_NEST_INTERFACE)) {
+			if (itemStack.isItem(ModItems.WEB_PORT)) {
 				val blockAnchor = selectedNode as? WebBlockAnchor ?: return
-				if (blockAnchor.hasNestInterface) return
+				if (blockAnchor.hasWebPort) return
 
-				savedData.installNestInterface(level, blockAnchor, itemStack)
+				savedData.installWebPort(level, blockAnchor, itemStack)
 				itemStack.consume(1, player)
 			} else if (itemStack.isItem(ModItems.WEB_PATHFINDER)) {
 				handlePathSelection(level, player, itemStack, selectedNode)
@@ -95,11 +95,11 @@ object WebLineInteractionHandler {
 		val interactionRange = player.blockInteractionRange()
 		val lookOffset = player.lookAngle.scale(interactionRange)
 		val lookEnd = eyePosition.add(lookOffset)
-		val snapToExistingNode = itemStack.isItem(ModItems.WEB_FLUID)
+		val snapToExistingNode = itemStack.isItem(ModItems.ARTIFICIAL_SPINNERETS)
 			|| itemStack.isItem(ModItems.WEB_PATHFINDER)
-			|| itemStack.isItem(ModItems.SPIDER_NEST_INTERFACE)
+			|| itemStack.isItem(ModItems.WEB_PORT)
 		val requireExistingNode = itemStack.isItem(ModItems.WEB_PATHFINDER)
-			|| itemStack.isItem(ModItems.SPIDER_NEST_INTERFACE)
+			|| itemStack.isItem(ModItems.WEB_PORT)
 		val targetedNode = getTargetedNode(
 			listOf(line),
 			eyePosition,
@@ -117,7 +117,7 @@ object WebLineInteractionHandler {
 			itemStack.isItem(Tags.Items.TOOLS_SHEAR) && selectedNode is WebLineAnchor ->
 				shearLine(level, player, itemStack, targetUuid, selectedNode, hand)
 
-			itemStack.isItem(ModItems.WEB_FLUID) ->
+			itemStack.isItem(ModItems.ARTIFICIAL_SPINNERETS) ->
 				handleNodeSelection(level, player, itemStack, selectedNode)
 
 			itemStack.isItem(ModItems.WEB_PATHFINDER) ->
@@ -125,15 +125,15 @@ object WebLineInteractionHandler {
 		}
 	}
 
-	private fun openNestInterface(player: ServerPlayer, anchor: WebBlockAnchor) {
+	private fun openWebPort(player: ServerPlayer, anchor: WebBlockAnchor) {
 		val constructor = MenuConstructor { containerId, inventory, _ ->
-			NestInterfaceMenu(containerId, inventory, anchor)
+			WebPortMenu(containerId, inventory, anchor)
 		}
-		val provider = SimpleMenuProvider(constructor, anchor.nestInterface.hoverName)
+		val provider = SimpleMenuProvider(constructor, anchor.webPort.hoverName)
 		player.openMenu(provider) { data ->
 			data.writeBoolean(true)
 			data.writeUUID(anchor.uuid)
-			ItemStack.OPTIONAL_STREAM_CODEC.encode(data, anchor.nestInterface)
+			ItemStack.OPTIONAL_STREAM_CODEC.encode(data, anchor.webPort)
 		}
 	}
 

@@ -3,8 +3,8 @@ package dev.aaronhowser.mods.critterworks.item
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isServerSide
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.toComponent
 import dev.aaronhowser.mods.critterworks.datagen.language.ModMenuLang
-import dev.aaronhowser.mods.critterworks.item.component.NestInterfaceComponent
-import dev.aaronhowser.mods.critterworks.menu.nest_interface.NestInterfaceMenu
+import dev.aaronhowser.mods.critterworks.item.component.WebPortComponent
+import dev.aaronhowser.mods.critterworks.menu.web_port.WebPortMenu
 import dev.aaronhowser.mods.critterworks.registry.ModDataComponents
 import net.minecraft.network.chat.Component
 import net.minecraft.world.InteractionHand
@@ -18,7 +18,7 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.TooltipFlag
 import net.minecraft.world.level.Level
 
-class SpiderNestInterfaceItem(properties: Properties) : Item(properties) {
+class WebPortItem(properties: Properties) : Item(properties) {
 
 	override fun use(
 		level: Level,
@@ -29,7 +29,7 @@ class SpiderNestInterfaceItem(properties: Properties) : Item(properties) {
 
 		if (level.isServerSide) {
 			val constructor = MenuConstructor { containerId, inventory, _ ->
-				NestInterfaceMenu(containerId, inventory, usedHand)
+				WebPortMenu(containerId, inventory, usedHand)
 			}
 
 			player.openMenu(SimpleMenuProvider(constructor, usedStack.hoverName)) {
@@ -48,13 +48,13 @@ class SpiderNestInterfaceItem(properties: Properties) : Item(properties) {
 		tooltipFlag: TooltipFlag
 	) {
 		val component = getComponent(stack)
-		val color = ModMenuLang.INTERFACE_COLOR_TOOLTIP.toComponent(component.color.name)
+		val color = ModMenuLang.WEB_PORT_COLOR_TOOLTIP.toComponent(component.color.name)
 		val directionKey = when (component.transferDirection) {
-			NestInterfaceComponent.TransferDirection.INPUT -> ModMenuLang.INTERFACE_INPUT_TOOLTIP
-			NestInterfaceComponent.TransferDirection.OUTPUT -> ModMenuLang.INTERFACE_OUTPUT_TOOLTIP
+			WebPortComponent.TransferDirection.INPUT -> ModMenuLang.WEB_PORT_INPUT_TOOLTIP
+			WebPortComponent.TransferDirection.OUTPUT -> ModMenuLang.WEB_PORT_OUTPUT_TOOLTIP
 		}
 		val direction = directionKey.toComponent()
-		val priority = ModMenuLang.INTERFACE_PRIORITY_TOOLTIP.toComponent(component.priority)
+		val priority = ModMenuLang.WEB_PORT_PRIORITY_TOOLTIP.toComponent(component.priority)
 
 		tooltipComponents.add(color)
 		tooltipComponents.add(direction)
@@ -62,24 +62,24 @@ class SpiderNestInterfaceItem(properties: Properties) : Item(properties) {
 	}
 
 	companion object {
-		fun getComponent(stack: ItemStack): NestInterfaceComponent {
-			return stack.get(ModDataComponents.NEST_INTERFACE) ?: NestInterfaceComponent()
+		fun getComponent(stack: ItemStack): WebPortComponent {
+			return stack.get(ModDataComponents.WEB_PORT) ?: WebPortComponent()
 		}
 
 		fun setFilter(stack: ItemStack, filter: ItemStack) {
-			stack.set(ModDataComponents.NEST_INTERFACE, getComponent(stack).withFilter(filter))
+			stack.set(ModDataComponents.WEB_PORT, getComponent(stack).withFilter(filter))
 		}
 
 		fun setColor(stack: ItemStack, color: DyeColor) {
-			stack.set(ModDataComponents.NEST_INTERFACE, getComponent(stack).withColor(color))
+			stack.set(ModDataComponents.WEB_PORT, getComponent(stack).withColor(color))
 		}
 
-		fun setTransferDirection(stack: ItemStack, direction: NestInterfaceComponent.TransferDirection) {
-			stack.set(ModDataComponents.NEST_INTERFACE, getComponent(stack).withTransferDirection(direction))
+		fun setTransferDirection(stack: ItemStack, direction: WebPortComponent.TransferDirection) {
+			stack.set(ModDataComponents.WEB_PORT, getComponent(stack).withTransferDirection(direction))
 		}
 
 		fun setPriority(stack: ItemStack, priority: Int) {
-			stack.set(ModDataComponents.NEST_INTERFACE, getComponent(stack).withPriority(priority))
+			stack.set(ModDataComponents.WEB_PORT, getComponent(stack).withPriority(priority))
 		}
 	}
 }

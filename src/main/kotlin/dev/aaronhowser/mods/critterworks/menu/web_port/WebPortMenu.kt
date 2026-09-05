@@ -1,12 +1,12 @@
-package dev.aaronhowser.mods.critterworks.menu.nest_interface
+package dev.aaronhowser.mods.critterworks.menu.web_port
 
 import dev.aaronhowser.mods.aaron.menu.MenuWithButtons
 import dev.aaronhowser.mods.aaron.menu.MenuWithInventory
 import dev.aaronhowser.mods.aaron.misc.AaronExtensions.isItem
 import dev.aaronhowser.mods.critterworks.handler.web.WebSavedData
 import dev.aaronhowser.mods.critterworks.handler.web.node.WebBlockAnchor
-import dev.aaronhowser.mods.critterworks.item.SpiderNestInterfaceItem
-import dev.aaronhowser.mods.critterworks.item.component.NestInterfaceComponent
+import dev.aaronhowser.mods.critterworks.item.WebPortItem
+import dev.aaronhowser.mods.critterworks.item.component.WebPortComponent
 import dev.aaronhowser.mods.critterworks.registry.ModItems
 import dev.aaronhowser.mods.critterworks.registry.ModMenuTypes
 import net.minecraft.network.RegistryFriendlyByteBuf
@@ -21,13 +21,13 @@ import net.neoforged.neoforge.items.ItemStackHandler
 import net.neoforged.neoforge.items.SlotItemHandler
 import java.util.*
 
-class NestInterfaceMenu private constructor(
+class WebPortMenu private constructor(
 	containerId: Int,
 	playerInventory: Inventory,
 	private val hand: InteractionHand?,
 	private val anchorUuid: UUID?,
 	private val clientAnchorStack: ItemStack
-) : MenuWithInventory(ModMenuTypes.NEST_INTERFACE.get(), containerId, playerInventory), MenuWithButtons {
+) : MenuWithInventory(ModMenuTypes.WEB_PORT.get(), containerId, playerInventory), MenuWithButtons {
 
 	constructor(containerId: Int, playerInventory: Inventory, hand: InteractionHand) :
 		this(containerId, playerInventory, hand, null, ItemStack.EMPTY)
@@ -41,7 +41,7 @@ class NestInterfaceMenu private constructor(
 		}
 
 		override fun onContentsChanged(slot: Int) {
-			SpiderNestInterfaceItem.setFilter(getInterfaceStack(), getStackInSlot(slot))
+			WebPortItem.setFilter(getWebPortStack(), getStackInSlot(slot))
 			syncAnchor()
 		}
 	}
@@ -51,26 +51,26 @@ class NestInterfaceMenu private constructor(
 		addDataSlot(object : DataSlot() {
 			override fun get(): Int = getComponent().color.ordinal
 			override fun set(value: Int) {
-				SpiderNestInterfaceItem.setColor(getInterfaceStack(), DyeColor.entries[value])
+				WebPortItem.setColor(getWebPortStack(), DyeColor.entries[value])
 			}
 		})
 		addDataSlot(object : DataSlot() {
 			override fun get(): Int = getComponent().transferDirection.ordinal
 			override fun set(value: Int) {
-				val direction = NestInterfaceComponent.TransferDirection.entries[value]
-				SpiderNestInterfaceItem.setTransferDirection(getInterfaceStack(), direction)
+				val direction = WebPortComponent.TransferDirection.entries[value]
+				WebPortItem.setTransferDirection(getWebPortStack(), direction)
 			}
 		})
 		addSlots(84)
 	}
 
-	private fun getInterfaceStack(): ItemStack {
+	private fun getWebPortStack(): ItemStack {
 		val hand = hand
 		if (hand != null) return playerInventory.player.getItemInHand(hand)
 
 		val level = playerInventory.player.level()
 		if (level is ServerLevel) {
-			return getAnchor(level)?.nestInterface ?: ItemStack.EMPTY
+			return getAnchor(level)?.webPort ?: ItemStack.EMPTY
 		}
 		return clientAnchorStack
 	}
@@ -80,8 +80,8 @@ class NestInterfaceMenu private constructor(
 		return WebSavedData.get(level).getNode(uuid) as? WebBlockAnchor
 	}
 
-	private fun getComponent(): NestInterfaceComponent {
-		return SpiderNestInterfaceItem.getComponent(getInterfaceStack())
+	private fun getComponent(): WebPortComponent {
+		return WebPortItem.getComponent(getWebPortStack())
 	}
 
 	private fun syncAnchor() {
@@ -92,11 +92,11 @@ class NestInterfaceMenu private constructor(
 	}
 
 	fun getColor(): DyeColor = getComponent().color
-	fun isInput(): Boolean = getComponent().transferDirection == NestInterfaceComponent.TransferDirection.INPUT
+	fun isInput(): Boolean = getComponent().transferDirection == WebPortComponent.TransferDirection.INPUT
 	fun getPriority(): Int = getComponent().priority
 
 	fun setPriority(priority: Int) {
-		SpiderNestInterfaceItem.setPriority(getInterfaceStack(), priority)
+		WebPortItem.setPriority(getWebPortStack(), priority)
 		syncAnchor()
 	}
 
@@ -106,26 +106,26 @@ class NestInterfaceMenu private constructor(
 
 	override fun stillValid(player: Player): Boolean {
 		val hand = hand
-		if (hand != null) return player.getItemInHand(hand).isItem(ModItems.SPIDER_NEST_INTERFACE)
+		if (hand != null) return player.getItemInHand(hand).isItem(ModItems.WEB_PORT)
 
 		val level = player.level()
 		if (level !is ServerLevel) return true
 		val anchor = getAnchor(level) ?: return false
-		return anchor.hasNestInterface && player.distanceToSqr(anchor.position) <= MAX_DISTANCE_SQUARED
+		return anchor.hasWebPort && player.distanceToSqr(anchor.position) <= MAX_DISTANCE_SQUARED
 	}
 
 	override fun handleButtonPressed(buttonId: Int) {
-		val stack = getInterfaceStack()
+		val stack = getWebPortStack()
 		when (buttonId) {
 			CYCLE_COLOR_BUTTON_ID -> {
 				val colors = DyeColor.entries
 				val nextIndex = (getComponent().color.ordinal + 1) % colors.size
-				SpiderNestInterfaceItem.setColor(stack, colors[nextIndex])
+				WebPortItem.setColor(stack, colors[nextIndex])
 			}
 
 			TOGGLE_DIRECTION_BUTTON_ID -> {
 				val direction = getComponent().transferDirection.next()
-				SpiderNestInterfaceItem.setTransferDirection(stack, direction)
+				WebPortItem.setTransferDirection(stack, direction)
 			}
 		}
 		syncAnchor()
@@ -140,10 +140,10 @@ class NestInterfaceMenu private constructor(
 			containerId: Int,
 			playerInventory: Inventory,
 			data: RegistryFriendlyByteBuf
-		): NestInterfaceMenu {
+		): WebPortMenu {
 			val targetsAnchor = data.readBoolean()
 			if (!targetsAnchor) {
-				return NestInterfaceMenu(
+				return WebPortMenu(
 					containerId,
 					playerInventory,
 					data.readEnum(InteractionHand::class.java)
@@ -151,8 +151,8 @@ class NestInterfaceMenu private constructor(
 			}
 
 			val anchorUuid = data.readUUID()
-			val interfaceStack = ItemStack.OPTIONAL_STREAM_CODEC.decode(data)
-			return NestInterfaceMenu(containerId, playerInventory, null, anchorUuid, interfaceStack)
+			val webPortStack = ItemStack.OPTIONAL_STREAM_CODEC.decode(data)
+			return WebPortMenu(containerId, playerInventory, null, anchorUuid, webPortStack)
 		}
 	}
 }

@@ -8,10 +8,10 @@ object ModItemLang {
 	fun add(provider: ModLanguageProvider) {
 		provider.apply {
 			addItem(ModItems.LOCKBOX, "Lockbox")
-			addItem(ModItems.WEB_FLUID, "Web Fluid")
+			addItem(ModItems.ARTIFICIAL_SPINNERETS, "Artificial Spinnerets")
 			addItem(ModItems.WEB_PATHFINDER, "Web Pathfinder")
 			addItem(ModItems.ITEM_FILTER, "Item Filter")
-			addItem(ModItems.SPIDER_NEST_INTERFACE, "Spider Nest Interface")
+			addItem(ModItems.WEB_PORT, "Web Port")
 			addItem(ModItems.HOPPING_SPIDER, "Hopping Spider")
 			addItem(ModItems.GREEN_DYEBERRY, "Green Dyeberry")
 			addItem(ModItems.BLUE_DYEBERRY, "Blue Dyeberry")

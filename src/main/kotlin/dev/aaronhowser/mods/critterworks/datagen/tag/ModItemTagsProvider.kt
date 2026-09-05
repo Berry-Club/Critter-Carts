@@ -42,9 +42,9 @@ class ModItemTagsProvider(
 			.add(Items.SADDLE)
 
 		tag(WEB_LINE_INTERACTABLE)
-			.add(ModItems.WEB_FLUID)
+			.add(ModItems.ARTIFICIAL_SPINNERETS)
 			.add(ModItems.WEB_PATHFINDER)
-			.add(ModItems.SPIDER_NEST_INTERFACE)
+			.add(ModItems.WEB_PORT)
 			.addTag(Tags.Items.TOOLS_SHEAR)
 
 		tag(ItemTags.LOGS)
