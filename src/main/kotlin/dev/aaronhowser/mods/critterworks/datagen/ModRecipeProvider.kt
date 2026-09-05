@@ -29,6 +29,14 @@ class ModRecipeProvider(
 	}
 
 	private fun buildShapelessRecipes(recipeOutput: RecipeOutput, holderLookup: HolderLookup.Provider) {
+		shapelessRecipe(
+			ModBlocks.STEM_ENCASED_COMPARATOR,
+			listOf(
+				ModBlocks.SCOOCHSTEM.asIngredient(),
+				Items.COMPARATOR.asIngredient()
+			)
+		).save(recipeOutput)
+
 		fun coloredScoochstem(dyeBerry: DeferredItem<out Item>, output: DeferredBlock<out Block>) {
 			shapelessRecipe(
 				output,

@@ -6,6 +6,7 @@ object ModBlockLang {
 
 	fun add(provider: ModLanguageProvider) {
 		provider.addBlock(ModBlocks.SCOOCHSTEM, "Scoochstem")
+		provider.addBlock(ModBlocks.STEM_ENCASED_COMPARATOR, "Stem-Encased Comparator")
 		provider.addBlock(ModBlocks.SCOOCHSTEM_WOOD, "Scoochstem Wood")
 		provider.addBlock(ModBlocks.APPLE_SLICE, "Apple Slice")
 		provider.addBlock(ModBlocks.HOPPING_SPIDER_NEST, "Hopping Spider Nest")

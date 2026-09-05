@@ -24,6 +24,7 @@ class ModBlockLootTablesSubProvider(
 	override fun generate() {
 		critterCage()
 		dropSelf(ModBlocks.SCOOCHSTEM.get())
+		dropSelf(ModBlocks.STEM_ENCASED_COMPARATOR.get())
 		dropSelf(ModBlocks.SCOOCHSTEM_WOOD.get())
 		dropSelf(ModBlocks.HOPPING_SPIDER_NEST.get())
 		appleSlice()

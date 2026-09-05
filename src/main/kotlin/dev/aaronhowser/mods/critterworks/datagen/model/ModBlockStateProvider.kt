@@ -34,7 +34,8 @@ class ModBlockStateProvider(
 		hoppingSpiderNest()
 		appleSlice()
 		scoochstem()
-		coloredScoochstems()
+		stemEncasedComparator()
+		coloredScoochstem()
 		dyeberryVines()
 	}
 
@@ -223,7 +224,7 @@ class ModBlockStateProvider(
 		simpleBlockItem(block, models().cubeAll("apple_slice", mcLoc("block/red_mushroom_block")))
 	}
 
-	private fun coloredScoochstems() {
+	private fun coloredScoochstem() {
 		val topTexture = modLoc("block/scoochstem/top")
 		val blocks = listOf(
 			ModBlocks.GREEN_SCOOCHSTEM.get(),
@@ -292,6 +293,42 @@ class ModBlockStateProvider(
 			.particle(side)
 
 		simpleBlockItem(scoochstemWood, woodItemModel)
+	}
+
+	private fun stemEncasedComparator() {
+		val stemEncasedComparator = ModBlocks.STEM_ENCASED_COMPARATOR.get()
+		val comparatorSide = modLoc("block/stem_encased_comparator/side")
+		val comparatorSideDisabled = modLoc("block/stem_encased_comparator/side_disabled")
+		val comparatorTop = modLoc("block/stem_encased_comparator/top")
+		val comparatorTopDisabled = modLoc("block/stem_encased_comparator/top_disabled")
+
+		scoochstemBlock(
+			block = stemEncasedComparator,
+			sideModels = scoochstemFaceModels("stem_encased_comparator_side", comparatorSide),
+			disabledSideModels = scoochstemFaceModels(
+				"stem_encased_comparator_side_disabled",
+				comparatorSideDisabled
+			),
+			endModels = scoochstemFaceModels("stem_encased_comparator_top", comparatorTop),
+			disabledEndModels = scoochstemFaceModels(
+				"stem_encased_comparator_top_disabled",
+				comparatorTopDisabled
+			)
+		)
+
+		val comparatorItemModel = models()
+			.cube(
+				"stem_encased_comparator",
+				comparatorTop,
+				comparatorTop,
+				comparatorSide,
+				comparatorSide,
+				comparatorSide,
+				comparatorSide
+			)
+			.particle(comparatorSide)
+
+		simpleBlockItem(stemEncasedComparator, comparatorItemModel)
 	}
 
 	private fun scoochstemBlock(

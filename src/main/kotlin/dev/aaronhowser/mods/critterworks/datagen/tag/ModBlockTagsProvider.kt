@@ -31,6 +31,7 @@ class ModBlockTagsProvider(
 		tag(SUPPORTS_SCOOCHWORM_TRAVEL)
 			.add(
 				ModBlocks.SCOOCHSTEM,
+				ModBlocks.STEM_ENCASED_COMPARATOR,
 				ModBlocks.SCOOCHSTEM_WOOD,
 				ModBlocks.GREEN_SCOOCHSTEM,
 				ModBlocks.BLUE_SCOOCHSTEM,
@@ -52,6 +53,7 @@ class ModBlockTagsProvider(
 		tag(BlockTags.MINEABLE_WITH_AXE)
 			.add(
 				ModBlocks.SCOOCHSTEM,
+				ModBlocks.STEM_ENCASED_COMPARATOR,
 				ModBlocks.SCOOCHSTEM_WOOD,
 				ModBlocks.GREEN_SCOOCHSTEM,
 				ModBlocks.BLUE_SCOOCHSTEM,
