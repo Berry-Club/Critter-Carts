@@ -1,4 +1,4 @@
-// 1.21.1	2026-09-04T12:07:17.4878275	Recipes
+// 1.21.1	2026-09-05T13:47:36.1741942	Recipes
 9f3c0fefc687fcb9593729bd3905bd9cae8298a0 data/critterworks/advancement/recipes/misc/apples_from_apple_slice.json
 f02a9a737972ffa462613e4f3b9996d01cd9623c data/critterworks/advancement/recipes/misc/blue_dye_from_dyeberry.json
 70bd0829ca09bc34bcf7d24267d12415bde70343 data/critterworks/advancement/recipes/misc/blue_scoochstem.json
@@ -12,6 +12,7 @@ a0b6ecaf5b34a1a71535675735974a9e6b58b21b data/critterworks/advancement/recipes/m
 fede1fb7298a7b1783361b1a096eb9de3c62a756 data/critterworks/advancement/recipes/misc/red_scoochstem.json
 6dad4639c2cec2870ed2164edd03b2a0f61720c6 data/critterworks/advancement/recipes/misc/rotten_flesh_from_aaronberry.json
 18b5a2780c5cffe64718eb956082826614ed4de4 data/critterworks/advancement/recipes/misc/scoochstem_wood.json
+8771696e008bcc0bb17da7dbc0589235f2784733 data/critterworks/advancement/recipes/misc/stem_encased_comparator.json
 5528ba0d9c979051dca8322b53c42756368ecf96 data/critterworks/advancement/recipes/misc/yellow_dye_from_dyeberry.json
 de19ebe3cb4c0c071fcb53a70bf3a00638a447f1 data/critterworks/advancement/recipes/misc/yellow_scoochstem.json
 76cac4109e393270100e339133803f7bd91be42b data/critterworks/recipe/apples_from_apple_slice.json
@@ -27,5 +28,6 @@ bce90c43819cd4ffc7bfeae1a0fa58d084ef71ad data/critterworks/recipe/green_scoochst
 11b9e1789319863161c09940a089b3f0e7c8b66a data/critterworks/recipe/red_scoochstem.json
 d288bc9e9e62db4edd9619e825dd248a5f4cd48b data/critterworks/recipe/rotten_flesh_from_aaronberry.json
 146714183dcbf757e1091d270f5efce1913b6721 data/critterworks/recipe/scoochstem_wood.json
+2f2f64ee9cf8c914167afdba196d37e9f35a47b3 data/critterworks/recipe/stem_encased_comparator.json
 53dc8d229b688f3769145a153c2692bd5cd5f62f data/critterworks/recipe/yellow_dye_from_dyeberry.json
 d2b282c04a3ffd7b86e36f6d54290f290d7f5a9e data/critterworks/recipe/yellow_scoochstem.json
